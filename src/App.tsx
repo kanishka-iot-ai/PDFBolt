@@ -74,8 +74,6 @@ const App: React.FC = () => {
       if (outcome === 'accepted') {
         setDeferredPrompt(null);
       }
-    } else {
-      alert("To install, use your browser's 'Add to Home Screen' or 'Install App' feature in the menu.");
     }
   };
 
