@@ -13,8 +13,8 @@ const Home: React.FC<{ darkMode: boolean; onInstall?: () => void }> = ({ darkMod
   ];
 
   return (
-    <div className="animate-fadeIn">
-      <section className="relative py-28 overflow-hidden text-center">
+    <div>
+      <section className="relative py-12 overflow-hidden text-center">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full pointer-events-none opacity-20">
           <div className="absolute top-10 left-10 w-[500px] h-[500px] bg-red-600 rounded-full blur-[200px]"></div>
           <div className="absolute bottom-10 right-10 w-[500px] h-[500px] bg-blue-600 rounded-full blur-[200px]"></div>
@@ -38,9 +38,11 @@ const Home: React.FC<{ darkMode: boolean; onInstall?: () => void }> = ({ darkMod
         </div>
       </section>
 
-      <section className="max-w-7xl mx-auto px-6 py-24 space-y-32">
+      <section className="max-w-7xl mx-auto px-6 py-24 space-y-16">
+        {(console.log('Rendering cats:', cats.length), null)}
+        {(console.log('Tools count:', TOOLS.length), null)}
         {cats.map((cat, i) => (
-          <div key={cat.id} className="animate-fadeInUp" style={{ animationDelay: `${i * 0.1}s` }}>
+          <div key={cat.id}>
             <div className="flex items-center gap-4 mb-12 border-b border-slate-100 dark:border-slate-800 pb-6">
               <div className="p-3 bg-slate-100 dark:bg-slate-800 rounded-2xl">{cat.icon}</div>
               <h2 className={`text-4xl font-black ${darkMode ? 'text-white' : 'text-slate-900'}`}>{cat.title}</h2>
