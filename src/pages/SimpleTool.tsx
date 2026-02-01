@@ -16,7 +16,7 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
   const [multiFiles, setMultiFiles] = useState<File[]>([]);
   const [signatureFile, setSignatureFile] = useState<File | null>(null);
   const [processing, setProcessing] = useState(false);
-  const [result, setResult] = useState<string | null>(null);
+  const [result, setResult] = useState<string | { name: string, url: string }[] | null>(null);
   const [showPreview, setShowPreview] = useState(false);
   const [compressionLevel, setCompressionLevel] = useState('recommended');
   const [pageInput, setPageInput] = useState('');
@@ -28,14 +28,16 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
   const [progress, setProgress] = useState(0);
   const [processingStatus, setProcessingStatus] = useState<'processing' | 'complete' | 'error'>('processing');
 
-  // Cleanup blob URLs only on component unmount
+  // Cleanup blob URLs
   useEffect(() => {
     return () => {
-      if (result) {
+      if (typeof result === 'string') {
         URL.revokeObjectURL(result);
+      } else if (Array.isArray(result)) {
+        result.forEach(f => URL.revokeObjectURL(f.url));
       }
     };
-  }, []); // Empty dependency array - only cleanup on unmount
+  }, []);
 
   const isImageTool = mode === 'jpg2pdf';
   const needsPassword = ['protect', 'unlock'].includes(mode);
@@ -108,7 +110,7 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
     setProgress(10);
     setProcessingStatus('processing');
     try {
-      let b: Uint8Array | Blob | string;
+      let b: Uint8Array | Blob | string | { name: string, blob: Blob }[];
       setProgress(30);
 
       // -- EDIT TOOLS --
@@ -133,21 +135,19 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
       else if (mode === 'excel2pdf' && file) b = await excelToPdf(file);
       else if (mode === 'html2pdf' && file) b = await htmlToPdf(file);
       else if (mode === 'pdf2jpg' && file) {
+        // Now returns array
         b = await pdfToJpg(file);
-        setIsZip(true);
       }
       else if ((mode === 'pdf2word' || mode === 'pdf2doc') && file) {
         b = await pdfToWord(file);
         setIsDoc(true);
       }
       // -- NEW ADVANCED TOOLS --
-      else if ((mode === 'pdf2ppt' || mode === 'ppt2pdf') && file) { // Note: using same for now, name in constants is valid
-        // If it's pdf2ppt (Export)
+      else if ((mode === 'pdf2ppt' || mode === 'ppt2pdf') && file) {
         if (mode.includes('pdf2ppt')) {
           b = await pdfToPpt(file);
           setIsPpt(true);
         } else {
-          // Mock for PPT -> PDF (Input) - Hard client side. For now fallback to simple
           throw new Error("PPT to PDF requires server conversion. Please use Word to PDF instead.");
         }
       }
@@ -181,21 +181,27 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
       }
 
       setProgress(80);
-      let type = 'application/pdf';
-      if (isZip) type = 'application/zip';
-      if (isDoc) type = 'application/msword';
-      if (isPpt) type = 'application/vnd.openxmlformats-officedocument.presentationml.presentation';
-      if (isText) type = 'text/plain';
 
-      setProgress(95);
-      const blob = b instanceof Blob ? b : new Blob([b instanceof Uint8Array ? b : b] as BlobPart[], { type });
+      if (Array.isArray(b)) {
+        const results = b.map(item => ({
+          name: item.name,
+          url: URL.createObjectURL(item.blob)
+        }));
+        setResult(results);
+      } else {
+        let type = 'application/pdf';
+        if (isZip) type = 'application/zip';
+        if (isDoc) type = 'application/msword';
+        if (isPpt) type = 'application/vnd.openxmlformats-officedocument.presentationml.presentation';
+        if (isText) type = 'text/plain';
 
-      // Revoke old URL before creating new one to prevent memory leaks
-      if (result) {
-        URL.revokeObjectURL(result);
+        setProgress(95);
+        const blob = b instanceof Blob ? b : new Blob([b instanceof Uint8Array ? b : b] as BlobPart[], { type });
+
+        if (typeof result === 'string') URL.revokeObjectURL(result);
+        setResult(URL.createObjectURL(blob));
       }
 
-      setResult(URL.createObjectURL(blob));
       setProgress(100);
       setProcessingStatus('complete');
       notify.complete();
@@ -375,21 +381,38 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
                   <span className="text-2xl">Processing Complete</span>
                 </div>
 
-                <div className="flex gap-4 w-full">
-                  {!isZip && !isDoc && !isPpt && !isText && (
-                    <button onClick={() => setShowPreview(true)} className="flex-1 py-5 rounded-2xl font-black border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-100 transition-all flex items-center justify-center gap-2">
-                      <Eye size={20} /> Preview
-                    </button>
-                  )}
-                  <a
-                    href={result}
-                    download={`pdfbolt_${mode}_output.${isZip ? 'zip' : isDoc ? 'doc' : isPpt ? 'pptx' : isText ? 'txt' : 'pdf'}`}
-                    onClick={() => notify.success()}
-                    className="flex-1 flex items-center justify-center gap-4 py-5 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-2xl font-black text-xl shadow-2xl hover:from-yellow-600 hover:to-orange-600 hover:scale-105 transition-all"
-                  >
-                    <Download size={24} /> Download {isZip ? 'ZIP' : isDoc ? 'DOC' : isPpt ? 'PPT' : isText ? 'TXT' : 'PDF'}
-                  </a>
-                </div>
+                {Array.isArray(result) ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full">
+                    {result.map((item, idx) => (
+                      <a
+                        key={idx}
+                        href={item.url}
+                        download={item.name}
+                        className="flex items-center justify-between p-4 bg-white dark:bg-slate-800 border rounded-xl hover:shadow-lg transition-all"
+                      >
+                        <span className="truncate font-bold max-w-[200px]">{item.name}</span>
+                        <Download size={20} className="text-yellow-600" />
+                      </a>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="flex gap-4 w-full">
+                    {/* Standard single file download */}
+                    {!isZip && !isDoc && !isPpt && !isText && (
+                      <button onClick={() => setShowPreview(true)} className="flex-1 py-5 rounded-2xl font-black border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-100 transition-all flex items-center justify-center gap-2">
+                        <Eye size={20} /> Preview
+                      </button>
+                    )}
+                    <a
+                      href={result}
+                      download={`pdfbolt_${mode}_output.${isZip ? 'zip' : isDoc ? 'doc' : isPpt ? 'pptx' : isText ? 'txt' : 'pdf'}`}
+                      onClick={() => notify.success()}
+                      className="flex-1 flex items-center justify-center gap-4 py-5 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-2xl font-black text-xl shadow-2xl hover:from-yellow-600 hover:to-orange-600 hover:scale-105 transition-all"
+                    >
+                      <Download size={24} /> Download {isZip ? 'ZIP' : isDoc ? 'DOC' : isPpt ? 'PPT' : isText ? 'TXT' : 'PDF'}
+                    </a>
+                  </div>
+                )}
               </div>
             ) : (
               <button
@@ -404,7 +427,7 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
         </div>
       )}
 
-      {showPreview && result && !isZip && !isDoc && !isPpt && !isText && (
+      {showPreview && result && !Array.isArray(result) && !isZip && !isDoc && !isPpt && !isText && (
         <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-slate-900/95 backdrop-blur-xl animate-fadeIn">
           <div className="relative w-full max-w-6xl h-[92vh] bg-white dark:bg-slate-800 rounded-[3rem] overflow-hidden shadow-2xl flex flex-col">
             <div className="p-6 flex justify-between items-center border-b dark:border-slate-700">

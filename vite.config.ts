@@ -32,14 +32,23 @@ export default defineConfig(({ mode }) => {
         output: {
           manualChunks: {
             'react-vendor': ['react', 'react-dom', 'react-router-dom'],
-            'pdf-vendor': ['pdf-lib', 'pdfjs-dist'],
-            'aws-vendor': ['@aws-sdk/client-s3'],
-            'conversion-vendor': ['mammoth', 'exceljs', 'tesseract.js', 'pptxgenjs'],
+            'pdf-lib': ['pdf-lib'],
+            'pdfjs-dist': ['pdfjs-dist'],
+            'aws-sdk': ['@aws-sdk/client-s3'],
+            'exceljs': ['exceljs'],
+            'tesseract': ['tesseract.js'],
+            'mammoth': ['mammoth'],
+            'pptxgenjs': ['pptxgenjs'],
           },
         },
       },
       chunkSizeWarningLimit: 1000,
       sourcemap: false,
+    },
+    test: {
+      globals: true,
+      environment: 'jsdom',
+      setupFiles: './src/test/setup.ts',
     },
   };
 });

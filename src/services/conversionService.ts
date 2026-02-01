@@ -86,10 +86,10 @@ export async function excelToPdf(file: File): Promise<Uint8Array> {
  * Converts PDF to JPG images.
  * Returns a ZIP file containing the images.
  */
-export async function pdfToJpg(file: File): Promise<Blob> {
+export async function pdfToJpg(file: File): Promise<{ name: string, blob: Blob }[]> {
   const arrayBuffer = await file.arrayBuffer();
   const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-  const zip = new JSZip();
+  const images: { name: string, blob: Blob }[] = [];
 
   for (let i = 1; i <= pdf.numPages; i++) {
     const page = await pdf.getPage(i);
@@ -108,12 +108,12 @@ export async function pdfToJpg(file: File): Promise<Blob> {
       // Convert to blob
       const blob = await new Promise<Blob | null>(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.9));
       if (blob) {
-        zip.file(`page_${i}.jpg`, blob);
+        images.push({ name: `page_${i}.jpg`, blob });
       }
     }
   }
 
-  return await zip.generateAsync({ type: 'blob' });
+  return images;
 }
 
 /**
