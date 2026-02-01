@@ -1,4 +1,4 @@
-# 🔥 PDF Master Pro - Ultimate PDF Toolkit
+# 🔥 PDF Bolt Pro - Ultimate PDF Toolkit
 
 > **Privacy-First | Client-Side Processing | 25+ Tools | SEO Optimized**
 
