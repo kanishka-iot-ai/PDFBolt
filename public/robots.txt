@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://pdfmaster.io/sitemap.xml

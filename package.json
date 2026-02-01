@@ -1,0 +1,47 @@
+{
+  "name": "pdfmaster---pro-pdf-toolkit",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "build:docker": "docker build -t pdfmaster-pro .",
+    "docker:run": "docker run -d -p 80:80 --name pdfmaster pdfmaster-pro",
+    "docker:stop": "docker stop pdfmaster && docker rm pdfmaster",
+    "deploy:docker": "npm run build:docker && npm run docker:run",
+    "clean": "rm -rf dist node_modules"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.500.0",
+    "@google/genai": "^1.38.0",
+    "exceljs": "^4.4.0",
+    "file-saver": "^2.0.5",
+    "jszip": "^3.10.1",
+    "lucide-react": "0.474.0",
+    "mammoth": "^1.6.0",
+    "pdf-lib": "1.17.1",
+    "pdfjs-dist": "^4.0.379",
+    "pptxgenjs": "^3.12.0",
+    "qrcode": "1.5.4",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-helmet-async": "^2.0.4",
+    "react-router-dom": "^7.13.0",
+    "tesseract.js": "^5.0.0"
+  },
+  "devDependencies": {
+    "@types/file-saver": "^2.0.7",
+    "@types/node": "^20.11.0",
+    "@types/react": "^18.3.1",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^5.0.0",
+    "autoprefixer": "^10.4.17",
+    "postcss": "^8.4.35",
+    "tailwindcss": "^3.4.1",
+    "terser": "^5.46.0",
+    "typescript": "~5.8.2",
+    "vite": "^6.2.0"
+  }
+}

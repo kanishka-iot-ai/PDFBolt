@@ -1,0 +1,16 @@
+{
+    "short_name": "PDFBolt",
+    "name": "PDFBolt - Pro PDF Toolkit",
+    "icons": [
+        {
+            "src": "/logo.jpg",
+            "type": "image/jpeg",
+            "sizes": "1024x1024"
+        }
+    ],
+    "start_url": ".",
+    "display": "standalone",
+    "theme_color": "#eab308",
+    "background_color": "#ffffff",
+    "description": "The ultimate browser-based PDF toolkit. Merge, split, compress, protect, and convert PDFs without uploading to a server."
+}

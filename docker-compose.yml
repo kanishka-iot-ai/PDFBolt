@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  pdfmaster:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: pdfmaster-pro
+    ports:
+      - "80:80"
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+    labels:
+      - "com.pdfmaster.description=PDF Master Pro - Privacy-First PDF Toolkit"
+      - "com.pdfmaster.version=1.0.0"
