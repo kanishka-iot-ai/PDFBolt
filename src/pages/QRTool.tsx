@@ -67,8 +67,8 @@ const QRTool: React.FC<QRToolProps> = ({ darkMode, notify }) => {
         margin: 2,
         errorCorrectionLevel: 'H',
         color: {
-          dark: darkMode ? '#ffffff' : '#0f172a',
-          light: darkMode ? '#1e293b' : '#ffffff'
+          dark: '#000000',  // Always Black Dots
+          light: '#ffffff'  // Always White Background
         },
       });
       setQrUrl(generatedQr);
@@ -87,7 +87,8 @@ const QRTool: React.FC<QRToolProps> = ({ darkMode, notify }) => {
       try {
         const generatedQr = await QRCode.toDataURL(shareUrl, {
           width: 800, margin: 2, errorCorrectionLevel: 'H',
-          color: { dark: darkMode ? '#ffffff' : '#0f172a', light: darkMode ? '#1e293b' : '#ffffff' }
+          width: 800, margin: 2, errorCorrectionLevel: 'H',
+          color: { dark: '#000000', light: '#ffffff' }
         });
         setQrUrl(generatedQr);
         notify.complete();

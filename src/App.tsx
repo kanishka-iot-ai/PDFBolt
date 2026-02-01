@@ -74,6 +74,14 @@ const App: React.FC = () => {
       if (outcome === 'accepted') {
         setDeferredPrompt(null);
       }
+    } else {
+      // Fallback: Download the portable app ZIP if PWA install isn't available
+      const link = document.createElement('a');
+      link.href = '/PDFBolt_Pro_Portfolio.zip';
+      link.download = 'PDFBolt_Pro_Portfolio.zip';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     }
   };
 
