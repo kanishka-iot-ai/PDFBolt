@@ -13,7 +13,7 @@ const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, darkMode }
     const [copied, setCopied] = useState(false);
 
     // Securely loaded from environment variables
-    const UPI_ID = import.meta.env.VITE_UPI_ID || "suraj@ybl";
+    const UPI_ID = "9932343232@ybl";
     const PAY_NAME = "PDFBolt Pro";
     const UPI_URL = `upi://pay?pa=${UPI_ID}&pn=${encodeURIComponent(PAY_NAME)}&cu=INR`;
 
