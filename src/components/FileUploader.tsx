@@ -53,16 +53,31 @@ const FileUploader: React.FC<FileUploaderProps> = ({
     }
   };
 
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const isMounted = useRef(true);
+
+  React.useEffect(() => {
+    isMounted.current = true;
+    return () => {
+      isMounted.current = false;
+      if (timerRef.current) clearTimeout(timerRef.current);
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, []);
+
   const simulateUpload = async (files: File[]) => {
     setUploading(true);
     setProgress(0);
-    const interval = setInterval(() => {
+    intervalRef.current = setInterval(() => {
       setProgress(prev => {
         if (prev >= 100) {
-          clearInterval(interval);
-          setTimeout(async () => {
-            setUploading(false);
-            await onFilesSelected(files);
+          if (intervalRef.current) clearInterval(intervalRef.current);
+          timerRef.current = setTimeout(async () => {
+            if (isMounted.current) {
+              setUploading(false);
+              await onFilesSelected(files);
+            }
           }, 400);
           return 100;
         }
