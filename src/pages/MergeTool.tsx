@@ -14,15 +14,18 @@ const MergeTool: React.FC<{ darkMode: boolean; notify: NotifySystem }> = ({ dark
   const [processingStatus, setProcessingStatus] = useState<'processing' | 'complete' | 'error'>('processing');
 
   // Cleanup blob URLs only on component unmount
+  // Cleanup blob URLs only when result changes or component unmounts
   useEffect(() => {
     return () => {
       if (result) {
         URL.revokeObjectURL(result);
       }
     };
-  }, []); // Empty dependency array - only cleanup on unmount
+  }, [result]);
 
   const handleFiles = async (nf: File[]) => {
+    if (nf.length === 0) return; // Prevent reset on empty updates
+
     // Validate PDF files
     const validation = await validateFiles(nf, {
       allowedTypes: ALLOWED_MIME_TYPES.PDF,

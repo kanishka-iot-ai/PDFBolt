@@ -29,6 +29,7 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
   const [processingStatus, setProcessingStatus] = useState<'processing' | 'complete' | 'error'>('processing');
 
   // Cleanup blob URLs
+  // Cleanup blob URLs
   useEffect(() => {
     return () => {
       if (typeof result === 'string') {
@@ -37,13 +38,15 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
         result.forEach(f => URL.revokeObjectURL(f.url));
       }
     };
-  }, []);
+  }, [result]);
 
   const isImageTool = mode === 'jpg2pdf';
   const needsPassword = ['protect', 'unlock'].includes(mode);
   const isSignTool = mode === 'sign';
 
   const handle = async (f: File[]) => {
+    if (f.length === 0) return; // Prevent reset on empty updates
+
     // Validate files before accepting
     let allowedTypes: string[];
 
