@@ -60,11 +60,11 @@ const QRTool: React.FC<QRToolProps> = ({ darkMode, notify }) => {
         k: key // 'k' = S3 Key
       }));
 
-      const shareUrl = `${window.location.origin}${window.location.pathname}#/qr-success?p=${securityPayload}${requirePin && pin ? `&auth=${btoa(pin)}` : ''}`;
+      const shareUrl = `${window.location.origin}/qr-success?p=${securityPayload}${requirePin && pin ? `&auth=${btoa(pin)}` : ''}`;
 
       const generatedQr = await QRCode.toDataURL(shareUrl, {
         width: 800,
-        margin: 2,
+        margin: 4,
         errorCorrectionLevel: 'H',
         color: {
           dark: '#000000',  // Always Black Dots
@@ -82,11 +82,11 @@ const QRTool: React.FC<QRToolProps> = ({ darkMode, notify }) => {
         k: 'offline-demo-mode',
         o: oneTimeScan
       }));
-      const shareUrl = `${window.location.origin}${window.location.pathname}#/qr-success?p=${offlinePayload}`;
+      const shareUrl = `${window.location.origin}/qr-success?p=${offlinePayload}`;
 
       try {
         const generatedQr = await QRCode.toDataURL(shareUrl, {
-          width: 800, margin: 2, errorCorrectionLevel: 'H',
+          width: 800, margin: 4, errorCorrectionLevel: 'H',
           color: { dark: '#000000', light: '#ffffff' }
         });
         setQrUrl(generatedQr);
