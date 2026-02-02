@@ -1,6 +1,7 @@
 
+
 import React, { useState, useEffect } from 'react';
-import { HashRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
@@ -24,22 +25,54 @@ const SEOManager: React.FC = () => {
     const currentTool = TOOLS.find(t => t.path === location.pathname || t.seoPath === location.pathname);
     const defaultTitle = "PDFBolt - Lightning Fast PDF Tools";
     const defaultDesc = "Lightning-fast browser-based PDF toolkit. Merge, split, compress, protect, and convert PDFs without uploading to a server. 100% private and blazing fast.";
+    const baseUrl = 'https://pdfbolt.in';
+
+    let title = defaultTitle;
+    let description = defaultDesc;
 
     if (currentTool) {
-      document.title = `${currentTool.seoTitle || currentTool.title} | PDFBolt`;
-      const metaDesc = document.getElementById('seo-description');
-      if (metaDesc) {
-        metaDesc.setAttribute('content', currentTool.description);
-      }
+      title = `${currentTool.seoTitle || currentTool.title} | PDFBolt`;
+      description = currentTool.description;
     } else if (location.pathname === '/contact') {
-      document.title = "Contact Customer Care | PDFBolt";
-    } else {
-      document.title = defaultTitle;
-      const metaDesc = document.getElementById('seo-description');
-      if (metaDesc) {
-        metaDesc.setAttribute('content', defaultDesc);
-      }
+      title = "Contact Customer Care | PDFBolt";
     }
+
+    // Update Title
+    document.title = title;
+
+    // Update Meta Description
+    const metaDesc = document.getElementById('seo-description');
+    if (metaDesc) {
+      metaDesc.setAttribute('content', description);
+    }
+
+    // Update Canonical URL
+    const canonicalPath = location.pathname === '/' ? '' : location.pathname;
+    const canonicalUrl = `${baseUrl}${canonicalPath}`;
+    let canonicalLink = document.querySelector('link[rel="canonical"]') as HTMLLinkElement;
+    if (!canonicalLink) {
+      canonicalLink = document.createElement('link');
+      canonicalLink.rel = 'canonical';
+      document.head.appendChild(canonicalLink);
+    }
+    canonicalLink.href = canonicalUrl;
+
+    // Update Open Graph
+    const updateMeta = (property: string, content: string) => {
+      let tag = document.querySelector(`meta[property="${property}"]`);
+      if (!tag) {
+        tag = document.createElement('meta');
+        tag.setAttribute('property', property);
+        document.head.appendChild(tag);
+      }
+      tag.setAttribute('content', content);
+    };
+
+    updateMeta('og:title', title);
+    updateMeta('og:description', description);
+    updateMeta('og:url', canonicalUrl);
+    updateMeta('og:image', `${baseUrl}/logo.jpg`);
+
     window.scrollTo(0, 0);
   }, [location]);
 

@@ -11,15 +11,17 @@
   <link rel="manifest" href="/manifest.json">
   <link rel="apple-touch-icon" href="/logo.jpg">
   <meta name="theme-color" content="#eab308">
+  <link rel="canonical" href="https://pdfbolt.in/" />
 
   <!-- OpenGraph Tags -->
   <meta property="og:title" content="PDFBolt - Lightning Fast PDF Tools">
   <meta property="og:description"
     content="Merge, Split, and Compress PDFs instantly in your browser. No uploads, 100% private, blazing fast.">
-  <meta property="og:image" content="/logo.jpg">
+  <meta property="og:image" content="https://pdfbolt.in/logo.jpg">
+  <meta property="og:url" content="https://pdfbolt.in/">
   <meta property="og:type" content="website">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:image" content="/logo.jpg">
+  <meta name="twitter:image" content="https://pdfbolt.in/logo.jpg">
 
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
     rel="stylesheet">
@@ -101,8 +103,100 @@
 </head>
 
 <body class="transition-colors duration-300">
-  <div id="root"></div>
+  <div id="root">
+    <!-- Static content for search engines and users without JavaScript -->
+    <noscript>
+      <div style="padding: 40px; max-width: 800px; margin: 0 auto; font-family: system-ui, -apple-system, sans-serif;">
+        <h1>PDFBolt - Lightning Fast PDF Tools</h1>
+        <p>Merge, split, compress, protect, and convert PDFs without uploading to a server. 100% private and blazing
+          fast.</p>
+        <p><strong>Please enable JavaScript to use this application.</strong></p>
+        <h2>Available Tools:</h2>
+        <ul>
+          <li>Merge PDF - Combine multiple PDFs into one</li>
+          <li>Split PDF - Extract pages from your PDF</li>
+          <li>Compress PDF - Reduce PDF file size</li>
+          <li>PDF to QR Code - Generate QR codes from PDFs</li>
+          <li>Sign PDF - Add digital signatures</li>
+          <li>Protect PDF - Add password protection</li>
+          <li>Convert PDF - PDF to Word, Excel, JPG and more</li>
+        </ul>
+      </div>
+    </noscript>
+
+    <!-- Loading fallback visible before React hydrates -->
+    <div id="loading-fallback"
+      style="display: flex; align-items: center; justify-content: center; min-height: 100vh; font-family: system-ui, -apple-system, sans-serif;">
+      <div style="text-align: center; padding: 20px;">
+        <h1 style="font-size: 2rem; font-weight: 800; margin-bottom: 1rem;">
+          PDF<span style="color: #eab308;">Bolt</span>
+        </h1>
+        <p style="color: #64748b; margin-bottom: 2rem;">Lightning Fast PDF Tools</p>
+        <div
+          style="width: 40px; height: 40px; border: 3px solid #eab308; border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto;">
+        </div>
+        <p style="color: #94a3b8; font-size: 0.875rem; margin-top: 1rem;">Loading your privacy-first PDF toolkit...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Structured Data for SEO -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "PDFBolt",
+    "description": "Lightning-fast browser-based PDF toolkit. Merge, split, compress, protect, and convert PDFs without uploading to a server. 100% private and blazing fast.",
+    "url": "https://pdfbolt.in",
+    "applicationCategory": "UtilitiesApplication",
+    "operatingSystem": "Any",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "featureList": [
+      "Merge PDF files",
+      "Split PDF pages",
+      "Compress PDF size",
+      "Convert PDF to Word, Excel, JPG",
+      "Add password protection",
+      "Digital signature",
+      "QR code generation",
+      "100% client-side processing"
+    ],
+    "browserRequirements": "Requires JavaScript",
+    "screenshot": "https://pdfbolt.in/logo.jpg"
+  }
+  </script>
+
+  <style>
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    #loading-fallback {
+      transition: opacity 0.3s ease-out;
+    }
+  </style>
+
   <script type="module" src="/src/index.tsx"></script>
+
+  <!-- Hide loading fallback once React loads -->
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      setTimeout(() => {
+        const fallback = document.getElementById('loading-fallback');
+        if (fallback) {
+          fallback.style.opacity = '0';
+          setTimeout(() => fallback.remove(), 300);
+        }
+      }, 100);
+    });
+  </script>
+
 
   <!-- Service Worker Registration -->
   <script>
