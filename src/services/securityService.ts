@@ -1,5 +1,4 @@
-
-import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
+import { PDFDocument, StandardFonts, rgb } from 'pdf-lib-plus-encrypt';
 
 /**
  * Encrypts a PDF file with a password.
@@ -8,29 +7,33 @@ import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
  * @returns Encrypted PDF as Uint8Array.
  */
 export async function protectPdf(file: File, password: string): Promise<Uint8Array> {
-    const bytes = await file.arrayBuffer();
-    // Load the PDF. Note: helper to load without password if it's already encrypted? 
-    // We assume the input file is NOT encrypted for "Protect" action.
-    const pdfDoc = await PDFDocument.load(bytes);
+    try {
+        const bytes = await file.arrayBuffer();
 
-    // Encrypt
-    // Encrypt
-    // Note: protectPdf requires the encrypt method to be available on PDFDocument
-    await pdfDoc.encrypt({
-        userPassword: password,
-        ownerPassword: password,
-        permissions: {
-            printing: 'highResolution',
-            modifying: false,
-            copying: false,
-            annotating: false,
-            fillingForms: false,
-            contentAccessibility: false,
-            documentAssembly: false,
-        },
-    });
+        // Load PDF using the extended library
+        const pdfDoc = await PDFDocument.load(bytes);
 
-    return await pdfDoc.save();
+        // Encrypt
+        await pdfDoc.encrypt({
+            userPassword: password,
+            ownerPassword: password,
+            permissions: {
+                printing: 'highResolution',
+                modifying: false,
+                copying: false,
+                annotating: false,
+                fillingForms: false,
+                contentAccessibility: false,
+                documentAssembly: false,
+            },
+        });
+
+        // Save encrypted PDF
+        return await pdfDoc.save();
+    } catch (err) {
+        console.error("Encryption Error:", err);
+        throw err;
+    }
 }
 
 /**
@@ -42,8 +45,8 @@ export async function protectPdf(file: File, password: string): Promise<Uint8Arr
 export async function unlockPdf(file: File, password: string): Promise<Uint8Array> {
     const bytes = await file.arrayBuffer();
     try {
-        // Load with password
-        const pdfDoc = await PDFDocument.load(bytes, { password });
+        // Load with password - bypass TS check for library extension
+        const pdfDoc = await PDFDocument.load(bytes, { password } as any);
 
         // To "remove" encryption in pdf-lib, we just save it. 
         // pdf-lib does not persist encryption on save unless .encrypt() is called again.

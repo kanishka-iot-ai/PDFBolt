@@ -24,6 +24,7 @@
     "lucide-react": "0.474.0",
     "mammoth": "^1.6.0",
     "pdf-lib": "1.17.1",
+    "pdf-lib-plus-encrypt": "^1.1.0",
     "pdfjs-dist": "^4.0.379",
     "pptxgenjs": "^3.12.0",
     "qrcode": "1.5.4",
@@ -31,6 +32,7 @@
     "react-dom": "^18.3.1",
     "react-helmet-async": "^2.0.4",
     "react-router-dom": "^7.13.0",
+    "save": "^2.9.0",
     "tailwindcss-animate": "^1.0.7",
     "tesseract.js": "^5.0.0"
   },
