@@ -153,7 +153,7 @@ const MergeTool: React.FC<{ darkMode: boolean; notify: NotifySystem }> = ({ dark
               )}
 
               {result ? (
-                <div key={resultKey} className="flex flex-col items-center gap-8 w-full max-w-xl animate-fadeInUp">
+                <div key={resultKey} className="flex flex-col items-center gap-8 w-full max-w-xl">
                   <div className="flex items-center gap-4 text-green-500 font-black bg-green-50 dark:bg-green-900/20 px-10 py-5 rounded-[2rem] border border-green-100 dark:border-green-800">
                     <CheckCircle2 size={32} />
                     <span className="text-2xl">Merge Ready</span>
