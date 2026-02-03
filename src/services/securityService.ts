@@ -14,9 +14,11 @@ export async function protectPdf(file: File, password: string): Promise<Uint8Arr
     const pdfDoc = await PDFDocument.load(bytes);
 
     // Encrypt
-    pdfDoc.encrypt({
+    // Encrypt
+    // Note: protectPdf requires the encrypt method to be available on PDFDocument
+    await pdfDoc.encrypt({
         userPassword: password,
-        ownerPassword: password, // Same for simplicity
+        ownerPassword: password,
         permissions: {
             printing: 'highResolution',
             modifying: false,

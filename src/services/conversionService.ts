@@ -6,7 +6,8 @@ import * as pdfjsLib from 'pdfjs-dist';
 import JSZip from 'jszip';
 
 // Configure PDF.js worker (Critical for Vite functionality)
-pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
+pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
 /**
  * Converts a Word (.docx) file to PDF.

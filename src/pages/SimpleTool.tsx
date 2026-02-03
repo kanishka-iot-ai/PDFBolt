@@ -12,6 +12,7 @@ import ProgressBar from '../components/ProgressBar';
 import { validateFiles, ALLOWED_MIME_TYPES, MAX_FILE_SIZE } from '../utils/fileValidation';
 
 const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; notify: NotifySystem }> = ({ title, mode, darkMode, notify }) => {
+  useEffect(() => { console.log("SimpleTool Loaded - Signature Update v5"); }, []);
   const [file, setFile] = useState<File | null>(null);
   const [multiFiles, setMultiFiles] = useState<File[]>([]);
   const [signatureFile, setSignatureFile] = useState<File | null>(null);
@@ -31,7 +32,7 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
 
   // New States
   const [watermarkText, setWatermarkText] = useState('CONFIDENTIAL');
-  const [signatureMode, setSignatureMode] = useState<'upload' | 'draw'>('upload');
+  // const [signatureMode, setSignatureMode] = useState<'upload' | 'draw'>('upload'); // Removed as per request
   const [signaturePosition, setSignaturePosition] = useState<'bottom-right' | 'bottom-left'>('bottom-right');
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
@@ -238,19 +239,18 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
         b = await unlockPdf(file, password);
       }
       else if (mode === 'sign' && file) {
-        let sigBlob: File | Blob | null = signatureFile;
+        let sigBlob: File | Blob | null = null;
 
-        if (signatureMode === 'draw') {
-          const canvas = canvasRef.current;
-          if (!canvas) throw new Error("Signature canvas not found.");
-          // Check if empty? Basic check
-          const blank = document.createElement('canvas');
-          blank.width = canvas.width;
-          blank.height = canvas.height;
-          if (canvas.toDataURL() === blank.toDataURL()) throw new Error("Please draw a signature.");
+        // Always usage draw mode
+        const canvas = canvasRef.current;
+        if (!canvas) throw new Error("Signature canvas not found.");
 
-          sigBlob = await new Promise<Blob | null>(resolve => canvas.toBlob(resolve, 'image/png'));
-        }
+        const blank = document.createElement('canvas');
+        blank.width = canvas.width;
+        blank.height = canvas.height;
+        if (canvas.toDataURL() === blank.toDataURL()) throw new Error("Please draw a signature.");
+
+        sigBlob = await new Promise<Blob | null>(resolve => canvas.toBlob(resolve, 'image/png'));
 
         if (!sigBlob) throw new Error("Please provide a signature.");
         b = await signPdf(file, sigBlob, signaturePosition);
@@ -358,64 +358,28 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
 
               {isSignTool && (
                 <div className="space-y-6">
-                  <div className="flex gap-4 mb-4">
-                    <button
-                      onClick={() => setSignatureMode('upload')}
-                      className={`flex-1 py-3 rounded-xl font-bold transition-all ${signatureMode === 'upload' ? 'bg-indigo-600 text-white shadow-lg' : 'bg-slate-100 dark:bg-slate-700'}`}
-                    >Upload Image</button>
-                    <button
-                      onClick={() => setSignatureMode('draw')}
-                      className={`flex-1 py-3 rounded-xl font-bold transition-all ${signatureMode === 'draw' ? 'bg-indigo-600 text-white shadow-lg' : 'bg-slate-100 dark:bg-slate-700'}`}
-                    >Draw Signature</button>
-                  </div>
-
-                  {signatureMode === 'upload' ? (
-                    <>
-                      <p className="text-sm font-bold text-slate-500">Upload Signature (PNG/JPG)</p>
-                      {signatureFile ? (
-                        <div className="flex items-center gap-4 p-4 bg-slate-100 dark:bg-slate-700 rounded-2xl">
-                          <ImageIcon size={20} />
-                          <span className="font-bold">{signatureFile.name}</span>
-                          <button onClick={() => setSignatureFile(null)} className="ml-auto text-yellow-600"><X size={20} /></button>
-                        </div>
-                      ) : (
-                        <div className="h-32 border-2 border-dashed rounded-2xl flex items-center justify-center bg-slate-50 dark:bg-slate-900/50">
-                          <label className="cursor-pointer flex flex-col items-center gap-2">
-                            <FileUploader
-                              accept="image/*"
-                              multiple={false}
-                              onFilesSelected={handleSignature}
-                              darkMode={darkMode}
-                              mini
-                            />
-                          </label>
-                        </div>
-                      )}
-                    </>
-                  ) : (
-                    <div className="space-y-2">
-                      <p className="text-sm font-bold text-slate-500">Draw Signature</p>
-                      <div className="border-2 border-slate-300 dark:border-slate-600 rounded-2xl overflow-hidden bg-white touch-none">
-                        <canvas
-                          ref={canvasRef}
-                          width={500}
-                          height={200}
-                          style={{ touchAction: 'none' }}
-                          className="w-full h-48 cursor-crosshair touch-none"
-                          onMouseDown={startDrawing}
-                          onMouseMove={draw}
-                          onMouseUp={endDrawing}
-                          onMouseLeave={endDrawing}
-                          onTouchStart={startDrawing}
-                          onTouchMove={draw}
-                          onTouchEnd={endDrawing}
-                        />
-                      </div>
-                      <div className="flex justify-end">
-                        <button onClick={clearCanvas} className="text-xs font-bold text-red-500 uppercase hover:text-red-600">Clear Signature</button>
-                      </div>
+                  <div className="space-y-2">
+                    <p className="text-sm font-bold text-slate-500">Draw Signature</p>
+                    <div className="border-2 border-slate-300 dark:border-slate-600 rounded-2xl overflow-hidden bg-white touch-none">
+                      <canvas
+                        ref={canvasRef}
+                        width={500}
+                        height={200}
+                        style={{ touchAction: 'none' }}
+                        className="w-full h-48 cursor-crosshair touch-none"
+                        onMouseDown={startDrawing}
+                        onMouseMove={draw}
+                        onMouseUp={endDrawing}
+                        onMouseLeave={endDrawing}
+                        onTouchStart={startDrawing}
+                        onTouchMove={draw}
+                        onTouchEnd={endDrawing}
+                      />
                     </div>
-                  )}
+                    <div className="flex justify-end">
+                      <button onClick={clearCanvas} className="text-xs font-bold text-red-500 uppercase hover:text-red-600">Clear Signature</button>
+                    </div>
+                  </div>
 
                   <div className="space-y-2">
                     <p className="text-xs font-black uppercase tracking-widest text-slate-500">Position</p>
@@ -570,7 +534,7 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
               </div>
             ) : (
               <button
-                disabled={processing || (needsPageInput && !pageInput) || (needsPassword && !password) || (isImageTool && multiFiles.length === 0) || (isSignTool && signatureMode === 'upload' && !signatureFile)}
+                disabled={processing || (needsPageInput && !pageInput) || (needsPassword && !password) || (isImageTool && multiFiles.length === 0)}
                 onClick={process}
                 className="w-full max-w-xl px-10 py-8 bg-red-600 text-white rounded-[2.5rem] font-black text-3xl shadow-2xl hover:bg-red-700 hover:scale-105 disabled:opacity-30 transition-all flex items-center justify-center gap-4 group"
               >

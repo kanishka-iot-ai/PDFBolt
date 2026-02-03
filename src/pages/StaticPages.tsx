@@ -22,7 +22,7 @@ export const ContactPage: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
     setLoading(true);
 
     // TODO: Replace with your actual keys from emailjs.com
-    const SERVICE_ID = 'service_ymueijf';
+    const SERVICE_ID = 'service_lrshcpf';
     const TEMPLATE_ID = 'template_ykqay24';
     const PUBLIC_KEY = 'JE-e7n6wYODP3qdSW';
 
