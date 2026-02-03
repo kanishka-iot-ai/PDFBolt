@@ -83,7 +83,7 @@ export async function signPdf(
         : await pdfDoc.embedJpg(sigBytes);
 
     const pages = pdfDoc.getPages();
-    const { width, height } = signatureImage.scale(0.25); // Scale down signature
+    const { width, height } = signatureImage.scale(0.15); // Scale down signature (0.15 is smaller than 0.25)
 
     for (const page of pages) {
         const { width: pageWidth, height: pageHeight } = page.getSize();

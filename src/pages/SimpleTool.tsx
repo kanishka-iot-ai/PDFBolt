@@ -37,6 +37,14 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
   const [isDrawing, setIsDrawing] = useState(false);
 
   // Canvas Logic
+  // Canvas Logic
+  const getCoordinates = (e: React.MouseEvent | React.TouchEvent, canvas: HTMLCanvasElement) => {
+    const rect = canvas.getBoundingClientRect();
+    const x = ('touches' in e ? e.touches[0].clientX : e.clientX) - rect.left;
+    const y = ('touches' in e ? e.touches[0].clientY : e.clientY) - rect.top;
+    return { x, y };
+  };
+
   const startDrawing = (e: React.MouseEvent | React.TouchEvent) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -44,14 +52,13 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
     if (!ctx) return;
 
     setIsDrawing(true);
-    const rect = canvas.getBoundingClientRect();
-    const x = ('touches' in e ? e.touches[0].clientX : e.clientX) - rect.left;
-    const y = ('touches' in e ? e.touches[0].clientY : e.clientY) - rect.top;
+    const { x, y } = getCoordinates(e, canvas);
 
     ctx.beginPath();
     ctx.moveTo(x, y);
     ctx.lineWidth = 3;
     ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
     ctx.strokeStyle = '#000';
   };
 
@@ -62,16 +69,12 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Prevent scrolling on touch
-    if ('touches' in e) {
-      // e.preventDefault(); 
-      // Note: passive listener issue might occur if preventing default here directly. 
-      // React handles events, usually okay.
+    // Prevent scrolling on touch devices strictly while drawing
+    if (e.cancelable && 'touches' in e) {
+      e.preventDefault();
     }
 
-    const rect = canvas.getBoundingClientRect();
-    const x = ('touches' in e ? e.touches[0].clientX : e.clientX) - rect.left;
-    const y = ('touches' in e ? e.touches[0].clientY : e.clientY) - rect.top;
+    const { x, y } = getCoordinates(e, canvas);
 
     ctx.lineTo(x, y);
     ctx.stroke();
@@ -391,13 +394,14 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
                     </>
                   ) : (
                     <div className="space-y-2">
-                      <p className="text-sm font-bold text-slate-500">Draw below</p>
+                      <p className="text-sm font-bold text-slate-500">Draw Signature</p>
                       <div className="border-2 border-slate-300 dark:border-slate-600 rounded-2xl overflow-hidden bg-white touch-none">
                         <canvas
                           ref={canvasRef}
                           width={500}
                           height={200}
-                          className="w-full h-48 cursor-crosshair"
+                          style={{ touchAction: 'none' }}
+                          className="w-full h-48 cursor-crosshair touch-none"
                           onMouseDown={startDrawing}
                           onMouseMove={draw}
                           onMouseUp={endDrawing}
@@ -407,7 +411,9 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
                           onTouchEnd={endDrawing}
                         />
                       </div>
-                      <button onClick={clearCanvas} className="text-xs font-bold text-red-500 uppercase">Clear Signature</button>
+                      <div className="flex justify-end">
+                        <button onClick={clearCanvas} className="text-xs font-bold text-red-500 uppercase hover:text-red-600">Clear Signature</button>
+                      </div>
                     </div>
                   )}
 

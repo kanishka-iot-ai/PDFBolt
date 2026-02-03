@@ -22,15 +22,11 @@ export const ContactPage: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
     setLoading(true);
 
     // TODO: Replace with your actual keys from emailjs.com
-    const SERVICE_ID = 'YOUR_SERVICE_ID';
-    const TEMPLATE_ID = 'YOUR_TEMPLATE_ID';
-    const PUBLIC_KEY = 'YOUR_PUBLIC_KEY';
+    const SERVICE_ID = 'service_ymueijf';
+    const TEMPLATE_ID = 'template_ykqay24';
+    const PUBLIC_KEY = 'JE-e7n6wYODP3qdSW';
 
-    if (SERVICE_ID === 'YOUR_SERVICE_ID') {
-      alert("EmailJS is not configured. Please add your SERVICE_ID, TEMPLATE_ID, and PUBLIC_KEY in src/pages/StaticPages.tsx");
-      setLoading(false);
-      return;
-    }
+    // Configuration check removed as keys are set
 
     if (form.current) {
       emailjs.sendForm(SERVICE_ID, TEMPLATE_ID, form.current, PUBLIC_KEY)
