@@ -273,15 +273,17 @@ const QRTool: React.FC<QRToolProps> = ({ darkMode, notify }) => {
           {/* QR Display Panel */}
           <div className="space-y-6">
             <div className={`p-10 rounded-[3rem] border shadow-2xl text-center relative overflow-hidden transition-all ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'}`}>
-              {!qrUrl ? (
+              {!qrUrl && (
                 <div className="py-20 flex flex-col items-center justify-center space-y-4">
                   <div className="w-20 h-20 bg-slate-100 dark:bg-slate-900 rounded-full flex items-center justify-center border-4 border-dashed border-slate-300 dark:border-slate-700">
                     <QrIcon className="text-slate-300 dark:text-slate-700 w-10 h-10" />
                   </div>
                   <p className="text-slate-400 font-black uppercase text-[10px] tracking-[0.2em]">Awaiting Key Generation</p>
                 </div>
-              ) : (
-                <div key={resultKey}>
+              )}
+
+              {qrUrl && !isGenerating && (
+                <div key={resultKey} className="animate-fadeIn">
                   <div className="relative group mx-auto w-fit mb-8">
                     <img src={qrUrl} alt="Secure QR" className="w-80 h-80 rounded-[2.5rem] border-8 border-slate-50 dark:border-slate-900 shadow-2xl" />
                     <div className="absolute top-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-[10px] font-black flex items-center gap-1 shadow-lg">

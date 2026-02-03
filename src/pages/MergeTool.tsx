@@ -152,7 +152,17 @@ const MergeTool: React.FC<{ darkMode: boolean; notify: NotifySystem }> = ({ dark
                 />
               )}
 
-              {result ? (
+              {!result && (
+                <button
+                  disabled={processing || files.length < 2}
+                  onClick={process}
+                  className="w-full max-w-xl px-10 py-8 bg-red-600 text-white rounded-[2.5rem] font-black text-3xl shadow-2xl hover:bg-red-700 hover:scale-105 active:scale-95 disabled:opacity-30 transition-all flex items-center justify-center gap-4 group"
+                >
+                  {processing ? <div className="w-8 h-8 border-4 border-white/30 border-t-white rounded-full animate-spin"></div> : <span>Merge {files.length} Files</span>}
+                </button>
+              )}
+
+              {result && !processing && (
                 <div key={resultKey} className="flex flex-col items-center gap-8 w-full max-w-xl">
                   <div className="flex items-center gap-4 text-green-500 font-black bg-green-50 dark:bg-green-900/20 px-10 py-5 rounded-[2rem] border border-green-100 dark:border-green-800">
                     <CheckCircle2 size={32} />
@@ -163,14 +173,6 @@ const MergeTool: React.FC<{ darkMode: boolean; notify: NotifySystem }> = ({ dark
                   </a>
                   <button onClick={() => { setFiles([]); setResult(null); }} className="text-slate-500 font-bold uppercase text-xs hover:underline">Start New Merge</button>
                 </div>
-              ) : (
-                <button
-                  disabled={processing || files.length < 2}
-                  onClick={process}
-                  className="w-full max-w-xl px-10 py-8 bg-red-600 text-white rounded-[2.5rem] font-black text-3xl shadow-2xl hover:bg-red-700 hover:scale-105 active:scale-95 disabled:opacity-30 transition-all flex items-center justify-center gap-4 group"
-                >
-                  {processing ? <div className="w-8 h-8 border-4 border-white/30 border-t-white rounded-full animate-spin"></div> : <span>Merge {files.length} Files</span>}
-                </button>
               )}
             </div>
           )}
