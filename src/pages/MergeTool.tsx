@@ -12,6 +12,7 @@ const MergeTool: React.FC<{ darkMode: boolean; notify: NotifySystem }> = ({ dark
   const [result, setResult] = useState<string | null>(null);
   const [progress, setProgress] = useState(0);
   const [processingStatus, setProcessingStatus] = useState<'processing' | 'complete' | 'error'>('processing');
+  const [resultKey, setResultKey] = useState(0);
 
   // Cleanup blob URLs only on component unmount
   // Cleanup blob URLs only when result changes or component unmounts
@@ -71,6 +72,11 @@ const MergeTool: React.FC<{ darkMode: boolean; notify: NotifySystem }> = ({ dark
     try {
       setProgress(30);
       const b = await mergeFiles(files);
+
+      if (b.length === 0) {
+        throw new Error("Merge produced an empty file.");
+      }
+
       setProgress(80);
       const blob = new Blob([b] as BlobPart[], { type: 'application/pdf' });
 
@@ -79,15 +85,17 @@ const MergeTool: React.FC<{ darkMode: boolean; notify: NotifySystem }> = ({ dark
         URL.revokeObjectURL(result);
       }
 
-      setResult(URL.createObjectURL(blob));
+      const url = URL.createObjectURL(blob);
+      setResult(url);
+      setResultKey(prev => prev + 1);
       setProgress(100);
       setProcessingStatus('complete');
       notify.complete();
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
       setProcessingStatus('error');
       notify.error();
-      alert('Merge failed. Please ensure all files are valid PDFs.');
+      alert(err.message || 'Merge failed. Please ensure all files are valid PDFs.');
     } finally {
       setProcessing(false);
     }
@@ -145,7 +153,7 @@ const MergeTool: React.FC<{ darkMode: boolean; notify: NotifySystem }> = ({ dark
               )}
 
               {result ? (
-                <div className="flex flex-col items-center gap-8 w-full max-w-xl animate-fadeInUp">
+                <div key={resultKey} className="flex flex-col items-center gap-8 w-full max-w-xl animate-fadeInUp">
                   <div className="flex items-center gap-4 text-green-500 font-black bg-green-50 dark:bg-green-900/20 px-10 py-5 rounded-[2rem] border border-green-100 dark:border-green-800">
                     <CheckCircle2 size={32} />
                     <span className="text-2xl">Merge Ready</span>

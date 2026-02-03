@@ -56,12 +56,27 @@ export async function unlockPdf(file: File, password: string): Promise<Uint8Arra
  * @param file PDF File
  * @param signatureFile Image File (PNG/JPG)
  */
-export async function signPdf(file: File, signatureFile: File): Promise<Uint8Array> {
+/**
+ * Signs a PDF with an image signature.
+ * @param file PDF File
+ * @param signatureFile Image File (PNG/JPG) or Blob
+ * @param position Position of the signature ('bottom-right' | 'bottom-left' | 'top-right' | 'top-left')
+ */
+export async function signPdf(
+    file: File,
+    signatureFile: File | Blob,
+    position: 'bottom-right' | 'bottom-left' | 'top-right' | 'top-left' = 'bottom-right'
+): Promise<Uint8Array> {
     const pdfBytes = await file.arrayBuffer();
     const sigBytes = await signatureFile.arrayBuffer();
 
     const pdfDoc = await PDFDocument.load(pdfBytes);
-    const isPng = signatureFile.name.toLowerCase().endsWith('.png');
+
+    // Detect type - default to PNG if Blob (usually from canvas)
+    let isPng = true;
+    if (signatureFile instanceof File) {
+        isPng = signatureFile.name.toLowerCase().endsWith('.png');
+    }
 
     const signatureImage = isPng
         ? await pdfDoc.embedPng(sigBytes)
@@ -71,13 +86,35 @@ export async function signPdf(file: File, signatureFile: File): Promise<Uint8Arr
     const { width, height } = signatureImage.scale(0.25); // Scale down signature
 
     for (const page of pages) {
-        const { width: pageWidth } = page.getSize();
-        // Place at bottom right
+        const { width: pageWidth, height: pageHeight } = page.getSize();
+
+        let x = pageWidth - width - 50;
+        let y = 50;
+
+        switch (position) {
+            case 'bottom-left':
+                x = 50;
+                y = 50;
+                break;
+            case 'bottom-right':
+                x = pageWidth - width - 50;
+                y = 50;
+                break;
+            case 'top-left':
+                x = 50;
+                y = pageHeight - height - 50;
+                break;
+            case 'top-right':
+                x = pageWidth - width - 50;
+                y = pageHeight - height - 50;
+                break;
+        }
+
         page.drawImage(signatureImage, {
-            x: pageWidth - width - 50,
-            y: 50,
-            width: width,
-            height: height,
+            x,
+            y,
+            width,
+            height,
         });
     }
 

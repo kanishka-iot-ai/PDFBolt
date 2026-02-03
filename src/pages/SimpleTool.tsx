@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import FileUploader from '../components/FileUploader';
 import { rotateFile, addPageNumbers, compressPdf, watermarkPdf, deletePages, splitPdf, imagesToPdf } from '../services/pdfService';
 import { wordToPdf, excelToPdf, htmlToPdf, pdfToJpg, pdfToWord } from '../services/conversionService';
@@ -27,6 +27,67 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
   const [isText, setIsText] = useState(false);
   const [progress, setProgress] = useState(0);
   const [processingStatus, setProcessingStatus] = useState<'processing' | 'complete' | 'error'>('processing');
+  const [resultKey, setResultKey] = useState(0);
+
+  // New States
+  const [watermarkText, setWatermarkText] = useState('CONFIDENTIAL');
+  const [signatureMode, setSignatureMode] = useState<'upload' | 'draw'>('upload');
+  const [signaturePosition, setSignaturePosition] = useState<'bottom-right' | 'bottom-left'>('bottom-right');
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [isDrawing, setIsDrawing] = useState(false);
+
+  // Canvas Logic
+  const startDrawing = (e: React.MouseEvent | React.TouchEvent) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    setIsDrawing(true);
+    const rect = canvas.getBoundingClientRect();
+    const x = ('touches' in e ? e.touches[0].clientX : e.clientX) - rect.left;
+    const y = ('touches' in e ? e.touches[0].clientY : e.clientY) - rect.top;
+
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineWidth = 3;
+    ctx.lineCap = 'round';
+    ctx.strokeStyle = '#000';
+  };
+
+  const draw = (e: React.MouseEvent | React.TouchEvent) => {
+    if (!isDrawing) return;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // Prevent scrolling on touch
+    if ('touches' in e) {
+      // e.preventDefault(); 
+      // Note: passive listener issue might occur if preventing default here directly. 
+      // React handles events, usually okay.
+    }
+
+    const rect = canvas.getBoundingClientRect();
+    const x = ('touches' in e ? e.touches[0].clientX : e.clientX) - rect.left;
+    const y = ('touches' in e ? e.touches[0].clientY : e.clientY) - rect.top;
+
+    ctx.lineTo(x, y);
+    ctx.stroke();
+  };
+
+  const endDrawing = () => {
+    setIsDrawing(false);
+  };
+
+  const clearCanvas = () => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  };
 
   // Cleanup blob URLs
   // Cleanup blob URLs
@@ -114,13 +175,13 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
     setProcessingStatus('processing');
     try {
       let b: Uint8Array | Blob | string | { name: string, blob: Blob }[];
-      setProgress(30);
+      setProgress(25);
 
       // -- EDIT TOOLS --
       if (mode === 'rotate' && file) b = await rotateFile(file, 90);
       else if (mode === 'numbers' && file) b = await addPageNumbers(file);
       else if (mode === 'compress' && file) b = await compressPdf(file, compressionLevel);
-      else if (mode === 'watermark' && file) b = await watermarkPdf(file, 'CONFIDENTIAL');
+      else if (mode === 'watermark' && file) b = await watermarkPdf(file, watermarkText || 'CONFIDENTIAL');
       else if (mode === 'split' && file) {
         if (!pageInput) throw new Error("Please enter a page range (e.g. 1-2, 4)");
         b = await splitPdf(file, pageInput);
@@ -174,8 +235,22 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
         b = await unlockPdf(file, password);
       }
       else if (mode === 'sign' && file) {
-        if (!signatureFile) throw new Error("Please upload a signature image.");
-        b = await signPdf(file, signatureFile);
+        let sigBlob: File | Blob | null = signatureFile;
+
+        if (signatureMode === 'draw') {
+          const canvas = canvasRef.current;
+          if (!canvas) throw new Error("Signature canvas not found.");
+          // Check if empty? Basic check
+          const blank = document.createElement('canvas');
+          blank.width = canvas.width;
+          blank.height = canvas.height;
+          if (canvas.toDataURL() === blank.toDataURL()) throw new Error("Please draw a signature.");
+
+          sigBlob = await new Promise<Blob | null>(resolve => canvas.toBlob(resolve, 'image/png'));
+        }
+
+        if (!sigBlob) throw new Error("Please provide a signature.");
+        b = await signPdf(file, sigBlob, signaturePosition);
       }
       else {
         // Fallback
@@ -183,7 +258,7 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
         b = await file.arrayBuffer().then(ab => new Uint8Array(ab));
       }
 
-      setProgress(80);
+      setProgress(60);
 
       if (Array.isArray(b)) {
         const results = b.map(item => ({
@@ -198,11 +273,16 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
         if (isPpt) type = 'application/vnd.openxmlformats-officedocument.presentationml.presentation';
         if (isText) type = 'text/plain';
 
-        setProgress(95);
+        setProgress(85);
         const blob = b instanceof Blob ? b : new Blob([b instanceof Uint8Array ? b : b] as BlobPart[], { type });
 
-        if (typeof result === 'string') URL.revokeObjectURL(result);
+        if (blob.size === 0) {
+          throw new Error("Generated file is empty. Please try again with a different configuration.");
+        }
+
+        setProgress(95);
         setResult(URL.createObjectURL(blob));
+        setResultKey(prev => prev + 1);
       }
 
       setProgress(100);
@@ -275,27 +355,92 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
 
               {isSignTool && (
                 <div className="space-y-6">
-                  <p className="text-sm font-bold text-slate-500">Upload Signature (PNG/JPG)</p>
-                  {signatureFile ? (
-                    <div className="flex items-center gap-4 p-4 bg-slate-100 dark:bg-slate-700 rounded-2xl">
-                      <ImageIcon size={20} />
-                      <span className="font-bold">{signatureFile.name}</span>
-                      <button onClick={() => setSignatureFile(null)} className="ml-auto text-yellow-600"><X size={20} /></button>
-                    </div>
+                  <div className="flex gap-4 mb-4">
+                    <button
+                      onClick={() => setSignatureMode('upload')}
+                      className={`flex-1 py-3 rounded-xl font-bold transition-all ${signatureMode === 'upload' ? 'bg-indigo-600 text-white shadow-lg' : 'bg-slate-100 dark:bg-slate-700'}`}
+                    >Upload Image</button>
+                    <button
+                      onClick={() => setSignatureMode('draw')}
+                      className={`flex-1 py-3 rounded-xl font-bold transition-all ${signatureMode === 'draw' ? 'bg-indigo-600 text-white shadow-lg' : 'bg-slate-100 dark:bg-slate-700'}`}
+                    >Draw Signature</button>
+                  </div>
+
+                  {signatureMode === 'upload' ? (
+                    <>
+                      <p className="text-sm font-bold text-slate-500">Upload Signature (PNG/JPG)</p>
+                      {signatureFile ? (
+                        <div className="flex items-center gap-4 p-4 bg-slate-100 dark:bg-slate-700 rounded-2xl">
+                          <ImageIcon size={20} />
+                          <span className="font-bold">{signatureFile.name}</span>
+                          <button onClick={() => setSignatureFile(null)} className="ml-auto text-yellow-600"><X size={20} /></button>
+                        </div>
+                      ) : (
+                        <div className="h-32 border-2 border-dashed rounded-2xl flex items-center justify-center bg-slate-50 dark:bg-slate-900/50">
+                          <label className="cursor-pointer flex flex-col items-center gap-2">
+                            <FileUploader
+                              accept="image/*"
+                              multiple={false}
+                              onFilesSelected={handleSignature}
+                              darkMode={darkMode}
+                              mini
+                            />
+                          </label>
+                        </div>
+                      )}
+                    </>
                   ) : (
-                    <div className="h-32 border-2 border-dashed rounded-2xl flex items-center justify-center bg-slate-50 dark:bg-slate-900/50">
-                      <label className="cursor-pointer flex flex-col items-center gap-2">
-                        <FileUploader
-                          accept="image/*"
-                          multiple={false}
-                          onFilesSelected={handleSignature}
-                          darkMode={darkMode}
-                          mini
+                    <div className="space-y-2">
+                      <p className="text-sm font-bold text-slate-500">Draw below</p>
+                      <div className="border-2 border-slate-300 dark:border-slate-600 rounded-2xl overflow-hidden bg-white touch-none">
+                        <canvas
+                          ref={canvasRef}
+                          width={500}
+                          height={200}
+                          className="w-full h-48 cursor-crosshair"
+                          onMouseDown={startDrawing}
+                          onMouseMove={draw}
+                          onMouseUp={endDrawing}
+                          onMouseLeave={endDrawing}
+                          onTouchStart={startDrawing}
+                          onTouchMove={draw}
+                          onTouchEnd={endDrawing}
                         />
-                      </label>
+                      </div>
+                      <button onClick={clearCanvas} className="text-xs font-bold text-red-500 uppercase">Clear Signature</button>
                     </div>
                   )}
-                  <p className="text-xs text-slate-400">Signature will be placed on the bottom right of each page.</p>
+
+                  <div className="space-y-2">
+                    <p className="text-xs font-black uppercase tracking-widest text-slate-500">Position</p>
+                    <div className="flex gap-4">
+                      <button
+                        onClick={() => setSignaturePosition('bottom-right')}
+                        className={`flex-1 py-3 rounded-xl text-sm font-bold border-2 transition-all ${signaturePosition === 'bottom-right' ? 'border-indigo-600 text-indigo-600 bg-indigo-50 dark:bg-indigo-900/20' : 'border-slate-200 dark:border-slate-700'}`}
+                      >
+                        Bottom Right
+                      </button>
+                      <button
+                        onClick={() => setSignaturePosition('bottom-left')}
+                        className={`flex-1 py-3 rounded-xl text-sm font-bold border-2 transition-all ${signaturePosition === 'bottom-left' ? 'border-indigo-600 text-indigo-600 bg-indigo-50 dark:bg-indigo-900/20' : 'border-slate-200 dark:border-slate-700'}`}
+                      >
+                        Bottom Left
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {mode === 'watermark' && (
+                <div className="space-y-4">
+                  <label className="block text-xs font-black uppercase tracking-widest text-slate-500 mb-2">Watermark Text</label>
+                  <input
+                    type="text"
+                    value={watermarkText}
+                    onChange={(e) => setWatermarkText(e.target.value)}
+                    placeholder="CONFIDENTIAL"
+                    className={`w-full p-6 rounded-2xl text-xl font-bold border-2 focus:ring-4 transition-all outline-none ${darkMode ? 'bg-slate-900 border-slate-700 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'}`}
+                  />
                 </div>
               )}
 
@@ -378,7 +523,7 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
 
           <div className="flex flex-col items-center gap-8">
             {result ? (
-              <div className="flex flex-col items-center gap-8 w-full animate-fadeInUp">
+              <div key={resultKey} className="flex flex-col items-center gap-8 w-full animate-fadeInUp">
                 <div className="flex items-center gap-4 text-green-500 font-black bg-green-50 dark:bg-green-900/20 px-10 py-5 rounded-[2rem] border border-green-100 dark:border-green-800">
                   <CheckCircle2 size={32} />
                   <span className="text-2xl">Processing Complete</span>
@@ -419,7 +564,7 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
               </div>
             ) : (
               <button
-                disabled={processing || (needsPageInput && !pageInput) || (needsPassword && !password) || (isImageTool && multiFiles.length === 0) || (isSignTool && !signatureFile)}
+                disabled={processing || (needsPageInput && !pageInput) || (needsPassword && !password) || (isImageTool && multiFiles.length === 0) || (isSignTool && signatureMode === 'upload' && !signatureFile)}
                 onClick={process}
                 className="w-full max-w-xl px-10 py-8 bg-red-600 text-white rounded-[2.5rem] font-black text-3xl shadow-2xl hover:bg-red-700 hover:scale-105 disabled:opacity-30 transition-all flex items-center justify-center gap-4 group"
               >

@@ -29,6 +29,7 @@ const QRTool: React.FC<QRToolProps> = ({ darkMode, notify }) => {
   const [oneTimeScan, setOneTimeScan] = useState(false);
   const [validDays, setValidDays] = useState(30);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [resultKey, setResultKey] = useState(0);
 
   useEffect(() => {
     return () => {
@@ -72,6 +73,7 @@ const QRTool: React.FC<QRToolProps> = ({ darkMode, notify }) => {
         },
       });
       setQrUrl(generatedQr);
+      setResultKey(prev => prev + 1);
       notify.complete();
     } catch (err: any) {
       console.error("QR Generation Error:", err);
@@ -90,6 +92,7 @@ const QRTool: React.FC<QRToolProps> = ({ darkMode, notify }) => {
           color: { dark: '#000000', light: '#ffffff' }
         });
         setQrUrl(generatedQr);
+        setResultKey(prev => prev + 1);
         notify.complete();
       } catch (qrErr) {
         console.error("Resulting QR generation failed:", qrErr);
@@ -278,7 +281,7 @@ const QRTool: React.FC<QRToolProps> = ({ darkMode, notify }) => {
                   <p className="text-slate-400 font-black uppercase text-[10px] tracking-[0.2em]">Awaiting Key Generation</p>
                 </div>
               ) : (
-                <div className="animate-fadeIn">
+                <div key={resultKey} className="animate-fadeIn">
                   <div className="relative group mx-auto w-fit mb-8">
                     <img src={qrUrl} alt="Secure QR" className="w-80 h-80 rounded-[2.5rem] border-8 border-slate-50 dark:border-slate-900 shadow-2xl" />
                     <div className="absolute top-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-[10px] font-black flex items-center gap-1 shadow-lg">

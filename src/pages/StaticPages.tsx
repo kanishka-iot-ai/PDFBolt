@@ -1,5 +1,6 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
+import emailjs from '@emailjs/browser';
 import { ShieldCheck, Lock, Globe, Mail, Headphones, Clock, Send, CheckCircle2 } from 'lucide-react';
 
 const PageLayout: React.FC<{ title: string; children: React.ReactNode; darkMode: boolean }> = ({ title, children, darkMode }) => (
@@ -14,15 +15,35 @@ const PageLayout: React.FC<{ title: string; children: React.ReactNode; darkMode:
 export const ContactPage: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const form = useRef<HTMLFormElement>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    // Simulate API call
-    setTimeout(() => {
+
+    // TODO: Replace with your actual keys from emailjs.com
+    const SERVICE_ID = 'YOUR_SERVICE_ID';
+    const TEMPLATE_ID = 'YOUR_TEMPLATE_ID';
+    const PUBLIC_KEY = 'YOUR_PUBLIC_KEY';
+
+    if (SERVICE_ID === 'YOUR_SERVICE_ID') {
+      alert("EmailJS is not configured. Please add your SERVICE_ID, TEMPLATE_ID, and PUBLIC_KEY in src/pages/StaticPages.tsx");
       setLoading(false);
-      setSubmitted(true);
-    }, 1500);
+      return;
+    }
+
+    if (form.current) {
+      emailjs.sendForm(SERVICE_ID, TEMPLATE_ID, form.current, PUBLIC_KEY)
+        .then((result) => {
+          console.log(result.text);
+          setLoading(false);
+          setSubmitted(true);
+        }, (error) => {
+          console.log(error.text);
+          setLoading(false);
+          alert("Failed to send message: " + error.text);
+        });
+    }
   };
 
   if (submitted) {
@@ -78,20 +99,20 @@ export const ContactPage: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
         </div>
 
         <div className={`p-10 rounded-[3rem] border shadow-2xl ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'}`}>
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form ref={form} onSubmit={handleSubmit} className="space-y-6">
             <div className="grid md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Full Name</label>
-                <input required type="text" className={`w-full p-4 rounded-2xl border-2 outline-none focus:ring-4 transition-all ${darkMode ? 'bg-slate-900 border-slate-700 text-white focus:ring-red-600/10 focus:border-red-600' : 'bg-slate-50 border-slate-200 text-slate-900 focus:ring-red-50 focus:border-red-600'}`} placeholder="John Doe" />
+                <input required name="user_name" type="text" className={`w-full p-4 rounded-2xl border-2 outline-none focus:ring-4 transition-all ${darkMode ? 'bg-slate-900 border-slate-700 text-white focus:ring-red-600/10 focus:border-red-600' : 'bg-slate-50 border-slate-200 text-slate-900 focus:ring-red-50 focus:border-red-600'}`} placeholder="John Doe" />
               </div>
               <div className="space-y-2">
                 <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Email Address</label>
-                <input required type="email" className={`w-full p-4 rounded-2xl border-2 outline-none focus:ring-4 transition-all ${darkMode ? 'bg-slate-900 border-slate-700 text-white focus:ring-red-600/10 focus:border-red-600' : 'bg-slate-50 border-slate-200 text-slate-900 focus:ring-red-50 focus:border-red-600'}`} placeholder="john@example.com" />
+                <input required name="user_email" type="email" className={`w-full p-4 rounded-2xl border-2 outline-none focus:ring-4 transition-all ${darkMode ? 'bg-slate-900 border-slate-700 text-white focus:ring-red-600/10 focus:border-red-600' : 'bg-slate-50 border-slate-200 text-slate-900 focus:ring-red-50 focus:border-red-600'}`} placeholder="john@example.com" />
               </div>
             </div>
             <div className="space-y-2">
               <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Subject</label>
-              <select required className={`w-full p-4 rounded-2xl border-2 outline-none focus:ring-4 transition-all ${darkMode ? 'bg-slate-900 border-slate-700 text-white focus:ring-red-600/10 focus:border-red-600' : 'bg-slate-50 border-slate-200 text-slate-900 focus:ring-red-50 focus:border-red-600'}`}>
+              <select required name="subject" className={`w-full p-4 rounded-2xl border-2 outline-none focus:ring-4 transition-all ${darkMode ? 'bg-slate-900 border-slate-700 text-white focus:ring-red-600/10 focus:border-red-600' : 'bg-slate-50 border-slate-200 text-slate-900 focus:ring-red-50 focus:border-red-600'}`}>
                 <option value="">Select an option</option>
                 <option value="support">Technical Support</option>
                 <option value="bug">Bug Report</option>
@@ -101,7 +122,7 @@ export const ContactPage: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
             </div>
             <div className="space-y-2">
               <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Message</label>
-              <textarea required rows={5} className={`w-full p-4 rounded-2xl border-2 outline-none focus:ring-4 transition-all resize-none ${darkMode ? 'bg-slate-900 border-slate-700 text-white focus:ring-red-600/10 focus:border-red-600' : 'bg-slate-50 border-slate-200 text-slate-900 focus:ring-red-50 focus:border-red-600'}`} placeholder="How can we help you master your PDFs?"></textarea>
+              <textarea required name="message" rows={5} className={`w-full p-4 rounded-2xl border-2 outline-none focus:ring-4 transition-all resize-none ${darkMode ? 'bg-slate-900 border-slate-700 text-white focus:ring-red-600/10 focus:border-red-600' : 'bg-slate-50 border-slate-200 text-slate-900 focus:ring-red-50 focus:border-red-600'}`} placeholder="How can we help you master your PDFs?"></textarea>
             </div>
             <button
               disabled={loading}

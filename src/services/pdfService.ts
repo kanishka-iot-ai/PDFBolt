@@ -21,7 +21,13 @@ export async function mergeFiles(files: File[]): Promise<Uint8Array> {
       throw new Error(`Failed to load PDF: ${f.name}`);
     }
   }
-  return await merged.save();
+  const result = await merged.save();
+
+  if (result.length === 0) {
+    throw new Error("Merging resulted in an empty file.");
+  }
+
+  return result;
 }
 
 /**
@@ -71,14 +77,25 @@ export async function compressPdf(file: File, level: string = 'recommended'): Pr
   // Prune by reconstruction: Only copy page objects
   const indices = sourcePdf.getPageIndices();
   const copiedPages = await targetPdf.copyPages(sourcePdf, indices);
+
+  if (copiedPages.length === 0) {
+    throw new Error("No pages found to compress.");
+  }
+
   copiedPages.forEach(p => targetPdf.addPage(p));
 
   // Save with Object Streams for smaller file size
-  return await targetPdf.save({
+  const result = await targetPdf.save({
     useObjectStreams: true,
     addDefaultPage: false,
     updateFieldAppearances: false
   });
+
+  if (result.length === 0) {
+    throw new Error("Compression resulted in an empty file.");
+  }
+
+  return result;
 }
 
 /**

@@ -11,6 +11,7 @@ const QRSuccess: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
   const [isVerified, setIsVerified] = useState(false);
   const [error, setError] = useState(false);
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
+  const [resultKey, setResultKey] = useState(0);
 
   const payload = searchParams.get('p');
   const authHash = searchParams.get('auth');
@@ -35,6 +36,7 @@ const QRSuccess: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
 
         if (data.k) {
           setDownloadUrl(getPublicUrl(data.k));
+          setResultKey(prev => prev + 1);
         }
       } catch (e) {
         console.error("Invalid payload", e);
@@ -125,22 +127,24 @@ const QRSuccess: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
           You have successfully established a secure tunnel to <span className="text-yellow-600 font-bold">PDFBolt</span>.
         </p>
 
-        {downloadUrl ? (
-          <div className="mb-10 animate-bounce-subtle">
-            <a
-              href={downloadUrl}
-              download
-              className="w-full py-6 bg-red-600 text-white rounded-3xl font-black text-2xl shadow-xl hover:bg-red-700 transition-all flex items-center justify-center gap-4"
-            >
-              <Download size={32} /> Download File
-            </a>
-            <p className="mt-4 text-xs font-bold text-slate-400 uppercase tracking-widest">Secure TLS 1.3 Download</p>
-          </div>
-        ) : (
-          <div className="mb-10 p-4 bg-amber-50 text-amber-600 rounded-xl font-bold">
-            Error: File Link Not Found in Payload
-          </div>
-        )}
+        <div key={resultKey} className="w-full">
+          {downloadUrl ? (
+            <div className="mb-10 animate-bounce-subtle">
+              <a
+                href={downloadUrl}
+                download
+                className="w-full py-6 bg-red-600 text-white rounded-3xl font-black text-2xl shadow-xl hover:bg-red-700 transition-all flex items-center justify-center gap-4"
+              >
+                <Download size={32} /> Download File
+              </a>
+              <p className="mt-4 text-xs font-bold text-slate-400 uppercase tracking-widest">Secure TLS 1.3 Download</p>
+            </div>
+          ) : (
+            <div className="mb-10 p-4 bg-amber-50 text-amber-600 rounded-xl font-bold">
+              Error: File Link Not Found in Payload
+            </div>
+          )}
+        </div>
 
         <div className={`p-8 rounded-3xl text-left mb-10 border-2 ${darkMode ? 'bg-slate-900/50 border-slate-700' : 'bg-slate-50 border-slate-200'}`}>
           <div className="flex items-start gap-4 mb-6">
