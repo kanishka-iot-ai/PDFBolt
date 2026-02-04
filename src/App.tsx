@@ -10,6 +10,7 @@ import MergeTool from './pages/MergeTool';
 import QRTool from './pages/QRTool';
 import SimpleTool from './pages/SimpleTool';
 import RedactTool from './pages/RedactTool';
+import EditTool from './pages/EditTool';
 import QRSuccess from './pages/QRSuccess';
 import SEOLandingPage from './components/SEOLandingPage';
 import { PrivacyPage, TermsPage, AboutPage, ContactPage } from './pages/StaticPages';
@@ -155,7 +156,7 @@ const App: React.FC = () => {
                 <Route path="/tutorials" element={<TutorialsPage darkMode={darkMode} />} />
                 <Route path="/qr-success" element={<QRSuccess darkMode={darkMode} />} />
                 <Route path="/organize" element={<SimpleTool title="Organize PDF" mode="organize" darkMode={darkMode} notify={notify} />} />
-                <Route path="/edit" element={<SimpleTool title="Edit PDF" mode="edit" darkMode={darkMode} notify={notify} />} />
+                <Route path="/edit" element={<EditTool darkMode={darkMode} notify={notify} />} />
                 <Route path="/page-numbers" element={<SimpleTool title="Add Page Numbers" mode="numbers" darkMode={darkMode} notify={notify} />} />
                 <Route path="/rotate" element={<SimpleTool title="Rotate PDF" mode="rotate" darkMode={darkMode} notify={notify} />} />
                 <Route path="/watermark" element={<SimpleTool title="Watermark PDF" mode="watermark" darkMode={darkMode} notify={notify} />} />
