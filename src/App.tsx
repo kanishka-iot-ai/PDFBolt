@@ -9,6 +9,7 @@ import Home from './pages/Home';
 import MergeTool from './pages/MergeTool';
 import QRTool from './pages/QRTool';
 import SimpleTool from './pages/SimpleTool';
+import RedactTool from './pages/RedactTool';
 import QRSuccess from './pages/QRSuccess';
 import SEOLandingPage from './components/SEOLandingPage';
 import { PrivacyPage, TermsPage, AboutPage, ContactPage } from './pages/StaticPages';
@@ -174,7 +175,7 @@ const App: React.FC = () => {
                 <Route path="/protect" element={<SimpleTool title="Protect PDF" mode="protect" darkMode={darkMode} notify={notify} />} />
                 <Route path="/unlock" element={<SimpleTool title="Unlock PDF" mode="unlock" darkMode={darkMode} notify={notify} />} />
                 <Route path="/sign" element={<SimpleTool title="Sign PDF" mode="sign" darkMode={darkMode} notify={notify} />} />
-                <Route path="/redact" element={<SimpleTool title="Redact PDF" mode="redact" darkMode={darkMode} notify={notify} />} />
+                <Route path="/redact" element={<RedactTool darkMode={darkMode} notify={notify} />} />
                 <Route path="/repair" element={<SimpleTool title="Repair PDF" mode="repair" darkMode={darkMode} notify={notify} />} />
                 <Route path="/ocr" element={<SimpleTool title="OCR PDF" mode="ocr" darkMode={darkMode} notify={notify} />} />
                 <Route path="/compare" element={<SimpleTool title="Compare PDF" mode="compare" darkMode={darkMode} notify={notify} />} />
