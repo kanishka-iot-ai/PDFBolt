@@ -11,6 +11,7 @@ import QRTool from './pages/QRTool';
 import SimpleTool from './pages/SimpleTool';
 import RedactTool from './pages/RedactTool';
 import EditTool from './pages/EditTool';
+import ScanTool from './pages/ScanTool';
 import QRSuccess from './pages/QRSuccess';
 import SEOLandingPage from './components/SEOLandingPage';
 import { PrivacyPage, TermsPage, AboutPage, ContactPage } from './pages/StaticPages';
@@ -176,6 +177,7 @@ const App: React.FC = () => {
                 <Route path="/redact" element={<RedactTool darkMode={darkMode} notify={notify} />} />
                 <Route path="/repair" element={<SimpleTool title="Repair PDF" mode="repair" darkMode={darkMode} notify={notify} />} />
                 <Route path="/ocr" element={<SimpleTool title="OCR PDF" mode="ocr" darkMode={darkMode} notify={notify} />} />
+                <Route path="/scan-pdf" element={<ScanTool darkMode={darkMode} notify={notify} />} />
                 <Route path="/compare" element={<SimpleTool title="Compare PDF" mode="compare" darkMode={darkMode} notify={notify} />} />
               </Routes>
             </main>

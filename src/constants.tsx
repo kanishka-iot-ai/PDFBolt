@@ -1,20 +1,20 @@
 import React from 'react';
-import { 
-  Merge, Scissors, Minimize2, Layout, Hash, RotateCw, 
+import {
+  Merge, Scissors, Minimize2, Layout, Hash, RotateCw,
   QrCode, Image as ImageIcon, FileImage, Type, Droplets, FileText,
   FilePlus, Table, Globe, FileStack, Lock, Unlock, PenTool, EyeOff,
-  Wrench, Search, Files, Trash2
+  Wrench, Search, Files, Trash2, Scan
 } from 'lucide-react';
 import { ToolMetadata, ToolType } from './types';
 
 export const TOOLS: ToolMetadata[] = [
-  { 
-    id: ToolType.MERGE, 
-    title: 'Merge PDF', 
+  {
+    id: ToolType.MERGE,
+    title: 'Merge PDF',
     seoTitle: 'Merge PDF Online – Free & Secure PDF Combiner',
-    description: 'Combine multiple PDF files into one document online. Fast, secure, and free with no registration required.', 
-    icon: 'Merge', 
-    category: 'edit', 
+    description: 'Combine multiple PDF files into one document online. Fast, secure, and free with no registration required.',
+    icon: 'Merge',
+    category: 'edit',
     path: '/merge',
     seoPath: '/merge-pdf-online',
     longDescription: 'Merge PDF files into one document in seconds with our professional-grade combiner. Whether you are handling legal documents, school assignments, or business reports, our tool ensures your files are joined with perfect alignment and zero quality loss. Unlike other services, we process everything locally in your browser.',
@@ -24,13 +24,13 @@ export const TOOLS: ToolMetadata[] = [
       { q: 'Do you keep a copy of my merged files?', a: 'Never. All processing is done locally on your machine.' }
     ]
   },
-  { 
-    id: ToolType.SPLIT, 
-    title: 'Split PDF', 
+  {
+    id: ToolType.SPLIT,
+    title: 'Split PDF',
     seoTitle: 'Split PDF Pages Online – Free Browser Tool',
-    description: 'Extract pages from your PDF or save each page as a separate PDF. Instant browser-based splitting.', 
-    icon: 'Scissors', 
-    category: 'edit', 
+    description: 'Extract pages from your PDF or save each page as a separate PDF. Instant browser-based splitting.',
+    icon: 'Scissors',
+    category: 'edit',
     path: '/split',
     seoPath: '/split-pdf-pages',
     longDescription: 'Need to extract a single page from a large report? Our Split PDF tool allows you to define custom ranges or extract every single page into its own individual file. It is the fastest way to break down large documents without any complicated software.',
@@ -40,13 +40,13 @@ export const TOOLS: ToolMetadata[] = [
       { q: 'Is the splitting process secure?', a: 'Yes, your document never leaves your device.' }
     ]
   },
-  { 
-    id: ToolType.COMPRESS, 
-    title: 'Compress PDF', 
+  {
+    id: ToolType.COMPRESS,
+    title: 'Compress PDF',
     seoTitle: 'Compress PDF Online – Reduce PDF Size Without Quality Loss',
-    description: 'Reduce PDF file size without losing quality. Optimize your documents for email and web sharing.', 
-    icon: 'Minimize2', 
-    category: 'edit', 
+    description: 'Reduce PDF file size without losing quality. Optimize your documents for email and web sharing.',
+    icon: 'Minimize2',
+    category: 'edit',
     path: '/compress',
     seoPath: '/compress-pdf-online',
     longDescription: 'Large PDF files can be a nightmare for email attachments. Our intelligent compression engine analyzes your document and reduces file size by optimizing images and removing redundant metadata, all while keeping your text sharp and legible.',
@@ -56,13 +56,13 @@ export const TOOLS: ToolMetadata[] = [
       { q: 'How much can I reduce my PDF size?', a: 'Depending on the content, you can see up to an 80% reduction in file size.' }
     ]
   },
-  { 
-    id: ToolType.PDF_TO_QR, 
-    title: 'PDF to QR', 
+  {
+    id: ToolType.PDF_TO_QR,
+    title: 'PDF to QR',
     seoTitle: 'PDF to QR Code Converter – Share Files Instantly',
-    description: 'Generate a QR code for your PDF file. Scan-to-view sharing for physical posters and business cards.', 
-    icon: 'QrCode', 
-    category: 'extra', 
+    description: 'Generate a QR code for your PDF file. Scan-to-view sharing for physical posters and business cards.',
+    icon: 'QrCode',
+    category: 'extra',
     path: '/pdf-to-qr',
     seoPath: '/pdf-to-qr-code',
     longDescription: 'Turn any PDF into a scannable QR code. Perfect for restaurants (menus), real estate (listings), or marketing flyers. This allows your audience to view your document instantly on their mobile device without typing a single URL.',
@@ -93,6 +93,7 @@ export const TOOLS: ToolMetadata[] = [
   { id: ToolType.REDACT, title: 'Redact PDF', description: 'Hide sensitive text and images.', icon: 'EyeOff', category: 'security', path: '/redact' },
   { id: ToolType.REPAIR, title: 'Repair PDF', description: 'Fix damaged PDF files.', icon: 'Wrench', category: 'utilities', path: '/repair' },
   { id: ToolType.OCR, title: 'OCR PDF', description: 'Make scanned PDFs searchable.', icon: 'Search', category: 'utilities', path: '/ocr' },
+  { id: ToolType.SCAN_TO_PDF, title: 'Scan to PDF', description: 'Scan documents with your camera.', icon: 'Scan', category: 'convert-to', path: '/scan-pdf' },
   { id: ToolType.COMPARE, title: 'Compare PDF', description: 'Find differences between PDFs.', icon: 'Files', category: 'utilities', path: '/compare' },
 ];
 
@@ -110,7 +111,7 @@ export const getIcon = (name: string) => {
     PenTool: <PenTool className="w-8 h-8" />, EyeOff: <EyeOff className="w-8 h-8" />,
     Wrench: <Wrench className="w-8 h-8" />,
     Search: <Search className="w-8 h-8" />, Files: <Files className="w-8 h-8" />,
-    Trash2: <Trash2 className="w-8 h-8" />,
+    Trash2: <Trash2 className="w-8 h-8" />, Scan: <Scan className="w-8 h-8" />,
   };
   return icons[name] || <FileText className="w-8 h-8" />;
 };
