@@ -35,12 +35,7 @@ const Home: React.FC<{ darkMode: boolean; onInstall?: () => void }> = ({ darkMod
           <p className={`text-2xl md:text-3xl max-w-3xl mx-auto mb-10 font-medium ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
             The ultimate browser-based toolkit. Fast, private, and powerful.
           </p>
-          <button
-            onClick={handleDownloadClick}
-            className="px-10 py-5 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-2xl font-black text-xl shadow-xl hover:from-yellow-600 hover:to-orange-600 hover:scale-105 transition-all flex items-center justify-center gap-3 mx-auto"
-          >
-            <Download size={24} /> Download App
-          </button>
+
         </div>
       </section>
 
