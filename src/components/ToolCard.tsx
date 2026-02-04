@@ -35,7 +35,7 @@ const ToolCard: React.FC<{ tool: ToolMetadata; darkMode: boolean }> = ({ tool, d
       to={tool.path}
       className={`group relative p-6 rounded-3xl border transition-all duration-300 hover:scale-[1.02] hover:shadow-xl overflow-hidden flex flex-col justify-between h-full ${darkMode
         ? `bg-slate-900/40 border-slate-700/50 hover:bg-slate-800/60 ${colors.hoverBorder} backdrop-blur-md`
-        : `bg-white border-slate-100 shadow-sm hover:shadow-md ${colors.hoverBorder.replace('/50', '/30')}` // Adjust opacity for light mode
+        : `bg-white border-slate-200 shadow-sm hover:shadow-md ${colors.hoverBorder.replace('/50', '/30')}` // Adjust opacity for light mode
         }`}
     >
       {/* Subtle colorful glow on hover */}
