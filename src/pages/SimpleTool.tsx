@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import FileUploader from '../components/FileUploader';
+import SignatureCanvas, { SignatureCanvasRef } from '../components/SignatureCanvas';
 import { rotateFile, addPageNumbers, compressPdf, watermarkPdf, deletePages, splitPdf, imagesToPdf } from '../services/pdfService';
 import { wordToPdf, excelToPdf, htmlToPdf, pdfToJpg, pdfToWord } from '../services/conversionService';
 import { protectPdf, unlockPdf, signPdf } from '../services/securityService';
@@ -32,65 +33,41 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
 
   // New States
   const [watermarkText, setWatermarkText] = useState('CONFIDENTIAL');
-  // const [signatureMode, setSignatureMode] = useState<'upload' | 'draw'>('upload'); // Removed as per request
   const [signaturePosition, setSignaturePosition] = useState<'bottom-right' | 'bottom-left'>('bottom-right');
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [isDrawing, setIsDrawing] = useState(false);
+  const [penColor, setPenColor] = useState('#000');
+  const [strokeWidth, setStrokeWidth] = useState<'thin' | 'medium' | 'thick'>('medium');
+  const [signatureBgColor, setSignatureBgColor] = useState('rgba(255,255,255,0)');
+  const [savedSignature, setSavedSignature] = useState<string | null>(null);
+  const signatureCanvasRef = useRef<SignatureCanvasRef>(null);
 
-  // Canvas Logic
-  // Canvas Logic
-  const getCoordinates = (e: React.MouseEvent | React.TouchEvent, canvas: HTMLCanvasElement) => {
-    const rect = canvas.getBoundingClientRect();
-    const x = ('touches' in e ? e.touches[0].clientX : e.clientX) - rect.left;
-    const y = ('touches' in e ? e.touches[0].clientY : e.clientY) - rect.top;
-    return { x, y };
+  // Signature Canvas Helpers
+  const clearSignature = () => {
+    signatureCanvasRef.current?.clear();
   };
 
-  const startDrawing = (e: React.MouseEvent | React.TouchEvent) => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    setIsDrawing(true);
-    const { x, y } = getCoordinates(e, canvas);
-
-    ctx.beginPath();
-    ctx.moveTo(x, y);
-    ctx.lineWidth = 3;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-    ctx.strokeStyle = '#000';
+  const undoSignature = () => {
+    signatureCanvasRef.current?.undo();
   };
 
-  const draw = (e: React.MouseEvent | React.TouchEvent) => {
-    if (!isDrawing) return;
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    // Prevent scrolling on touch devices strictly while drawing
-    if (e.cancelable && 'touches' in e) {
-      e.preventDefault();
+  const saveSignature = () => {
+    if (signatureCanvasRef.current && !signatureCanvasRef.current.isEmpty()) {
+      const data = signatureCanvasRef.current.getData();
+      setSavedSignature(JSON.stringify(data));
+      notify.success();
+      alert('Signature saved! You can load it later.');
+    } else {
+      alert('Please draw a signature first.');
     }
-
-    const { x, y } = getCoordinates(e, canvas);
-
-    ctx.lineTo(x, y);
-    ctx.stroke();
   };
 
-  const endDrawing = () => {
-    setIsDrawing(false);
-  };
-
-  const clearCanvas = () => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  const loadSignature = () => {
+    if (savedSignature && signatureCanvasRef.current) {
+      const data = JSON.parse(savedSignature);
+      signatureCanvasRef.current.setData(data);
+      notify.success();
+    } else {
+      alert('No saved signature found.');
+    }
   };
 
   // Cleanup blob URLs
@@ -239,20 +216,16 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
         b = await unlockPdf(file, password);
       }
       else if (mode === 'sign' && file) {
-        let sigBlob: File | Blob | null = null;
+        // Use signature_pad for professional signature
+        if (!signatureCanvasRef.current) throw new Error("Signature canvas not found.");
 
-        // Always usage draw mode
-        const canvas = canvasRef.current;
-        if (!canvas) throw new Error("Signature canvas not found.");
+        if (signatureCanvasRef.current.isEmpty()) {
+          throw new Error("Please draw a signature.");
+        }
 
-        const blank = document.createElement('canvas');
-        blank.width = canvas.width;
-        blank.height = canvas.height;
-        if (canvas.toDataURL() === blank.toDataURL()) throw new Error("Please draw a signature.");
+        const sigBlob = await signatureCanvasRef.current.toBlob(signatureBgColor);
+        if (!sigBlob) throw new Error("Failed to generate signature.");
 
-        sigBlob = await new Promise<Blob | null>(resolve => canvas.toBlob(resolve, 'image/png'));
-
-        if (!sigBlob) throw new Error("Please provide a signature.");
         b = await signPdf(file, sigBlob, signaturePosition);
       }
       else {
@@ -359,25 +332,88 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
               {isSignTool && (
                 <div className="space-y-6">
                   <div className="space-y-2">
-                    <p className="text-sm font-bold text-slate-500">Draw Signature</p>
+                    <div className="flex justify-between items-center mb-2">
+                      <p className="text-sm font-bold text-slate-500">Draw Signature</p>
+                      <div className="flex gap-2">
+                        <button onClick={saveSignature} className="text-xs font-bold text-green-600 hover:text-green-700 bg-green-50 px-3 py-1 rounded-lg border border-green-200 uppercase">Save</button>
+                        <button onClick={loadSignature} className="text-xs font-bold text-blue-600 hover:text-blue-700 bg-blue-50 px-3 py-1 rounded-lg border border-blue-200 uppercase">Load</button>
+                      </div>
+                    </div>
                     <div className="border-2 border-slate-300 dark:border-slate-600 rounded-2xl overflow-hidden bg-white touch-none">
-                      <canvas
-                        ref={canvasRef}
-                        width={500}
-                        height={200}
-                        style={{ touchAction: 'none' }}
-                        className="w-full h-48 cursor-crosshair touch-none"
-                        onMouseDown={startDrawing}
-                        onMouseMove={draw}
-                        onMouseUp={endDrawing}
-                        onMouseLeave={endDrawing}
-                        onTouchStart={startDrawing}
-                        onTouchMove={draw}
-                        onTouchEnd={endDrawing}
+                      <SignatureCanvas
+                        ref={signatureCanvasRef}
+                        darkMode={darkMode}
+                        penColor={penColor}
+                        strokeWidth={strokeWidth}
+                        backgroundColor={signatureBgColor}
                       />
                     </div>
-                    <div className="flex justify-end">
-                      <button onClick={clearCanvas} className="text-xs font-bold text-red-500 uppercase hover:text-red-600">Clear Signature</button>
+
+                    <div className="flex flex-col gap-4 mt-4">
+                      {/* Controls Row 1 */}
+                      <div className="flex justify-between items-center">
+                        <div className="flex gap-2">
+                          <button onClick={undoSignature} className="text-xs font-bold text-blue-500 uppercase hover:text-blue-600">Undo</button>
+                          <button onClick={clearSignature} className="text-xs font-bold text-red-500 uppercase hover:text-red-600">Clear</button>
+                        </div>
+
+                        <div className="flex gap-4 items-center">
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-bold text-slate-500 uppercase">Width:</span>
+                            {(['thin', 'medium', 'thick'] as const).map((w) => (
+                              <button
+                                key={w}
+                                onClick={() => setStrokeWidth(w)}
+                                className={`px-2 py-1 rounded-md text-xs font-bold border transition-all ${strokeWidth === w ? 'bg-slate-800 text-white dark:bg-white dark:text-slate-900 border-slate-800' : 'bg-transparent text-slate-500 border-slate-200'}`}
+                              >
+                                {w === 'thin' ? '1px' : w === 'medium' ? '2px' : '4px'}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Controls Row 2 */}
+                      <div className="flex justify-between items-center border-t pt-4 border-slate-100 dark:border-slate-800">
+                        <div className="flex gap-2 items-center">
+                          <span className="text-xs font-bold text-slate-500 uppercase">Color:</span>
+                          {['#000', '#0066FF', '#FF0000', '#008000', '#800080'].map((color) => (
+                            <button
+                              key={color}
+                              onClick={() => setPenColor(color)}
+                              className={`w-6 h-6 rounded-full border-2 transition-all ${penColor === color ? 'border-yellow-500 scale-110' : 'border-slate-300'}`}
+                              style={{ backgroundColor: color }}
+                              title={color}
+                            />
+                          ))}
+                          <div className="relative w-6 h-6 rounded-full overflow-hidden border-2 border-slate-300">
+                            <input
+                              type="color"
+                              value={penColor}
+                              onChange={(e) => setPenColor(e.target.value)}
+                              className="absolute inset-0 w-[150%] h-[150%] -top-[25%] -left-[25%] p-0 border-0 cursor-pointer"
+                              title="Custom Color"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="flex gap-2 items-center">
+                          <span className="text-xs font-bold text-slate-500 uppercase">Background:</span>
+                          {[
+                            { name: 'Transparent', val: 'rgba(255,255,255,0)' },
+                            { name: 'White', val: '#ffffff' },
+                            { name: 'Paper', val: '#f8f9fa' }
+                          ].map((bg) => (
+                            <button
+                              key={bg.name}
+                              onClick={() => setSignatureBgColor(bg.val)}
+                              className={`w-6 h-6 rounded-full border-2 transition-all ${signatureBgColor === bg.val ? 'border-yellow-500 scale-110' : 'border-slate-300'}`}
+                              style={{ backgroundColor: bg.val === 'rgba(255,255,255,0)' ? 'white' : bg.val, backgroundImage: bg.val === 'rgba(255,255,255,0)' ? 'linear-gradient(45deg, #ccc 25%, transparent 25%), linear-gradient(-45deg, #ccc 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #ccc 75%), linear-gradient(-45deg, transparent 75%, #ccc 75%)' : 'none', backgroundSize: '10px 10px' }}
+                              title={bg.name}
+                            />
+                          ))}
+                        </div>
+                      </div>
                     </div>
                   </div>
 
