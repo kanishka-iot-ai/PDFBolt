@@ -18,6 +18,7 @@ import { soundEngine } from './utils/sounds';
 import { NotifySystem } from './types';
 import { TOOLS } from './constants';
 import ErrorBoundary from './components/ErrorBoundary';
+import DownloadModal from './components/DownloadModal';
 
 const SEOManager: React.FC = () => {
   const location = useLocation();
@@ -84,6 +85,7 @@ const App: React.FC = () => {
   const [darkMode, setDarkMode] = useState(() => localStorage.getItem('theme') === 'dark');
   const [soundEnabled, setSoundEnabled] = useState(() => localStorage.getItem('sound') !== 'false');
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [showDownloadModal, setShowDownloadModal] = useState(false);
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', darkMode);
@@ -109,13 +111,8 @@ const App: React.FC = () => {
         setDeferredPrompt(null);
       }
     } else {
-      // Fallback: Download the portable app ZIP if PWA install isn't available
-      const link = document.createElement('a');
-      link.href = '/PDFBolt_Pro_Portfolio.zip';
-      link.download = 'PDFBolt_Pro_Portfolio.zip';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      // Fallback: Show "Coming Soon" modal instead of downloading ZIP
+      setShowDownloadModal(true);
     }
   };
 
@@ -183,6 +180,10 @@ const App: React.FC = () => {
             </main>
             <Footer darkMode={darkMode} />
           </div>
+
+          {showDownloadModal && (
+            <DownloadModal onClose={() => setShowDownloadModal(false)} />
+          )}
         </Router>
       </HelmetProvider>
     </ErrorBoundary>
