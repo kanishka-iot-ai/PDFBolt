@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { TOOLS } from '../constants';
 import ToolCard from '../components/ToolCard';
 import { Star, Edit3, Repeat, Shield, Settings, Download, Smartphone, Laptop, CheckCircle2, FileText } from 'lucide-react';
@@ -143,12 +144,12 @@ const Home: React.FC<{ darkMode: boolean; onInstall?: () => void }> = ({ darkMod
               Our dedicated support team is here to help you with any issues or questions. We pride ourselves on providing fast, human responses.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-              <a href="#/contact" className="px-10 py-5 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-2xl font-black text-lg shadow-xl hover:from-yellow-600 hover:to-orange-600 hover:scale-105 transition-all w-full sm:w-auto">
+              <Link to="/contact" className="px-10 py-5 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-2xl font-black text-lg shadow-xl hover:from-yellow-600 hover:to-orange-600 hover:scale-105 transition-all w-full sm:w-auto">
                 Contact Support
-              </a>
-              <a href="#/about" className={`px-10 py-5 rounded-2xl font-black text-lg border-2 transition-all w-full sm:w-auto ${darkMode ? 'border-slate-700 text-white hover:bg-slate-800' : 'border-slate-200 text-slate-700 hover:bg-white'}`}>
+              </Link>
+              <Link to="/about" className={`px-10 py-5 rounded-2xl font-black text-lg border-2 transition-all w-full sm:w-auto ${darkMode ? 'border-slate-700 text-white hover:bg-slate-800' : 'border-slate-200 text-slate-700 hover:bg-white'}`}>
                 Learn More
-              </a>
+              </Link>
             </div>
           </div>
         </div>

@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Moon, Sun, FileText, Menu, X, Volume2, VolumeX, Headphones, Download } from 'lucide-react';
+import { Moon, Sun, FileText, Menu, X, Volume2, VolumeX, Headphones, Download, Laptop } from 'lucide-react';
 
 import PaymentModal from './PaymentModal';
 
@@ -46,8 +46,17 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
               className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest transition-all ${darkMode ? 'bg-white text-slate-900 hover:bg-yellow-500 hover:text-white' : 'bg-slate-900 text-white hover:bg-yellow-500'
                 }`}
             >
-              <Download size={14} className="animate-bounce" />
-              App
+              {canInstall ? (
+                <>
+                  <Download size={14} className="animate-bounce" />
+                  Install App
+                </>
+              ) : (
+                <>
+                  <Laptop size={14} />
+                  Desktop App
+                </>
+              )}
             </button>
 
             <Link to="/contact" className="text-sm font-black text-yellow-600 flex items-center gap-1.5 hover:scale-105 transition-transform">
