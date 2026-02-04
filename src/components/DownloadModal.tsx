@@ -17,7 +17,7 @@ const DownloadModal: React.FC<DownloadModalProps> = ({ onClose }) => {
                         <Laptop className="text-white" size={40} />
                     </div>
 
-                    <h3 className="text-4xl font-black text-white mb-4 tracking-tight">Desktop App <br /><span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-pink-500">Coming Soon!</span></h3>
+                    <h3 className="text-4xl font-black text-white mb-4 tracking-tight">Desktop & Mobile App <br /><span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-pink-500">Coming Soon!</span></h3>
 
                     <p className="text-slate-300 text-lg font-medium leading-relaxed mb-8">
                         We are building a powerful offline experience just for you. Get ready for zero-latency editing directly from your desktop.

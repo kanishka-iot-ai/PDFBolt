@@ -54,7 +54,7 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
               ) : (
                 <>
                   <Laptop size={14} />
-                  Desktop App
+                  Desktop & Mobile App
                 </>
               )}
             </button>
