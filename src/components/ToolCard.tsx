@@ -6,23 +6,70 @@ import { getIcon } from '../constants';
 import { ArrowUpRight } from 'lucide-react';
 
 // Define color schemes for different tools
+// Define color schemes for different tools
 const getToolColors = (toolId: string) => {
-  const colorMap: Record<string, { icon: string; hoverBorder: string; glow: string }> = {
-    'merge': { icon: 'bg-gradient-to-br from-red-500 to-pink-600', hoverBorder: 'group-hover:border-red-500/50', glow: 'bg-red-500' },
-    'split': { icon: 'bg-gradient-to-br from-blue-500 to-cyan-600', hoverBorder: 'group-hover:border-blue-500/50', glow: 'bg-blue-500' },
-    'compress': { icon: 'bg-gradient-to-br from-green-400 to-emerald-600', hoverBorder: 'group-hover:border-green-500/50', glow: 'bg-green-400' },
-    'repair': { icon: 'bg-gradient-to-br from-yellow-500 to-orange-600', hoverBorder: 'group-hover:border-yellow-500/50', glow: 'bg-yellow-500' },
-    'organize': { icon: 'bg-gradient-to-br from-purple-500 to-violet-600', hoverBorder: 'group-hover:border-purple-500/50', glow: 'bg-purple-500' },
-    'rotate': { icon: 'bg-gradient-to-br from-teal-500 to-cyan-600', hoverBorder: 'group-hover:border-teal-500/50', glow: 'bg-teal-500' },
-    'watermark': { icon: 'bg-gradient-to-br from-indigo-500 to-blue-600', hoverBorder: 'group-hover:border-indigo-500/50', glow: 'bg-indigo-500' },
-    'protect': { icon: 'bg-gradient-to-br from-amber-500 to-yellow-600', hoverBorder: 'group-hover:border-amber-500/50', glow: 'bg-amber-500' },
-    'unlock': { icon: 'bg-gradient-to-br from-lime-500 to-green-600', hoverBorder: 'group-hover:border-lime-500/50', glow: 'bg-lime-500' },
+  const colorMap: Record<string, { icon: string; hoverBorder: string; glow: string; gradient: string }> = {
+    'merge': {
+      icon: 'bg-gradient-to-br from-red-500 to-pink-600',
+      hoverBorder: 'group-hover:border-red-500/50',
+      glow: 'bg-red-500',
+      gradient: 'from-red-500 via-white to-red-500'
+    },
+    'split': {
+      icon: 'bg-gradient-to-br from-blue-500 to-cyan-600',
+      hoverBorder: 'group-hover:border-blue-500/50',
+      glow: 'bg-blue-500',
+      gradient: 'from-blue-500 via-white to-blue-500'
+    },
+    'compress': {
+      icon: 'bg-gradient-to-br from-green-400 to-emerald-600',
+      hoverBorder: 'group-hover:border-green-500/50',
+      glow: 'bg-green-400',
+      gradient: 'from-green-400 via-white to-green-400'
+    },
+    'repair': {
+      icon: 'bg-gradient-to-br from-yellow-500 to-orange-600',
+      hoverBorder: 'group-hover:border-yellow-500/50',
+      glow: 'bg-yellow-500',
+      gradient: 'from-yellow-500 via-white to-yellow-500'
+    },
+    'organize': {
+      icon: 'bg-gradient-to-br from-purple-500 to-violet-600',
+      hoverBorder: 'group-hover:border-purple-500/50',
+      glow: 'bg-purple-500',
+      gradient: 'from-purple-500 via-white to-purple-500'
+    },
+    'rotate': {
+      icon: 'bg-gradient-to-br from-teal-500 to-cyan-600',
+      hoverBorder: 'group-hover:border-teal-500/50',
+      glow: 'bg-teal-500',
+      gradient: 'from-teal-500 via-white to-teal-500'
+    },
+    'watermark': {
+      icon: 'bg-gradient-to-br from-indigo-500 to-blue-600',
+      hoverBorder: 'group-hover:border-indigo-500/50',
+      glow: 'bg-indigo-500',
+      gradient: 'from-indigo-500 via-white to-indigo-500'
+    },
+    'protect': {
+      icon: 'bg-gradient-to-br from-amber-500 to-yellow-600',
+      hoverBorder: 'group-hover:border-amber-500/50',
+      glow: 'bg-amber-500',
+      gradient: 'from-amber-500 via-white to-amber-500'
+    },
+    'unlock': {
+      icon: 'bg-gradient-to-br from-lime-500 to-green-600',
+      hoverBorder: 'group-hover:border-lime-500/50',
+      glow: 'bg-lime-500',
+      gradient: 'from-lime-500 via-white to-lime-500'
+    },
   };
 
   return colorMap[toolId] || {
     icon: 'bg-gradient-to-br from-slate-500 to-gray-600',
     hoverBorder: 'group-hover:border-slate-500/50',
-    glow: 'bg-slate-500'
+    glow: 'bg-slate-500',
+    gradient: 'from-slate-500 via-white to-slate-500'
   };
 };
 
@@ -36,7 +83,7 @@ const ToolCard: React.FC<{ tool: ToolMetadata; darkMode: boolean }> = ({ tool, d
       className={`group relative p-[2px] rounded-3xl transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl h-full block overflow-hidden`}
     >
       {/* Moving Gradient Border Background */}
-      <div className={`absolute inset-0 bg-gradient-to-r ${colors.glow.replace('bg-', 'from-')} via-white to-${colors.glow.replace('bg-', '')} opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-[spin_4s_linear_infinite]`} style={{ width: '200%', height: '200%', left: '-50%', top: '-50%' }}></div>
+      <div className={`absolute inset-0 bg-gradient-to-r ${colors.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-[spin_3s_linear_infinite]`} style={{ width: '200%', height: '200%', left: '-50%', top: '-50%' }}></div>
 
       {/* Inner Card Content (Masks the center of the gradient) */}
       <div className={`relative h-full p-6 rounded-[22px] flex flex-col justify-between overflow-hidden z-10 ${darkMode

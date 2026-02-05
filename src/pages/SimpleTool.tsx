@@ -43,7 +43,7 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
 
   // Brute Force State
   const [bruteForceMode, setBruteForceMode] = useState(false);
-  const [bruteCharset, setBruteCharset] = useState<'numeric' | 'alpha-lower' | 'alpha-mixed' | 'alphanumeric'>('numeric');
+  const [bruteCharset, setBruteCharset] = useState<'numeric' | 'alpha-lower' | 'alpha-mixed' | 'alphanumeric' | 'all'>('numeric');
   const [bruteMaxLength, setBruteMaxLength] = useState(4);
   const [bruteStatus, setBruteStatus] = useState<string | null>(null);
 
@@ -645,7 +645,7 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
             {!result && (
               <div className="flex flex-col gap-4 w-full max-w-xl">
                 <button
-                  disabled={processing || (needsPageInput && !pageInput) || (needsPassword && !password) || (isImageTool && multiFiles.length === 0)}
+                  disabled={processing || (needsPageInput && !pageInput) || (needsPassword && !password && !bruteForceMode) || (isImageTool && multiFiles.length === 0)}
                   onClick={process}
                   className="w-full px-10 py-8 bg-red-600 text-white rounded-[2.5rem] font-black text-3xl shadow-2xl hover:bg-red-700 hover:scale-105 disabled:opacity-30 transition-all flex items-center justify-center gap-4 group"
                 >

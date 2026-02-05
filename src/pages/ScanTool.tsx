@@ -83,6 +83,11 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
         }
     }, []);
 
+    // Filter State
+    const [activeFilter, setActiveFilter] = useState<'none' | 'bw' | 'contrast'>('none');
+
+    // ... (Start Camera logic same) ...
+
     // Capture Image
     const captureImage = useCallback(() => {
         if (!videoRef.current || !canvasRef.current) return;
@@ -97,31 +102,21 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
 
-        // Draw image
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-        // Enhance Image (Grayscale + Contrast)
-        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        const data = imageData.data;
-
-        for (let i = 0; i < data.length; i += 4) {
-            const r = data[i];
-            const g = data[i + 1];
-            const b = data[i + 2];
-
-            // Grayscale
-            let gray = 0.299 * r + 0.587 * g + 0.114 * b;
-
-            // Contrast
-            const contrast = 1.2;
-            gray = ((gray - 128) * contrast) + 128;
-
-            data[i] = gray;
-            data[i + 1] = gray;
-            data[i + 2] = gray;
+        // Apply Filters via Context Context filter (Modern Browsers) or Pixel Manipulation
+        // Note: ctx.filter support is good in most modern browsers.
+        if (activeFilter === 'bw') {
+            ctx.filter = 'grayscale(100%)';
+        } else if (activeFilter === 'contrast') {
+            ctx.filter = 'contrast(150%) grayscale(100%)';
+        } else {
+            ctx.filter = 'none';
         }
 
-        ctx.putImageData(imageData, 0, 0);
+        // Draw image with filter
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        // Reset filter for safety 
+        ctx.filter = 'none';
 
         const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
 
@@ -130,7 +125,7 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
 
         if (notify && notify.success) notify.success("Page Scanned!");
 
-    }, [notify]);
+    }, [notify, activeFilter]);
 
     const removePage = (index: number) => {
         setCapturedImages(prev => prev.filter((_, i) => i !== index));
@@ -238,8 +233,8 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
 
                                 {autoDetect && (
                                     <div className={`px-4 py-2 rounded-full text-xs font-bold uppercase tracking-widest flex items-center gap-2 border shadow-lg transition-colors ${detectState === 'detected'
-                                            ? 'bg-green-500 text-white border-green-400'
-                                            : 'bg-black/60 text-white/70 border-white/10 backdrop-blur-md'
+                                        ? 'bg-green-500 text-white border-green-400'
+                                        : 'bg-black/60 text-white/70 border-white/10 backdrop-blur-md'
                                         }`}>
                                         {detectState === 'detected' ? (
                                             <> <CheckCircle2 size={14} /> Detected </>
@@ -285,16 +280,32 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
                                 onClick={captureImage}
                                 disabled={processing}
                                 className={`w-20 h-20 rounded-full border-[6px] flex items-center justify-center transition-all duration-200 ${detectState === 'detected'
-                                        ? 'border-green-500 scale-105'
-                                        : 'border-white/80 hover:border-white'
+                                    ? 'border-green-500 scale-105'
+                                    : 'border-white/80 hover:border-white'
                                     }`}
                             >
                                 <div className={`w-16 h-16 rounded-full transition-all duration-100 ${processing ? 'scale-90 bg-white/50' : 'scale-100 bg-white'}`}></div>
                             </button>
 
-                            {/* Options Spacer / Torch (future) */}
+                            {/* Options Spacer / Filter Toggle */}
                             <div className="w-20 flex justify-end">
-                                {/* Placeholder for torch or settings */}
+                                <button
+                                    onClick={() => setActiveFilter(prev => {
+                                        if (prev === 'none') return 'bw';
+                                        if (prev === 'bw') return 'contrast';
+                                        return 'none';
+                                    })}
+                                    className="flex flex-col items-center gap-1 text-white/80 active:scale-95 transition-transform"
+                                >
+                                    <div className={`w-10 h-10 rounded-full border-2 flex items-center justify-center ${activeFilter !== 'none' ? 'bg-white text-black border-white' : 'border-white/30 bg-black/40'}`}>
+                                        {activeFilter === 'none' && <div className="w-4 h-4 rounded-full bg-gradient-to-tr from-blue-400 to-pink-400"></div>}
+                                        {activeFilter === 'bw' && <div className="w-4 h-4 rounded-full bg-gray-400"></div>}
+                                        {activeFilter === 'contrast' && <div className="w-4 h-4 rounded-full border-2 border-black bg-white"></div>}
+                                    </div>
+                                    <span className="text-[10px] uppercase font-bold tracking-wider">
+                                        {activeFilter === 'none' ? 'Color' : activeFilter === 'bw' ? 'B&W' : 'Pro'}
+                                    </span>
+                                </button>
                             </div>
                         </div>
                     </div>

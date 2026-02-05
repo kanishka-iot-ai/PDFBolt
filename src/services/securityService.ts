@@ -135,7 +135,7 @@ export async function signPdf(
 export async function bruteForceUnlock(
     file: File,
     options: {
-        charset: 'numeric' | 'alpha-lower' | 'alpha-mixed' | 'alphanumeric';
+        charset: 'numeric' | 'alpha-lower' | 'alpha-mixed' | 'alphanumeric' | 'all';
         maxLength: number;
         signal?: AbortSignal;
     },
@@ -147,7 +147,8 @@ export async function bruteForceUnlock(
         'numeric': '0123456789',
         'alpha-lower': 'abcdefghijklmnopqrstuvwxyz',
         'alpha-mixed': 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
-        'alphanumeric': '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+        'alphanumeric': '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
+        'all': '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*()_+-=[]{}|;:,.<>?/~`'
     };
 
     const chars = charsets[options.charset];
