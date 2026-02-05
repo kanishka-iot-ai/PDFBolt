@@ -1,6 +1,5 @@
-
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { Camera, RefreshCw, FileText, Download, X, Scan as ScanIcon, Flashlight, CheckCircle2 } from 'lucide-react';
+import { Camera, RefreshCw, FileText, Download, X, Scan as ScanIcon, Flashlight, CheckCircle2, ChevronLeft, ChevronRight, Plus, Trash2 } from 'lucide-react';
 
 interface ScanToolProps {
     darkMode: boolean;
@@ -11,10 +10,11 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
     const videoRef = useRef<HTMLVideoElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [stream, setStream] = useState<MediaStream | null>(null);
-    const [capturedImage, setCapturedImage] = useState<string | null>(null);
+    const [capturedImages, setCapturedImages] = useState<string[]>([]);
     const [isCameraActive, setIsCameraActive] = useState(false);
     const [loading, setLoading] = useState(false);
     const [processing, setProcessing] = useState(false);
+    const [cameraError, setCameraError] = useState<string | null>(null);
 
     // "Auto Detect" simulation state
     const [autoDetect, setAutoDetect] = useState(true);
@@ -22,19 +22,37 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
 
     // Start Camera
     const startCamera = async () => {
+        setCameraError(null);
         try {
-            const mediaStream = await navigator.mediaDevices.getUserMedia({
+            // Try environment facing camera first (rear camera)
+            const constraints = {
                 video: { facingMode: 'environment', width: { ideal: 1920 }, height: { ideal: 1080 } }
-            });
+            };
+
+            let mediaStream;
+            try {
+                mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
+            } catch (err: any) {
+                // Fallback to any camera if environment fails
+                console.warn("Environment camera failed, trying default user media", err);
+                mediaStream = await navigator.mediaDevices.getUserMedia({ video: true });
+            }
+
             setStream(mediaStream);
             if (videoRef.current) {
                 videoRef.current.srcObject = mediaStream;
             }
             setIsCameraActive(true);
             setDetectState('searching');
-        } catch (err) {
+        } catch (err: any) {
             console.error("Error accessing camera:", err);
-            alert("Could not access camera. Please ensure you have granted permission.");
+            if (err.name === 'NotAllowedError') {
+                setCameraError("Camera access denied. Please allow camera permissions in your browser settings.");
+            } else if (err.name === 'NotFoundError') {
+                setCameraError("No camera found based on your constraints.");
+            } else {
+                setCameraError("Could not access camera. Please ensure you are on HTTPS or localhost.");
+            }
         }
     };
 
@@ -49,57 +67,54 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
 
     // Simulated Auto-Detect Logic
     useEffect(() => {
-        if (!isCameraActive || !autoDetect || capturedImage) return;
+        if (!isCameraActive || !autoDetect) return;
 
-        // Simulate "searching" vs "detected" state change every few seconds
         const interval = setInterval(() => {
             setDetectState(prev => prev === 'searching' ? 'detected' : 'searching');
         }, 2000);
 
         return () => clearInterval(interval);
-    }, [isCameraActive, autoDetect, capturedImage]);
+    }, [isCameraActive, autoDetect]);
+
+    // Cleanup on unmount
+    useEffect(() => {
+        return () => {
+            stopCamera();
+        }
+    }, []);
 
     // Capture Image
     const captureImage = useCallback(() => {
         if (!videoRef.current || !canvasRef.current) return;
 
-        // Flash effect
         setProcessing(true);
-
         const video = videoRef.current;
         const canvas = canvasRef.current;
 
-        // Set canvas dimensions to match video
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
 
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
 
-        // Draw raw image
+        // Draw image
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-        // Apply "Document Scan" enhancements (Contrast + Grayscale simulation)
-        // We get the data and manipulate it
+        // Enhance Image (Grayscale + Contrast)
         const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
         const data = imageData.data;
 
-        // Simple filter: High Contrast Grayscale
         for (let i = 0; i < data.length; i += 4) {
             const r = data[i];
             const g = data[i + 1];
             const b = data[i + 2];
 
-            // Grayscale standard: 0.299R + 0.587G + 0.114B
+            // Grayscale
             let gray = 0.299 * r + 0.587 * g + 0.114 * b;
 
             // Contrast
-            const contrast = 1.2; // Increase contrast
+            const contrast = 1.2;
             gray = ((gray - 128) * contrast) + 128;
-
-            // Thresholding (Optional, for "Scanner" look) - let's keep it grayscale for quality
-            // if (gray > 160) gray = 255;
-            // else if (gray < 80) gray = 0;
 
             data[i] = gray;
             data[i + 1] = gray;
@@ -108,37 +123,38 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
 
         ctx.putImageData(imageData, 0, 0);
 
-        const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
-        setCapturedImage(dataUrl);
-        setProcessing(false);
-        stopCamera();
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
 
-        if (notify && notify.success) notify.success("Document Scanned!");
+        setCapturedImages(prev => [...prev, dataUrl]);
+        setProcessing(false);
+
+        if (notify && notify.success) notify.success("Page Scanned!");
 
     }, [notify]);
 
-    const retake = () => {
-        setCapturedImage(null);
-        startCamera();
+    const removePage = (index: number) => {
+        setCapturedImages(prev => prev.filter((_, i) => i !== index));
     };
 
     const saveAsPdf = async () => {
-        if (!capturedImage) return;
+        if (capturedImages.length === 0) return;
         setLoading(true);
         try {
             const { PDFDocument } = await import('pdf-lib');
             const pdfDoc = await PDFDocument.create();
-            const page = pdfDoc.addPage();
 
-            const jpgImage = await pdfDoc.embedJpg(capturedImage);
-            const jpgDims = jpgImage.scaleToFit(page.getWidth(), page.getHeight());
+            for (const imgData of capturedImages) {
+                const page = pdfDoc.addPage();
+                const jpgImage = await pdfDoc.embedJpg(imgData);
+                const jpgDims = jpgImage.scaleToFit(page.getWidth(), page.getHeight());
 
-            page.drawImage(jpgImage, {
-                x: page.getWidth() / 2 - jpgDims.width / 2,
-                y: page.getHeight() / 2 - jpgDims.height / 2,
-                width: jpgDims.width,
-                height: jpgDims.height,
-            });
+                page.drawImage(jpgImage, {
+                    x: page.getWidth() / 2 - jpgDims.width / 2,
+                    y: page.getHeight() / 2 - jpgDims.height / 2,
+                    width: jpgDims.width,
+                    height: jpgDims.height,
+                });
+            }
 
             const pdfBytes = await pdfDoc.save();
             const blob = new Blob([pdfBytes], { type: 'application/pdf' });
@@ -152,6 +168,9 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
             document.body.removeChild(link);
 
             if (notify && notify.complete) notify.complete();
+            // Reset after save
+            setCapturedImages([]);
+            setIsCameraActive(false);
         } catch (e) {
             console.error(e);
             alert('Failed to generate PDF');
@@ -160,119 +179,180 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
         }
     };
 
-    useEffect(() => {
-        // Cleanup on unmount
-        return () => {
-            stopCamera();
-        }
-    }, []);
-
     return (
-        <div className={`min-h-screen flex flex-col ${darkMode ? 'bg-slate-900 text-white' : 'bg-slate-50 text-slate-900'}`}>
-            {/* Header */}
-            <div className={`h-16 border-b flex items-center justify-between px-6 ${darkMode ? 'border-slate-700 bg-slate-900' : 'border-slate-200 bg-white'}`}>
-                <h1 className="font-black text-xl flex items-center gap-2">
-                    <ScanIcon className="text-blue-500" /> Scan to PDF
-                </h1>
-            </div>
+        <div className={`min-h-[80vh] flex flex-col items-center ${darkMode ? 'text-white' : 'text-slate-900'}`}>
 
-            <div className="flex-1 flex flex-col items-center justify-center p-4">
-                {!isCameraActive && !capturedImage && (
-                    <div className="text-center max-w-md">
-                        <div className={`w-24 h-24 mx-auto rounded-full flex items-center justify-center mb-6 ${darkMode ? 'bg-slate-800' : 'bg-white shadow-lg'}`}>
-                            <Camera size={48} className="text-blue-500" />
-                        </div>
-                        <h2 className="text-2xl font-black mb-4">Start Scanning</h2>
-                        <p className="mb-8 opacity-70">Use your camera to scan documents directly to PDF. We use smart detection to enhance your scans.</p>
-                        <button
-                            onClick={startCamera}
-                            className="px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-full font-bold text-lg shadow-xl shadow-blue-500/20 transition-all hover:scale-105 flex items-center gap-3 mx-auto"
-                        >
-                            <Camera /> Activate Camera
-                        </button>
+            {/* Initial State - Start Button */}
+            {!isCameraActive && capturedImages.length === 0 && (
+                <div className="flex flex-col items-center justify-center p-8 text-center max-w-md animate-fadeIn mt-12">
+                    <div className={`w-28 h-28 mx-auto rounded-full flex items-center justify-center mb-8 ${darkMode ? 'bg-slate-800' : 'bg-white shadow-xl'}`}>
+                        <Camera size={56} className="text-blue-500" />
                     </div>
-                )}
+                    <h2 className="text-3xl font-black mb-4">Scan Documents</h2>
+                    <p className="mb-10 opacity-70 text-lg leading-relaxed">
+                        Use your camera to scan multiple pages into a single PDF.
+                        Features standard auto-detection and image enhancement.
+                    </p>
 
-                {isCameraActive && (
-                    <div className="relative w-full max-w-2xl aspect-[3/4] bg-black rounded-3xl overflow-hidden shadow-2xl">
+                    {cameraError && (
+                        <div className="mb-6 p-4 bg-red-500/10 border border-red-500/50 rounded-xl text-red-500 text-sm font-bold">
+                            {cameraError}
+                        </div>
+                    )}
+
+                    <button
+                        onClick={startCamera}
+                        className="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-bold text-xl shadow-xl shadow-blue-500/20 transition-all hover:scale-105 flex items-center justify-center gap-3"
+                    >
+                        <Camera /> Start Camera
+                    </button>
+                    <p className="mt-4 text-xs opacity-50 uppercase tracking-widest font-bold">HTTPS required for Camera Access</p>
+                </div>
+            )}
+
+            {/* Camera View */}
+            {isCameraActive && (
+                <div className="w-full max-w-4xl flex flex-col h-full bg-black rounded-3xl overflow-hidden shadow-2xl relative animate-fadeIn">
+                    <div className="relative flex-grow bg-black">
                         <video
                             ref={videoRef}
                             autoPlay
                             playsInline
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-contain max-h-[70vh]"
                         ></video>
 
-                        {/* Overlay Grid */}
-                        <div className="absolute inset-0 pointer-events-none p-8 flex flex-col justify-between">
+                        {/* Overlays */}
+                        <div className="absolute inset-0 pointer-events-none p-6 flex flex-col justify-between">
                             <div className="flex justify-between">
-                                <div className={`w-12 h-12 border-t-4 border-l-4 rounded-tl-xl transition-colors ${detectState === 'detected' ? 'border-green-500' : 'border-white/50'}`}></div>
-                                <div className={`w-12 h-12 border-t-4 border-r-4 rounded-tr-xl transition-colors ${detectState === 'detected' ? 'border-green-500' : 'border-white/50'}`}></div>
+                                <div className={`w-16 h-16 border-t-4 border-l-4 rounded-tl-2xl transition-colors ${detectState === 'detected' ? 'border-green-500' : 'border-white/50'}`}></div>
+                                <div className={`w-16 h-16 border-t-4 border-r-4 rounded-tr-2xl transition-colors ${detectState === 'detected' ? 'border-green-500' : 'border-white/50'}`}></div>
                             </div>
 
-                            {/* Scan Line Animation */}
-                            <div className="absolute top-0 left-0 w-full h-full opacity-20 bg-gradient-to-b from-transparent via-blue-500 to-transparent animate-pulse"></div>
+                            {/* Scanning Animation */}
+                            <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-transparent via-blue-500/10 to-transparent animate-scan"></div>
 
                             <div className="flex justify-between">
-                                <div className={`w-12 h-12 border-b-4 border-l-4 rounded-bl-xl transition-colors ${detectState === 'detected' ? 'border-green-500' : 'border-white/50'}`}></div>
-                                <div className={`w-12 h-12 border-b-4 border-r-4 rounded-br-xl transition-colors ${detectState === 'detected' ? 'border-green-500' : 'border-white/50'}`}></div>
+                                <div className={`w-16 h-16 border-b-4 border-l-4 rounded-bl-2xl transition-colors ${detectState === 'detected' ? 'border-green-500' : 'border-white/50'}`}></div>
+                                <div className={`w-16 h-16 border-b-4 border-r-4 rounded-br-2xl transition-colors ${detectState === 'detected' ? 'border-green-500' : 'border-white/50'}`}></div>
                             </div>
                         </div>
 
-                        {/* Detect Status */}
+                        {/* Status Chip */}
                         {autoDetect && (
-                            <div className="absolute top-6 left-1/2 -translate-x-1/2 px-4 py-1 bg-black/50 backdrop-blur-md rounded-full text-xs font-bold text-white uppercase tracking-widest flex items-center gap-2">
+                            <div className="absolute top-8 left-1/2 -translate-x-1/2 px-5 py-2 bg-black/60 backdrop-blur-md rounded-full text-sm font-bold text-white uppercase tracking-widest flex items-center gap-2 border border-white/10 shadow-lg">
                                 {detectState === 'detected' ? (
-                                    <> <CheckCircle2 size={14} className="text-green-400" /> Document Detected </>
+                                    <> <CheckCircle2 size={16} className="text-green-400" /> Detected </>
                                 ) : (
-                                    <> <ScanIcon size={14} className="animate-spin" /> Searching... </>
+                                    <> <ScanIcon size={16} className="animate-spin" /> Searching... </>
                                 )}
                             </div>
                         )}
-
-                        {/* Controls */}
-                        <div className="absolute bottom-6 left-0 w-full flex items-center justify-center gap-6">
-                            <button onClick={stopCamera} className="p-4 bg-white/10 backdrop-blur-md rounded-full text-white hover:bg-white/20">
-                                <X size={24} />
-                            </button>
-                            <button
-                                onClick={captureImage}
-                                className={`p-6 rounded-full border-4 shadow-xl transition-all ${detectState === 'detected' ? 'bg-white border-green-500 scale-110' : 'bg-white border-transparent'
-                                    }`}
-                            >
-                                <div className="w-4 h-4 rounded-full bg-slate-900"></div>
-                            </button>
-                            <button
-                                className={`p-4 backdrop-blur-md rounded-full text-white ${autoDetect ? 'bg-green-500/80' : 'bg-white/10 hover:bg-white/20'}`}
-                                onClick={() => setAutoDetect(!autoDetect)}
-                            >
-                                <ScanIcon size={24} />
-                            </button>
-                        </div>
                     </div>
-                )}
 
-                {capturedImage && (
-                    <div className="w-full max-w-lg">
-                        <div className="relative rounded-xl overflow-hidden shadow-2xl border-4 border-slate-200 dark:border-slate-700 mb-8">
-                            <img src={capturedImage} alt="Scanned" className="w-full" />
-                            <div className="absolute bottom-4 right-4 bg-slate-900 text-white text-xs px-2 py-1 rounded shadow">
-                                Enhanced (Grayscale)
+                    {/* Camera Controls Bar */}
+                    <div className="bg-slate-900 border-t border-slate-800 p-6 flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                            <div
+                                className="w-12 h-12 rounded-lg bg-slate-800 border border-slate-700 overflow-hidden relative"
+                                role="button"
+                                onClick={() => { stopCamera(); /* Go to gallery view */ }}
+                            >
+                                {capturedImages.length > 0 ? (
+                                    <>
+                                        <img src={capturedImages[capturedImages.length - 1]} className="w-full h-full object-cover opacity-60" alt="" />
+                                        <div className="absolute inset-0 flex items-center justify-center font-black text-white text-lg">
+                                            {capturedImages.length}
+                                        </div>
+                                    </>
+                                ) : (
+                                    <div className="w-full h-full flex items-center justify-center text-slate-500">
+                                        <FileText size={20} />
+                                    </div>
+                                )}
                             </div>
                         </div>
 
-                        <div className="flex gap-4">
-                            <button onClick={retake} className="flex-1 py-3 rounded-xl border-2 border-slate-300 dark:border-slate-700 font-bold hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors flex items-center justify-center gap-2">
-                                <RefreshCw size={20} /> Retake
-                            </button>
-                            <button onClick={saveAsPdf} disabled={loading} className="flex-1 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-bold hover:scale-105 transition-all shadow-lg flex items-center justify-center gap-2">
-                                {loading ? 'Processing...' : <><Download size={20} /> Save PDF</>}
+                        <button
+                            onClick={captureImage}
+                            disabled={processing}
+                            className={`w-20 h-20 rounded-full border-4 shadow-xl flex items-center justify-center transition-all ${detectState === 'detected'
+                                    ? 'bg-white border-green-500 scale-105 active:scale-95'
+                                    : 'bg-transparent border-white hover:bg-white/10 active:scale-95'
+                                }`}
+                        >
+                            <div className={`w-16 h-16 rounded-full transition-all ${detectState === 'detected' ? 'bg-green-500' : 'bg-white'}`}></div>
+                        </button>
+
+                        <div className="flex items-center gap-4">
+                            <button onClick={stopCamera} className="p-3 bg-slate-800 rounded-full text-white hover:bg-slate-700 border border-slate-700">
+                                <X size={24} />
                             </button>
                         </div>
                     </div>
-                )}
+                </div>
+            )}
 
-                <canvas ref={canvasRef} className="hidden" />
-            </div>
+            {/* Gallery / Review Mode */}
+            {!isCameraActive && capturedImages.length > 0 && (
+                <div className="w-full max-w-5xl animate-fadeIn">
+                    <div className="flex items-center justify-between mb-8">
+                        <div>
+                            <h2 className="text-3xl font-black">Review Scans</h2>
+                            <p className="opacity-60">{capturedImages.length} pages captured</p>
+                        </div>
+                        <div className="flex gap-4">
+                            <button
+                                onClick={startCamera}
+                                className="px-6 py-3 rounded-xl border-2 border-slate-200 dark:border-slate-700 font-bold hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors flex items-center gap-2"
+                            >
+                                <Plus size={20} /> Add Page
+                            </button>
+                            <button
+                                onClick={saveAsPdf}
+                                disabled={loading}
+                                className="px-8 py-3 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-700 shadow-lg hover:shadow-blue-500/20 transition-all flex items-center gap-2"
+                            >
+                                {loading ? 'Saving...' : <><Download size={20} /> Save PDF</>}
+                            </button>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                        {capturedImages.map((img, idx) => (
+                            <div key={idx} className="relative group rounded-xl overflow-hidden shadow-lg border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
+                                <div className="aspect-[3/4] relative">
+                                    <img src={img} alt={`Page ${idx + 1}`} className="w-full h-full object-cover" />
+                                </div>
+                                <div className="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <button
+                                        onClick={() => removePage(idx)}
+                                        className="p-2 bg-red-600 text-white rounded-lg shadow-lg hover:bg-red-700"
+                                        title="Delete Page"
+                                    >
+                                        <Trash2 size={16} />
+                                    </button>
+                                </div>
+                                <div className="p-3 text-center border-t border-slate-200 dark:border-slate-700">
+                                    <span className="text-sm font-bold text-slate-500">Page {idx + 1}</span>
+                                </div>
+                            </div>
+                        ))}
+
+                        {/* Add Page Card */}
+                        <button
+                            onClick={startCamera}
+                            className="aspect-[3/4] rounded-xl border-4 border-dashed border-slate-200 dark:border-slate-700 flex flex-col items-center justify-center gap-4 text-slate-400 hover:text-blue-500 hover:border-blue-500/50 hover:bg-blue-50/5 dark:hover:bg-blue-900/10 transition-all group"
+                        >
+                            <div className="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <Plus size={32} />
+                            </div>
+                            <span className="font-bold">Add Page</span>
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            <canvas ref={canvasRef} className="hidden" />
         </div>
     );
 };

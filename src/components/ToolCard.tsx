@@ -33,43 +33,50 @@ const ToolCard: React.FC<{ tool: ToolMetadata; darkMode: boolean }> = ({ tool, d
   return (
     <Link
       to={tool.path}
-      className={`group relative p-6 rounded-3xl border transition-all duration-300 hover:scale-[1.02] hover:shadow-xl overflow-hidden flex flex-col justify-between h-full ${darkMode
-        ? `bg-slate-900/40 border-slate-700/50 hover:bg-slate-800/60 ${colors.hoverBorder} backdrop-blur-md`
-        : `bg-white border-slate-200 shadow-sm hover:shadow-md ${colors.hoverBorder.replace('/50', '/30')}` // Adjust opacity for light mode
-        }`}
+      className={`group relative p-[1px] rounded-3xl transition-all duration-300 hover:scale-[1.02] hover:shadow-xl overflow-hidden h-full block`}
     >
-      {/* Subtle colorful glow on hover */}
-      <div className={`absolute -right-10 -bottom-10 w-32 h-32 rounded-full blur-[50px] opacity-0 group-hover:opacity-20 transition-opacity duration-500 ${colors.glow}`}></div>
+      {/* Animated Gradient Border */}
+      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-blue-500/50 to-transparent translate-x-[-100%] group-hover:animate-shimmer z-0"></div>
+      <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-r ${colors.glow.replace('bg-', 'from-').replace('500', '500/40')} to-transparent blur-xl`}></div>
 
-      <div className="relative z-10">
-        <div className="flex justify-between items-start mb-4">
-          {/* Icon - Smaller & Sleek */}
-          <div className={`p-3.5 rounded-2xl ${colors.icon} shadow-lg group-hover:scale-110 transition-transform duration-300`}>
-            <div className="text-white scale-90">{getIcon(tool.icon)}</div>
+      <div className={`relative h-full p-6 rounded-[23px] flex flex-col justify-between overflow-hidden ${darkMode
+        ? `bg-slate-900/90 border border-slate-700/50 ${colors.hoverBorder} backdrop-blur-md`
+        : `bg-white border border-slate-200 shadow-sm ${colors.hoverBorder.replace('/50', '/30')}` // Adjust opacity for light mode
+        }`}
+      >
+        {/* Subtle colorful glow on hover */}
+        <div className={`absolute -right-10 -bottom-10 w-32 h-32 rounded-full blur-[50px] opacity-0 group-hover:opacity-20 transition-opacity duration-500 ${colors.glow}`}></div>
+
+        <div className="relative z-10">
+          <div className="flex justify-between items-start mb-4">
+            {/* Icon - Smaller & Sleek */}
+            <div className={`p-3.5 rounded-2xl ${colors.icon} shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+              <div className="text-white scale-90">{getIcon(tool.icon)}</div>
+            </div>
+
+            {/* Arrow */}
+            <ArrowUpRight className={`w-5 h-5 opacity-0 group-hover:opacity-100 transition-all duration-300 -translate-x-2 translate-y-2 group-hover:translate-x-0 group-hover:translate-y-0 ${darkMode ? 'text-white/50' : 'text-slate-400'}`} />
           </div>
 
-          {/* Arrow */}
-          <ArrowUpRight className={`w-5 h-5 opacity-0 group-hover:opacity-100 transition-all duration-300 -translate-x-2 translate-y-2 group-hover:translate-x-0 group-hover:translate-y-0 ${darkMode ? 'text-white/50' : 'text-slate-400'}`} />
+          {/* Title - Compact */}
+          <h3 className={`text-lg font-bold leading-tight ${darkMode ? 'text-slate-100' : 'text-slate-800'}`}>
+            {tool.title}
+          </h3>
+
+          {/* Description - Added per user request */}
+          <p className={`mt-2 text-[11px] leading-relaxed line-clamp-2 ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+            {tool.description}
+          </p>
+
+          {/* Core Badge - Minimalist */}
+          {isCore && (
+            <div className="mt-3">
+              <span className={`text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-md ${darkMode ? 'bg-white/5 text-white/40' : 'bg-slate-100 text-slate-400'}`}>
+                Core
+              </span>
+            </div>
+          )}
         </div>
-
-        {/* Title - Compact */}
-        <h3 className={`text-lg font-bold leading-tight ${darkMode ? 'text-slate-100' : 'text-slate-800'}`}>
-          {tool.title}
-        </h3>
-
-        {/* Description - Added per user request */}
-        <p className={`mt-2 text-[11px] leading-relaxed line-clamp-2 ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
-          {tool.description}
-        </p>
-
-        {/* Core Badge - Minimalist */}
-        {isCore && (
-          <div className="mt-3">
-            <span className={`text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-md ${darkMode ? 'bg-white/5 text-white/40' : 'bg-slate-100 text-slate-400'}`}>
-              Core
-            </span>
-          </div>
-        )}
       </div>
     </Link>
   );

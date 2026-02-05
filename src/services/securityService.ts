@@ -125,3 +125,95 @@ export async function signPdf(
 
     return await pdfDoc.save();
 }
+
+/**
+ * Attempts to brute force a PDF password.
+ * @param file Encrypted PDF file
+ * @param options Charset and length options
+ * @param onProgress Callback for progress
+ */
+export async function bruteForceUnlock(
+    file: File,
+    options: {
+        charset: 'numeric' | 'alpha-lower' | 'alpha-mixed' | 'alphanumeric';
+        maxLength: number;
+    },
+    onProgress: (currentAttempt: string, totalAttempts: number) => void
+): Promise<{ password: string | null; decryptedPdf: Uint8Array | null }> {
+
+    // Define charsets
+    const charsets = {
+        'numeric': '0123456789',
+        'alpha-lower': 'abcdefghijklmnopqrstuvwxyz',
+        'alpha-mixed': 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
+        'alphanumeric': '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+    };
+
+    const chars = charsets[options.charset];
+    const bytes = await file.arrayBuffer();
+
+    // Helper to generate combinations
+    const generateCombinations = function* (maxLength: number) {
+        // Try lengths from 1 up to maxLength
+        for (let len = 1; len <= maxLength; len++) {
+            const indices = new Array(len).fill(0);
+
+            while (true) {
+                let password = "";
+                for (let i = 0; i < len; i++) {
+                    password += chars[indices[i]];
+                }
+                yield password;
+
+                let nextIndex = len - 1;
+                while (nextIndex >= 0) {
+                    indices[nextIndex]++;
+                    if (indices[nextIndex] < chars.length) {
+                        break;
+                    }
+                    indices[nextIndex] = 0;
+                    nextIndex--;
+                }
+
+                if (nextIndex < 0) break;
+            }
+        }
+    };
+
+    let count = 0;
+    // Estimated count not calculated for perf, just raw loop
+
+    // Load document ONCE if possible to check encryption? 
+    // No, pdf-lib loads WITH password. So we must try load every time.
+    // OPTIMIZATION: This is slow in JS.
+
+    // Attempt limited chunk of combinations to avoid freezing UI
+    // We will use a batch approach if this was a worker, but here we just loop async-ish?
+    // Actually, making it async per attempt is too slow. 
+    // We'll try to burst 100 attempts then yield.
+
+    const generator = generateCombinations(options.maxLength);
+
+    for (const password of generator) {
+        count++;
+        if (count % 50 === 0) {
+            onProgress(password, count);
+            // Yield to main thread to keep UI responsive
+            await new Promise(r => setTimeout(r, 0));
+        }
+
+        try {
+            // Attempt load
+            // Note: ignoreErrors=true might help speed up?
+            const pdfDoc = await PDFDocument.load(bytes, { password } as any);
+
+            // If we get here, password is correct!
+            const decryptedPdf = await pdfDoc.save();
+            return { password, decryptedPdf };
+        } catch (e) {
+            // Wrong password, continue
+        }
+    }
+
+    return { password: null, decryptedPdf: null };
+}

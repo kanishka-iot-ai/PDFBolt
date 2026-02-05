@@ -3,7 +3,7 @@ import FileUploader from '../components/FileUploader';
 import SignatureCanvas, { SignatureCanvasRef } from '../components/SignatureCanvas';
 import { rotateFile, addPageNumbers, compressPdf, watermarkPdf, deletePages, splitPdf, imagesToPdf } from '../services/pdfService';
 import { wordToPdf, excelToPdf, htmlToPdf, pdfToJpg, pdfToWord } from '../services/conversionService';
-import { protectPdf, unlockPdf, signPdf } from '../services/securityService';
+import { protectPdf, unlockPdf, signPdf, bruteForceUnlock } from '../services/securityService';
 import { ocrPdf } from '../services/ocrService';
 import { pdfToPpt } from '../services/pptService';
 import { redactPdf, repairPdf } from '../services/sanitizeService';
@@ -39,6 +39,13 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
   const [signatureBgColor, setSignatureBgColor] = useState('rgba(255,255,255,0)');
   const [savedSignature, setSavedSignature] = useState<string | null>(null);
   const signatureCanvasRef = useRef<SignatureCanvasRef>(null);
+
+  // Brute Force State
+  const [bruteForceMode, setBruteForceMode] = useState(false);
+  const [bruteCharset, setBruteCharset] = useState<'numeric' | 'alpha-lower' | 'alpha-mixed' | 'alphanumeric'>('numeric');
+  const [bruteMaxLength, setBruteMaxLength] = useState(4);
+  const [bruteStatus, setBruteStatus] = useState<string | null>(null);
+
 
   // Signature Canvas Helpers
   const clearSignature = () => {
@@ -212,8 +219,25 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
         b = await protectPdf(file, password);
       }
       else if (mode === 'unlock' && file) {
-        if (!password) throw new Error("Please enter the password.");
-        b = await unlockPdf(file, password);
+        if (bruteForceMode) {
+          // Brute Force Logic
+          setProcessingStatus('processing');
+          notify.upload(); // Sound effect
+
+          const result = await bruteForceUnlock(file, { charset: bruteCharset, maxLength: bruteMaxLength }, (pass, count) => {
+            setBruteStatus(`Trying: ${pass} (${count} attempts)`);
+          });
+
+          if (result.password && result.decryptedPdf) {
+            b = result.decryptedPdf;
+            alert(`Password Found: ${result.password}`);
+          } else {
+            throw new Error("Password not found with current settings.");
+          }
+        } else {
+          if (!password) throw new Error("Please enter the password.");
+          b = await unlockPdf(file, password);
+        }
       }
       else if (mode === 'sign' && file) {
         // Use signature_pad for professional signature
@@ -494,21 +518,90 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
               )}
 
               {needsPassword && (
-                <div className="space-y-4">
-                  <label className="block text-xs font-black uppercase tracking-widest text-slate-500 mb-2">
-                    {mode === 'protect' ? 'Set Encryption Password' : 'Enter Password to Unlock'}
-                  </label>
-                  <div className="relative">
-                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
-                    <input
-                      type="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      placeholder="••••••••"
-                      className={`w-full p-6 pl-14 rounded-2xl text-xl font-bold border-2 focus:ring-4 transition-all outline-none ${darkMode ? 'bg-slate-900 border-slate-700 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
-                        }`}
-                    />
-                  </div>
+                <div className="space-y-6">
+                  {mode === 'unlock' && (
+                    <div className="flex items-center justify-between p-4 bg-slate-100 dark:bg-slate-700/50 rounded-xl">
+                      <span className="font-bold text-sm uppercase">Forgot Password? (Brute Force)</span>
+                      <button
+                        onClick={() => setBruteForceMode(!bruteForceMode)}
+                        className={`w-12 h-6 rounded-full transition-colors relative ${bruteForceMode ? 'bg-red-600' : 'bg-slate-300'}`}
+                      >
+                        <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${bruteForceMode ? 'left-7' : 'left-1'}`}></div>
+                      </button>
+                    </div>
+                  )}
+
+                  {!bruteForceMode ? (
+                    <div className="space-y-4">
+                      <label className="block text-xs font-black uppercase tracking-widest text-slate-500 mb-2">
+                        {mode === 'protect' ? 'Set Encryption Password' : 'Enter Password to Unlock'}
+                      </label>
+                      <div className="relative">
+                        <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
+                        <input
+                          type="password"
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          placeholder="••••••••"
+                          className={`w-full p-6 pl-14 rounded-2xl text-xl font-bold border-2 focus:ring-4 transition-all outline-none ${darkMode ? 'bg-slate-900 border-slate-700 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
+                            }`}
+                        />
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-6 animate-fadeIn">
+                      <div className="p-4 bg-orange-50 text-orange-800 rounded-xl text-sm font-bold border border-orange-200">
+                        Create a range of possible passwords. Browser-based cracking is slow, so this works best for short or numeric passwords.
+                      </div>
+
+                      {/* Charset Selector */}
+                      <div className="space-y-2">
+                        <label className="block text-xs font-black uppercase tracking-widest text-slate-500">Character Set</label>
+                        <div className="grid grid-cols-2 gap-3">
+                          {[
+                            { id: 'numeric', label: 'Numeric (0-9)' },
+                            { id: 'alpha-lower', label: 'Letters (a-z)' },
+                            { id: 'alpha-mixed', label: 'Mixed Case (a-Z)' },
+                            { id: 'alphanumeric', label: 'All (a-Z, 0-9)' }
+                          ].map(opt => (
+                            <button
+                              key={opt.id}
+                              onClick={() => setBruteCharset(opt.id as any)}
+                              className={`p-3 rounded-xl border-2 text-sm font-bold transition-all ${bruteCharset === opt.id ? 'border-red-500 bg-red-50 text-red-600 dark:bg-red-900/20' : 'border-slate-200 dark:border-slate-700'}`}
+                            >
+                              {opt.label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Max Length Slider */}
+                      <div className="space-y-4">
+                        <div className="flex justify-between">
+                          <label className="block text-xs font-black uppercase tracking-widest text-slate-500">Max Length: {bruteMaxLength}</label>
+                        </div>
+                        <input
+                          type="range"
+                          min="1"
+                          max="6"
+                          value={bruteMaxLength}
+                          onChange={(e) => setBruteMaxLength(parseInt(e.target.value))}
+                          className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-red-600"
+                        />
+                        <div className="flex justify-between text-xs font-bold text-slate-400">
+                          <span>1</span>
+                          <span>6 (Very Slow)</span>
+                        </div>
+                      </div>
+
+                      {/* Status Display */}
+                      {bruteStatus && (
+                        <div className="p-4 bg-slate-900 text-green-400 font-mono text-sm rounded-xl overflow-hidden truncate">
+                          &gt; {bruteStatus}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -596,6 +689,7 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
           </div>
         </div>
       )}
+
     </div>
   );
 };
