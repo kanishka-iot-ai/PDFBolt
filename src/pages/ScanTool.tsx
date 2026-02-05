@@ -210,83 +210,92 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
                 </div>
             )}
 
-            {/* Camera View */}
+            {/* Camera View - Full Screen Overlay */}
             {isCameraActive && (
-                <div className="w-full max-w-4xl flex flex-col h-full bg-black rounded-3xl overflow-hidden shadow-2xl relative animate-fadeIn">
-                    <div className="relative flex-grow bg-black">
+                <div className="fixed inset-0 z-50 bg-black flex flex-col animate-fadeIn">
+                    <div className="relative flex-grow overflow-hidden">
                         <video
                             ref={videoRef}
                             autoPlay
                             playsInline
-                            className="w-full h-full object-contain max-h-[70vh]"
+                            muted
+                            className="absolute inset-0 w-full h-full object-cover"
+                            onLoadedMetadata={() => {
+                                if (videoRef.current) videoRef.current.play().catch(e => console.error("Play error:", e));
+                            }}
                         ></video>
 
                         {/* Overlays */}
-                        <div className="absolute inset-0 pointer-events-none p-6 flex flex-col justify-between">
-                            <div className="flex justify-between">
-                                <div className={`w-16 h-16 border-t-4 border-l-4 rounded-tl-2xl transition-colors ${detectState === 'detected' ? 'border-green-500' : 'border-white/50'}`}></div>
-                                <div className={`w-16 h-16 border-t-4 border-r-4 rounded-tr-2xl transition-colors ${detectState === 'detected' ? 'border-green-500' : 'border-white/50'}`}></div>
-                            </div>
+                        <div className="absolute inset-0 pointer-events-none p-6 flex flex-col justify-between z-10">
+                            {/* Top Bar with Back Button */}
+                            <div className="flex justify-between items-start">
+                                <button
+                                    onClick={stopCamera}
+                                    className="p-3 bg-black/40 backdrop-blur-md rounded-full text-white hover:bg-black/60 border border-white/10"
+                                >
+                                    <X size={24} />
+                                </button>
 
-                            {/* Scanning Animation */}
-                            <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-transparent via-blue-500/10 to-transparent animate-scan"></div>
-
-                            <div className="flex justify-between">
-                                <div className={`w-16 h-16 border-b-4 border-l-4 rounded-bl-2xl transition-colors ${detectState === 'detected' ? 'border-green-500' : 'border-white/50'}`}></div>
-                                <div className={`w-16 h-16 border-b-4 border-r-4 rounded-br-2xl transition-colors ${detectState === 'detected' ? 'border-green-500' : 'border-white/50'}`}></div>
-                            </div>
-                        </div>
-
-                        {/* Status Chip */}
-                        {autoDetect && (
-                            <div className="absolute top-8 left-1/2 -translate-x-1/2 px-5 py-2 bg-black/60 backdrop-blur-md rounded-full text-sm font-bold text-white uppercase tracking-widest flex items-center gap-2 border border-white/10 shadow-lg">
-                                {detectState === 'detected' ? (
-                                    <> <CheckCircle2 size={16} className="text-green-400" /> Detected </>
-                                ) : (
-                                    <> <ScanIcon size={16} className="animate-spin" /> Searching... </>
-                                )}
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Camera Controls Bar */}
-                    <div className="bg-slate-900 border-t border-slate-800 p-6 flex items-center justify-between">
-                        <div className="flex items-center gap-4">
-                            <div
-                                className="w-12 h-12 rounded-lg bg-slate-800 border border-slate-700 overflow-hidden relative"
-                                role="button"
-                                onClick={() => { stopCamera(); /* Go to gallery view */ }}
-                            >
-                                {capturedImages.length > 0 ? (
-                                    <>
-                                        <img src={capturedImages[capturedImages.length - 1]} className="w-full h-full object-cover opacity-60" alt="" />
-                                        <div className="absolute inset-0 flex items-center justify-center font-black text-white text-lg">
-                                            {capturedImages.length}
-                                        </div>
-                                    </>
-                                ) : (
-                                    <div className="w-full h-full flex items-center justify-center text-slate-500">
-                                        <FileText size={20} />
+                                {autoDetect && (
+                                    <div className={`px-4 py-2 rounded-full text-xs font-bold uppercase tracking-widest flex items-center gap-2 border shadow-lg transition-colors ${detectState === 'detected'
+                                            ? 'bg-green-500 text-white border-green-400'
+                                            : 'bg-black/60 text-white/70 border-white/10 backdrop-blur-md'
+                                        }`}>
+                                        {detectState === 'detected' ? (
+                                            <> <CheckCircle2 size={14} /> Detected </>
+                                        ) : (
+                                            <> <ScanIcon size={14} className="animate-spin" /> Searching... </>
+                                        )}
                                     </div>
                                 )}
                             </div>
+
+                            {/* Enrollment Frame Guides */}
+                            <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-50">
+                                <div className={`w-[80%] h-[70%] border-2 rounded-3xl transition-colors duration-300 ${detectState === 'detected' ? 'border-green-500' : 'border-white/30'}`}>
+                                    <div className="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-white -translate-x-1 -translate-y-1 rounded-tl-xl"></div>
+                                    <div className="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-white translate-x-1 -translate-y-1 rounded-tr-xl"></div>
+                                    <div className="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-white -translate-x-1 translate-y-1 rounded-bl-xl"></div>
+                                    <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-white translate-x-1 translate-y-1 rounded-br-xl"></div>
+                                </div>
+                            </div>
                         </div>
+                    </div>
 
-                        <button
-                            onClick={captureImage}
-                            disabled={processing}
-                            className={`w-20 h-20 rounded-full border-4 shadow-xl flex items-center justify-center transition-all ${detectState === 'detected'
-                                    ? 'bg-white border-green-500 scale-105 active:scale-95'
-                                    : 'bg-transparent border-white hover:bg-white/10 active:scale-95'
-                                }`}
-                        >
-                            <div className={`w-16 h-16 rounded-full transition-all ${detectState === 'detected' ? 'bg-green-500' : 'bg-white'}`}></div>
-                        </button>
+                    {/* Camera Controls Bar - Fixed at Bottom */}
+                    <div className="bg-black/80 backdrop-blur-xl border-t border-white/10 p-6 safe-area-bottom">
+                        <div className="flex items-center justify-between max-w-lg mx-auto">
+                            {/* Gallery Preview */}
+                            <div className="flex items-center gap-4 w-20">
+                                {capturedImages.length > 0 && (
+                                    <div
+                                        className="w-12 h-12 rounded-lg bg-slate-800 border-2 border-white/20 overflow-hidden relative cursor-pointer active:scale-95 transition-transform"
+                                        onClick={() => stopCamera()}
+                                    >
+                                        <img src={capturedImages[capturedImages.length - 1]} className="w-full h-full object-cover" alt="" />
+                                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center text-white font-bold text-xs ring-1 ring-white/20">
+                                            {capturedImages.length}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
 
-                        <div className="flex items-center gap-4">
-                            <button onClick={stopCamera} className="p-3 bg-slate-800 rounded-full text-white hover:bg-slate-700 border border-slate-700">
-                                <X size={24} />
+                            {/* Capture Button */}
+                            <button
+                                onClick={captureImage}
+                                disabled={processing}
+                                className={`w-20 h-20 rounded-full border-[6px] flex items-center justify-center transition-all duration-200 ${detectState === 'detected'
+                                        ? 'border-green-500 scale-105'
+                                        : 'border-white/80 hover:border-white'
+                                    }`}
+                            >
+                                <div className={`w-16 h-16 rounded-full transition-all duration-100 ${processing ? 'scale-90 bg-white/50' : 'scale-100 bg-white'}`}></div>
                             </button>
+
+                            {/* Options Spacer / Torch (future) */}
+                            <div className="w-20 flex justify-end">
+                                {/* Placeholder for torch or settings */}
+                            </div>
                         </div>
                     </div>
                 </div>

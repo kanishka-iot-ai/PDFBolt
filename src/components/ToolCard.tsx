@@ -33,15 +33,15 @@ const ToolCard: React.FC<{ tool: ToolMetadata; darkMode: boolean }> = ({ tool, d
   return (
     <Link
       to={tool.path}
-      className={`group relative p-[1px] rounded-3xl transition-all duration-300 hover:scale-[1.02] hover:shadow-xl overflow-hidden h-full block`}
+      className={`group relative p-[2px] rounded-3xl transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl h-full block overflow-hidden`}
     >
-      {/* Animated Gradient Border */}
-      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-blue-500/50 to-transparent translate-x-[-100%] group-hover:animate-shimmer z-0"></div>
-      <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-r ${colors.glow.replace('bg-', 'from-').replace('500', '500/40')} to-transparent blur-xl`}></div>
+      {/* Moving Gradient Border Background */}
+      <div className={`absolute inset-0 bg-gradient-to-r ${colors.glow.replace('bg-', 'from-')} via-white to-${colors.glow.replace('bg-', '')} opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-[spin_4s_linear_infinite]`} style={{ width: '200%', height: '200%', left: '-50%', top: '-50%' }}></div>
 
-      <div className={`relative h-full p-6 rounded-[23px] flex flex-col justify-between overflow-hidden ${darkMode
-        ? `bg-slate-900/90 border border-slate-700/50 ${colors.hoverBorder} backdrop-blur-md`
-        : `bg-white border border-slate-200 shadow-sm ${colors.hoverBorder.replace('/50', '/30')}` // Adjust opacity for light mode
+      {/* Inner Card Content (Masks the center of the gradient) */}
+      <div className={`relative h-full p-6 rounded-[22px] flex flex-col justify-between overflow-hidden z-10 ${darkMode
+        ? `bg-slate-900 border-slate-700/50`
+        : `bg-white border-white`
         }`}
       >
         {/* Subtle colorful glow on hover */}
