@@ -39,6 +39,7 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
   const [signatureBgColor, setSignatureBgColor] = useState('rgba(255,255,255,0)');
   const [savedSignature, setSavedSignature] = useState<string | null>(null);
   const signatureCanvasRef = useRef<SignatureCanvasRef>(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   // Brute Force State
   const [bruteForceMode, setBruteForceMode] = useState(false);
@@ -222,17 +223,37 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
         if (bruteForceMode) {
           // Brute Force Logic
           setProcessingStatus('processing');
-          notify.upload(); // Sound effect
+          notify.upload();
 
-          const result = await bruteForceUnlock(file, { charset: bruteCharset, maxLength: bruteMaxLength }, (pass, count) => {
-            setBruteStatus(`Trying: ${pass} (${count} attempts)`);
-          });
+          // Create AbortController
+          const controller = new AbortController();
+          abortControllerRef.current = controller;
 
-          if (result.password && result.decryptedPdf) {
-            b = result.decryptedPdf;
-            alert(`Password Found: ${result.password}`);
-          } else {
-            throw new Error("Password not found with current settings.");
+          try {
+            const result = await bruteForceUnlock(file, {
+              charset: bruteCharset,
+              maxLength: bruteMaxLength,
+              signal: controller.signal
+            }, (pass, count) => {
+              setBruteStatus(`Trying: ${pass} (${count} attempts)`);
+            });
+
+            if (result.password && result.decryptedPdf) {
+              b = result.decryptedPdf;
+              alert(`Password Found: ${result.password}`);
+            } else {
+              throw new Error("Password not found with current settings.");
+            }
+          } catch (err: any) {
+            if (err.message === 'Brute force stopped by user.') {
+              setProcessing(false);
+              setProcessingStatus('error'); // Or 'idle'
+              setBruteStatus('stopped');
+              return; // Exit without further processing
+            }
+            throw err;
+          } finally {
+            abortControllerRef.current = null;
           }
         } else {
           if (!password) throw new Error("Please enter the password.");
@@ -622,13 +643,24 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
 
           <div className="flex flex-col items-center gap-8">
             {!result && (
-              <button
-                disabled={processing || (needsPageInput && !pageInput) || (needsPassword && !password) || (isImageTool && multiFiles.length === 0)}
-                onClick={process}
-                className="w-full max-w-xl px-10 py-8 bg-red-600 text-white rounded-[2.5rem] font-black text-3xl shadow-2xl hover:bg-red-700 hover:scale-105 disabled:opacity-30 transition-all flex items-center justify-center gap-4 group"
-              >
-                {processing ? <div className="w-8 h-8 border-4 border-white/30 border-t-white rounded-full animate-spin"></div> : <span>Process {title}</span>}
-              </button>
+              <div className="flex flex-col gap-4 w-full max-w-xl">
+                <button
+                  disabled={processing || (needsPageInput && !pageInput) || (needsPassword && !password) || (isImageTool && multiFiles.length === 0)}
+                  onClick={process}
+                  className="w-full px-10 py-8 bg-red-600 text-white rounded-[2.5rem] font-black text-3xl shadow-2xl hover:bg-red-700 hover:scale-105 disabled:opacity-30 transition-all flex items-center justify-center gap-4 group"
+                >
+                  {processing ? <div className="w-8 h-8 border-4 border-white/30 border-t-white rounded-full animate-spin"></div> : <span>Process {title}</span>}
+                </button>
+
+                {processing && bruteForceMode && (
+                  <button
+                    onClick={() => abortControllerRef.current?.abort()}
+                    className="w-full py-4 bg-slate-800 text-white rounded-2xl font-bold hover:bg-slate-700 active:scale-95 transition-all"
+                  >
+                    Stop Operation
+                  </button>
+                )}
+              </div>
             )}
 
             {result && !processing && (

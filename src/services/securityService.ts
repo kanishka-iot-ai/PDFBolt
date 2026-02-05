@@ -137,6 +137,7 @@ export async function bruteForceUnlock(
     options: {
         charset: 'numeric' | 'alpha-lower' | 'alpha-mixed' | 'alphanumeric';
         maxLength: number;
+        signal?: AbortSignal;
     },
     onProgress: (currentAttempt: string, totalAttempts: number) => void
 ): Promise<{ password: string | null; decryptedPdf: Uint8Array | null }> {
@@ -181,30 +182,24 @@ export async function bruteForceUnlock(
     };
 
     let count = 0;
-    // Estimated count not calculated for perf, just raw loop
-
-    // Load document ONCE if possible to check encryption? 
-    // No, pdf-lib loads WITH password. So we must try load every time.
-    // OPTIMIZATION: This is slow in JS.
-
-    // Attempt limited chunk of combinations to avoid freezing UI
-    // We will use a batch approach if this was a worker, but here we just loop async-ish?
-    // Actually, making it async per attempt is too slow. 
-    // We'll try to burst 100 attempts then yield.
-
     const generator = generateCombinations(options.maxLength);
 
     for (const password of generator) {
+        // Check for cancellation
+        if (options.signal?.aborted) {
+            throw new Error("Brute force stopped by user.");
+        }
+
         count++;
-        if (count % 50 === 0) {
+        // Update more frequently for better responsiveness
+        if (count % 10 === 0) {
             onProgress(password, count);
-            // Yield to main thread to keep UI responsive
+            // Yield to main thread
             await new Promise(r => setTimeout(r, 0));
         }
 
         try {
             // Attempt load
-            // Note: ignoreErrors=true might help speed up?
             const pdfDoc = await PDFDocument.load(bytes, { password } as any);
 
             // If we get here, password is correct!
