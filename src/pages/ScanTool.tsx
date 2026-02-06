@@ -9,72 +9,97 @@ interface ScanToolProps {
 const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
     const videoRef = useRef<HTMLVideoElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
-    const [stream, setStream] = useState<MediaStream | null>(null);
+    // capturedImages stores base64 data URLs
     const [capturedImages, setCapturedImages] = useState<string[]>([]);
     const [isCameraActive, setIsCameraActive] = useState(false);
     const [loading, setLoading] = useState(false);
     const [processing, setProcessing] = useState(false);
     const [cameraError, setCameraError] = useState<string | null>(null);
 
-    // "Auto Detect" simulation state
-    const [autoDetect, setAutoDetect] = useState(true);
-    const [detectState, setDetectState] = useState<'searching' | 'detected'>('searching');
+    // Filter State
+    const [activeFilter, setActiveFilter] = useState<'none' | 'bw' | 'contrast'>('none');
 
     // Start Camera
     const startCamera = async () => {
         setCameraError(null);
-        try {
-            // Try environment facing camera first (rear camera)
-            const constraints = {
-                video: { facingMode: 'environment', width: { ideal: 1920 }, height: { ideal: 1080 } }
-            };
-
-            let mediaStream;
+        setIsCameraActive(true);
+        // Wait a tick for the video element to be mounted
+        setTimeout(async () => {
             try {
-                mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
-            } catch (err: any) {
-                // Fallback to any camera if environment fails
-                console.warn("Environment camera failed, trying default user media", err);
-                mediaStream = await navigator.mediaDevices.getUserMedia({ video: true });
-            }
+                // Try environment facing camera first (rear camera)
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: 'environment' },
+                    audio: false
+                });
 
-            setStream(mediaStream);
-            if (videoRef.current) {
-                videoRef.current.srcObject = mediaStream;
+                if (videoRef.current) {
+                    videoRef.current.srcObject = stream;
+                    try {
+                        await videoRef.current.play();
+                    } catch (playErr) {
+                        console.error("Play error:", playErr);
+                    }
+                }
+            } catch (err: any) {
+                console.error("Error accessing camera:", err);
+                setIsCameraActive(false);
+                if (err.name === 'NotAllowedError') {
+                    setCameraError("Camera permission denied. Please allow access.");
+                } else if (err.name === 'NotFoundError') {
+                    setCameraError("No camera found.");
+                } else {
+                    setCameraError("Camera access error. Ensure you are on HTTPS.");
+                }
             }
-            setIsCameraActive(true);
-            setDetectState('searching');
-        } catch (err: any) {
-            console.error("Error accessing camera:", err);
-            if (err.name === 'NotAllowedError') {
-                setCameraError("Camera access denied. Please allow camera permissions in your browser settings.");
-            } else if (err.name === 'NotFoundError') {
-                setCameraError("No camera found based on your constraints.");
-            } else {
-                setCameraError("Could not access camera. Please ensure you are on HTTPS or localhost.");
-            }
-        }
+        }, 100);
     };
 
     // Stop Camera
     const stopCamera = () => {
-        if (stream) {
+        if (videoRef.current && videoRef.current.srcObject) {
+            const stream = videoRef.current.srcObject as MediaStream;
             stream.getTracks().forEach(track => track.stop());
-            setStream(null);
+            videoRef.current.srcObject = null;
         }
         setIsCameraActive(false);
     };
 
-    // Simulated Auto-Detect Logic
-    useEffect(() => {
-        if (!isCameraActive || !autoDetect) return;
+    // Capture Image
+    const captureImage = () => {
+        if (!videoRef.current || !canvasRef.current) return;
 
-        const interval = setInterval(() => {
-            setDetectState(prev => prev === 'searching' ? 'detected' : 'searching');
-        }, 2000);
+        setProcessing(true);
+        const video = videoRef.current;
+        const canvas = canvasRef.current;
+        const ctx = canvas.getContext('2d');
 
-        return () => clearInterval(interval);
-    }, [isCameraActive, autoDetect]);
+        if (!ctx) return;
+
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+
+        // Draw video frame to canvas
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        // Apply filters via canvas pixel manipulation if supported, or CSS filters are visual only.
+        // For actual saved image, we need to process the canvas data or use the filter context (if supported)
+        // Here we'll do simple processing if needed, but for now we'll stick to 'none' stored to keep it fast, 
+        // or apply basic distinct logic.
+        // NOTE: Standard canvas 'filter' property is supported in modern browsers.
+        if (activeFilter !== 'none') {
+            if (activeFilter === 'bw') ctx.filter = 'grayscale(100%)';
+            if (activeFilter === 'contrast') ctx.filter = 'contrast(150%) grayscale(100%)';
+            // Redraw with filter
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            ctx.filter = 'none'; // reset
+        }
+
+        const imageData = canvas.toDataURL("image/jpeg", 0.85);
+        setCapturedImages(prev => [...prev, imageData]);
+
+        setProcessing(false);
+        if (notify && notify.success) notify.success("Captured!");
+    };
 
     // Cleanup on unmount
     useEffect(() => {
@@ -82,50 +107,6 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
             stopCamera();
         }
     }, []);
-
-    // Filter State
-    const [activeFilter, setActiveFilter] = useState<'none' | 'bw' | 'contrast'>('none');
-
-    // ... (Start Camera logic same) ...
-
-    // Capture Image
-    const captureImage = useCallback(() => {
-        if (!videoRef.current || !canvasRef.current) return;
-
-        setProcessing(true);
-        const video = videoRef.current;
-        const canvas = canvasRef.current;
-
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-
-        const ctx = canvas.getContext('2d');
-        if (!ctx) return;
-
-        // Apply Filters via Context Context filter (Modern Browsers) or Pixel Manipulation
-        // Note: ctx.filter support is good in most modern browsers.
-        if (activeFilter === 'bw') {
-            ctx.filter = 'grayscale(100%)';
-        } else if (activeFilter === 'contrast') {
-            ctx.filter = 'contrast(150%) grayscale(100%)';
-        } else {
-            ctx.filter = 'none';
-        }
-
-        // Draw image with filter
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-        // Reset filter for safety 
-        ctx.filter = 'none';
-
-        const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
-
-        setCapturedImages(prev => [...prev, dataUrl]);
-        setProcessing(false);
-
-        if (notify && notify.success) notify.success("Page Scanned!");
-
-    }, [notify, activeFilter]);
 
     const removePage = (index: number) => {
         setCapturedImages(prev => prev.filter((_, i) => i !== index));
@@ -163,7 +144,6 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
             document.body.removeChild(link);
 
             if (notify && notify.complete) notify.complete();
-            // Reset after save
             setCapturedImages([]);
             setIsCameraActive(false);
         } catch (e) {
@@ -186,7 +166,6 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
                     <h2 className="text-3xl font-black mb-4">Scan Documents</h2>
                     <p className="mb-10 opacity-70 text-lg leading-relaxed">
                         Use your camera to scan multiple pages into a single PDF.
-                        Features standard auto-detection and image enhancement.
                     </p>
 
                     {cameraError && (
@@ -205,116 +184,68 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
                 </div>
             )}
 
-            {/* Camera View - Full Screen Overlay */}
+            {/* Camera View - Full Screen Overlay with Clean CSS */}
             {isCameraActive && (
-                <div className="fixed inset-0 z-50 bg-black flex flex-col animate-fadeIn">
-                    <div className="relative flex-grow overflow-hidden">
-                        <video
-                            ref={videoRef}
-                            autoPlay
-                            playsInline
-                            muted
-                            className="absolute inset-0 w-full h-full object-cover"
-                            onLoadedMetadata={() => {
-                                if (videoRef.current) videoRef.current.play().catch(e => console.error("Play error:", e));
-                            }}
-                        ></video>
+                <div className="fixed inset-0 z-[100] bg-black">
+                    <div className="relative w-full h-full flex flex-col">
+                        {/* Video Container - Production Level CSS */}
+                        <div className="relative flex-grow w-full bg-black overflow-hidden">
+                            <video
+                                ref={videoRef}
+                                autoPlay
+                                playsInline
+                                className="w-full h-full object-cover"
+                                style={{ transform: 'scaleX(1)' }} // Ensure no weird mirroring by default unless selfie
+                            ></video>
 
-                        {/* Overlays */}
-                        <div className="absolute inset-0 pointer-events-none p-6 flex flex-col justify-between z-10">
-                            {/* Top Bar with Back Button */}
-                            <div className="flex justify-between items-start">
-                                <button
-                                    onClick={stopCamera}
-                                    className="p-3 bg-black/40 backdrop-blur-md rounded-full text-white hover:bg-black/60 border border-white/10"
-                                >
-                                    <X size={24} />
-                                </button>
-
-                                {autoDetect && (
-                                    <div className={`px-4 py-2 rounded-full text-xs font-bold uppercase tracking-widest flex items-center gap-2 border shadow-lg transition-colors ${detectState === 'detected'
-                                        ? 'bg-green-500 text-white border-green-400'
-                                        : 'bg-black/60 text-white/70 border-white/10 backdrop-blur-md'
-                                        }`}>
-                                        {detectState === 'detected' ? (
-                                            <> <CheckCircle2 size={14} /> Detected </>
-                                        ) : (
-                                            <> <ScanIcon size={14} className="animate-spin" /> Searching... </>
-                                        )}
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* Enrollment Frame Guides */}
-                            <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-50">
-                                <div className={`w-[80%] h-[70%] border-2 rounded-3xl transition-colors duration-300 ${detectState === 'detected' ? 'border-green-500' : 'border-white/30'}`}>
-                                    <div className="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-white -translate-x-1 -translate-y-1 rounded-tl-xl"></div>
-                                    <div className="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-white translate-x-1 -translate-y-1 rounded-tr-xl"></div>
-                                    <div className="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-white -translate-x-1 translate-y-1 rounded-bl-xl"></div>
-                                    <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-white translate-x-1 translate-y-1 rounded-br-xl"></div>
+                            {/* Overlay UI */}
+                            <div className="absolute inset-0 pointer-events-none p-4 flex flex-col justify-between">
+                                <div className="flex justify-end pt-2">
+                                    <button
+                                        onClick={stopCamera}
+                                        className="pointer-events-auto p-3 bg-black/50 text-white rounded-full backdrop-blur-md"
+                                    >
+                                        <X size={24} />
+                                    </button>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    {/* Camera Controls Bar - Fixed at Bottom */}
-                    <div className="bg-black/80 backdrop-blur-xl border-t border-white/10 p-6 safe-area-bottom">
-                        <div className="flex items-center justify-between max-w-lg mx-auto">
-                            {/* Gallery Preview */}
-                            <div className="flex items-center gap-4 w-20">
-                                {capturedImages.length > 0 && (
-                                    <div
-                                        className="w-12 h-12 rounded-lg bg-slate-800 border-2 border-white/20 overflow-hidden relative cursor-pointer active:scale-95 transition-transform"
-                                        onClick={() => stopCamera()}
-                                    >
-                                        <img src={capturedImages[capturedImages.length - 1]} className="w-full h-full object-cover" alt="" />
-                                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center text-white font-bold text-xs ring-1 ring-white/20">
-                                            {capturedImages.length}
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* Capture Button */}
-                            <button
-                                onClick={captureImage}
-                                disabled={processing}
-                                className={`w-20 h-20 rounded-full border-[6px] flex items-center justify-center transition-all duration-200 ${detectState === 'detected'
-                                    ? 'border-green-500 scale-105'
-                                    : 'border-white/80 hover:border-white'
-                                    }`}
-                            >
-                                <div className={`w-16 h-16 rounded-full transition-all duration-100 ${processing ? 'scale-90 bg-white/50' : 'scale-100 bg-white'}`}></div>
-                            </button>
-
-                            {/* Options Spacer / Filter Toggle */}
-                            <div className="w-20 flex justify-end">
+                        {/* Controls - Fixed Bottom */}
+                        <div className="bg-black/90 p-6 pb-12">
+                            <div className="flex justify-between items-center max-w-md mx-auto">
+                                {/* Filter Toggle */}
                                 <button
-                                    onClick={() => setActiveFilter(prev => {
-                                        if (prev === 'none') return 'bw';
-                                        if (prev === 'bw') return 'contrast';
-                                        return 'none';
-                                    })}
-                                    className="flex flex-col items-center gap-1 text-white/80 active:scale-95 transition-transform"
+                                    onClick={() => setActiveFilter(prev => prev === 'none' ? 'bw' : prev === 'bw' ? 'contrast' : 'none')}
+                                    className="p-3 text-white/80 flex flex-col items-center gap-1"
                                 >
-                                    <div className={`w-10 h-10 rounded-full border-2 flex items-center justify-center ${activeFilter !== 'none' ? 'bg-white text-black border-white' : 'border-white/30 bg-black/40'}`}>
-                                        {activeFilter === 'none' && <div className="w-4 h-4 rounded-full bg-gradient-to-tr from-blue-400 to-pink-400"></div>}
-                                        {activeFilter === 'bw' && <div className="w-4 h-4 rounded-full bg-gray-400"></div>}
-                                        {activeFilter === 'contrast' && <div className="w-4 h-4 rounded-full border-2 border-black bg-white"></div>}
-                                    </div>
-                                    <span className="text-[10px] uppercase font-bold tracking-wider">
-                                        {activeFilter === 'none' ? 'Color' : activeFilter === 'bw' ? 'B&W' : 'Pro'}
-                                    </span>
+                                    <div className={`w-8 h-8 rounded-full border ${activeFilter !== 'none' ? 'bg-white' : 'border-white/50'}`}></div>
+                                    <span className="text-[10px] uppercase font-bold">{activeFilter}</span>
                                 </button>
+
+                                {/* Capture Button */}
+                                <button
+                                    onClick={captureImage}
+                                    disabled={processing}
+                                    className="w-20 h-20 rounded-full border-4 border-white flex items-center justify-center active:scale-95 transition-transform"
+                                >
+                                    <div className="w-16 h-16 bg-white rounded-full"></div>
+                                </button>
+
+                                {/* Gallery / Done */}
+                                <div className="text-white flex flex-col items-center gap-1 cursor-pointer" onClick={stopCamera}>
+                                    <span className="text-xl font-bold">{capturedImages.length}</span>
+                                    <span className="text-[10px] uppercase font-bold text-white/50">Done</span>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             )}
 
-            {/* Gallery / Review Mode */}
+            {/* Review Mode */}
             {!isCameraActive && capturedImages.length > 0 && (
-                <div className="w-full max-w-5xl animate-fadeIn">
+                <div className="w-full max-w-5xl animate-fadeIn p-6">
                     <div className="flex items-center justify-between mb-8">
                         <div>
                             <h2 className="text-3xl font-black">Review Scans</h2>
@@ -337,41 +268,24 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                         {capturedImages.map((img, idx) => (
-                            <div key={idx} className="relative group rounded-xl overflow-hidden shadow-lg border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
-                                <div className="aspect-[3/4] relative">
-                                    <img src={img} alt={`Page ${idx + 1}`} className="w-full h-full object-cover" />
-                                </div>
-                                <div className="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <button
-                                        onClick={() => removePage(idx)}
-                                        className="p-2 bg-red-600 text-white rounded-lg shadow-lg hover:bg-red-700"
-                                        title="Delete Page"
-                                    >
-                                        <Trash2 size={16} />
-                                    </button>
-                                </div>
-                                <div className="p-3 text-center border-t border-slate-200 dark:border-slate-700">
-                                    <span className="text-sm font-bold text-slate-500">Page {idx + 1}</span>
+                            <div key={idx} className="relative group rounded-xl overflow-hidden shadow-lg border-2 border-slate-200 dark:border-slate-700">
+                                <img src={img} alt={`Page ${idx}`} className="w-full h-auto" />
+                                <button
+                                    onClick={() => removePage(idx)}
+                                    className="absolute top-2 right-2 p-2 bg-red-600 text-white rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                                >
+                                    <Trash2 size={16} />
+                                </button>
+                                <div className="absolute bottom-0 inset-x-0 bg-black/50 text-white text-center text-xs py-1">
+                                    Page {idx + 1}
                                 </div>
                             </div>
                         ))}
-
-                        {/* Add Page Card */}
-                        <button
-                            onClick={startCamera}
-                            className="aspect-[3/4] rounded-xl border-4 border-dashed border-slate-200 dark:border-slate-700 flex flex-col items-center justify-center gap-4 text-slate-400 hover:text-blue-500 hover:border-blue-500/50 hover:bg-blue-50/5 dark:hover:bg-blue-900/10 transition-all group"
-                        >
-                            <div className="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center group-hover:scale-110 transition-transform">
-                                <Plus size={32} />
-                            </div>
-                            <span className="font-bold">Add Page</span>
-                        </button>
                     </div>
                 </div>
             )}
-
             <canvas ref={canvasRef} className="hidden" />
         </div>
     );

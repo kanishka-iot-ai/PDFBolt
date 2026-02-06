@@ -15,6 +15,7 @@
         animation: shimmer 2s linear infinite;
     }
 
+
     @keyframes fadeIn {
         from { opacity: 0; transform: translateY(10px); }
         to { opacity: 1; transform: translateY(0); }
@@ -29,4 +30,83 @@
         0% { transform: translateX(-150%) skewX(-15deg); }
         100% { transform: translateX(150%) skewX(-15deg); }
     }
+}
+
+/* Premium Tool Card Animations */
+.pdf-card {
+  /* width: 260px;  Removed fixed width for responsiveness */
+  width: 100%;
+  height: 100%; /* Match existing h-full behavior */
+  min-height: 160px; 
+  /* background: #ffffff; handled by tailwind classes based on dark mode */
+  border-radius: 14px;
+  /* padding: 20px; handled by tailwind */
+  cursor: pointer;
+  transition: all 0.35s ease;
+  /* box-shadow: 0 6px 18px rgba(0,0,0,0.08); handled by tailwind */
+  position: relative;
+  overflow: hidden;
+}
+
+/* Gradient border glow */
+.pdf-card::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  background: linear-gradient(
+    120deg,
+    #00f0ff,
+    #ff00ff,
+    #00ff88,
+    #00f0ff
+  );
+  z-index: -1;
+  filter: blur(10px);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  border-radius: 16px;
+}
+
+.pdf-card:hover {
+  transform: translateY(-10px) scale(1.03);
+  box-shadow: 0 18px 40px rgba(0,0,0,0.15);
+}
+
+.pdf-card:hover::before {
+  opacity: 1;
+}
+
+/* Floating Icon Animation */
+@keyframes floatIcon {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-6px); }
+  100% { transform: translateY(0px); }
+}
+
+.pdf-icon {
+  font-size: 42px; /* Fallback */
+  animation: floatIcon 3s ease-in-out infinite;
+  display: inline-block; /* Required for transform to work */
+}
+
+/* Shine Sweep Effect */
+.pdf-card::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    120deg,
+    transparent,
+    rgba(255,255,255,0.5),
+    transparent
+  );
+  transition: 0.6s;
+  pointer-events: none; /* Ensure clicks go through */
+}
+
+.pdf-card:hover::after {
+  left: 100%;
 }

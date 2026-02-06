@@ -80,24 +80,17 @@ const ToolCard: React.FC<{ tool: ToolMetadata; darkMode: boolean }> = ({ tool, d
   return (
     <Link
       to={tool.path}
-      className={`group relative p-[2px] rounded-3xl transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl h-full block overflow-hidden`}
+      className={`block h-full group perspective-1000`} // perspective for potential future 3d
     >
-      {/* Moving Gradient Border Background */}
-      <div className={`absolute inset-0 bg-gradient-to-r ${colors.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-[spin_3s_linear_infinite]`} style={{ width: '200%', height: '200%', left: '-50%', top: '-50%' }}></div>
+      <div className={`pdf-card p-6 flex flex-col justify-between ${darkMode
+        ? `bg-slate-900 border border-slate-700/50`
+        : `bg-white border border-white shadow-xl`
+        }`}>
 
-      {/* Inner Card Content (Masks the center of the gradient) */}
-      <div className={`relative h-full p-6 rounded-[22px] flex flex-col justify-between overflow-hidden z-10 ${darkMode
-        ? `bg-slate-900 border-slate-700/50`
-        : `bg-white border-white`
-        }`}
-      >
-        {/* Subtle colorful glow on hover */}
-        <div className={`absolute -right-10 -bottom-10 w-32 h-32 rounded-full blur-[50px] opacity-0 group-hover:opacity-20 transition-opacity duration-500 ${colors.glow}`}></div>
-
-        <div className="relative z-10">
+        <div className="relative z-10 w-full">
           <div className="flex justify-between items-start mb-4">
-            {/* Icon - Smaller & Sleek */}
-            <div className={`p-3.5 rounded-2xl ${colors.icon} shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+            {/* Icon - Wrapped in float animation */}
+            <div className={`p-3.5 rounded-2xl ${colors.icon} shadow-lg transition-transform duration-300 pdf-icon`}>
               <div className="text-white scale-90">{getIcon(tool.icon)}</div>
             </div>
 
@@ -105,17 +98,17 @@ const ToolCard: React.FC<{ tool: ToolMetadata; darkMode: boolean }> = ({ tool, d
             <ArrowUpRight className={`w-5 h-5 opacity-0 group-hover:opacity-100 transition-all duration-300 -translate-x-2 translate-y-2 group-hover:translate-x-0 group-hover:translate-y-0 ${darkMode ? 'text-white/50' : 'text-slate-400'}`} />
           </div>
 
-          {/* Title - Compact */}
+          {/* Title */}
           <h3 className={`text-lg font-bold leading-tight ${darkMode ? 'text-slate-100' : 'text-slate-800'}`}>
             {tool.title}
           </h3>
 
-          {/* Description - Added per user request */}
+          {/* Description */}
           <p className={`mt-2 text-[11px] leading-relaxed line-clamp-2 ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
             {tool.description}
           </p>
 
-          {/* Core Badge - Minimalist */}
+          {/* Core Badge */}
           {isCore && (
             <div className="mt-3">
               <span className={`text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-md ${darkMode ? 'bg-white/5 text-white/40' : 'bg-slate-100 text-slate-400'}`}>
