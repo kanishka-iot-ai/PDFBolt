@@ -1,6 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import FileUploader from '../components/FileUploader';
 import SignatureCanvas, { SignatureCanvasRef } from '../components/SignatureCanvas';
+import { createZipFromFiles } from '../services/zipService';
+
+// ... (existing imports)
+
+// Inside SimpleTool component
+// ...
+
 import { rotateFile, addPageNumbers, compressPdf, watermarkPdf, deletePages, splitPdf, imagesToPdf } from '../services/pdfService';
 import { wordToPdf, excelToPdf, htmlToPdf, pdfToJpg, pdfToWord } from '../services/conversionService';
 import { protectPdf, unlockPdf, signPdf, bruteForceUnlock } from '../services/securityService';
@@ -97,6 +104,21 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
   const handle = async (f: File[]) => {
     if (f.length === 0) return; // Prevent reset on empty updates
 
+    // Check if this is a folder upload (detected via webkitRelativePath or standard compress mode with multiple files)
+    const isFolderUpload = f.length > 0 && (f[0].webkitRelativePath !== "" || (mode === 'compress' && f.length > 1));
+
+    if (mode === 'compress' && isFolderUpload) {
+      setMultiFiles(f);
+      setIsZip(true);
+      setFile(null); // Clear single file
+      setResult(null);
+      setPageInput('');
+      setPassword('');
+      setProcessingStatus('processing');
+      notify.upload();
+      return;
+    }
+
     // Validate files before accepting
     let allowedTypes: string[];
 
@@ -169,7 +191,15 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
       // -- EDIT TOOLS --
       if (mode === 'rotate' && file) b = await rotateFile(file, 90);
       else if (mode === 'numbers' && file) b = await addPageNumbers(file);
-      else if (mode === 'compress' && file) b = await compressPdf(file, compressionLevel);
+      else if (mode === 'compress') {
+        if (isZip && multiFiles.length > 0) {
+          b = await createZipFromFiles(multiFiles);
+        } else if (file) {
+          b = await compressPdf(file, compressionLevel);
+        } else {
+          throw new Error("No file selected.");
+        }
+      }
       else if (mode === 'watermark' && file) b = await watermarkPdf(file, watermarkText || 'CONFIDENTIAL');
       else if (mode === 'split' && file) {
         if (!pageInput) throw new Error("Please enter a page range (e.g. 1-2, 4)");
@@ -332,6 +362,7 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
             accept={isImageTool ? "image/*" : (mode.includes('word') ? ".docx" : mode.includes('excel') ? ".xlsx" : mode.includes('html') ? ".html" : ".pdf")}
             onFilesSelected={handle}
             darkMode={darkMode}
+            allowFolder={mode === 'compress'}
           />
         </div>
       ) : (
@@ -344,7 +375,7 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
               </div>
               <div className="overflow-hidden">
                 <h3 className={`text-xl font-black truncate max-w-[250px] ${darkMode ? 'text-white' : 'text-slate-900'}`}>
-                  {isImageTool ? `${multiFiles.length} Images Selected` : file?.name}
+                  {isImageTool ? `${multiFiles.length} Images Selected` : isZip ? `${multiFiles.length} Files (Folder)` : file?.name}
                 </h3>
                 <p className="text-slate-500 font-bold uppercase text-[10px] tracking-widest">
                   {result ? 'FILE READY' : 'AWAITING CONFIGURATION'}
