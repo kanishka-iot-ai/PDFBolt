@@ -1,4 +1,5 @@
 import * as mammoth from 'mammoth';
+import Tesseract from 'tesseract.js';
 // @ts-ignore
 import * as XLSX from 'xlsx';
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
@@ -209,58 +210,100 @@ export async function htmlToPdf(file: File): Promise<Uint8Array> {
 }
 
 /**
- * Converts PDF to Word (.docx)
- * Method: PDF.js (text extraction) + docx.js (DOCX generation)
- * Best for plain text PDFs. Complex layouts may not preserve formatting perfectly.
+ * OCR Fallback for Scanned PDFs
+ */
+async function runOCR(page: any): Promise<string> {
+  const viewport = page.getViewport({ scale: 2.0 });
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return "";
+
+  canvas.width = viewport.width;
+  canvas.height = viewport.height;
+
+  await page.render({ canvasContext: ctx, viewport }).promise;
+
+  // Basic Pre-processing for better OCR
+  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const data = imageData.data;
+  for (let i = 0; i < data.length; i += 4) {
+    const avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
+    const val = avg > 128 ? 255 : 0;
+    data[i] = data[i + 1] = data[i + 2] = val;
+  }
+  ctx.putImageData(imageData, 0, 0);
+
+  const result = await Tesseract.recognize(canvas, "eng");
+  return result.data.text;
+}
+
+/**
+ * Converts PDF to Word (.docx) - ADVANCED WORLD-CLASS VERSION
+ * Method: PDF.js (text extraction) + docx.js (DOCX generation) + OCR Fallback
  */
 export async function pdfToWord(file: File): Promise<Uint8Array> {
   const arrayBuffer = await file.arrayBuffer();
   const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+  const { Document, Packer, Paragraph, TextRun, PageBreak } = await import('docx');
 
-  // Extract all text from PDF
-  let allParagraphs: string[] = [];
+  let docParagraphs: any[] = [];
 
   for (let i = 1; i <= pdf.numPages; i++) {
     const page = await pdf.getPage(i);
     const textContent = await page.getTextContent();
 
-    // Join text items with proper spacing
-    const pageText = textContent.items.map((item: any) => item.str).join(' ');
+    // 1. OCR Fallback if page is empty (scanned)
+    if (textContent.items.length === 0) {
+      const ocrText = await runOCR(page);
+      const lines = ocrText.split('\n');
+      lines.forEach(l => {
+        if (l.trim()) docParagraphs.push(new Paragraph({ children: [new TextRun(l.trim())] }));
+      });
+    } else {
+      // 2. Advanced Layout Logic: Group by Y-position
+      // Sort items by vertical position (transform[5] is Y coordinate)
+      const items = textContent.items.sort((a: any, b: any) => b.transform[5] - a.transform[5]);
 
-    // Add page text as a paragraph (simple approach)
-    if (pageText.trim()) {
-      allParagraphs.push(pageText);
+      let currentLine = "";
+      let lastY: number | null = null;
+      const Y_THRESHOLD = 5;
 
-      // Add page break marker except for last page
-      if (i < pdf.numPages) {
-        allParagraphs.push('__PAGE_BREAK__');
+      items.forEach((item: any) => {
+        const y = Math.round(item.transform[5]);
+
+        if (lastY === null || Math.abs(lastY - y) < Y_THRESHOLD) {
+          // Same line or very close
+          currentLine += item.str + " ";
+          lastY = y;
+        } else {
+          // New line detected
+          if (currentLine.trim()) {
+            docParagraphs.push(new Paragraph({ children: [new TextRun(currentLine.trim())] }));
+          }
+          currentLine = item.str + " ";
+          lastY = y;
+        }
+      });
+
+      // Add final line of page
+      if (currentLine.trim()) {
+        docParagraphs.push(new Paragraph({ children: [new TextRun(currentLine.trim())] }));
       }
     }
-  }
 
-  // Dynamically import docx library
-  const { Document, Packer, Paragraph, TextRun, PageBreak } = await import('docx');
-
-  // Create DOCX document
-  const paragraphs = allParagraphs.map(text => {
-    if (text === '__PAGE_BREAK__') {
-      return new Paragraph({
-        children: [new PageBreak()]
-      });
+    // Add page break except for last page
+    if (i < pdf.numPages) {
+      docParagraphs.push(new Paragraph({ children: [new PageBreak()] }));
     }
-    return new Paragraph({
-      children: [new TextRun(text)]
-    });
-  });
+  }
 
   const doc = new Document({
     sections: [{
       properties: {},
-      children: paragraphs
+      children: docParagraphs
     }]
   });
 
-  // Generate DOCX as blob, then convert to Uint8Array
   const blob = await Packer.toBlob(doc);
   return new Uint8Array(await blob.arrayBuffer());
 }
