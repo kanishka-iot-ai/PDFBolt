@@ -226,7 +226,7 @@ const RedactTool: React.FC<RedactToolProps> = ({ darkMode, notify }) => {
                         <FileUploader
                             onFilesSelected={handleFilesSelected}
                             accept=".pdf"
-                            maxSizeMB={50}
+                            maxSizeMB={30}
                             darkMode={darkMode}
                         />
                     </div>

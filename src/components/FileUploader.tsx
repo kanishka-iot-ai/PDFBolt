@@ -16,7 +16,7 @@ const FileUploader: React.FC<FileUploaderProps> = ({
   onFilesSelected,
   accept = ".pdf",
   multiple = true,
-  maxSizeMB = 100,
+  maxSizeMB = 30,
   darkMode,
   allowFolder
 }) => {

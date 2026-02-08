@@ -160,7 +160,7 @@ const QRTool: React.FC<QRToolProps> = ({ darkMode, notify }) => {
       </div>
 
       {!file ? (
-        <FileUploader multiple={false} onFilesSelected={handleFile} darkMode={darkMode} />
+        <FileUploader multiple={false} onFilesSelected={handleFile} darkMode={darkMode} maxSizeMB={100} />
       ) : (
         <div className="grid lg:grid-cols-2 gap-12 items-start">
           {/* Configuration Panel */}
