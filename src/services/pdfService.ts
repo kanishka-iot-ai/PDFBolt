@@ -166,7 +166,7 @@ export async function deletePages(file: File, indicesStr: string): Promise<Uint8
 /**
  * Watermarks PDF.
  */
-export async function watermarkPdf(file: File, text: string): Promise<Uint8Array> {
+export async function watermarkPdf(file: File, text: string, fontSize: number = 50): Promise<Uint8Array> {
   const bytes = await file.arrayBuffer();
   const pdf = await PDFDocument.load(bytes);
   const font = await pdf.embedFont(StandardFonts.HelveticaBold);
@@ -175,7 +175,7 @@ export async function watermarkPdf(file: File, text: string): Promise<Uint8Array
     p.drawText(text, {
       x: width / 4,
       y: height / 2,
-      size: 50,
+      size: fontSize,
       font,
       color: rgb(0.8, 0.8, 0.8),
       opacity: 0.3,
@@ -185,11 +185,31 @@ export async function watermarkPdf(file: File, text: string): Promise<Uint8Array
   return await pdf.save();
 }
 
+
+interface ImageFitOptions {
+  pageSize: 'fit' | 'a4' | 'letter';
+  orientation: 'portrait' | 'landscape';
+  margin: 'none' | 'small' | 'standard'; // standard=50pt, small=20pt, none=0
+}
+
 /**
  * Converts multiple image files into one PDF.
  */
-export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
+export async function imagesToPdf(files: File[], options: ImageFitOptions = { pageSize: 'fit', orientation: 'portrait', margin: 'small' }): Promise<Uint8Array> {
   const pdfDoc = await PDFDocument.create();
+
+  // Define sizes in points (1 pt = 1/72 inch)
+  const sizes = {
+    a4: { width: 595.28, height: 841.89 },
+    letter: { width: 612, height: 792 }
+  };
+
+  const margins = {
+    none: 0,
+    small: 20,
+    standard: 50
+  };
+
   for (const f of files) {
     const imgBytes = await f.arrayBuffer();
     let img;
@@ -201,11 +221,42 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
       } else if (type.includes('png')) {
         img = await pdfDoc.embedPng(imgBytes);
       } else {
-        continue; // Skip unknown
+        continue;
       }
 
-      const page = pdfDoc.addPage([img.width, img.height]);
-      page.drawImage(img, { x: 0, y: 0, width: img.width, height: img.height });
+      let pageWidth, pageHeight, drawX, drawY, drawWidth, drawHeight;
+
+      if (options.pageSize === 'fit') {
+        pageWidth = img.width;
+        pageHeight = img.height;
+        drawX = 0;
+        drawY = 0;
+        drawWidth = img.width;
+        drawHeight = img.height;
+      } else {
+        // Standard Size (A4/Letter)
+        const size = sizes[options.pageSize];
+        const isLandscape = options.orientation === 'landscape';
+        pageWidth = isLandscape ? size.height : size.width;
+        pageHeight = isLandscape ? size.width : size.height;
+
+        const margin = margins[options.margin];
+        const availableWidth = pageWidth - (margin * 2);
+        const availableHeight = pageHeight - (margin * 2);
+
+        // Scale Logic (Fit within available area)
+        const scale = Math.min(availableWidth / img.width, availableHeight / img.height);
+        drawWidth = img.width * scale;
+        drawHeight = img.height * scale;
+
+        // Center Image
+        drawX = margin + (availableWidth - drawWidth) / 2;
+        drawY = margin + (availableHeight - drawHeight) / 2;
+      }
+
+      const page = pdfDoc.addPage([pageWidth, pageHeight]);
+      page.drawImage(img, { x: drawX, y: drawY, width: drawWidth, height: drawHeight });
+
     } catch (e) {
       console.warn(`Could not embed image ${f.name}`, e);
     }

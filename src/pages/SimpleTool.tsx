@@ -9,10 +9,10 @@ import { createZipFromFiles } from '../services/zipService';
 // ...
 
 import { rotateFile, addPageNumbers, compressPdf, watermarkPdf, deletePages, splitPdf, imagesToPdf } from '../services/pdfService';
-import { wordToPdf, excelToPdf, htmlToPdf, pdfToJpg, pdfToWord } from '../services/conversionService';
+import { wordToPdf, excelToPdf, htmlToPdf, pdfToJpg, pdfToWord, pdfToExcel } from '../services/conversionService';
 import { protectPdf, unlockPdf, signPdf, bruteForceUnlock } from '../services/securityService';
 import { ocrPdf } from '../services/ocrService';
-import { pdfToPpt } from '../services/pptService';
+import { pptToPdf, pdfToPpt } from '../services/pptService';
 import { redactPdf, repairPdf } from '../services/sanitizeService';
 import { FileText, Download, CheckCircle2, Settings2, Eye, X, Image as ImageIcon, Lock, Key, PenTool } from 'lucide-react';
 import { NotifySystem } from '../types';
@@ -38,8 +38,14 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
   const [processingStatus, setProcessingStatus] = useState<'processing' | 'complete' | 'error'>('processing');
   const [resultKey, setResultKey] = useState(0);
 
+  // Image Tool State
+  const [imgPageSize, setImgPageSize] = useState<'fit' | 'a4' | 'letter'>('fit');
+  const [imgOrientation, setImgOrientation] = useState<'portrait' | 'landscape'>('portrait');
+  const [imgMargin, setImgMargin] = useState<'none' | 'small' | 'standard'>('small');
+
   // New States
   const [watermarkText, setWatermarkText] = useState('CONFIDENTIAL');
+  const [watermarkSize, setWatermarkSize] = useState(50);
   const [signaturePosition, setSignaturePosition] = useState<'bottom-right' | 'bottom-left'>('bottom-right');
   const [penColor, setPenColor] = useState('#000');
   const [strokeWidth, setStrokeWidth] = useState<'thin' | 'medium' | 'thick'>('medium');
@@ -200,7 +206,7 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
           throw new Error("No file selected.");
         }
       }
-      else if (mode === 'watermark' && file) b = await watermarkPdf(file, watermarkText || 'CONFIDENTIAL');
+      else if (mode === 'watermark' && file) b = await watermarkPdf(file, watermarkText || 'CONFIDENTIAL', watermarkSize);
       else if (mode === 'split' && file) {
         if (!pageInput) throw new Error("Please enter a page range (e.g. 1-2, 4)");
         b = await splitPdf(file, pageInput);
@@ -210,9 +216,14 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
         b = await deletePages(file, pageInput);
       }
       // -- CONVERSION TOOLS --
+      // -- CONVERSION TOOLS --
       else if (isImageTool) {
         if (multiFiles.length === 0) throw new Error("No images selected.");
-        b = await imagesToPdf(multiFiles);
+        b = await imagesToPdf(multiFiles, {
+          pageSize: imgPageSize,
+          orientation: imgOrientation,
+          margin: imgMargin
+        });
       }
       else if (mode === 'word2pdf' && file) b = await wordToPdf(file);
       else if (mode === 'excel2pdf' && file) b = await excelToPdf(file);
@@ -225,13 +236,18 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
         b = await pdfToWord(file);
         setIsDoc(true);
       }
+      else if (mode === 'pdf2excel' && file) {
+        b = await pdfToExcel(file);
+        setIsZip(true); // Reuse zip download logic for Excel
+      }
       // -- NEW ADVANCED TOOLS --
       else if ((mode === 'pdf2ppt' || mode === 'ppt2pdf') && file) {
         if (mode.includes('pdf2ppt')) {
           b = await pdfToPpt(file);
           setIsPpt(true);
         } else {
-          throw new Error("PPT to PDF requires server conversion. Please use Word to PDF instead.");
+          // PPT to PDF
+          b = await pptToPdf(file);
         }
       }
       else if (mode === 'ocr' && file) {
@@ -514,15 +530,32 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
               )}
 
               {mode === 'watermark' && (
-                <div className="space-y-4">
-                  <label className="block text-xs font-black uppercase tracking-widest text-slate-500 mb-2">Watermark Text</label>
-                  <input
-                    type="text"
-                    value={watermarkText}
-                    onChange={(e) => setWatermarkText(e.target.value)}
-                    placeholder="CONFIDENTIAL"
-                    className={`w-full p-6 rounded-2xl text-xl font-bold border-2 focus:ring-4 transition-all outline-none ${darkMode ? 'bg-slate-900 border-slate-700 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'}`}
-                  />
+                <div className="space-y-6">
+                  <div className="space-y-2">
+                    <label className="block text-xs font-black uppercase tracking-widest text-slate-500">Watermark Text</label>
+                    <input
+                      type="text"
+                      value={watermarkText}
+                      onChange={(e) => setWatermarkText(e.target.value)}
+                      placeholder="CONFIDENTIAL"
+                      className={`w-full p-6 rounded-2xl text-xl font-bold border-2 focus:ring-4 transition-all outline-none ${darkMode ? 'bg-slate-900 border-slate-700 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'}`}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center">
+                      <label className="block text-xs font-black uppercase tracking-widest text-slate-500">Font Size ({watermarkSize})</label>
+                      <span className="text-sm font-bold text-indigo-600">{watermarkSize}px</span>
+                    </div>
+                    <input
+                      type="range"
+                      min="10"
+                      max="200"
+                      value={watermarkSize}
+                      onChange={(e) => setWatermarkSize(parseInt(e.target.value))}
+                      className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600"
+                    />
+                  </div>
                 </div>
               )}
 
@@ -702,18 +735,50 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
                 </div>
 
                 {Array.isArray(result) ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full">
-                    {result.map((item, idx) => (
-                      <a
-                        key={idx}
-                        href={item.url}
-                        download={item.name}
-                        className="flex items-center justify-between p-4 bg-white dark:bg-slate-800 border rounded-xl hover:shadow-lg transition-all"
-                      >
-                        <span className="truncate font-bold max-w-[200px]">{item.name}</span>
-                        <Download size={20} className="text-yellow-600" />
-                      </a>
-                    ))}
+                  <div className="flex flex-col items-center gap-8 w-full">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full">
+                      {result.map((item, idx) => (
+                        <a
+                          key={idx}
+                          href={item.url}
+                          download={item.name}
+                          className="flex items-center justify-between p-4 bg-white dark:bg-slate-800 border rounded-xl hover:shadow-lg transition-all"
+                        >
+                          <span className="truncate font-bold max-w-[200px]">{item.name}</span>
+                          <Download size={20} className="text-yellow-600" />
+                        </a>
+                      ))}
+                    </div>
+
+                    {/* Download All as ZIP Button */}
+                    <button
+                      onClick={async () => {
+                        const JSZip = (await import('jszip')).default;
+                        const zip = new JSZip();
+
+                        // Fetch all blobs
+                        const promises = result.map(async (item) => {
+                          const blob = await fetch(item.url).then(r => r.blob());
+                          zip.file(item.name, blob);
+                        });
+
+                        await Promise.all(promises);
+
+                        const zipContent = await zip.generateAsync({ type: 'blob' });
+                        const zipUrl = URL.createObjectURL(zipContent);
+
+                        const link = document.createElement('a');
+                        link.href = zipUrl;
+                        link.download = `converted_images.zip`;
+                        link.click();
+
+                        setTimeout(() => URL.revokeObjectURL(zipUrl), 1000);
+                        notify.success();
+                      }}
+                      className="w-full max-w-sm py-4 bg-slate-900 text-white rounded-2xl font-black text-lg shadow-xl hover:scale-105 transition-all flex items-center justify-center gap-3"
+                    >
+                      <Download size={24} /> Download All (ZIP)
+                    </button>
                   </div>
                 ) : (
                   <div className="flex gap-4 w-full">
@@ -735,6 +800,65 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
                 )}
               </div>
             )}
+          </div>
+
+        </div>
+      )}
+
+      {isImageTool && !result && multiFiles.length > 0 && (
+        <div className="max-w-3xl mx-auto mt-8 p-8 rounded-[2.5rem] border shadow-xl bg-white dark:bg-slate-800 dark:border-slate-700 text-left">
+          <h4 className="text-xl font-black uppercase mb-6 flex items-center gap-3">
+            <Settings2 className="w-6 h-6 text-yellow-500" /> PDF Layout Settings
+          </h4>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Page Size */}
+            <div className="space-y-3">
+              <label className="text-xs font-bold uppercase text-slate-500">Page Size</label>
+              <div className="flex flex-col gap-2">
+                {['fit', 'a4', 'letter'].map(size => (
+                  <button
+                    key={size}
+                    onClick={() => setImgPageSize(size as any)}
+                    className={`py-2 px-4 rounded-xl border-2 font-bold text-sm transition-all ${imgPageSize === size ? 'border-yellow-500 bg-yellow-50 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400' : 'border-slate-200 dark:border-slate-700'}`}
+                  >
+                    {size === 'fit' ? 'Fit Image' : size.toUpperCase()}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Orientation (Only if not Fit) */}
+            <div className={`space-y-3 transition-opacity ${imgPageSize === 'fit' ? 'opacity-50 pointer-events-none' : ''}`}>
+              <label className="text-xs font-bold uppercase text-slate-500">Orientation</label>
+              <div className="flex flex-col gap-2">
+                {['portrait', 'landscape'].map(or => (
+                  <button
+                    key={or}
+                    onClick={() => setImgOrientation(or as any)}
+                    className={`py-2 px-4 rounded-xl border-2 font-bold text-sm transition-all ${imgOrientation === or ? 'border-yellow-500 bg-yellow-50 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400' : 'border-slate-200 dark:border-slate-700'}`}
+                  >
+                    {or.charAt(0).toUpperCase() + or.slice(1)}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Margin */}
+            <div className={`space-y-3 transition-opacity ${imgPageSize === 'fit' ? 'opacity-50 pointer-events-none' : ''}`}>
+              <label className="text-xs font-bold uppercase text-slate-500">Margins</label>
+              <div className="flex flex-col gap-2">
+                {['none', 'small', 'standard'].map(m => (
+                  <button
+                    key={m}
+                    onClick={() => setImgMargin(m as any)}
+                    className={`py-2 px-4 rounded-xl border-2 font-bold text-sm transition-all ${imgMargin === m ? 'border-yellow-500 bg-yellow-50 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400' : 'border-slate-200 dark:border-slate-700'}`}
+                  >
+                    {m.charAt(0).toUpperCase() + m.slice(1)}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       )}
