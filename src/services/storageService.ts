@@ -8,17 +8,17 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 // However, for this "Serverless/Static" requirement, we use direct SDK with specific IAM user keys
 // meant for this bucket only.
 const s3Client = new S3Client({
-    region: import.meta.env.VITE_AWS_REGION || "us-east-1",
+    region: (import.meta.env.VITE_AWS_REGION || "us-east-1").trim(),
     credentials: {
-        accessKeyId: import.meta.env.VITE_AWS_ACCESS_KEY_ID || "",
-        secretAccessKey: import.meta.env.VITE_AWS_SECRET_ACCESS_KEY || "",
+        accessKeyId: (import.meta.env.VITE_AWS_ACCESS_KEY_ID || "").trim(),
+        secretAccessKey: (import.meta.env.VITE_AWS_SECRET_ACCESS_KEY || "").trim(),
     },
 });
 
-const BUCKET_NAME = import.meta.env.VITE_AWS_BUCKET_NAME || "pdfmaster-upload-bucket";
+const BUCKET_NAME = (import.meta.env.VITE_AWS_BUCKET_NAME || "pdfmaster-upload-bucket").trim();
 
 // Check if keys are present
-const hasKeys = !!(import.meta.env.VITE_AWS_ACCESS_KEY_ID && import.meta.env.VITE_AWS_SECRET_ACCESS_KEY);
+const hasKeys = !!(import.meta.env.VITE_AWS_ACCESS_KEY_ID?.trim() && import.meta.env.VITE_AWS_SECRET_ACCESS_KEY?.trim());
 
 /**
  * Uploads a file to S3 and returns the object key.
@@ -96,7 +96,7 @@ export function getPublicUrl(key: string): string {
         return "javascript:alert('DEMO MODE: Valid AWS Credentials are required to download this file from the Secure Cloud Vault.')";
     }
 
-    const region = import.meta.env.VITE_AWS_REGION || "us-east-1";
+    const region = (import.meta.env.VITE_AWS_REGION || "us-east-1").trim();
     // Standard S3 URL format
     return `https://${BUCKET_NAME}.s3.${region}.amazonaws.com/${key}`;
 }

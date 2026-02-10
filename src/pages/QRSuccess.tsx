@@ -53,7 +53,7 @@ const QRSuccess: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
               setResultKey(prev => prev + 1);
             } catch (err) {
               console.error("Secure Link Error:", err);
-              // If it fails, we show the error state or handle appropriately
+              setError(true); // Reuse the PIN error state or add a new one
             }
           }
         } catch (e) {
