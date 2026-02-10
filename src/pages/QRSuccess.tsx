@@ -12,6 +12,8 @@ const QRSuccess: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
   const [error, setError] = useState(false);
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
   const [resultKey, setResultKey] = useState(0);
+  const [expiryDate, setExpiryDate] = useState<Date | null>(null);
+  const [daysLeft, setDaysLeft] = useState<number | null>(null);
 
   const payload = searchParams.get('p');
   const authHash = searchParams.get('auth');
@@ -24,24 +26,43 @@ const QRSuccess: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
   const [isExpired, setIsExpired] = useState(false);
 
   useEffect(() => {
-    if (isVerified && payload) {
-      try {
-        const data = JSON.parse(atob(payload));
+    const resolveDownloadUrl = async () => {
+      if (isVerified && payload) {
+        try {
+          const data = JSON.parse(atob(payload));
 
-        // Check Expiration
-        if (data.e && Date.now() > data.e) {
-          setIsExpired(true);
-          return;
-        }
+          // Set Expiry Details
+          if (data.e) {
+            const date = new Date(data.e);
+            setExpiryDate(date);
+            const remaining = Math.ceil((data.e - Date.now()) / (1000 * 60 * 60 * 24));
+            setDaysLeft(remaining > 0 ? remaining : 0);
+          }
 
-        if (data.k) {
-          setDownloadUrl(getPublicUrl(data.k));
-          setResultKey(prev => prev + 1);
+          // Check Expiration (30 Days check)
+          if (data.e && Date.now() > data.e) {
+            setIsExpired(true);
+            return;
+          }
+
+          if (data.k) {
+            const { getSecureDownloadUrl } = await import('../services/storageService');
+            try {
+              const url = await getSecureDownloadUrl(data.k);
+              setDownloadUrl(url);
+              setResultKey(prev => prev + 1);
+            } catch (err) {
+              console.error("Secure Link Error:", err);
+              // If it fails, we show the error state or handle appropriately
+            }
+          }
+        } catch (e) {
+          console.error("Invalid payload", e);
         }
-      } catch (e) {
-        console.error("Invalid payload", e);
       }
-    }
+    };
+
+    resolveDownloadUrl();
   }, [isVerified, payload]);
 
   const handleAuth = () => {
@@ -137,7 +158,19 @@ const QRSuccess: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
               >
                 <Download size={32} /> Download File
               </a>
-              <p className="mt-4 text-xs font-bold text-slate-400 uppercase tracking-widest">Secure TLS 1.3 Download</p>
+              <div className="mt-6 flex flex-col items-center gap-2 animate-fadeInUp">
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                  <ShieldCheck size={14} className="text-green-500" />
+                  Secure TLS 1.3 Download
+                </p>
+                {expiryDate && (
+                  <div className="px-4 py-2 bg-slate-50 dark:bg-slate-900/50 rounded-full border border-slate-200 dark:border-slate-700 mt-2">
+                    <p className={`text-[10px] font-black uppercase tracking-[0.1em] ${daysLeft && daysLeft < 3 ? 'text-red-500' : 'text-slate-500'}`}>
+                      {daysLeft} Days Remaining • Valid Until {expiryDate.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
           ) : (
             <div className="mb-10 p-4 bg-amber-50 text-amber-600 rounded-xl font-bold">

@@ -44,6 +44,33 @@ The application is fully configured for production deployment on AWS.
    - Create Distribution pointing to S3 bucket.
    - **Important**: Set Error Page for 404 to `/index.html` (Status 200) to support React Router.
 
+## AWS S3 Bucket Configuration (for Secure Downloads)
+
+To ensure the "Temporary Secure Download" system works correctly, configure your upload bucket as follows:
+
+### 1. S3 Lifecycle Policy (Auto-Delete after 30 Days)
+- Go to S3 Console -> Your Bucket -> **Management** tab.
+- Click **Create lifecycle rule**.
+- Rule Name: `DeleteExpiredPDFs`.
+- Scope: **Apply to all objects**.
+- Lifecycle rule actions: Select **Expire current versions of objects**.
+- Days after object creation: `30`.
+
+### 2. CORS Policy
+- Go to S3 Console -> Your Bucket -> **Permissions** tab.
+- Scroll to **CORS** and paste:
+  ```json
+  [
+      {
+          "AllowedHeaders": ["*"],
+          "AllowedMethods": ["GET", "PUT", "POST", "HEAD"],
+          "AllowedOrigins": ["*"],
+          "ExposeHeaders": ["ETag"]
+      }
+  ]
+  ```
+  *(Note: In production, change `AllowedOrigins` to your actual domain).*
+
 ## Pre-Deployment Checklist
 - [ ] Set `GEMINI_API_KEY` in your environment (Secrets Manager / Parameter Store).
 - [ ] Ensure Domain DNS (Route53) points to your CloudFront distribution or App Runner service.

@@ -229,6 +229,9 @@ const QRTool: React.FC<QRToolProps> = ({ darkMode, notify }) => {
                       <option value={30}>30 Days</option>
                       <option value={90}>90 Days</option>
                     </select>
+                    <p className="text-[10px] font-bold text-slate-500 mt-2 uppercase tracking-tight">
+                      Expires: {new Date(Date.now() + validDays * 24 * 60 * 60 * 1000).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}
+                    </p>
                   </div>
 
                   <div className={`p-6 rounded-2xl border-2 transition-all ${oneTimeScan ? 'border-amber-500/50 bg-amber-500/5' : 'border-slate-100 dark:border-slate-700'}`}>

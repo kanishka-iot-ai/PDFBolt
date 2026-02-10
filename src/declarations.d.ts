@@ -33,6 +33,11 @@ declare module 'pdfjs-dist' {
 declare module '@aws-sdk/client-s3' {
     export const S3Client: any;
     export const PutObjectCommand: any;
+    export const GetObjectCommand: any;
+}
+
+declare module '@aws-sdk/s3-request-presigner' {
+    export const getSignedUrl: any;
 }
 
 declare module 'react-helmet-async' {
