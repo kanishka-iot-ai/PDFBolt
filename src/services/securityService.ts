@@ -213,3 +213,38 @@ export async function bruteForceUnlock(
 
     return { password: null, decryptedPdf: null };
 }
+
+/**
+ * Attempts to unlock a PDF using a dictionary of common passwords (John the Ripper style).
+ * @param file Encrypted PDF file
+ * @param wordlist Array of passwords to try
+ * @param onProgress Callback for progress
+ */
+export async function dictionaryUnlock(
+    file: File,
+    wordlist: string[],
+    onProgress: (currentAttempt: string, totalAttempts: number) => void
+): Promise<{ password: string | null; decryptedPdf: Uint8Array | null }> {
+    const bytes = await file.arrayBuffer();
+    let count = 0;
+
+    for (const password of wordlist) {
+        count++;
+
+        // Update UI every 5 attempts for dictionary (since it's usually small)
+        if (count % 5 === 0) {
+            onProgress(password, count);
+            await new Promise(r => setTimeout(r, 0));
+        }
+
+        try {
+            const pdfDoc = await PDFDocument.load(bytes, { password } as any);
+            const decryptedPdf = await pdfDoc.save();
+            return { password, decryptedPdf };
+        } catch (e) {
+            // Continue
+        }
+    }
+
+    return { password: null, decryptedPdf: null };
+}
