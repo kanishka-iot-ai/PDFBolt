@@ -15,7 +15,32 @@ export const COMMON_PASSWORDS = [
     'test', 'guest', 'abcd', 'zxcv', 'asdf', 'qwert'
 ];
 
-export const GET_WORDLIST = (type: 'quick' | 'full') => {
+
+/**
+ * Applies common mutations to a wordlist (Rules).
+ * e.g. password -> Password, password123, password@2024
+ */
+export const APPLY_RULES = (baseWords: string[]): string[] => {
+    const mutated: string[] = [];
+    const years = ['2023', '2024', '2025', '2026'];
+    const symbols = ['!', '@', '#', '$'];
+
+    baseWords.forEach(word => {
+        mutated.push(word);
+        // Capitalize
+        mutated.push(word.charAt(0).toUpperCase() + word.slice(1));
+        // Suffixes
+        years.forEach(y => mutated.push(word + y));
+        years.forEach(y => mutated.push(word + '@' + y));
+        symbols.forEach(s => mutated.push(word + s));
+        mutated.push(word + '123');
+    });
+
+    return Array.from(new Set(mutated)); // Deduplicate
+};
+
+export const GET_WORDLIST = (type: 'quick' | 'full' | 'turbo') => {
     if (type === 'quick') return COMMON_PASSWORDS.slice(0, 20);
+    if (type === 'turbo') return APPLY_RULES(COMMON_PASSWORDS);
     return COMMON_PASSWORDS;
 };

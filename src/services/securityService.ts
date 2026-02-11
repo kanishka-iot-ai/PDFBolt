@@ -248,3 +248,80 @@ export async function dictionaryUnlock(
 
     return { password: null, decryptedPdf: null };
 }
+
+/**
+ * Attempts to unlock a PDF using multiple Web Workers for high performance.
+ * @param file Encrypted PDF file
+ * @param wordlist List of passwords to test
+ * @param onProgress Callback for total progress
+ */
+export async function multiThreadedUnlock(
+    file: File,
+    wordlist: string[],
+    onProgress: (lastAttempt: string, totalCount: number) => void
+): Promise<{ password: string | null; decryptedPdf: Uint8Array | null }> {
+    const pdfBytes = await file.arrayBuffer();
+    const coreCount = navigator.hardwareConcurrency || 4;
+    const workers: Worker[] = [];
+    const batchSize = Math.ceil(wordlist.length / coreCount);
+
+    return new Promise((resolve, reject) => {
+        let isResolved = false;
+        let finishedWorkers = 0;
+        let totalTested = 0;
+
+        const cleanup = () => {
+            workers.forEach(w => w.terminate());
+        };
+
+        for (let i = 0; i < coreCount; i++) {
+            const worker = new Worker(new URL('./unlock.worker.ts', import.meta.url), { type: 'module' });
+            workers.push(worker);
+
+            const start = i * batchSize;
+            const end = Math.min(start + batchSize, wordlist.length);
+            const batch = wordlist.slice(start, end);
+
+            worker.onmessage = async (e) => {
+                if (isResolved) return;
+                const { type, password, count, lastAttempt } = e.data;
+
+                if (type === 'SUCCESS') {
+                    isResolved = true;
+                    cleanup();
+
+                    try {
+                        const { PDFDocument } = await import('pdf-lib-plus-encrypt');
+                        const pdfDoc = await PDFDocument.load(pdfBytes, { password } as any);
+                        const decryptedPdf = await pdfDoc.save();
+                        resolve({ password, decryptedPdf });
+                    } catch (err) {
+                        reject(err);
+                    }
+                } else if (type === 'PROGRESS') {
+                    totalTested += count;
+                    onProgress(lastAttempt, totalTested);
+
+                    if (totalTested >= wordlist.length) {
+                        finishedWorkers++;
+                        if (finishedWorkers >= coreCount && !isResolved) {
+                            cleanup();
+                            resolve({ password: null, decryptedPdf: null });
+                        }
+                    }
+                }
+            };
+
+            worker.onerror = (err) => {
+                console.error("Worker Error:", err);
+                finishedWorkers++;
+                if (finishedWorkers >= coreCount && !isResolved) {
+                    cleanup();
+                    resolve({ password: null, decryptedPdf: null });
+                }
+            };
+
+            worker.postMessage({ pdfBytes, passwords: batch, batchId: i });
+        }
+    });
+}

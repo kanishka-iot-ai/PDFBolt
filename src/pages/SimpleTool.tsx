@@ -10,7 +10,7 @@ import { createZipFromFiles } from '../services/zipService';
 
 import { rotateFile, addPageNumbers, compressPdf, watermarkPdf, deletePages, splitPdf, imagesToPdf } from '../services/pdfService';
 import { wordToPdf, excelToPdf, htmlToPdf, pdfToJpg, pdfToWord, pdfToExcel } from '../services/conversionService';
-import { protectPdf, unlockPdf, signPdf, bruteForceUnlock, dictionaryUnlock } from '../services/securityService';
+import { protectPdf, unlockPdf, signPdf, bruteForceUnlock, dictionaryUnlock, multiThreadedUnlock } from '../services/securityService';
 import { ocrPdf } from '../services/ocrService';
 import { pptToPdf, pdfToPpt } from '../services/pptService';
 import { redactPdf, repairPdf } from '../services/sanitizeService';
@@ -58,6 +58,7 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
   // Brute Force State
   const [bruteForceMode, setBruteForceMode] = useState(false);
   const [unlockStrategy, setUnlockStrategy] = useState<'sequential' | 'ripper'>('ripper');
+  const [turboMode, setTurboMode] = useState(false);
   const [bruteCharset, setBruteCharset] = useState<'numeric' | 'alpha-lower' | 'alpha-mixed' | 'alphanumeric' | 'all'>('numeric');
   const [bruteMaxLength, setBruteMaxLength] = useState(4);
   const [bruteStatus, setBruteStatus] = useState<string | null>(null);
@@ -280,18 +281,36 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
           try {
             let result;
             if (unlockStrategy === 'ripper') {
-              const wordlist = GET_WORDLIST('full');
-              result = await dictionaryUnlock(file, wordlist, (pass, count) => {
-                setBruteStatus(`Ripper Mode: Testing "${pass}" (${count} attempts)`);
-              });
+              const wordlist = GET_WORDLIST(turboMode ? 'turbo' : 'full');
+              if (turboMode) {
+                result = await multiThreadedUnlock(file, wordlist, (pass, count) => {
+                  setBruteStatus(`Turbo Pro: Testing "${pass}" (${count}/${wordlist.length})`);
+                });
+              } else {
+                result = await dictionaryUnlock(file, wordlist, (pass, count) => {
+                  setBruteStatus(`Ripper Mode: Testing "${pass}" (${count} attempts)`);
+                });
+              }
             } else {
-              result = await bruteForceUnlock(file, {
-                charset: bruteCharset,
-                maxLength: bruteMaxLength,
-                signal: controller.signal
-              }, (pass, count) => {
-                setBruteStatus(`Sequential Mode: Testing "${pass}" (${count} attempts)`);
-              });
+              if (turboMode) {
+                // For sequential turbo, we could implement a sequential wordlist generator and feed it to multiThreadedUnlock
+                // But for now, let's just use it for ripper which is most common.
+                result = await bruteForceUnlock(file, {
+                  charset: bruteCharset,
+                  maxLength: bruteMaxLength,
+                  signal: controller.signal
+                }, (pass, count) => {
+                  setBruteStatus(`Sequential Mode: Testing "${pass}" (${count} attempts)`);
+                });
+              } else {
+                result = await bruteForceUnlock(file, {
+                  charset: bruteCharset,
+                  maxLength: bruteMaxLength,
+                  signal: controller.signal
+                }, (pass, count) => {
+                  setBruteStatus(`Sequential Mode: Testing "${pass}" (${count} attempts)`);
+                });
+              }
             }
 
             if (result.password && result.decryptedPdf) {
@@ -647,6 +666,23 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
                     <div className="space-y-6 animate-fadeIn">
                       <div className="p-4 bg-orange-50 text-orange-800 rounded-xl text-sm font-bold border border-orange-200">
                         Browser-based cracking works best for short passwords. "John the Ripper" mode uses a fast dictionary attack.
+                      </div>
+
+                      {/* Turbo Toggle */}
+                      <div className="flex items-center justify-between p-4 bg-red-50 dark:bg-red-900/10 rounded-xl border border-red-100 dark:border-red-900/30">
+                        <div className="flex items-center gap-3">
+                          <Zap className="text-red-600 fill-red-600" size={20} />
+                          <div>
+                            <span className="font-black text-sm uppercase block text-red-700">Turbo Pro Mode</span>
+                            <span className="text-[10px] text-red-600/70 font-bold uppercase tracking-tighter">Uses all CPU cores (Extreme Speed)</span>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => setTurboMode(!turboMode)}
+                          className={`w-12 h-6 rounded-full transition-colors relative ${turboMode ? 'bg-red-600' : 'bg-slate-300'}`}
+                        >
+                          <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${turboMode ? 'left-7' : 'left-1'}`}></div>
+                        </button>
                       </div>
 
                       {/* Strategy Selector */}
