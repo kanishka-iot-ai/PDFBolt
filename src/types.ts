@@ -34,6 +34,7 @@ export enum ToolType {
   OCR = 'ocr',
   COMPARE = 'compare',
   PDF_TO_QR = 'pdf-to-qr',
+  SCAN_HANDWRITING = 'scan-handwriting',
 }
 
 export interface FAQ {

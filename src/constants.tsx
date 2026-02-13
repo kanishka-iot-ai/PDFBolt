@@ -94,6 +94,21 @@ export const TOOLS: ToolMetadata[] = [
   { id: ToolType.REPAIR, title: 'Repair PDF', description: 'Fix damaged PDF files.', icon: 'Wrench', category: 'utilities', path: '/repair' },
   { id: ToolType.OCR, title: 'OCR PDF', description: 'Make scanned PDFs searchable.', icon: 'Search', category: 'utilities', path: '/ocr' },
   { id: ToolType.SCAN_TO_PDF, title: 'Scan to PDF', description: 'Scan documents with your camera.', icon: 'Scan', category: 'convert-to', path: '/scan-pdf' },
+  {
+    id: ToolType.SCAN_HANDWRITING,
+    title: 'Handwriting to PDF',
+    seoTitle: 'Scan Handwriting to Text PDF – Free OCR Tool',
+    description: 'Convert handwritten notes or printed images into computerized typed PDF text.',
+    icon: 'PenTool',
+    category: 'convert-to',
+    path: '/scan-handwriting',
+    longDescription: 'Our advanced OCR (Optical Character Recognition) engine allows you to capture images of handwriting or printed text and instantly convert them into editable, digitized PDF documents. Perfect for students, researchers, and professionals who need to digitize physical notes quickly.',
+    features: ['High-accuracy handwriting OCR', 'Instant text editing', 'Multi-page support', 'Private offline processing'],
+    faqs: [
+      { q: 'How accurate is the handwriting recognition?', a: 'Accuracy depends on the clarity of the handwriting, but our engine is optimized for common handwriting styles.' },
+      { q: 'Is my scanned text private?', a: 'Yes, all OCR processing happens right in your browser. No images or text are sent to any server.' }
+    ]
+  },
   { id: ToolType.COMPARE, title: 'Compare PDF', description: 'Find differences between PDFs.', icon: 'Files', category: 'utilities', path: '/compare' },
 ];
 

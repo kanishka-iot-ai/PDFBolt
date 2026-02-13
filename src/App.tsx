@@ -22,6 +22,7 @@ const ScanTool = lazy(() => import('./pages/ScanTool'));
 const QRSuccess = lazy(() => import('./pages/QRSuccess'));
 const SEOLandingPage = lazy(() => import('./components/SEOLandingPage'));
 const TutorialsPage = lazy(() => import('./pages/TutorialsPage'));
+const HandwritingTool = lazy(() => import('./pages/HandwritingTool'));
 
 // Static pages can also be lazy
 const Static = lazy(() => import('./pages/StaticPages').then(m => ({ default: m.PrivacyPage })));
@@ -195,6 +196,7 @@ const App: React.FC = () => {
                   <Route path="/repair" element={<SimpleTool title="Repair PDF" mode="repair" darkMode={darkMode} notify={notify} />} />
                   <Route path="/ocr" element={<SimpleTool title="OCR PDF" mode="ocr" darkMode={darkMode} notify={notify} />} />
                   <Route path="/scan-pdf" element={<ScanTool darkMode={darkMode} notify={notify} />} />
+                  <Route path="/scan-handwriting" element={<HandwritingTool darkMode={darkMode} notify={notify} />} />
                   <Route path="/compare" element={<SimpleTool title="Compare PDF" mode="compare" darkMode={darkMode} notify={notify} />} />
                 </Routes>
               </Suspense>

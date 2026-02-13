@@ -67,3 +67,22 @@ export async function ocrPdf(file: File): Promise<string> {
     await worker.terminate();
     return fullText;
 }
+
+/**
+ * Performs OCR on a single image (data URL or Blob).
+ */
+export async function ocrImage(imageSource: string | Blob): Promise<string> {
+    const worker = await Tesseract.createWorker('eng');
+
+    // Recognize
+    const { data: { text } } = await worker.recognize(imageSource);
+
+    // Clean
+    const cleanedText = text
+        .replace(/[^\w\s.,@\-;:()!?'"]/g, "") // Keep more punctuation for handwriting
+        .replace(/\s+/g, " ")
+        .trim();
+
+    await worker.terminate();
+    return cleanedText;
+}
