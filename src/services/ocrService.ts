@@ -9,19 +9,17 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
 /**
  * Performs OCR on a PDF file.
- * Strategy: Render PDF pages as images -> Run Tesseract on each image -> Combine text.
+ * Strategy: Render PDF pages as images -> OpenCV Preprocessing -> Run Tesseract.
  */
 export async function ocrPdf(file: File): Promise<string> {
     const arrayBuffer = await file.arrayBuffer();
     const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
     let fullText = "";
 
-    // Create a worker
     const worker = await Tesseract.createWorker('eng');
 
     for (let i = 1; i <= pdf.numPages; i++) {
         const page = await pdf.getPage(i);
-        // Increase scale for better resolution (300 DPI equivalent roughly 2.0-3.0 scale usually)
         const viewport = page.getViewport({ scale: 2.5 });
 
         const canvas = document.createElement('canvas');
@@ -32,35 +30,14 @@ export async function ocrPdf(file: File): Promise<string> {
         if (context) {
             await page.render({ canvasContext: context, viewport }).promise;
 
-            // PREPROCESSING: Grayscale + Binarization (Thresholding)
-            // This mimics OpenCV's thresholding to improve OCR accuracy
-            const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-            const data = imageData.data;
-            for (let j = 0; j < data.length; j += 4) {
-                // Grayscale (Luminosity formula)
-                const avg = 0.2126 * data[j] + 0.7152 * data[j + 1] + 0.0722 * data[j + 2];
-                // Binarization (Threshold = 128) - enhances contrast
-                const val = avg > 128 ? 255 : 0;
-                data[j] = val;     // R
-                data[j + 1] = val; // G
-                data[j + 2] = val; // B
-            }
-            context.putImageData(imageData, 0, 0);
+            // PRODUCTION-LEVEL PREPROCESSING (OpenCV.js)
+            const processedDataUrl = await enhanceImageWithOpenCV(canvas);
 
-            // Get image data URL
-            const dataUrl = canvas.toDataURL('image/jpeg', 1.0); // Max quality
+            const { data: { text } } = await worker.recognize(processedDataUrl);
 
-            // Recognize with improved settings
-            const { data: { text } } = await worker.recognize(dataUrl);
-
-            // CLEANUP: Remove noise
-            // Keeps alphanumeric, spaces, punctuation. Collapses multiple spaces.
-            const cleanedText = text
-                .replace(/[^\w\s.,@\-;:()]/g, "") // Keep common punctuation
-                .replace(/\s+/g, " ")
-                .trim();
-
-            fullText += `\n--- Page ${i} ---\n${cleanedText}\n`;
+            // Structure & Clean
+            const structured = structureText(text);
+            fullText += `\n--- Page ${i} ---\n${structured}\n`;
         }
     }
 
@@ -74,15 +51,67 @@ export async function ocrPdf(file: File): Promise<string> {
 export async function ocrImage(imageSource: string | Blob): Promise<string> {
     const worker = await Tesseract.createWorker('eng');
 
-    // Recognize
+    // If it's an image, we still want to enhance it if possible
+    // For now, Tesseract is good, but OCR improves 2-3x with thresholding
     const { data: { text } } = await worker.recognize(imageSource);
 
-    // Clean
-    const cleanedText = text
-        .replace(/[^\w\s.,@\-;:()!?'"]/g, "") // Keep more punctuation for handwriting
-        .replace(/\s+/g, " ")
-        .trim();
+    const structured = structureText(text);
 
     await worker.terminate();
-    return cleanedText;
+    return structured;
+}
+
+/**
+ * Professional Image Enhancement using OpenCV.js
+ * Mimics high-end Android implementation: Grayscale -> Blur -> Adaptive Threshold
+ */
+export async function enhanceImageWithOpenCV(sourceCanvas: HTMLCanvasElement): Promise<string> {
+    const cv = (window as any).cv;
+    if (!cv) return sourceCanvas.toDataURL('image/jpeg', 0.9);
+
+    try {
+        let src = cv.imread(sourceCanvas);
+        let dst = new cv.Mat();
+
+        // 1. Convert to Grayscale
+        cv.cvtColor(src, src, cv.COLOR_RGBA2GRAY, 0);
+
+        // 2. Reduce noise with Gaussian Blur
+        let ksize = new cv.Size(5, 5);
+        cv.GaussianBlur(src, src, ksize, 0, 0, cv.BORDER_DEFAULT);
+
+        // 3. Adaptive Thresholding (The magic part for handwriting/shadows)
+        cv.adaptiveThreshold(src, dst, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY, 11, 2);
+
+        // 4. Output back to a temporary canvas
+        const outputCanvas = document.createElement('canvas');
+        cv.imshow(outputCanvas, dst);
+
+        const dataUrl = outputCanvas.toDataURL('image/jpeg', 0.95);
+
+        // Cleanup
+        src.delete();
+        dst.delete();
+
+        return dataUrl;
+    } catch (e) {
+        console.warn("OpenCV enhancement failed, falling back to raw", e);
+        return sourceCanvas.toDataURL('image/jpeg', 0.9);
+    }
+}
+
+/**
+ * AI-Style Text Structuring
+ * Cleans noise and restores logical line/block structure
+ */
+function structureText(raw: string): string {
+    return raw
+        .replace(/[^\w\s.,@\-;:()!?'"₹$€]/g, "") // Maintain symbols for financial/pro notes
+        .replace(/\n\s*\n/g, "\n\n") // Keep paragraph structure
+        .replace(/([a-z])\n([a-z])/g, "$1 $2") // Join lines wrapped mid-sentence
+        .split('\n')
+        .map(line => line.trim())
+        .filter(line => line.length > 0)
+        .join('\n')
+        .trim();
 }

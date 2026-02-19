@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Camera, X, Download, Plus, Trash2, Zap, FileText, CheckCircle2, RefreshCw } from 'lucide-react';
 import { ocrImage } from '../services/ocrService';
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
@@ -20,7 +20,30 @@ const HandwritingTool: React.FC<HandwritingToolProps> = ({ darkMode, notify }) =
     const [step, setStep] = useState<'scan' | 'edit' | 'preview'>('scan');
     const [cameraError, setCameraError] = useState<string | null>(null);
 
-    // Start Camera (Reusing logic from ScanTool)
+    const [isLibLoading, setIsLibLoading] = useState(false);
+    const [previewImage, setPreviewImage] = useState<string | null>(null);
+
+    // Load OpenCV dynamically
+    const loadLibraries = useCallback(async () => {
+        if ((window as any).cv) return;
+        setIsLibLoading(true);
+        return new Promise<void>((resolve) => {
+            const script = document.createElement('script');
+            script.src = '/lib/opencv.js';
+            script.async = true;
+            script.onload = () => {
+                setIsLibLoading(false);
+                resolve();
+            };
+            document.body.appendChild(script);
+        });
+    }, []);
+
+    useEffect(() => {
+        loadLibraries();
+    }, [loadLibraries]);
+
+    // Start Camera (Reused logic from ScanTool)
     const startCamera = async () => {
         setCameraError(null);
         setIsCameraActive(true);
@@ -50,7 +73,7 @@ const HandwritingTool: React.FC<HandwritingToolProps> = ({ darkMode, notify }) =
         setIsCameraActive(false);
     };
 
-    const captureImage = () => {
+    const captureImage = async () => {
         if (!videoRef.current || !canvasRef.current) return;
         const ctx = canvasRef.current.getContext('2d');
         if (!ctx) return;
@@ -70,13 +93,30 @@ const HandwritingTool: React.FC<HandwritingToolProps> = ({ darkMode, notify }) =
         try {
             let combinedText = '';
             for (let i = 0; i < capturedImages.length; i++) {
-                const text = await ocrImage(capturedImages[i]);
+                // Production Preprocessing for EVERY scan
+                const tempCanvas = document.createElement('canvas');
+                const img = new Image();
+                img.src = capturedImages[i];
+                await new Promise(r => img.onload = r);
+
+                tempCanvas.width = img.width;
+                tempCanvas.height = img.height;
+                tempCanvas.getContext('2d')?.drawImage(img, 0, 0);
+
+                const { ocrImage, enhanceImageWithOpenCV } = await import('../services/ocrService');
+                const enhancedUrl = await enhanceImageWithOpenCV(tempCanvas);
+
+                // Set the last one as preview for UX
+                if (i === capturedImages.length - 1) setPreviewImage(enhancedUrl);
+
+                const text = await ocrImage(enhancedUrl);
                 combinedText += text + '\n\n';
             }
             setOcrText(combinedText.trim());
             setStep('edit');
             if (notify?.complete) notify.complete();
         } catch (err) {
+            console.error(err);
             if (notify?.error) notify.error();
             alert("OCR failed. Please try again with a clearer image.");
         } finally {
@@ -204,6 +244,19 @@ const HandwritingTool: React.FC<HandwritingToolProps> = ({ darkMode, notify }) =
                                             <Plus className="text-slate-400" />
                                             <span className="text-[10px] font-bold uppercase mt-2">Add Page</span>
                                         </div>
+                                    </div>
+                                )}
+
+                                {isProcessing && previewImage && (
+                                    <div className="flex flex-col items-center gap-4 animate-fadeIn">
+                                        <div className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-500 bg-indigo-50 dark:bg-indigo-900/30 px-4 py-1.5 rounded-full border border-indigo-500/20">
+                                            AI-Enhanced Preview
+                                        </div>
+                                        <div className="relative w-48 h-64 rounded-2xl overflow-hidden border-2 border-indigo-500 shadow-2xl shadow-indigo-500/20">
+                                            <img src={previewImage} className="w-full h-full object-cover" alt="AI Preview" />
+                                            <div className="absolute inset-0 bg-indigo-600/10 animate-pulse"></div>
+                                        </div>
+                                        <p className="text-[10px] opacity-50 font-bold uppercase">Optimizing for OCR...</p>
                                     </div>
                                 )}
 
