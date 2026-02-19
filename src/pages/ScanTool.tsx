@@ -218,8 +218,7 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
     const toggleTorch = async () => {
         if (videoTrackRef.current) {
             try {
-                // @ts-ignore
-                const capabilities = videoTrackRef.current.getCapabilities();
+                const capabilities = videoTrackRef.current.getCapabilities() as any;
                 if (capabilities && capabilities.torch) {
                     await videoTrackRef.current.applyConstraints({
                         // @ts-ignore
