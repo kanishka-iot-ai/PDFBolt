@@ -9,6 +9,8 @@ const STATIC_ASSETS = [
     '/index.html',
     '/logo.jpg',
     '/manifest.json',
+    '/lib/opencv.js',
+    '/lib/jscanify.min.js',
 ];
 
 // Install event - cache static assets
