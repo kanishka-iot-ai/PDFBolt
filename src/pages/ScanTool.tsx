@@ -59,7 +59,7 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
         });
     }, []);
 
-    // Detection Loop
+    // Detection Loop - Professional Area Detection Logic
     const detectionLoop = useCallback(() => {
         if (!videoRef.current || !overlayCanvasRef.current || !scannerRef.current || !isAutoScan) {
             requestRef.current = requestAnimationFrame(detectionLoop);
@@ -76,41 +76,48 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
             canvas.height = video.videoHeight;
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // Animate Laser Line
-            laserPosRef.current = (laserPosRef.current + 5) % canvas.height;
-            ctx.strokeStyle = 'rgba(59, 130, 246, 0.5)';
-            ctx.lineWidth = 2;
+            // 1. Premium Laser Scan Animation
+            laserPosRef.current = (laserPosRef.current + 8) % canvas.height;
+            ctx.strokeStyle = 'rgba(59, 130, 246, 0.4)';
+            ctx.lineWidth = 3;
+            ctx.setLineDash([15, 5]);
             ctx.beginPath();
             ctx.moveTo(0, laserPosRef.current);
             ctx.lineTo(canvas.width, laserPosRef.current);
             ctx.stroke();
+            ctx.setLineDash([]); // Reset
 
             try {
+                // 2. Core Detection using jscanify (OpenCV powered)
+                // This finds the document area exactly like professional apps
                 const contour = scannerRef.current.findPaperContour(video);
+
                 if (contour) {
                     const corners = scannerRef.current.getCornerPoints(contour);
 
-                    // Stability Logic
+                    // 3. Area Stability & Snapping Logic
                     if (lastCornersRef.current) {
                         const dist = Math.abs(corners.topLeft.x - lastCornersRef.current.topLeft.x) +
                             Math.abs(corners.topLeft.y - lastCornersRef.current.topLeft.y);
 
-                        if (dist < 10) {
+                        if (dist < 8) { // OKEN-level precision tolerance
                             steadyCountRef.current++;
                         } else {
                             steadyCountRef.current = 0;
                             setIsSteady(false);
                         }
 
-                        if (steadyCountRef.current > 30) { // Steady for ~0.5s
+                        if (steadyCountRef.current > 25) {
                             setIsSteady(true);
                         }
                     }
                     lastCornersRef.current = corners;
 
-                    // Draw Bounding Box
-                    ctx.strokeStyle = steadyCountRef.current > 30 ? '#22c55e' : '#3b82f6';
-                    ctx.lineWidth = 8;
+                    // 4. Draw the GORGEOUS BORDER (Professional Feedback)
+                    ctx.shadowBlur = 20;
+                    ctx.shadowColor = steadyCountRef.current > 25 ? '#22c55e' : '#3b82f6';
+                    ctx.strokeStyle = steadyCountRef.current > 25 ? '#22c55e' : '#3b82f6';
+                    ctx.lineWidth = 12;
                     ctx.lineJoin = 'round';
                     ctx.beginPath();
                     ctx.moveTo(corners.topLeft.x, corners.topLeft.y);
@@ -119,19 +126,32 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
                     ctx.lineTo(corners.bottomLeft.x, corners.bottomLeft.y);
                     ctx.closePath();
                     ctx.stroke();
+                    ctx.shadowBlur = 0; // Reset
 
-                    // Fill effect
-                    ctx.fillStyle = steadyCountRef.current > 30 ? 'rgba(34, 197, 94, 0.2)' : 'rgba(59, 130, 246, 0.2)';
+                    // 5. Fill with semi-transparent premium overlay
+                    ctx.fillStyle = steadyCountRef.current > 25 ? 'rgba(34, 197, 94, 0.3)' : 'rgba(59, 130, 246, 0.2)';
                     ctx.fill();
 
-                    // Auto capture trigger
-                    if (steadyCountRef.current === 60 && !isAutoCapturing) { // Steady for ~1s
+                    // 6. Pulse effect on corners for target locking
+                    const pulseSize = Math.sin(Date.now() / 200) * 5 + 15;
+                    ctx.fillStyle = steadyCountRef.current > 25 ? '#22c55e' : '#3b82f6';
+                    [corners.topLeft, corners.topRight, corners.bottomRight, corners.bottomLeft].forEach(p => {
+                        ctx.beginPath();
+                        ctx.arc(p.x, p.y, pulseSize, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.strokeStyle = 'white';
+                        ctx.lineWidth = 4;
+                        ctx.stroke();
+                    });
+
+                    // 7. Auto capture trigger when steady
+                    if (steadyCountRef.current === 50 && !isAutoCapturing) {
                         setIsAutoCapturing(true);
                         setTimeout(() => {
                             captureImage();
                             setIsAutoCapturing(false);
                             steadyCountRef.current = 0;
-                        }, 200);
+                        }, 100);
                     }
                 } else {
                     steadyCountRef.current = 0;
@@ -167,7 +187,10 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
 
                 if (videoRef.current) {
                     videoRef.current.srcObject = stream;
-                    videoTrackRef.current = stream.getVideoTracks()[0];
+                    const tracks = stream.getVideoTracks();
+                    if (tracks.length > 0) {
+                        videoTrackRef.current = tracks[0];
+                    }
                     await videoRef.current.play();
                 }
             } catch (err: any) {
@@ -195,11 +218,13 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
     const toggleTorch = async () => {
         if (videoTrackRef.current) {
             try {
-                const capabilities = videoTrackRef.current.getCapabilities() as any;
-                if (capabilities.torch) {
+                // @ts-ignore
+                const capabilities = videoTrackRef.current.getCapabilities();
+                if (capabilities && capabilities.torch) {
                     await videoTrackRef.current.applyConstraints({
+                        // @ts-ignore
                         advanced: [{ torch: !isTorchOn }]
-                    } as any);
+                    });
                     setIsTorchOn(!isTorchOn);
                 } else {
                     notify.error("Flashlight not supported on this device");
@@ -210,7 +235,7 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
         }
     };
 
-    // Capture Image
+    // Capture Image with Perspective Correction
     const captureImage = () => {
         if (!videoRef.current || !canvasRef.current) return;
 
@@ -225,17 +250,19 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
 
         if (scannerRef.current && isAutoScan) {
             try {
+                // Professional Perspective Warp (Extracts perfectly rectangular document)
                 const resultCanvas = scannerRef.current.extractPaper(video, 1200, 1600);
-                const imageData = resultCanvas.toDataURL("image/jpeg", 0.9);
+                const imageData = resultCanvas.toDataURL("image/jpeg", 0.95);
                 setCapturedImages(prev => [...prev, imageData]);
                 setProcessing(false);
-                if (notify && notify.success) notify.success("Document Scanned!");
+                if (notify && notify.success) notify.success("Document area detected and cropped!");
                 return;
             } catch (e) {
                 console.warn("Auto-extract failed", e);
             }
         }
 
+        // Fallback to manual capture
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
@@ -247,7 +274,7 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
             ctx.filter = 'none';
         }
 
-        const imageData = canvas.toDataURL("image/jpeg", 0.85);
+        const imageData = canvas.toDataURL("image/jpeg", 0.9);
         setCapturedImages(prev => [...prev, imageData]);
         setProcessing(false);
         if (notify && notify.success) notify.success("Captured!");
@@ -290,7 +317,7 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
 
             const link = document.createElement('a');
             link.href = url;
-            link.download = `scanned_document_${Date.now()}.pdf`;
+            link.download = `pdfbolt_scan_${Date.now()}.pdf`;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
@@ -315,9 +342,9 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
                     <div className={`w-28 h-28 mx-auto rounded-full flex items-center justify-center mb-8 ${darkMode ? 'bg-slate-800' : 'bg-white shadow-xl'}`}>
                         <Camera size={56} className="text-blue-500" />
                     </div>
-                    <h2 className="text-3xl font-black mb-4">AI Scan to PDF</h2>
+                    <h2 className="text-3xl font-black mb-4 tracking-tight">Professional AI Scanner</h2>
                     <p className="mb-10 opacity-70 text-lg leading-relaxed">
-                        Hold steady for auto-capture. Professional AI document detection and edge cropping.
+                        Features <span className="text-blue-500 font-bold">Auto Area Detection</span> and <span className="text-green-500 font-bold">Smart Perspective Correction</span> just like OKEN Scanner.
                     </p>
 
                     {cameraError && (
@@ -328,151 +355,155 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
 
                     <button
                         onClick={startCamera}
-                        className="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-bold text-xl shadow-xl shadow-blue-500/20 transition-all hover:scale-105 flex items-center justify-center gap-3"
+                        className="w-full py-5 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-black text-xl shadow-2xl shadow-blue-500/30 transition-all hover:scale-[1.03] flex items-center justify-center gap-3 active:scale-95"
                     >
-                        <Camera /> Start AI Scanner
+                        <Camera /> Start Detection
                     </button>
-                    <p className="mt-4 text-xs opacity-50 uppercase tracking-widest font-bold">HTTPS required for Camera Access</p>
+                    <p className="mt-4 text-[10px] opacity-50 uppercase tracking-[0.2em] font-black">Powered by OpenCV.js</p>
                 </div>
             )}
 
-            {/* Camera View - Full Screen Overlay with Clean CSS */}
+            {/* Camera View - Professional Interface */}
             {isCameraActive && (
                 <div className="fixed inset-0 z-[100] bg-black">
                     <div className="relative w-full h-full flex flex-col">
-                        {/* Video Container - Production Level CSS */}
+                        {/* Video Layer */}
                         <div className="relative flex-grow w-full bg-black overflow-hidden flex items-center justify-center">
                             <video
                                 ref={videoRef}
                                 autoPlay
                                 playsInline
                                 className="absolute inset-0 w-full h-full object-cover"
-                                style={{ transform: 'scaleX(1)' }}
                             ></video>
 
-                            {/* Detection Overlay */}
+                            {/* Detection Overlay Layer */}
                             <canvas
                                 ref={overlayCanvasRef}
                                 className="absolute inset-0 w-full h-full object-cover pointer-events-none z-10"
                             />
 
-                            {/* Overlay UI */}
+                            {/* HUD UI Layer */}
                             <div className="absolute inset-0 pointer-events-none p-4 flex flex-col justify-between z-20">
                                 <div className="flex justify-between pt-2">
-                                    <div className="pointer-events-auto flex items-center gap-2 bg-black/50 px-4 py-2 rounded-full backdrop-blur-md">
-                                        <div className={`w-2 h-2 rounded-full ${isSteady ? 'bg-green-500 animate-pulse' : 'bg-blue-500'}`} />
-                                        <span className="text-white text-xs font-black uppercase tracking-widest">
-                                            {isLibLoading ? 'Loading AI...' : isSteady ? 'Hold Steady...' : isAutoScan ? 'Scanning...' : 'Manual'}
+                                    <div className="pointer-events-auto flex items-center gap-2 bg-black/60 px-5 py-2.5 rounded-full backdrop-blur-xl border border-white/10 shadow-2xl">
+                                        <div className={`w-2.5 h-2.5 rounded-full ${isSteady ? 'bg-green-500 animate-pulse' : 'bg-blue-500'}`} />
+                                        <span className="text-white text-[10px] font-black uppercase tracking-[0.15em]">
+                                            {isLibLoading ? 'Initializing AI...' : isSteady ? 'Steady... Area Locked' : isAutoScan ? 'Detecting Area' : 'Manual'}
                                         </span>
                                     </div>
-                                    <div className="flex gap-2">
+                                    <div className="flex gap-3">
                                         <button
                                             onClick={toggleTorch}
-                                            className="pointer-events-auto p-3 bg-black/50 text-white rounded-full backdrop-blur-md active:scale-95"
+                                            className="pointer-events-auto p-3.5 bg-black/60 text-white rounded-full backdrop-blur-xl border border-white/10 active:scale-90"
                                         >
-                                            {isTorchOn ? <Zap className="text-yellow-400" size={24} /> : <ZapOff size={24} />}
+                                            {isTorchOn ? <Zap className="text-yellow-400 fill-current" size={24} /> : <ZapOff size={24} />}
                                         </button>
                                         <button
                                             onClick={stopCamera}
-                                            className="pointer-events-auto p-3 bg-black/50 text-white rounded-full backdrop-blur-md active:scale-95"
+                                            className="pointer-events-auto p-3.5 bg-black/60 text-white rounded-full backdrop-blur-xl border border-white/10 active:scale-90"
                                         >
                                             <X size={24} />
                                         </button>
                                     </div>
                                 </div>
 
-                                {isAutoScan && !isLibLoading && !isSteady && (
-                                    <div className="flex flex-col items-center mb-8">
-                                        <div className="text-white bg-blue-600/80 px-4 py-2 rounded-xl text-xs font-bold animate-pulse backdrop-blur-sm uppercase tracking-tighter">
-                                            Align document to scan
+                                {/* Status Messages */}
+                                <div className="flex flex-col items-center mb-8 gap-4">
+                                    {isAutoScan && !isLibLoading && !isSteady && (
+                                        <div className="text-white bg-blue-600/90 px-5 py-2.5 rounded-2xl text-[11px] font-black animate-pulse backdrop-blur-md border border-white/20 uppercase tracking-widest shadow-2xl">
+                                            Place document in frame
                                         </div>
-                                    </div>
-                                )}
+                                    )}
 
-                                {isSteady && (
-                                    <div className="flex flex-col items-center mb-8">
-                                        <div className="text-white bg-green-600/90 px-6 py-2 rounded-xl text-sm font-black animate-bounce backdrop-blur-sm border-2 border-white/20">
-                                            STEADY... CAPTURING
+                                    {isSteady && (
+                                        <div className="text-white bg-green-600/90 px-8 py-3 rounded-2xl text-sm font-black animate-bounce backdrop-blur-md border-2 border-white/30 shadow-2xl shadow-green-500/20 uppercase tracking-widest">
+                                            Area Locked • Capturing
                                         </div>
-                                    </div>
-                                )}
+                                    )}
+                                </div>
                             </div>
                         </div>
 
-                        {/* Controls - Fixed Bottom */}
-                        <div className="bg-black/95 p-6 pb-12 z-30 border-t border-white/10">
-                            <div className="flex justify-between items-center max-w-md mx-auto">
-                                {/* Auto Scan Toggle */}
+                        {/* Professional Control Bar */}
+                        <div className="bg-black/95 p-8 pb-12 z-30 border-t border-white/10 shadow-[0_-10px_40px_rgba(0,0,0,0.8)]">
+                            <div className="flex justify-between items-center max-w-lg mx-auto">
+                                {/* Auto Scan Mode Toggle */}
                                 <button
                                     onClick={() => setIsAutoScan(!isAutoScan)}
-                                    className={`p-3 flex flex-col items-center gap-1 transition-colors ${isAutoScan ? 'text-blue-500' : 'text-white/50'}`}
+                                    className={`flex flex-col items-center gap-1.5 transition-all active:scale-90 ${isAutoScan ? 'text-blue-500' : 'text-white/40'}`}
                                 >
-                                    <ScanIcon size={24} />
-                                    <span className="text-[10px] uppercase font-black">AI Mode</span>
+                                    <div className={`p-3 rounded-2xl border-2 ${isAutoScan ? 'border-blue-500/50 bg-blue-500/10' : 'border-white/10'}`}>
+                                        <ScanIcon size={24} />
+                                    </div>
+                                    <span className="text-[9px] uppercase font-black tracking-widest">AI Area</span>
                                 </button>
 
-                                {/* Capture Button */}
+                                {/* Shutter Button */}
                                 <button
                                     onClick={captureImage}
                                     disabled={processing || isLibLoading}
-                                    className={`group relative w-20 h-20 rounded-full border-4 flex items-center justify-center active:scale-90 transition-all duration-200 ${isSteady ? 'border-green-500' : 'border-white'}`}
+                                    className={`group relative w-24 h-24 rounded-full border-4 flex items-center justify-center active:scale-90 transition-all duration-300 ${isSteady ? 'border-green-500 scale-110 shadow-[0_0_30px_rgba(34,197,94,0.4)]' : 'border-white shadow-[0_0_20px_rgba(255,255,255,0.2)]'}`}
                                 >
-                                    <div className={`w-16 h-16 rounded-full transition-all duration-200 ${processing ? 'scale-75 opacity-50' : 'group-hover:scale-95'} ${isSteady ? 'bg-green-500' : 'bg-white'}`}></div>
+                                    <div className={`w-20 h-20 rounded-full transition-all duration-300 ${processing ? 'scale-75 opacity-50' : 'group-hover:scale-95'} ${isSteady ? 'bg-green-500' : 'bg-white'}`}></div>
                                     {processing && (
-                                        <div className="absolute inset-0 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                                        <div className="absolute inset-0 border-[6px] border-blue-500 border-t-transparent rounded-full animate-spin"></div>
                                     )}
                                 </button>
 
-                                {/* Gallery / Done */}
-                                <div className="text-white flex flex-col items-center gap-1 cursor-pointer group" onClick={stopCamera}>
-                                    <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center group-hover:bg-white/20 transition-colors border-2 border-white/5">
-                                        <span className="text-xl font-black">{capturedImages.length}</span>
+                                {/* Page Gallery / Export */}
+                                <button onClick={stopCamera} className="flex flex-col items-center gap-1.5 group active:scale-90">
+                                    <div className="w-14 h-14 rounded-2xl bg-white/5 border-2 border-white/10 flex items-center justify-center group-hover:bg-white/10 transition-all">
+                                        <span className="text-2xl font-black text-white">{capturedImages.length}</span>
                                     </div>
-                                    <span className="text-[10px] uppercase font-black text-white/50">Save</span>
-                                </div>
+                                    <span className="text-[9px] uppercase font-black tracking-widest text-white/40 group-hover:text-white transition-colors">Done</span>
+                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
             )}
 
-            {/* Review Mode */}
+            {/* Premium Post-Scan Review */}
             {!isCameraActive && capturedImages.length > 0 && (
-                <div className="w-full max-w-5xl animate-fadeIn p-6">
-                    <div className="flex flex-col md:flex-row items-center justify-between mb-8 gap-4">
+                <div className="w-full max-w-6xl animate-fadeIn p-8">
+                    <div className="flex flex-col md:flex-row items-center justify-between mb-12 gap-6 bg-white dark:bg-slate-800 p-8 rounded-3xl shadow-2xl">
                         <div>
-                            <h2 className="text-3xl font-black">Scan Complete</h2>
-                            <p className="opacity-60">{capturedImages.length} pages captured & AI optimized</p>
+                            <h2 className="text-4xl font-black tracking-tight mb-2">Scan Result</h2>
+                            <p className="opacity-50 font-bold uppercase tracking-widest text-xs">
+                                {capturedImages.length} {capturedImages.length === 1 ? 'Page' : 'Pages'} • AI Optimized • Ready for PDF
+                            </p>
                         </div>
                         <div className="flex gap-4 w-full md:w-auto">
                             <button
                                 onClick={startCamera}
-                                className="flex-1 px-6 py-3 rounded-xl border-2 border-slate-200 dark:border-slate-700 font-bold hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors flex items-center justify-center gap-2"
+                                className="flex-1 px-8 py-4 rounded-2xl border-2 border-slate-200 dark:border-slate-700 font-black hover:bg-slate-50 dark:hover:bg-slate-700 transition-all flex items-center justify-center gap-2 text-sm active:scale-95"
                             >
-                                <Plus size={20} /> Add Page
+                                <Plus size={18} /> Add More
                             </button>
                             <button
                                 onClick={saveAsPdf}
                                 disabled={loading}
-                                className="flex-1 px-8 py-3 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-700 shadow-lg hover:shadow-blue-500/20 transition-all flex items-center justify-center gap-2"
+                                className="flex-1 px-10 py-4 rounded-2xl bg-blue-600 text-white font-black hover:bg-blue-700 shadow-xl shadow-blue-500/20 transition-all flex items-center justify-center gap-2 text-sm active:scale-95"
                             >
-                                {loading ? 'Saving...' : <><Download size={20} /> Download PDF</>}
+                                {loading ? 'Processing...' : <><Download size={18} /> Save PDF Document</>}
                             </button>
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10">
                         {capturedImages.map((img, idx) => (
-                            <div key={idx} className="relative group rounded-2xl overflow-hidden shadow-2xl border-4 border-white dark:border-slate-800 transform hover:scale-[1.02] transition-transform">
-                                <img src={img} alt={`Page ${idx}`} className="w-full h-auto" />
-                                <button
-                                    onClick={() => removePage(idx)}
-                                    className="absolute top-2 right-2 p-2 bg-red-600/90 text-white rounded-xl opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm"
-                                >
-                                    <Trash2 size={18} />
-                                </button>
-                                <div className="absolute bottom-0 inset-x-0 bg-black/60 text-white text-center text-[10px] py-1 font-black uppercase tracking-widest backdrop-blur-sm">
-                                    Page {idx + 1}
+                            <div key={idx} className="relative group rounded-3xl overflow-hidden shadow-2xl border-[6px] border-white dark:border-slate-800 transform hover:scale-[1.05] transition-all duration-300">
+                                <img src={img} alt={`Scanned Page ${idx + 1}`} className="w-full h-auto" />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-6">
+                                    <button
+                                        onClick={() => removePage(idx)}
+                                        className="w-full py-3 bg-red-600/90 hover:bg-red-700 text-white rounded-xl font-bold text-xs backdrop-blur-md transition-colors flex items-center justify-center gap-2"
+                                    >
+                                        <Trash2 size={14} /> Remove Page
+                                    </button>
+                                </div>
+                                <div className="absolute top-4 left-4 bg-black/60 text-white text-[10px] px-3 py-1 rounded-full font-black uppercase tracking-widest backdrop-blur-md border border-white/20">
+                                    P{idx + 1}
                                 </div>
                             </div>
                         ))}
