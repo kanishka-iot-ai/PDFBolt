@@ -16,40 +16,109 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
     const [processing, setProcessing] = useState(false);
     const [cameraError, setCameraError] = useState<string | null>(null);
 
+    // Overlay Canvas for detection feedback
+    const overlayCanvasRef = useRef<HTMLCanvasElement>(null);
+    const [isAutoScan, setIsAutoScan] = useState(true);
+    const [isLibLoading, setIsLibLoading] = useState(false);
+    const scannerRef = useRef<any>(null);
+    const requestRef = useRef<number>();
+
     // Filter State
     const [activeFilter, setActiveFilter] = useState<'none' | 'bw' | 'contrast'>('none');
+
+    // Load OpenCV and jscanify dynamically
+    const loadLibraries = useCallback(async () => {
+        if ((window as any).cv && scannerRef.current) return;
+        setIsLibLoading(true);
+
+        return new Promise<void>((resolve) => {
+            const scriptCv = document.createElement('script');
+            scriptCv.src = 'https://docs.opencv.org/4.5.2/opencv.js';
+            scriptCv.async = true;
+            scriptCv.onload = () => {
+                const scriptJscanify = document.createElement('script');
+                scriptJscanify.src = 'https://cdn.jsdelivr.net/gh/ColonelParrot/jscanify@master/src/jscanify.min.js';
+                scriptJscanify.onload = () => {
+                    // @ts-ignore
+                    scannerRef.current = new jscanify();
+                    setIsLibLoading(false);
+                    resolve();
+                };
+                document.body.appendChild(scriptJscanify);
+            };
+            document.body.appendChild(scriptCv);
+        });
+    }, []);
+
+    // Detection Loop
+    const detectionLoop = useCallback(() => {
+        if (!videoRef.current || !overlayCanvasRef.current || !scannerRef.current || !isAutoScan) {
+            requestRef.current = requestAnimationFrame(detectionLoop);
+            return;
+        }
+
+        const video = videoRef.current;
+        const canvas = overlayCanvasRef.current;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+
+        if (video.videoWidth > 0 && video.videoHeight > 0) {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            try {
+                const contour = scannerRef.current.findPaperContour(video);
+                if (contour) {
+                    const cornerPoints = scannerRef.current.getCornerPoints(contour);
+                    ctx.strokeStyle = '#3b82f6';
+                    ctx.lineWidth = 6;
+                    ctx.beginPath();
+                    ctx.moveTo(cornerPoints.topLeft.x, cornerPoints.topLeft.y);
+                    ctx.lineTo(cornerPoints.topRight.x, cornerPoints.topRight.y);
+                    ctx.lineTo(cornerPoints.bottomRight.x, cornerPoints.bottomRight.y);
+                    ctx.lineTo(cornerPoints.bottomLeft.x, cornerPoints.bottomLeft.y);
+                    ctx.closePath();
+                    ctx.stroke();
+                    ctx.fillStyle = 'rgba(59, 130, 246, 0.2)';
+                    ctx.fill();
+                }
+            } catch (e) { }
+        }
+
+        requestRef.current = requestAnimationFrame(detectionLoop);
+    }, [isAutoScan]);
+
+    useEffect(() => {
+        if (isCameraActive) {
+            loadLibraries().then(() => {
+                requestRef.current = requestAnimationFrame(detectionLoop);
+            });
+        }
+        return () => {
+            if (requestRef.current) cancelAnimationFrame(requestRef.current);
+        };
+    }, [isCameraActive, loadLibraries, detectionLoop]);
 
     // Start Camera
     const startCamera = async () => {
         setCameraError(null);
         setIsCameraActive(true);
-        // Wait a tick for the video element to be mounted
         setTimeout(async () => {
             try {
-                // Try environment facing camera first (rear camera)
                 const stream = await navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: 'environment' },
+                    video: { facingMode: 'environment', width: { ideal: 1920 }, height: { ideal: 1080 } },
                     audio: false
                 });
 
                 if (videoRef.current) {
                     videoRef.current.srcObject = stream;
-                    try {
-                        await videoRef.current.play();
-                    } catch (playErr) {
-                        console.error("Play error:", playErr);
-                    }
+                    await videoRef.current.play();
                 }
             } catch (err: any) {
                 console.error("Error accessing camera:", err);
                 setIsCameraActive(false);
-                if (err.name === 'NotAllowedError') {
-                    setCameraError("Camera permission denied. Please allow access.");
-                } else if (err.name === 'NotFoundError') {
-                    setCameraError("No camera found.");
-                } else {
-                    setCameraError("Camera access error. Ensure you are on HTTPS.");
-                }
+                setCameraError("Camera access error. Ensure you are on HTTPS.");
             }
         }, 100);
     };
@@ -62,6 +131,7 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
             videoRef.current.srcObject = null;
         }
         setIsCameraActive(false);
+        if (requestRef.current) cancelAnimationFrame(requestRef.current);
     };
 
     // Capture Image
@@ -75,28 +145,32 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
 
         if (!ctx) return;
 
+        if (scannerRef.current && isAutoScan) {
+            try {
+                const resultCanvas = scannerRef.current.extractPaper(video, 1200, 1600);
+                const imageData = resultCanvas.toDataURL("image/jpeg", 0.9);
+                setCapturedImages(prev => [...prev, imageData]);
+                setProcessing(false);
+                if (notify && notify.success) notify.success("Document Scanned!");
+                return;
+            } catch (e) {
+                console.warn("Auto-extract failed", e);
+            }
+        }
+
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
-
-        // Draw video frame to canvas
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-        // Apply filters via canvas pixel manipulation if supported, or CSS filters are visual only.
-        // For actual saved image, we need to process the canvas data or use the filter context (if supported)
-        // Here we'll do simple processing if needed, but for now we'll stick to 'none' stored to keep it fast, 
-        // or apply basic distinct logic.
-        // NOTE: Standard canvas 'filter' property is supported in modern browsers.
         if (activeFilter !== 'none') {
             if (activeFilter === 'bw') ctx.filter = 'grayscale(100%)';
             if (activeFilter === 'contrast') ctx.filter = 'contrast(150%) grayscale(100%)';
-            // Redraw with filter
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-            ctx.filter = 'none'; // reset
+            ctx.filter = 'none';
         }
 
         const imageData = canvas.toDataURL("image/jpeg", 0.85);
         setCapturedImages(prev => [...prev, imageData]);
-
         setProcessing(false);
         if (notify && notify.success) notify.success("Captured!");
     };
@@ -165,7 +239,7 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
                     </div>
                     <h2 className="text-3xl font-black mb-4">Scan Documents</h2>
                     <p className="mb-10 opacity-70 text-lg leading-relaxed">
-                        Use your camera to scan multiple pages into a single PDF.
+                        Features AI document detection and auto-cropping for perfect scans every time.
                     </p>
 
                     {cameraError && (
@@ -178,7 +252,7 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
                         onClick={startCamera}
                         className="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-bold text-xl shadow-xl shadow-blue-500/20 transition-all hover:scale-105 flex items-center justify-center gap-3"
                     >
-                        <Camera /> Start Camera
+                        <Camera /> Start AI Scanner
                     </button>
                     <p className="mt-4 text-xs opacity-50 uppercase tracking-widest font-bold">HTTPS required for Camera Access</p>
                 </div>
@@ -189,18 +263,30 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
                 <div className="fixed inset-0 z-[100] bg-black">
                     <div className="relative w-full h-full flex flex-col">
                         {/* Video Container - Production Level CSS */}
-                        <div className="relative flex-grow w-full bg-black overflow-hidden">
+                        <div className="relative flex-grow w-full bg-black overflow-hidden flex items-center justify-center">
                             <video
                                 ref={videoRef}
                                 autoPlay
                                 playsInline
-                                className="w-full h-full object-cover"
-                                style={{ transform: 'scaleX(1)' }} // Ensure no weird mirroring by default unless selfie
+                                className="absolute inset-0 w-full h-full object-cover"
+                                style={{ transform: 'scaleX(1)' }}
                             ></video>
 
+                            {/* Detection Overlay */}
+                            <canvas
+                                ref={overlayCanvasRef}
+                                className="absolute inset-0 w-full h-full object-cover pointer-events-none z-10"
+                            />
+
                             {/* Overlay UI */}
-                            <div className="absolute inset-0 pointer-events-none p-4 flex flex-col justify-between">
-                                <div className="flex justify-end pt-2">
+                            <div className="absolute inset-0 pointer-events-none p-4 flex flex-col justify-between z-20">
+                                <div className="flex justify-between pt-2">
+                                    <div className="pointer-events-auto flex items-center gap-2 bg-black/50 px-4 py-2 rounded-full backdrop-blur-md">
+                                        <ScanIcon size={18} className={isLibLoading ? 'animate-pulse text-yellow-500' : 'text-blue-500'} />
+                                        <span className="text-white text-xs font-black uppercase tracking-widest">
+                                            {isLibLoading ? 'Loading AI...' : isAutoScan ? 'AI Detection On' : 'Manual Mode'}
+                                        </span>
+                                    </div>
                                     <button
                                         onClick={stopCamera}
                                         className="pointer-events-auto p-3 bg-black/50 text-white rounded-full backdrop-blur-md"
@@ -208,34 +294,47 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
                                         <X size={24} />
                                     </button>
                                 </div>
+
+                                {isAutoScan && !isLibLoading && (
+                                    <div className="flex flex-col items-center mb-8">
+                                        <div className="text-white bg-blue-600/80 px-4 py-2 rounded-xl text-xs font-bold animate-pulse backdrop-blur-sm">
+                                            Align document in frame
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         </div>
 
                         {/* Controls - Fixed Bottom */}
-                        <div className="bg-black/90 p-6 pb-12">
+                        <div className="bg-black/95 p-6 pb-12 z-30 border-t border-white/10">
                             <div className="flex justify-between items-center max-w-md mx-auto">
-                                {/* Filter Toggle */}
+                                {/* Auto Scan Toggle */}
                                 <button
-                                    onClick={() => setActiveFilter(prev => prev === 'none' ? 'bw' : prev === 'bw' ? 'contrast' : 'none')}
-                                    className="p-3 text-white/80 flex flex-col items-center gap-1"
+                                    onClick={() => setIsAutoScan(!isAutoScan)}
+                                    className={`p-3 flex flex-col items-center gap-1 transition-colors ${isAutoScan ? 'text-blue-500' : 'text-white/50'}`}
                                 >
-                                    <div className={`w-8 h-8 rounded-full border ${activeFilter !== 'none' ? 'bg-white' : 'border-white/50'}`}></div>
-                                    <span className="text-[10px] uppercase font-bold">{activeFilter}</span>
+                                    <ScanIcon size={24} />
+                                    <span className="text-[10px] uppercase font-black">Auto</span>
                                 </button>
 
                                 {/* Capture Button */}
                                 <button
                                     onClick={captureImage}
-                                    disabled={processing}
-                                    className="w-20 h-20 rounded-full border-4 border-white flex items-center justify-center active:scale-95 transition-transform"
+                                    disabled={processing || isLibLoading}
+                                    className="group relative w-20 h-20 rounded-full border-4 border-white flex items-center justify-center active:scale-90 transition-all duration-200"
                                 >
-                                    <div className="w-16 h-16 bg-white rounded-full"></div>
+                                    <div className={`w-16 h-16 bg-white rounded-full transition-all duration-200 ${processing ? 'scale-75 opacity-50' : 'group-hover:scale-95'}`}></div>
+                                    {processing && (
+                                        <div className="absolute inset-0 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                                    )}
                                 </button>
 
                                 {/* Gallery / Done */}
-                                <div className="text-white flex flex-col items-center gap-1 cursor-pointer" onClick={stopCamera}>
-                                    <span className="text-xl font-bold">{capturedImages.length}</span>
-                                    <span className="text-[10px] uppercase font-bold text-white/50">Done</span>
+                                <div className="text-white flex flex-col items-center gap-1 cursor-pointer group" onClick={stopCamera}>
+                                    <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center group-hover:bg-white/20 transition-colors">
+                                        <span className="text-xl font-black">{capturedImages.length}</span>
+                                    </div>
+                                    <span className="text-[10px] uppercase font-black text-white/50">Done</span>
                                 </div>
                             </div>
                         </div>

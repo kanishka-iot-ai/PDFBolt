@@ -80,7 +80,7 @@ const SEOManager: React.FC = () => {
 
     // Inject JSON-LD
     const injectJsonLd = (id: string, data: any) => {
-      let script = document.getElementById(id);
+      let script = document.getElementById(id) as HTMLScriptElement | null;
       if (!script) {
         script = document.createElement('script');
         script.id = id;
