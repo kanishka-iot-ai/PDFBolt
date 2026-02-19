@@ -33,11 +33,11 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
 
         return new Promise<void>((resolve) => {
             const scriptCv = document.createElement('script');
-            scriptCv.src = 'https://docs.opencv.org/4.5.2/opencv.js';
+            scriptCv.src = '/lib/opencv.js';
             scriptCv.async = true;
             scriptCv.onload = () => {
                 const scriptJscanify = document.createElement('script');
-                scriptJscanify.src = 'https://cdn.jsdelivr.net/gh/ColonelParrot/jscanify@master/src/jscanify.min.js';
+                scriptJscanify.src = '/lib/jscanify.min.js';
                 scriptJscanify.onload = () => {
                     // @ts-ignore
                     scannerRef.current = new jscanify();
