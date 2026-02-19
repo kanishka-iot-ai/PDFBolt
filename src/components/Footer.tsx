@@ -56,8 +56,21 @@ const Footer: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
       </div>
 
       <div className="max-w-7xl mx-auto px-6 mt-16 pt-8 border-t border-slate-200 dark:border-slate-800 flex flex-col md:flex-row justify-between items-center gap-4">
-        <div className="flex items-center gap-2 text-green-500 text-[10px] font-black uppercase tracking-widest">
-          <CheckCircle size={14} /> 100% Private Browser Execution
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 text-green-500 text-[10px] font-black uppercase tracking-widest">
+            <CheckCircle size={14} /> 100% Private Browser Execution
+          </div>
+          <button
+            onClick={async () => {
+              const { clearAllAppData } = await import('../utils/privacy');
+              if (confirm("This will wipe all 24MB of cached AI tools and app data. You will need to re-download them on your next visit. Proceed?")) {
+                await clearAllAppData();
+              }
+            }}
+            className="text-[10px] font-black uppercase tracking-widest text-red-500/60 hover:text-red-500 border-b border-red-500/20 hover:border-red-500 transition-all cursor-pointer"
+          >
+            Wipe Site Data (24MB)
+          </button>
         </div>
         <p className="text-[10px] font-bold uppercase tracking-widest opacity-50">© 2025 PDFBolt. Built for Privacy and Speed.</p>
       </div>
