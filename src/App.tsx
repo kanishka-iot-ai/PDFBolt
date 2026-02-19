@@ -78,21 +78,65 @@ const SEOManager: React.FC = () => {
     }
     canonicalLink.href = canonicalUrl;
 
-    // Update Open Graph
-    const updateMeta = (property: string, content: string) => {
-      let tag = document.querySelector(`meta[property="${property}"]`);
-      if (!tag) {
-        tag = document.createElement('meta');
-        tag.setAttribute('property', property);
-        document.head.appendChild(tag);
+    // Inject JSON-LD
+    const injectJsonLd = (id: string, data: any) => {
+      let script = document.getElementById(id);
+      if (!script) {
+        script = document.createElement('script');
+        script.id = id;
+        script.type = 'application/ld+json';
+        document.head.appendChild(script);
       }
-      tag.setAttribute('content', content);
+      script.textContent = JSON.stringify(data);
     };
 
-    updateMeta('og:title', title);
-    updateMeta('og:description', description);
-    updateMeta('og:url', canonicalUrl);
-    updateMeta('og:image', `${baseUrl}/logo.jpg`);
+    // BreadcrumbList Schema
+    const breadcrumbData = {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": baseUrl
+        }
+      ]
+    };
+
+    if (currentTool) {
+      breadcrumbData.itemListElement.push({
+        "@type": "ListItem",
+        "position": 2,
+        "name": currentTool.title,
+        "item": `${baseUrl}${currentTool.seoPath || currentTool.path}`
+      });
+    } else if (location.pathname !== '/') {
+      const name = location.pathname.split('/').pop()?.replace(/-/g, ' ');
+      if (name) {
+        breadcrumbData.itemListElement.push({
+          "@type": "ListItem",
+          "position": 2,
+          "name": name.charAt(0).toUpperCase() + name.slice(1),
+          "item": `${baseUrl}${location.pathname}`
+        });
+      }
+    }
+
+    injectJsonLd('breadcrumb-schema', breadcrumbData);
+
+    // SiteNavigationElement Schema (for major tools)
+    const navigationData = {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      "itemListElement": TOOLS.filter(t => t.seoTitle).map((t, idx) => ({
+        "@type": "SiteNavigationElement",
+        "position": idx + 1,
+        "name": t.title,
+        "url": `${baseUrl}${t.seoPath || t.path}`
+      }))
+    };
+    injectJsonLd('navigation-schema', navigationData);
 
     window.scrollTo(0, 0);
   }, [location]);

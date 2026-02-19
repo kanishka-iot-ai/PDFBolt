@@ -19,7 +19,7 @@ const Footer: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
           </div>
         </div>
 
-        <div>
+        <nav aria-label="Tool Links">
           <h4 className={`font-black uppercase text-xs tracking-widest mb-6 ${darkMode ? 'text-slate-100' : 'text-slate-900'}`}>Top Tools</h4>
           <ul className="space-y-3 text-sm font-bold">
             <li><Link to="/merge-pdf-online" className="hover:text-yellow-500 transition-colors">Merge PDF</Link></li>
@@ -27,9 +27,9 @@ const Footer: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
             <li><Link to="/split-pdf-pages" className="hover:text-yellow-500 transition-colors">Split PDF</Link></li>
             <li><Link to="/pdf-to-qr-code" className="hover:text-yellow-500 transition-colors">PDF to QR</Link></li>
           </ul>
-        </div>
+        </nav>
 
-        <div>
+        <nav aria-label="Company Links">
           <h4 className={`font-black uppercase text-xs tracking-widest mb-6 ${darkMode ? 'text-slate-100' : 'text-slate-900'}`}>Company</h4>
           <ul className="space-y-3 text-sm font-bold">
             <li><Link to="/contact" className="hover:text-yellow-500 transition-colors flex items-center gap-2"><Headphones size={14} /> Contact Us</Link></li>
@@ -38,7 +38,7 @@ const Footer: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
             <li><Link to="/privacy" className="hover:text-yellow-500 transition-colors">Privacy Policy</Link></li>
             <li><Link to="/terms" className="hover:text-yellow-500 transition-colors">Terms of Service</Link></li>
           </ul>
-        </div>
+        </nav>
 
         <div>
           <h4 className={`font-black uppercase text-xs tracking-widest mb-6 ${darkMode ? 'text-slate-100' : 'text-slate-900'}`}>Community</h4>
