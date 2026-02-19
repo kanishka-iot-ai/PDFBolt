@@ -17,11 +17,15 @@ class SoundEngine {
       g.gain.exponentialRampToValueAtTime(0.0001, c.currentTime + duration);
       o.connect(g).connect(c.destination);
       o.start(); o.stop(c.currentTime + duration);
-    } catch {}
+    } catch { }
   }
   playSuccess() { this.playTone(523, 'sine', 0.5, 0.1); setTimeout(() => this.playTone(659, 'sine', 0.5, 0.1), 100); }
   playComplete() { this.playTone(523, 'sine', 0.3, 0.1); setTimeout(() => this.playTone(783, 'sine', 0.3, 0.1), 100); setTimeout(() => this.playTone(1046, 'sine', 0.6, 0.1), 200); }
   playError() { this.playTone(150, 'sawtooth', 0.3, 0.1); setTimeout(() => this.playTone(110, 'sawtooth', 0.5, 0.1), 150); }
   playUpload() { this.playTone(880, 'sine', 0.1, 0.05); }
+  playShutter() {
+    this.playTone(200, 'sine', 0.05, 0.3);
+    setTimeout(() => this.playTone(150, 'sine', 0.05, 0.2), 50);
+  }
 }
 export const soundEngine = new SoundEngine();

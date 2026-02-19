@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { Camera, RefreshCw, FileText, Download, X, Scan as ScanIcon, Flashlight, CheckCircle2, ChevronLeft, ChevronRight, Plus, Trash2 } from 'lucide-react';
+import { Camera, RefreshCw, FileText, Download, X, Scan as ScanIcon, Flashlight, CheckCircle2, ChevronLeft, ChevronRight, Plus, Trash2, Zap, ZapOff } from 'lucide-react';
+import { soundEngine } from '../utils/sounds';
 
 interface ScanToolProps {
     darkMode: boolean;
@@ -9,7 +10,6 @@ interface ScanToolProps {
 const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
     const videoRef = useRef<HTMLVideoElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
-    // capturedImages stores base64 data URLs
     const [capturedImages, setCapturedImages] = useState<string[]>([]);
     const [isCameraActive, setIsCameraActive] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -22,6 +22,15 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
     const [isLibLoading, setIsLibLoading] = useState(false);
     const scannerRef = useRef<any>(null);
     const requestRef = useRef<number>();
+
+    // OKEN Scanner Features
+    const [isTorchOn, setIsTorchOn] = useState(false);
+    const [isSteady, setIsSteady] = useState(false);
+    const steadyCountRef = useRef(0);
+    const lastCornersRef = useRef<any>(null);
+    const [isAutoCapturing, setIsAutoCapturing] = useState(false);
+    const laserPosRef = useRef(0);
+    const videoTrackRef = useRef<MediaStreamTrack | null>(null);
 
     // Filter State
     const [activeFilter, setActiveFilter] = useState<'none' | 'bw' | 'contrast'>('none');
@@ -67,27 +76,72 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
             canvas.height = video.videoHeight;
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+            // Animate Laser Line
+            laserPosRef.current = (laserPosRef.current + 5) % canvas.height;
+            ctx.strokeStyle = 'rgba(59, 130, 246, 0.5)';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(0, laserPosRef.current);
+            ctx.lineTo(canvas.width, laserPosRef.current);
+            ctx.stroke();
+
             try {
                 const contour = scannerRef.current.findPaperContour(video);
                 if (contour) {
-                    const cornerPoints = scannerRef.current.getCornerPoints(contour);
-                    ctx.strokeStyle = '#3b82f6';
-                    ctx.lineWidth = 6;
+                    const corners = scannerRef.current.getCornerPoints(contour);
+
+                    // Stability Logic
+                    if (lastCornersRef.current) {
+                        const dist = Math.abs(corners.topLeft.x - lastCornersRef.current.topLeft.x) +
+                            Math.abs(corners.topLeft.y - lastCornersRef.current.topLeft.y);
+
+                        if (dist < 10) {
+                            steadyCountRef.current++;
+                        } else {
+                            steadyCountRef.current = 0;
+                            setIsSteady(false);
+                        }
+
+                        if (steadyCountRef.current > 30) { // Steady for ~0.5s
+                            setIsSteady(true);
+                        }
+                    }
+                    lastCornersRef.current = corners;
+
+                    // Draw Bounding Box
+                    ctx.strokeStyle = steadyCountRef.current > 30 ? '#22c55e' : '#3b82f6';
+                    ctx.lineWidth = 8;
+                    ctx.lineJoin = 'round';
                     ctx.beginPath();
-                    ctx.moveTo(cornerPoints.topLeft.x, cornerPoints.topLeft.y);
-                    ctx.lineTo(cornerPoints.topRight.x, cornerPoints.topRight.y);
-                    ctx.lineTo(cornerPoints.bottomRight.x, cornerPoints.bottomRight.y);
-                    ctx.lineTo(cornerPoints.bottomLeft.x, cornerPoints.bottomLeft.y);
+                    ctx.moveTo(corners.topLeft.x, corners.topLeft.y);
+                    ctx.lineTo(corners.topRight.x, corners.topRight.y);
+                    ctx.lineTo(corners.bottomRight.x, corners.bottomRight.y);
+                    ctx.lineTo(corners.bottomLeft.x, corners.bottomLeft.y);
                     ctx.closePath();
                     ctx.stroke();
-                    ctx.fillStyle = 'rgba(59, 130, 246, 0.2)';
+
+                    // Fill effect
+                    ctx.fillStyle = steadyCountRef.current > 30 ? 'rgba(34, 197, 94, 0.2)' : 'rgba(59, 130, 246, 0.2)';
                     ctx.fill();
+
+                    // Auto capture trigger
+                    if (steadyCountRef.current === 60 && !isAutoCapturing) { // Steady for ~1s
+                        setIsAutoCapturing(true);
+                        setTimeout(() => {
+                            captureImage();
+                            setIsAutoCapturing(false);
+                            steadyCountRef.current = 0;
+                        }, 200);
+                    }
+                } else {
+                    steadyCountRef.current = 0;
+                    setIsSteady(false);
                 }
             } catch (e) { }
         }
 
         requestRef.current = requestAnimationFrame(detectionLoop);
-    }, [isAutoScan]);
+    }, [isAutoScan, isAutoCapturing]);
 
     useEffect(() => {
         if (isCameraActive) {
@@ -113,6 +167,7 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
 
                 if (videoRef.current) {
                     videoRef.current.srcObject = stream;
+                    videoTrackRef.current = stream.getVideoTracks()[0];
                     await videoRef.current.play();
                 }
             } catch (err: any) {
@@ -129,9 +184,30 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
             const stream = videoRef.current.srcObject as MediaStream;
             stream.getTracks().forEach(track => track.stop());
             videoRef.current.srcObject = null;
+            videoTrackRef.current = null;
         }
         setIsCameraActive(false);
+        setIsSteady(false);
+        steadyCountRef.current = 0;
         if (requestRef.current) cancelAnimationFrame(requestRef.current);
+    };
+
+    const toggleTorch = async () => {
+        if (videoTrackRef.current) {
+            try {
+                const capabilities = videoTrackRef.current.getCapabilities() as any;
+                if (capabilities.torch) {
+                    await videoTrackRef.current.applyConstraints({
+                        advanced: [{ torch: !isTorchOn }]
+                    } as any);
+                    setIsTorchOn(!isTorchOn);
+                } else {
+                    notify.error("Flashlight not supported on this device");
+                }
+            } catch (e) {
+                console.error("Torch error", e);
+            }
+        }
     };
 
     // Capture Image
@@ -139,6 +215,8 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
         if (!videoRef.current || !canvasRef.current) return;
 
         setProcessing(true);
+        soundEngine.playShutter();
+
         const video = videoRef.current;
         const canvas = canvasRef.current;
         const ctx = canvas.getContext('2d');
@@ -237,9 +315,9 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
                     <div className={`w-28 h-28 mx-auto rounded-full flex items-center justify-center mb-8 ${darkMode ? 'bg-slate-800' : 'bg-white shadow-xl'}`}>
                         <Camera size={56} className="text-blue-500" />
                     </div>
-                    <h2 className="text-3xl font-black mb-4">Scan Documents</h2>
+                    <h2 className="text-3xl font-black mb-4">AI Scan to PDF</h2>
                     <p className="mb-10 opacity-70 text-lg leading-relaxed">
-                        Features AI document detection and auto-cropping for perfect scans every time.
+                        Hold steady for auto-capture. Professional AI document detection and edge cropping.
                     </p>
 
                     {cameraError && (
@@ -282,23 +360,39 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
                             <div className="absolute inset-0 pointer-events-none p-4 flex flex-col justify-between z-20">
                                 <div className="flex justify-between pt-2">
                                     <div className="pointer-events-auto flex items-center gap-2 bg-black/50 px-4 py-2 rounded-full backdrop-blur-md">
-                                        <ScanIcon size={18} className={isLibLoading ? 'animate-pulse text-yellow-500' : 'text-blue-500'} />
+                                        <div className={`w-2 h-2 rounded-full ${isSteady ? 'bg-green-500 animate-pulse' : 'bg-blue-500'}`} />
                                         <span className="text-white text-xs font-black uppercase tracking-widest">
-                                            {isLibLoading ? 'Loading AI...' : isAutoScan ? 'AI Detection On' : 'Manual Mode'}
+                                            {isLibLoading ? 'Loading AI...' : isSteady ? 'Hold Steady...' : isAutoScan ? 'Scanning...' : 'Manual'}
                                         </span>
                                     </div>
-                                    <button
-                                        onClick={stopCamera}
-                                        className="pointer-events-auto p-3 bg-black/50 text-white rounded-full backdrop-blur-md"
-                                    >
-                                        <X size={24} />
-                                    </button>
+                                    <div className="flex gap-2">
+                                        <button
+                                            onClick={toggleTorch}
+                                            className="pointer-events-auto p-3 bg-black/50 text-white rounded-full backdrop-blur-md active:scale-95"
+                                        >
+                                            {isTorchOn ? <Zap className="text-yellow-400" size={24} /> : <ZapOff size={24} />}
+                                        </button>
+                                        <button
+                                            onClick={stopCamera}
+                                            className="pointer-events-auto p-3 bg-black/50 text-white rounded-full backdrop-blur-md active:scale-95"
+                                        >
+                                            <X size={24} />
+                                        </button>
+                                    </div>
                                 </div>
 
-                                {isAutoScan && !isLibLoading && (
+                                {isAutoScan && !isLibLoading && !isSteady && (
                                     <div className="flex flex-col items-center mb-8">
-                                        <div className="text-white bg-blue-600/80 px-4 py-2 rounded-xl text-xs font-bold animate-pulse backdrop-blur-sm">
-                                            Align document in frame
+                                        <div className="text-white bg-blue-600/80 px-4 py-2 rounded-xl text-xs font-bold animate-pulse backdrop-blur-sm uppercase tracking-tighter">
+                                            Align document to scan
+                                        </div>
+                                    </div>
+                                )}
+
+                                {isSteady && (
+                                    <div className="flex flex-col items-center mb-8">
+                                        <div className="text-white bg-green-600/90 px-6 py-2 rounded-xl text-sm font-black animate-bounce backdrop-blur-sm border-2 border-white/20">
+                                            STEADY... CAPTURING
                                         </div>
                                     </div>
                                 )}
@@ -314,16 +408,16 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
                                     className={`p-3 flex flex-col items-center gap-1 transition-colors ${isAutoScan ? 'text-blue-500' : 'text-white/50'}`}
                                 >
                                     <ScanIcon size={24} />
-                                    <span className="text-[10px] uppercase font-black">Auto</span>
+                                    <span className="text-[10px] uppercase font-black">AI Mode</span>
                                 </button>
 
                                 {/* Capture Button */}
                                 <button
                                     onClick={captureImage}
                                     disabled={processing || isLibLoading}
-                                    className="group relative w-20 h-20 rounded-full border-4 border-white flex items-center justify-center active:scale-90 transition-all duration-200"
+                                    className={`group relative w-20 h-20 rounded-full border-4 flex items-center justify-center active:scale-90 transition-all duration-200 ${isSteady ? 'border-green-500' : 'border-white'}`}
                                 >
-                                    <div className={`w-16 h-16 bg-white rounded-full transition-all duration-200 ${processing ? 'scale-75 opacity-50' : 'group-hover:scale-95'}`}></div>
+                                    <div className={`w-16 h-16 rounded-full transition-all duration-200 ${processing ? 'scale-75 opacity-50' : 'group-hover:scale-95'} ${isSteady ? 'bg-green-500' : 'bg-white'}`}></div>
                                     {processing && (
                                         <div className="absolute inset-0 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
                                     )}
@@ -331,10 +425,10 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
 
                                 {/* Gallery / Done */}
                                 <div className="text-white flex flex-col items-center gap-1 cursor-pointer group" onClick={stopCamera}>
-                                    <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center group-hover:bg-white/20 transition-colors">
+                                    <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center group-hover:bg-white/20 transition-colors border-2 border-white/5">
                                         <span className="text-xl font-black">{capturedImages.length}</span>
                                     </div>
-                                    <span className="text-[10px] uppercase font-black text-white/50">Done</span>
+                                    <span className="text-[10px] uppercase font-black text-white/50">Save</span>
                                 </div>
                             </div>
                         </div>
@@ -345,39 +439,39 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
             {/* Review Mode */}
             {!isCameraActive && capturedImages.length > 0 && (
                 <div className="w-full max-w-5xl animate-fadeIn p-6">
-                    <div className="flex items-center justify-between mb-8">
+                    <div className="flex flex-col md:flex-row items-center justify-between mb-8 gap-4">
                         <div>
-                            <h2 className="text-3xl font-black">Review Scans</h2>
-                            <p className="opacity-60">{capturedImages.length} pages captured</p>
+                            <h2 className="text-3xl font-black">Scan Complete</h2>
+                            <p className="opacity-60">{capturedImages.length} pages captured & AI optimized</p>
                         </div>
-                        <div className="flex gap-4">
+                        <div className="flex gap-4 w-full md:w-auto">
                             <button
                                 onClick={startCamera}
-                                className="px-6 py-3 rounded-xl border-2 border-slate-200 dark:border-slate-700 font-bold hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors flex items-center gap-2"
+                                className="flex-1 px-6 py-3 rounded-xl border-2 border-slate-200 dark:border-slate-700 font-bold hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors flex items-center justify-center gap-2"
                             >
                                 <Plus size={20} /> Add Page
                             </button>
                             <button
                                 onClick={saveAsPdf}
                                 disabled={loading}
-                                className="px-8 py-3 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-700 shadow-lg hover:shadow-blue-500/20 transition-all flex items-center gap-2"
+                                className="flex-1 px-8 py-3 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-700 shadow-lg hover:shadow-blue-500/20 transition-all flex items-center justify-center gap-2"
                             >
-                                {loading ? 'Saving...' : <><Download size={20} /> Save PDF</>}
+                                {loading ? 'Saving...' : <><Download size={20} /> Download PDF</>}
                             </button>
                         </div>
                     </div>
 
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                         {capturedImages.map((img, idx) => (
-                            <div key={idx} className="relative group rounded-xl overflow-hidden shadow-lg border-2 border-slate-200 dark:border-slate-700">
+                            <div key={idx} className="relative group rounded-2xl overflow-hidden shadow-2xl border-4 border-white dark:border-slate-800 transform hover:scale-[1.02] transition-transform">
                                 <img src={img} alt={`Page ${idx}`} className="w-full h-auto" />
                                 <button
                                     onClick={() => removePage(idx)}
-                                    className="absolute top-2 right-2 p-2 bg-red-600 text-white rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                                    className="absolute top-2 right-2 p-2 bg-red-600/90 text-white rounded-xl opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm"
                                 >
-                                    <Trash2 size={16} />
+                                    <Trash2 size={18} />
                                 </button>
-                                <div className="absolute bottom-0 inset-x-0 bg-black/50 text-white text-center text-xs py-1">
+                                <div className="absolute bottom-0 inset-x-0 bg-black/60 text-white text-center text-[10px] py-1 font-black uppercase tracking-widest backdrop-blur-sm">
                                     Page {idx + 1}
                                 </div>
                             </div>
