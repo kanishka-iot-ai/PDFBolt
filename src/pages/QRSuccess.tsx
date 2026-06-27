@@ -14,14 +14,30 @@ const QRSuccess: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
   const [resultKey, setResultKey] = useState(0);
   const [expiryDate, setExpiryDate] = useState<Date | null>(null);
   const [daysLeft, setDaysLeft] = useState<number | null>(null);
+  const [linkError, setLinkError] = useState(false);
 
   const payload = searchParams.get('p');
   const authHash = searchParams.get('auth');
-  const requiresAuth = !!authHash;
+
+  const [isPinRequired, setIsPinRequired] = useState(false);
 
   useEffect(() => {
-    if (!requiresAuth) setIsVerified(true);
-  }, [requiresAuth]);
+    if (payload) {
+      try {
+        const data = JSON.parse(atob(payload));
+        const pinNeeded = data.p === 'v';
+        setIsPinRequired(pinNeeded);
+        if (!pinNeeded) {
+          setIsVerified(true);
+        }
+      } catch (e) {
+        console.error("Payload parse error", e);
+        setIsVerified(true); // Fallback to verified if payload is unparseable (unlikely)
+      }
+    } else {
+      setIsVerified(true);
+    }
+  }, [payload]);
 
   const [isExpired, setIsExpired] = useState(false);
 
@@ -53,7 +69,7 @@ const QRSuccess: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
               setResultKey(prev => prev + 1);
             } catch (err) {
               console.error("Secure Link Error:", err);
-              setError(true); // Reuse the PIN error state or add a new one
+              setLinkError(true);
             }
           }
         } catch (e) {
@@ -99,7 +115,7 @@ const QRSuccess: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
     );
   }
 
-  if (!isVerified) {
+  if (isPinRequired && !isVerified) {
     return (
       <div className="min-h-[80vh] flex items-center justify-center px-6 py-12">
         <div className={`max-w-md w-full p-10 rounded-[3.5rem] border text-center shadow-2xl animate-fadeInUp ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'}`}>
@@ -149,7 +165,16 @@ const QRSuccess: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
         </p>
 
         <div key={resultKey} className="w-full">
-          {downloadUrl ? (
+          {linkError ? (
+            <div className="mb-10 p-8 bg-red-50 dark:bg-red-900/10 border-2 border-red-100 dark:border-red-900/20 rounded-[2rem] text-center">
+              <AlertCircle className="mx-auto text-red-500 mb-4 w-12 h-12" />
+              <h3 className="text-lg font-black text-red-600 mb-2 uppercase tracking-tight">Secure Tunnel Failed</h3>
+              <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
+                Cloud retrieval error: The document could not be established.
+                The link may be corrupted or storage is unavailable.
+              </p>
+            </div>
+          ) : downloadUrl ? (
             <div className="mb-10 animate-bounce-subtle">
               <a
                 href={downloadUrl}

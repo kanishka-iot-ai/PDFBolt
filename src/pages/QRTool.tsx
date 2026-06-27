@@ -19,6 +19,7 @@ interface QRToolProps {
 const QRTool: React.FC<QRToolProps> = ({ darkMode, notify }) => {
   const [file, setFile] = useState<File | null>(null);
   const [qrUrl, setQrUrl] = useState<string | null>(null);
+  const [shareableLink, setShareableLink] = useState<string | null>(null);
   const [localPdfUrl, setLocalPdfUrl] = useState<string | null>(null);
   const [showPreview, setShowPreview] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -73,6 +74,7 @@ const QRTool: React.FC<QRToolProps> = ({ darkMode, notify }) => {
         },
       });
       setQrUrl(generatedQr);
+      setShareableLink(shareUrl);
       setResultKey(prev => prev + 1);
       notify.complete();
     } catch (err: any) {
@@ -81,10 +83,11 @@ const QRTool: React.FC<QRToolProps> = ({ darkMode, notify }) => {
       console.log("Falling back to offline mode...");
       const offlinePayload = btoa(JSON.stringify({
         t: Date.now(),
-        k: 'offline-demo-mode',
-        o: oneTimeScan
+        k: 'simulated-offline-demo',
+        o: oneTimeScan,
+        p: requirePin ? 'v' : 'n'
       }));
-      const shareUrl = `${window.location.origin}/qr-success?p=${offlinePayload}`;
+      const shareUrl = `${window.location.origin}/qr-success?p=${offlinePayload}${requirePin && pin ? `&auth=${btoa(pin)}` : ''}`;
 
       try {
         const generatedQr = await QRCode.toDataURL(shareUrl, {
@@ -92,6 +95,7 @@ const QRTool: React.FC<QRToolProps> = ({ darkMode, notify }) => {
           color: { dark: '#000000', light: '#ffffff' }
         });
         setQrUrl(generatedQr);
+        setShareableLink(shareUrl);
         setResultKey(prev => prev + 1);
         notify.complete();
       } catch (qrErr) {
@@ -140,8 +144,8 @@ const QRTool: React.FC<QRToolProps> = ({ darkMode, notify }) => {
   };
 
   const copyLink = () => {
-    const shareUrl = qrUrl ? qrUrl : ''; // In real app, this would be the actual text URL
-    navigator.clipboard.writeText(shareUrl);
+    const urlToCopy = shareableLink || '';
+    navigator.clipboard.writeText(urlToCopy);
     setCopied(true);
     notify.success();
     setTimeout(() => setCopied(false), 2000);
@@ -268,7 +272,7 @@ const QRTool: React.FC<QRToolProps> = ({ darkMode, notify }) => {
                 <h4 className={`font-black uppercase text-sm tracking-tight ${darkMode ? 'text-green-400' : 'text-green-800'}`}>Privacy Protocol Active</h4>
               </div>
               <p className="text-xs font-bold leading-relaxed text-green-900/70 dark:text-green-400/70">
-                Documents are paired via <strong>Localized Identity Handshakes</strong>. No bytes are sent to our cloud. The QR simply contains an encrypted pointer that only your browser can resolve to the local document buffer.
+                Documents are temporarily hosted in a <strong>Secure Cloud Vault</strong> for 30 days. The QR code contains an encrypted handshake that allows authorized devices to establish a secure tunnel and retrieve the file.
               </p>
             </div>
           </div>
