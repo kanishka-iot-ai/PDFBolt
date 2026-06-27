@@ -68,7 +68,7 @@ export const TOOLS: ToolMetadata[] = [
     longDescription: 'Turn any PDF into a scannable QR code. Perfect for restaurants (menus), real estate (listings), or marketing flyers. This allows your audience to view your document instantly on their mobile device without typing a single URL.',
     features: ['Instant QR generation', 'High-res QR downloads', 'Private scan landing pages', 'No hosting required'],
     faqs: [
-      { q: 'Does the QR code expire?', a: 'No, the QR code is permanent, but the document must be accessible for others to view it.' },
+      { q: 'Does the QR code expire?', a: 'The sharing link expires after 30 days for security. However, you can generate a new code anytime.' },
       { q: 'Is it free to use for business?', a: 'Yes, our QR generator is free for both personal and commercial use.' }
     ]
   },
