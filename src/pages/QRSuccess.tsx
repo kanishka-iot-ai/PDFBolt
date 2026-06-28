@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from 'react';
 import { CheckCircle, ShieldCheck, Laptop, Phone, ArrowRight, Lock, Key, AlertCircle, Download, Clock } from 'lucide-react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { getPublicUrl } from '../services/storageService';
 
 const QRSuccess: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
   const [searchParams] = useSearchParams();
@@ -17,7 +16,7 @@ const QRSuccess: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
   const [linkError, setLinkError] = useState(false);
 
   const payload = searchParams.get('p');
-  const authHash = searchParams.get('auth');
+  const [internalAuthHash, setInternalAuthHash] = useState<string | null>(null);
 
   const [isPinRequired, setIsPinRequired] = useState(false);
 
@@ -27,6 +26,7 @@ const QRSuccess: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
         const data = JSON.parse(atob(payload));
         const pinNeeded = data.p === 'v';
         setIsPinRequired(pinNeeded);
+        if (data.a) setInternalAuthHash(data.a);
         if (!pinNeeded) {
           setIsVerified(true);
         }
@@ -86,7 +86,7 @@ const QRSuccess: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
     setError(false);
 
     setTimeout(() => {
-      if (btoa(pin) === authHash) {
+      if (btoa(pin) === internalAuthHash) {
         setIsVerified(true);
       } else {
         setError(true);

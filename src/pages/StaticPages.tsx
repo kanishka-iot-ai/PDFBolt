@@ -21,21 +21,16 @@ export const ContactPage: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
     e.preventDefault();
     setLoading(true);
 
-    // TODO: Replace with your actual keys from emailjs.com
     const SERVICE_ID = 'service_lrshcpf';
     const TEMPLATE_ID = 'template_ykqay24';
     const PUBLIC_KEY = 'JE-e7n6wYODP3qdSW';
 
-    // Configuration check removed as keys are set
-
     if (form.current) {
       emailjs.sendForm(SERVICE_ID, TEMPLATE_ID, form.current, PUBLIC_KEY)
-        .then((result) => {
-          console.log(result.text);
+        .then(() => {
           setLoading(false);
           setSubmitted(true);
         }, (error) => {
-          console.log(error.text);
           setLoading(false);
           alert("Failed to send message: " + error.text);
         });
@@ -77,11 +72,11 @@ export const ContactPage: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
           </p>
 
           <div className="space-y-6">
-            <a href="mailto:support@pdfbolt.com" className={`p-6 rounded-3xl border flex items-center gap-6 transition-all hover:scale-[1.02] ${darkMode ? 'bg-slate-800 border-slate-700 hover:bg-slate-700' : 'bg-slate-50 border-slate-200 hover:bg-slate-100'}`}>
+            <a href="mailto:support@pdfbolt.in" className={`p-6 rounded-3xl border flex items-center gap-6 transition-all hover:scale-[1.02] ${darkMode ? 'bg-slate-800 border-slate-700 hover:bg-slate-700' : 'bg-slate-50 border-slate-200 hover:bg-slate-100'}`}>
               <div className="p-4 bg-white dark:bg-slate-900 rounded-2xl text-yellow-500 shadow-sm"><Mail size={24} /></div>
               <div>
                 <h4 className={`font-black uppercase text-xs tracking-widest mb-1 ${darkMode ? 'text-white' : 'text-slate-900'}`}>Email Support</h4>
-                <p className="text-sm font-bold text-slate-500">Click to Send Email</p>
+                <p className="text-sm font-bold text-slate-500">support@pdfbolt.in</p>
               </div>
             </a>
             <a href="tel:993234232" className={`p-6 rounded-3xl border flex items-center gap-6 transition-all hover:scale-[1.02] ${darkMode ? 'bg-slate-800 border-slate-700 hover:bg-slate-700' : 'bg-slate-50 border-slate-200 hover:bg-slate-100'}`}>
@@ -148,7 +143,7 @@ export const PrivacyPage: React.FC<{ darkMode: boolean }> = ({ darkMode }) => (
       <li>No third-party tracking</li>
     </ul>
     <h3>Contact Us</h3>
-    <p>If you have questions about our security model, contact us at <span className="text-yellow-600 font-bold">privacy@pdfbolt.com</span>.</p>
+    <p>If you have questions about our security model, contact us at <span className="text-yellow-600 font-bold">privacy@pdfbolt.in</span>.</p>
   </PageLayout>
 );
 

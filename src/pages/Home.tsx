@@ -40,8 +40,6 @@ const Home: React.FC<{ darkMode: boolean; onInstall?: () => void }> = ({ darkMod
       </section>
 
       <section className="max-w-7xl mx-auto px-6 py-24 space-y-16">
-        {(console.log('Rendering cats:', cats.length), null)}
-        {(console.log('Tools count:', TOOLS.length), null)}
         {cats.map((cat, i) => (
           <div key={cat.id}>
             <div className="flex items-center gap-4 mb-12 border-b border-slate-100 dark:border-slate-800 pb-6">

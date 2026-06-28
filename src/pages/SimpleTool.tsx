@@ -21,7 +21,6 @@ import ProgressBar from '../components/ProgressBar';
 import { validateFiles, ALLOWED_MIME_TYPES, MAX_FILE_SIZE } from '../utils/fileValidation';
 
 const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; notify: NotifySystem }> = ({ title, mode, darkMode, notify }) => {
-  useEffect(() => { console.log("SimpleTool Loaded - Signature Update v5"); }, []);
   const [file, setFile] = useState<File | null>(null);
   const [multiFiles, setMultiFiles] = useState<File[]>([]);
   const [signatureFile, setSignatureFile] = useState<File | null>(null);
@@ -95,7 +94,6 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
   };
 
   // Cleanup blob URLs
-  // Cleanup blob URLs
   useEffect(() => {
     return () => {
       if (typeof result === 'string') {
@@ -107,6 +105,7 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
   }, [result]);
 
   const isImageTool = mode === 'jpg2pdf';
+  const isMultiFileTool = isImageTool || mode === 'compare';
   const needsPassword = ['protect', 'unlock'].includes(mode);
   const isSignTool = mode === 'sign';
 
@@ -133,6 +132,8 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
 
     if (isImageTool) {
       allowedTypes = ALLOWED_MIME_TYPES.IMAGE;
+    } else if (mode === 'compare') {
+      allowedTypes = ALLOWED_MIME_TYPES.PDF;
     } else if (mode.includes('word') || mode === 'word2pdf') {
       allowedTypes = ALLOWED_MIME_TYPES.WORD;
     } else if (mode.includes('excel') || mode === 'excel2pdf') {
@@ -151,7 +152,7 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
     const validation = await validateFiles(f, {
       allowedTypes,
       maxSize,
-      maxFiles: isImageTool ? 50 : 1,
+      maxFiles: isImageTool ? 50 : mode === 'compare' ? 2 : 1,
       checkStructure: allowedTypes === ALLOWED_MIME_TYPES.PDF
     });
 
@@ -166,7 +167,7 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
       }
     }
 
-    if (isImageTool) {
+    if (isMultiFileTool) {
       setMultiFiles(prev => [...prev, ...f]);
     } else {
       setFile(f[0]);
@@ -262,6 +263,28 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
       }
       else if (mode === 'repair' && file) {
         b = await repairPdf(file);
+      }
+      else if (mode === 'compare') {
+        if (multiFiles.length < 2) throw new Error("Please select 2 PDF files to compare.");
+        setProgress(30);
+        const text1 = await ocrPdf(multiFiles[0]);
+        setProgress(60);
+        const text2 = await ocrPdf(multiFiles[1]);
+        setProgress(90);
+
+        b = `PDF COMPARISON REPORT\n`;
+        b += `=====================\n`;
+        b += `File 1: ${multiFiles[0].name}\n`;
+        b += `File 2: ${multiFiles[1].name}\n\n`;
+
+        if (text1 === text2) {
+          b += `RESULT: The documents are identical in text content.\n`;
+        } else {
+          b += `RESULT: Differences detected.\n\n`;
+          b += `--- Content from ${multiFiles[0].name} ---\n${text1}\n\n`;
+          b += `--- Content from ${multiFiles[1].name} ---\n${text2}\n`;
+        }
+        setIsText(true);
       }
       // -- SECURITY TOOLS --
       else if (mode === 'protect' && file) {
@@ -403,7 +426,7 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
       {!file && multiFiles.length === 0 ? (
         <div className="space-y-12">
           <FileUploader
-            multiple={isImageTool}
+            multiple={isMultiFileTool}
             accept={isImageTool ? "image/*" : (mode.includes('word') ? ".docx" : mode.includes('excel') ? ".xlsx" : mode.includes('html') ? ".html" : ".pdf")}
             onFilesSelected={handle}
             darkMode={darkMode}
@@ -420,7 +443,7 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
               </div>
               <div className="overflow-hidden">
                 <h3 className={`text-xl font-black truncate max-w-[250px] ${darkMode ? 'text-white' : 'text-slate-900'}`}>
-                  {isImageTool ? `${multiFiles.length} Images Selected` : isZip ? `${multiFiles.length} Files (Folder)` : file?.name}
+                  {isImageTool ? `${multiFiles.length} Images Selected` : mode === 'compare' ? `${multiFiles.length} PDFs Selected` : isZip ? `${multiFiles.length} Files (Folder)` : file?.name}
                 </h3>
                 <p className="text-slate-500 font-bold uppercase text-[10px] tracking-widest">
                   {result ? 'FILE READY' : 'AWAITING CONFIGURATION'}
@@ -786,7 +809,7 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
             {!result && (
               <div className="flex flex-col gap-4 w-full max-w-xl">
                 <button
-                  disabled={processing || (needsPageInput && !pageInput) || (needsPassword && !password && !bruteForceMode) || (isImageTool && multiFiles.length === 0)}
+                  disabled={processing || (needsPageInput && !pageInput) || (needsPassword && !password && !bruteForceMode) || (isMultiFileTool && multiFiles.length === 0)}
                   onClick={process}
                   className="w-full px-10 py-8 bg-red-600 text-white rounded-[2.5rem] font-black text-3xl shadow-2xl hover:bg-red-700 hover:scale-105 disabled:opacity-30 transition-all flex items-center justify-center gap-4 group"
                 >

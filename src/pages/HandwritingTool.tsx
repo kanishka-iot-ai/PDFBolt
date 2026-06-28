@@ -41,6 +41,9 @@ const HandwritingTool: React.FC<HandwritingToolProps> = ({ darkMode, notify }) =
 
     useEffect(() => {
         loadLibraries();
+        return () => {
+            stopCamera();
+        };
     }, [loadLibraries]);
 
     // Start Camera (Reused logic from ScanTool)
@@ -92,24 +95,15 @@ const HandwritingTool: React.FC<HandwritingToolProps> = ({ darkMode, notify }) =
         setIsProcessing(true);
         try {
             let combinedText = '';
+            const { ocrImage } = await import('../services/ocrService');
+
             for (let i = 0; i < capturedImages.length; i++) {
-                // Production Preprocessing for EVERY scan
-                const tempCanvas = document.createElement('canvas');
-                const img = new Image();
-                img.src = capturedImages[i];
-                await new Promise(r => img.onload = r);
+                // ocrImage now internally handles enhancement
+                const text = await ocrImage(capturedImages[i]);
 
-                tempCanvas.width = img.width;
-                tempCanvas.height = img.height;
-                tempCanvas.getContext('2d')?.drawImage(img, 0, 0);
+                // Set the last one as preview for UX (showing raw for now as ocrImage returns text)
+                if (i === capturedImages.length - 1) setPreviewImage(capturedImages[i]);
 
-                const { ocrImage, enhanceImageWithOpenCV } = await import('../services/ocrService');
-                const enhancedUrl = await enhanceImageWithOpenCV(tempCanvas);
-
-                // Set the last one as preview for UX
-                if (i === capturedImages.length - 1) setPreviewImage(enhancedUrl);
-
-                const text = await ocrImage(enhancedUrl);
                 combinedText += text + '\n\n';
             }
             setOcrText(combinedText.trim());

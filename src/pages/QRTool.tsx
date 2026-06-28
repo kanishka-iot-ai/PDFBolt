@@ -59,10 +59,11 @@ const QRTool: React.FC<QRToolProps> = ({ darkMode, notify }) => {
         e: expiry,
         o: oneTimeScan,
         p: requirePin ? 'v' : 'n',
-        k: key // 'k' = S3 Key
+        k: key, // 'k' = S3 Key
+        a: requirePin && pin ? btoa(pin) : undefined
       }));
 
-      const shareUrl = `${window.location.origin}/qr-success?p=${securityPayload}${requirePin && pin ? `&auth=${btoa(pin)}` : ''}`;
+      const shareUrl = `${window.location.origin}/qr-success?p=${securityPayload}`;
 
       const generatedQr = await QRCode.toDataURL(shareUrl, {
         width: 800,
@@ -80,14 +81,14 @@ const QRTool: React.FC<QRToolProps> = ({ darkMode, notify }) => {
     } catch (err: any) {
       console.error("QR Generation Error:", err);
       // Fallback: Generate a local-only QR code if upload fails
-      console.log("Falling back to offline mode...");
       const offlinePayload = btoa(JSON.stringify({
         t: Date.now(),
         k: 'simulated-offline-demo',
         o: oneTimeScan,
-        p: requirePin ? 'v' : 'n'
+        p: requirePin ? 'v' : 'n',
+        a: requirePin && pin ? btoa(pin) : undefined
       }));
-      const shareUrl = `${window.location.origin}/qr-success?p=${offlinePayload}${requirePin && pin ? `&auth=${btoa(pin)}` : ''}`;
+      const shareUrl = `${window.location.origin}/qr-success?p=${offlinePayload}`;
 
       try {
         const generatedQr = await QRCode.toDataURL(shareUrl, {
@@ -145,9 +146,10 @@ const QRTool: React.FC<QRToolProps> = ({ darkMode, notify }) => {
 
   const copyLink = () => {
     const urlToCopy = shareableLink || '';
+    if (!urlToCopy) return;
     navigator.clipboard.writeText(urlToCopy);
     setCopied(true);
-    notify.success();
+    if (notify && notify.success) notify.success();
     setTimeout(() => setCopied(false), 2000);
   };
 
@@ -248,7 +250,7 @@ const QRTool: React.FC<QRToolProps> = ({ darkMode, notify }) => {
                         onClick={() => setOneTimeScan(!oneTimeScan)}
                         className={`w-10 h-5 rounded-full transition-all relative ${oneTimeScan ? 'bg-amber-500' : 'bg-slate-200 dark:bg-slate-700'}`}
                       >
-                        <div className={`absolute top-0.5 w-4 h-4 bg-white rounded-full transition-all ${oneTimeScan ? 'left-5.5' : 'left-0.5'}`}></div>
+                        <div className={`absolute top-0.5 w-4 h-4 bg-white rounded-full transition-all ${oneTimeScan ? 'left-[1.375rem]' : 'left-0.5'}`}></div>
                       </button>
                     </div>
                     <p className="text-[9px] font-bold text-slate-500 mt-2 uppercase">Self-destruct after scan</p>

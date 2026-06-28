@@ -25,7 +25,6 @@ const TutorialsPage = lazy(() => import('./pages/TutorialsPage'));
 const HandwritingTool = lazy(() => import('./pages/HandwritingTool'));
 
 // Static pages can also be lazy
-const Static = lazy(() => import('./pages/StaticPages').then(m => ({ default: m.PrivacyPage })));
 const PrivacyPage = lazy(() => import('./pages/StaticPages').then(m => ({ default: m.PrivacyPage })));
 const TermsPage = lazy(() => import('./pages/StaticPages').then(m => ({ default: m.TermsPage })));
 const AboutPage = lazy(() => import('./pages/StaticPages').then(m => ({ default: m.AboutPage })));

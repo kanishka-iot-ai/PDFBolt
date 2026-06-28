@@ -47,14 +47,36 @@ export async function ocrPdf(file: File): Promise<string> {
 
 /**
  * Performs OCR on a single image (data URL or Blob).
+ * Strategy: OpenCV Preprocessing -> Run Tesseract.
  */
 export async function ocrImage(imageSource: string | Blob): Promise<string> {
     const worker = await Tesseract.createWorker('eng');
+    let finalSource = imageSource;
 
-    // If it's an image, we still want to enhance it if possible
-    // For now, Tesseract is good, but OCR improves 2-3x with thresholding
-    const { data: { text } } = await worker.recognize(imageSource);
+    try {
+        // Load image to canvas for OpenCV enhancement
+        const img = new Image();
+        const url = typeof imageSource === 'string' ? imageSource : URL.createObjectURL(imageSource);
+        img.src = url;
+        await new Promise((resolve, reject) => {
+            img.onload = resolve;
+            img.onerror = reject;
+        });
 
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+            ctx.drawImage(img, 0, 0);
+            finalSource = await enhanceImageWithOpenCV(canvas);
+        }
+        if (typeof imageSource !== 'string') URL.revokeObjectURL(url);
+    } catch (e) {
+        console.warn("Pre-OCR enhancement failed, using raw source", e);
+    }
+
+    const { data: { text } } = await worker.recognize(finalSource);
     const structured = structureText(text);
 
     await worker.terminate();
