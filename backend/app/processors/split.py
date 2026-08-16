@@ -5,17 +5,36 @@ from backend.app.processors.base import BaseProcessor
 from backend.app.core.errors import PDFProcessingException, ErrorCode
 
 
-def parse_page_ranges(range_str: str, max_pages: int) -> List[int]:
-    """Parses range strings like '1-3, 5, 7-10' into 0-indexed page indices."""
+def parse_page_ranges(range_input: Any, max_pages: int) -> List[int]:
+    """Parses range strings like '1-3, 5, 7-10' or integer lists [1, 2, 5] into 0-indexed page indices."""
     selected_indices = set()
+    if range_input is None:
+        return []
+
+    if isinstance(range_input, (list, tuple, set)):
+        for item in range_input:
+            if isinstance(item, int):
+                if 1 <= item <= max_pages:
+                    selected_indices.add(item - 1)
+            elif isinstance(item, str):
+                for idx in parse_page_ranges(item, max_pages):
+                    selected_indices.add(idx)
+        return sorted(list(selected_indices))
+
+    if isinstance(range_input, int):
+        if 1 <= range_input <= max_pages:
+            return [range_input - 1]
+        return []
+
+    range_str = str(range_input)
     parts = [p.strip() for p in range_str.split(',') if p.strip()]
 
     for part in parts:
         if '-' in part:
             bounds = part.split('-')
-            if len(bounds) == 2 and bounds[0].isdigit() and bounds[1].isdigit():
-                start = max(1, int(bounds[0]))
-                end = min(max_pages, int(bounds[1]))
+            if len(bounds) == 2 and bounds[0].strip().isdigit() and bounds[1].strip().isdigit():
+                start = max(1, int(bounds[0].strip()))
+                end = min(max_pages, int(bounds[1].strip()))
                 for i in range(start, end + 1):
                     selected_indices.add(i - 1)
         elif part.isdigit():
@@ -36,8 +55,9 @@ class SplitProcessor(BaseProcessor):
                 status_code=400
             )
 
-        range_str = self.settings.get("range", "1")
-        selected_pages = parse_page_ranges(range_str, page_count)
+        range_input = self.settings.get("range") or self.settings.get("page_ranges") or self.settings.get("pages", "1")
+        range_str = str(range_input)
+        selected_pages = parse_page_ranges(range_input, page_count)
 
         if not selected_pages:
             raise PDFProcessingException(

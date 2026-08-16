@@ -16,8 +16,8 @@ class DeletePagesProcessor(BaseProcessor):
                 status_code=400
             )
 
-        pages_to_delete_str = self.settings.get("pages", "")
-        delete_indices = set(parse_page_ranges(pages_to_delete_str, page_count))
+        pages_input = self.settings.get("pages") or self.settings.get("page_ranges") or self.settings.get("pages_to_delete", "")
+        delete_indices = set(parse_page_ranges(pages_input, page_count))
 
         if not delete_indices:
             raise PDFProcessingException(
