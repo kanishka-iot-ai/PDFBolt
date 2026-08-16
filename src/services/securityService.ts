@@ -1,8 +1,6 @@
 import { PDFDocument, StandardFonts, rgb } from 'pdf-lib-plus-encrypt';
 
 /**
- * Encrypts a PDF file with a password.
- * @param file The original PDF file.
  * @param password The password to set.
  * @returns Encrypted PDF as Uint8Array.
  */
@@ -59,11 +57,6 @@ export async function unlockPdf(file: File, password: string): Promise<Uint8Arra
 /**
  * Signs a PDF with an image signature.
  * @param file PDF File
- * @param signatureFile Image File (PNG/JPG)
- */
-/**
- * Signs a PDF with an image signature.
- * @param file PDF File
  * @param signatureFile Image File (PNG/JPG) or Blob
  * @param position Position of the signature ('bottom-right' | 'bottom-left' | 'top-right' | 'top-left')
  */
@@ -81,6 +74,13 @@ export async function signPdf(
     let isPng = true;
     if (signatureFile instanceof File) {
         isPng = signatureFile.name.toLowerCase().endsWith('.png');
+    } else if (signatureFile instanceof Blob) {
+        const header = new Uint8Array(sigBytes.slice(0, 4));
+        if (header[0] === 0x89 && header[1] === 0x50 && header[2] === 0x4E && header[3] === 0x47) {
+            isPng = true;
+        } else if (header[0] === 0xFF && header[1] === 0xD8 && header[2] === 0xFF) {
+            isPng = false;
+        }
     }
 
     const signatureImage = isPng
@@ -206,7 +206,11 @@ export async function bruteForceUnlock(
             // If we get here, password is correct!
             const decryptedPdf = await pdfDoc.save();
             return { password, decryptedPdf };
-        } catch (e) {
+        } catch (e: any) {
+            const msg = (e.message || '').toLowerCase();
+            if (!msg.includes('password') && !msg.includes('decrypt') && !msg.includes('encrypted') && !msg.includes('permission')) {
+                throw e;
+            }
             // Wrong password, continue
         }
     }
@@ -241,7 +245,11 @@ export async function dictionaryUnlock(
             const pdfDoc = await PDFDocument.load(bytes, { password } as any);
             const decryptedPdf = await pdfDoc.save();
             return { password, decryptedPdf };
-        } catch (e) {
+        } catch (e: any) {
+            const msg = (e.message || '').toLowerCase();
+            if (!msg.includes('password') && !msg.includes('decrypt') && !msg.includes('encrypted') && !msg.includes('permission')) {
+                throw e;
+            }
             // Continue
         }
     }
@@ -282,6 +290,16 @@ export async function multiThreadedUnlock(
             const end = Math.min(start + batchSize, wordlist.length);
             const batch = wordlist.slice(start, end);
 
+            const chunkSize = 50;
+            let offset = 0;
+
+            const sendNextChunk = () => {
+                if (offset >= batch.length || isResolved) return;
+                const chunk = batch.slice(offset, offset + chunkSize);
+                worker.postMessage({ pdfBytes, passwords: chunk, batchId: i });
+                offset += chunkSize;
+            };
+
             worker.onmessage = async (e) => {
                 if (isResolved) return;
                 const { type, password, count, lastAttempt } = e.data;
@@ -298,15 +316,19 @@ export async function multiThreadedUnlock(
                     } catch (err) {
                         reject(err);
                     }
-                } else if (type === 'PROGRESS') {
+                } else if (type === 'PROGRESS' || type === 'FINISHED') {
                     totalTested += count;
                     onProgress(lastAttempt, totalTested);
 
-                    if (totalTested >= wordlist.length) {
-                        finishedWorkers++;
-                        if (finishedWorkers >= coreCount && !isResolved) {
-                            cleanup();
-                            resolve({ password: null, decryptedPdf: null });
+                    if (type === 'FINISHED') {
+                        if (offset < batch.length && !isResolved) {
+                            sendNextChunk();
+                        } else {
+                            finishedWorkers++;
+                            if (finishedWorkers >= coreCount && !isResolved) {
+                                cleanup();
+                                resolve({ password: null, decryptedPdf: null });
+                            }
                         }
                     }
                 }
@@ -321,7 +343,7 @@ export async function multiThreadedUnlock(
                 }
             };
 
-            worker.postMessage({ pdfBytes, passwords: batch, batchId: i });
+            sendNextChunk();
         }
     });
 }

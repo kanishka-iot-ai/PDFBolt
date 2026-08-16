@@ -1,18 +1,27 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import FileUploader from '../components/FileUploader';
 import { mergeFiles } from '../services/pdfService';
 import { FileText, Download, Trash2, ArrowUp, ArrowDown, CheckCircle2, Plus } from 'lucide-react';
 import { NotifySystem } from '../types';
 import ProgressBar from '../components/ProgressBar';
 import { validateFiles, ALLOWED_MIME_TYPES, MAX_FILE_SIZE } from '../utils/fileValidation';
+import { useActiveWork } from '../context/ActiveWorkContext';
 
 const MergeTool: React.FC<{ darkMode: boolean; notify: NotifySystem }> = ({ darkMode, notify }) => {
+  const { setHasActiveWork } = useActiveWork();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [files, setFiles] = useState<File[]>([]);
   const [processing, setProcessing] = useState(false);
   const [result, setResult] = useState<string | null>(null);
   const [progress, setProgress] = useState(0);
   const [processingStatus, setProcessingStatus] = useState<'processing' | 'complete' | 'error'>('processing');
   const [resultKey, setResultKey] = useState(0);
+
+  // Sync active work state
+  useEffect(() => {
+    setHasActiveWork((files.length > 0 && !result) || processing);
+    return () => setHasActiveWork(false);
+  }, [files.length, result, processing, setHasActiveWork]);
 
   // Cleanup blob URLs only on component unmount
   // Cleanup blob URLs only when result changes or component unmounts
@@ -128,7 +137,7 @@ const MergeTool: React.FC<{ darkMode: boolean; notify: NotifySystem }> = ({ dark
             ))}
 
             <button
-              onClick={() => document.querySelector('input')?.click()}
+              onClick={() => fileInputRef.current?.click()}
               className="w-full py-4 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-[2rem] text-slate-400 hover:text-yellow-500 hover:border-yellow-500 transition-all flex items-center justify-center gap-2 font-black uppercase text-xs tracking-widest"
             >
               <Plus size={16} /> Add More Files
@@ -180,9 +189,19 @@ const MergeTool: React.FC<{ darkMode: boolean; notify: NotifySystem }> = ({ dark
       </div>
 
       {/* Hidden uploader for 'Add More' button */}
-      <div className="hidden">
-        <FileUploader onFilesSelected={handleFiles} darkMode={darkMode} />
-      </div>
+      <input
+        type="file"
+        multiple
+        accept=".pdf"
+        className="hidden"
+        ref={fileInputRef}
+        onChange={(e) => {
+          if (e.target.files && e.target.files.length > 0) {
+            handleFiles(Array.from(e.target.files));
+            e.target.value = '';
+          }
+        }}
+      />
     </div>
   );
 };

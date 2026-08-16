@@ -30,16 +30,6 @@ declare module 'pdfjs-dist' {
     export const version: string;
 }
 
-declare module '@aws-sdk/client-s3' {
-    export const S3Client: any;
-    export const PutObjectCommand: any;
-    export const GetObjectCommand: any;
-}
-
-declare module '@aws-sdk/s3-request-presigner' {
-    export const getSignedUrl: any;
-}
-
 declare module 'react-helmet-async' {
     export const Helmet: any;
     export const HelmetProvider: any;
@@ -50,7 +40,3 @@ declare module 'tesseract.js' {
     export default Tesseract;
 }
 
-declare module 'pptxgenjs' {
-    const PptxGenJS: any;
-    export default PptxGenJS;
-}

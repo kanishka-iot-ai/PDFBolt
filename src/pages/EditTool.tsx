@@ -4,6 +4,7 @@ import * as pdfjsLib from 'pdfjs-dist';
 import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
 import FileUploader from '../components/FileUploader';
 import { ChevronLeft, ChevronRight, ZoomIn, ZoomOut, Eraser, Type, Image as ImageIcon, PenTool, Download, Save, MousePointer, Move, Trash2, Check } from 'lucide-react';
+import { useActiveWork } from '../context/ActiveWorkContext';
 
 // Initialize Worker
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
@@ -40,12 +41,20 @@ interface ImageElement {
 const generateId = () => Math.random().toString(36).substr(2, 9);
 
 const EditTool: React.FC<EditToolProps> = ({ darkMode, notify }) => {
+    const { setHasActiveWork } = useActiveWork();
+
     // PDF State
     const [file, setFile] = useState<File | null>(null);
     const [pdfDoc, setPdfDoc] = useState<any>(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [scale, setScale] = useState(1.0);
     const [loading, setLoading] = useState(false);
+
+    // Sync active work
+    useEffect(() => {
+        setHasActiveWork(file !== null);
+        return () => setHasActiveWork(false);
+    }, [file, setHasActiveWork]);
 
     // Editor State
     const [mode, setMode] = useState<EditorMode>('select');
@@ -67,10 +76,6 @@ const EditTool: React.FC<EditToolProps> = ({ darkMode, notify }) => {
     // Selection/Drag State
     const [selectedElementId, setSelectedElementId] = useState<string | null>(null);
     const [dragOffset, setDragOffset] = useState<{ x: number, y: number } | null>(null);
-
-    // Text Editing State
-    const [editingTextId, setEditingTextId] = useState<string | null>(null);
-    const [inputText, setInputText] = useState("");
 
     // --- PDF Loading & Rendering ---
     const handleFilesSelected = async (files: File[]) => {
@@ -192,7 +197,6 @@ const EditTool: React.FC<EditToolProps> = ({ darkMode, notify }) => {
         // Deselect if clicking empty space
         if (e.target === containerRef.current || e.target === drawingCanvasRef.current) {
             setSelectedElementId(null);
-            setEditingTextId(null);
         }
     };
 
@@ -234,6 +238,32 @@ const EditTool: React.FC<EditToolProps> = ({ darkMode, notify }) => {
     const handleMouseUp = () => {
         if (mode === 'draw') stopDrawing();
         setDragOffset(null);
+    };
+
+    const startResize = (e: React.MouseEvent, id: string) => {
+        e.stopPropagation();
+        const img = imageElements.find(i => i.id === id);
+        if (!img) return;
+        
+        const startX = e.clientX;
+        const startWidth = img.width;
+        const startHeight = img.height;
+        const ratio = startWidth / startHeight;
+
+        const onMouseMove = (moveEvent: MouseEvent) => {
+            const dx = (moveEvent.clientX - startX) / scale;
+            const newWidth = Math.max(20, startWidth + dx);
+            const newHeight = newWidth / ratio;
+            setImageElements(prev => prev.map(el => el.id === id ? { ...el, width: newWidth, height: newHeight } : el));
+        };
+
+        const onMouseUpEvent = () => {
+            window.removeEventListener('mousemove', onMouseMove);
+            window.removeEventListener('mouseup', onMouseUpEvent);
+        };
+
+        window.addEventListener('mousemove', onMouseMove);
+        window.addEventListener('mouseup', onMouseUpEvent);
     };
 
     // --- Drawing Logic ---
@@ -291,10 +321,25 @@ const EditTool: React.FC<EditToolProps> = ({ darkMode, notify }) => {
                 let imgObj;
                 if (imgEl.dataUrl.startsWith('data:image/png')) {
                     imgObj = await pdf.embedPng(imgEl.bytes);
+                } else if (imgEl.dataUrl.startsWith('data:image/jpeg') || imgEl.dataUrl.startsWith('data:image/jpg')) {
+                    imgObj = await pdf.embedJpg(imgEl.bytes);
                 } else {
-                    imgObj = await pdf.embedJpg(imgEl.bytes); // Fallback to JPG
+                    const img = new Image();
+                    img.src = imgEl.dataUrl;
+                    await new Promise(resolve => { img.onload = resolve; });
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    const ctx = canvas.getContext('2d');
+                    if (ctx) {
+                        ctx.drawImage(img, 0, 0);
+                        const pngUrl = canvas.toDataURL('image/png');
+                        imgObj = await pdf.embedPng(pngUrl);
+                    }
                 }
-                embeddedImages[imgEl.id] = imgObj;
+                if (imgObj) {
+                    embeddedImages[imgEl.id] = imgObj;
+                }
             }
 
             // 2. Process Drawing Canvases (Convert to PNG and Embed)
@@ -494,7 +539,10 @@ const EditTool: React.FC<EditToolProps> = ({ darkMode, notify }) => {
                                             <img src={el.dataUrl} className="w-full h-full object-contain" draggable={false} />
                                             {/* Simple Resize Handle (Bottom Right) */}
                                             {selectedElementId === el.id && (
-                                                <div className="absolute bottom-0 right-0 w-4 h-4 bg-yellow-500 rounded-full cursor-se-resize translate-x-1/2 translate-y-1/2"></div>
+                                                <div 
+                                                    onMouseDown={(e) => startResize(e, el.id)}
+                                                    className="absolute bottom-0 right-0 w-4 h-4 bg-yellow-500 rounded-full cursor-se-resize translate-x-1/2 translate-y-1/2"
+                                                ></div>
                                             )}
                                         </div>
                                     ))}

@@ -1,0 +1,51 @@
+# ==============================================================================
+# PDFBolt Production API Container (Google Cloud Run Ready)
+# Optimized for Fast Startup, Minimal Memory Footprint, and Sub-second Latency
+# ==============================================================================
+
+FROM python:3.11-slim AS base
+
+# Prevent Python from writing .pyc files & enable unbuffered stdout
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PORT=8000 \
+    APP_ENV=production
+
+# Install essential runtime utilities & libmagic for byte sniffing
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    libmagic1 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create non-root system user for security compliance (Principle of Least Privilege)
+RUN addgroup --system --gid 10001 pdfbolt && \
+    adduser --system --uid 10001 --ingroup pdfbolt --no-create-home pdfbolt
+
+WORKDIR /app
+
+# Copy dependency requirements
+COPY requirements.txt /app/requirements.txt
+
+# Install dependencies into system Python
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
+
+# Copy backend application code
+COPY backend /app/backend
+
+# Create isolated local storage mount point with appropriate permissions
+RUN mkdir -p /app/backend/storage && \
+    chown -R pdfbolt:pdfbolt /app
+
+# Switch to unprivileged user
+USER pdfbolt:pdfbolt
+
+# Cloud Run / Render Container Port
+EXPOSE 8000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:${PORT:-8000}/api/v1/health || exit 1
+
+# Start Uvicorn production server with dynamic $PORT support
+CMD ["sh", "-c", "exec uvicorn backend.app.main:app --host 0.0.0.0 --port ${PORT:-8000} --workers 2"]

@@ -79,6 +79,8 @@ const SignatureCanvas = forwardRef<SignatureCanvasRef, SignatureCanvasProps>(
 
             const width = STROKE_WIDTHS[strokeWidth];
 
+            const previousData = sigPadRef.current?.toData();
+
             // Initialize signature pad with world-class settings
             sigPadRef.current = new SignaturePad(canvas, {
                 minWidth: width.min,
@@ -89,6 +91,10 @@ const SignatureCanvas = forwardRef<SignatureCanvasRef, SignatureCanvasProps>(
                 velocityFilterWeight: 0.7,
                 minDistance: 5,
             });
+
+            if (previousData && previousData.length > 0) {
+                sigPadRef.current.fromData(previousData);
+            }
 
             // Add event listeners
             if (onBegin) {
@@ -104,7 +110,7 @@ const SignatureCanvas = forwardRef<SignatureCanvasRef, SignatureCanvasProps>(
                     sigPadRef.current.off();
                 }
             };
-        }, []);
+        }, [onBegin, onEnd, strokeWidth, penColor, currentBgColor]);
 
         // Update pen color when prop changes
         useEffect(() => {

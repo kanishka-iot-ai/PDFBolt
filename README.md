@@ -62,8 +62,8 @@ A blazing-fast, production-ready PDF toolkit with advanced features including OC
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/pdfmaster-pro.git
-cd pdfmaster---pro-pdf-toolkit
+git clone https://github.com/your-username/pdfbolt-pro.git
+cd pdfbolt-pro
 
 # Install dependencies
 npm install
@@ -76,7 +76,7 @@ cp .env.example .env
 npm run dev
 ```
 
-Visit **http://localhost:3000** 🎉
+Visit **http://localhost:5173** 🎉
 
 ---
 
@@ -101,10 +101,10 @@ npm run preview
 ### Quick Deploy with Docker
 ```bash
 # Build the image
-docker build -t pdfmaster-pro .
+docker build -t pdfbolt-pro .
 
 # Run the container
-docker run -d -p 80:80 --name pdfmaster pdfmaster-pro
+docker run -d -p 80:80 --name pdfbolt pdfbolt-pro
 
 # Access at http://localhost
 ```
@@ -126,10 +126,13 @@ docker-compose up -d
 | **Routing** | React Router 7 |
 | **Styling** | Tailwind CSS 3.4 |
 | **PDF Processing** | pdf-lib, pdfjs-dist |
-| **OCR** | Tesseract.js |
-| **Cloud Storage** | AWS S3 SDK |
-| **Build Tool** | Vite 6 |
-| **Deployment** | Docker + Nginx |
+| **OCR** | Tesseract.js / PyTesseract |
+| **Backend API** | FastAPI + Uvicorn (Render) |
+| **Heavy Workers** | Google Cloud Run Worker Pool |
+| **Async Queue** | Google Cloud Pub/Sub |
+| **Cloud Storage** | Google Cloud Storage (GCS) |
+| **Build & CI/CD** | Vite 6, Google Cloud Build |
+| **Deployment** | Docker + Nginx / Render |
 | **SEO** | react-helmet-async, JSON-LD |
 
 ---
@@ -138,42 +141,24 @@ docker-compose up -d
 
 ### Environment Variables
 
-Create a `.env` file in the project root:
+Create a `.env` file in the project root for local development:
 
 ```env
-# AWS S3 (Required for QR Code feature)
-VITE_AWS_ACCESS_KEY_ID=your_access_key
-VITE_AWS_SECRET_ACCESS_KEY=your_secret_key
-VITE_AWS_REGION=us-east-1
-VITE_AWS_BUCKET_NAME=your-bucket-name
-
-# Google AI (Optional)
+# Google AI / Gemini (Optional for Handwriting OCR enhancement)
 GEMINI_API_KEY=your_gemini_api_key
-```
 
-### AWS S3 Setup
-
-1. Create an S3 bucket
-2. Enable public read access
-3. Add CORS policy:
-```json
-[
-  {
-    "AllowedHeaders": ["*"],
-    "AllowedMethods": ["GET", "PUT"],
-    "AllowedOrigins": ["*"],
-    "ExposeHeaders": []
-  }
-]
+# Google Cloud Storage (Server-side backend/.env only)
+GCS_PROJECT_ID=your-gcp-project-id
+GCS_BUCKET_NAME=your-private-gcs-bucket
+GCS_REGION=us-central1
 ```
-4. (Optional) Add lifecycle rule to auto-delete after 30 days
 
 ---
 
 ## 📁 Project Structure
 
 ```
-pdfmaster---pro-pdf-toolkit/
+pdfbolt/
 ├── components/          # Reusable UI components
 │   ├── FileUploader.tsx
 │   ├── Navbar.tsx
@@ -214,10 +199,10 @@ pdfmaster---pro-pdf-toolkit/
 - **Secure** - All processing happens in your device's memory
 
 ### QR Code Cloud Sharing
-- Upload PDFs to AWS S3 with **30-day auto-expiry**
-- Generate QR codes for easy mobile access
-- Perfect for **"Scan to View"** workflows
-- Secure, temporary links
+- Upload PDFs via backend with **user-selectable auto-expiry** (15m, 1h, 24h default, 7d, 30d)
+- Generates unguessable cryptographic share IDs (`/s/{share_id}`)
+- Short-lived signed download URLs via Google Cloud Storage
+- Instant one-click user revocation
 
 ### SEO Optimized
 - JSON-LD Schema markup for all tools
@@ -235,7 +220,7 @@ pdfmaster---pro-pdf-toolkit/
 - [ ] Protect PDF with password
 - [ ] Sign PDF with signature image
 - [ ] OCR a scanned document
-- [ ] Generate QR code and verify S3 upload
+- [ ] Generate QR code and verify secure download
 - [ ] Test on mobile device
 - [ ] Verify SEO meta tags in page source
 
@@ -252,9 +237,8 @@ npm install
 ```
 
 **2. QR Code Upload Fails**
-- Verify AWS credentials in `.env`
-- Check S3 bucket CORS policy
-- Ensure bucket has public read access
+- Verify backend API is running on port 8000
+- Check Google Cloud Storage permissions (ADC / Service Account)
 
 **3. Build Fails**
 ```bash
@@ -325,7 +309,7 @@ This project is licensed under the **MIT License**.
 
 For issues or questions:
 - 📝 Open an issue on GitHub
-- 📧 Email: support@pdfmaster.io
+- 📧 Email: support@pdfbolt.com
 - 📖 Read [DEPLOYMENT.md](./DEPLOYMENT.md) for deployment help
 
 ---

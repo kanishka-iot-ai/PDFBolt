@@ -1,3 +1,20 @@
+# robots.txt for PDFBolt (https://pdfbolt.com)
 User-agent: *
 Allow: /
-Sitemap: https://pdfbolt.in/sitemap.xml
+Allow: /tools
+Allow: /guides/
+Allow: /encyclopedia/
+Allow: /student-pdf-tools
+Allow: /business-pdf-tools
+Allow: /developer-pdf-tools
+Allow: /compare/
+
+# Private API endpoints, temporary processing jobs, and test files
+Disallow: /api/
+Disallow: /jobs/
+Disallow: /storage/
+Disallow: /qr-success
+Disallow: /test-files
+
+# Sitemaps
+Sitemap: https://pdfbolt.com/sitemap.xml

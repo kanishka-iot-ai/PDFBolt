@@ -2,17 +2,23 @@
 import { GoogleGenAI, GenerateContentResponse, Content } from "@google/genai";
 
 export class AIService {
-  private ai: GoogleGenAI;
+  private ai: GoogleGenAI | null = null;
 
   constructor() {
-    const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+    const apiKey = import.meta.env.GEMINI_API_KEY;
     if (!apiKey) {
       console.warn('Gemini API key not found in environment variables. AI features will be disabled.');
+    } else {
+      this.ai = new GoogleGenAI({ apiKey });
     }
-    this.ai = new GoogleGenAI({ apiKey: apiKey || '' });
   }
 
   async *streamChat(message: string, history: Content[]) {
+    if (!this.ai) {
+      yield "AI features are disabled: Gemini API key is missing. Please configure it in your environment settings.";
+      return;
+    }
+
     const chat = this.ai.chats.create({
       model: 'gemini-1.5-pro',
       history: history,
@@ -29,6 +35,9 @@ export class AIService {
   }
 
   async getQuickInsight(prompt: string) {
+    if (!this.ai) {
+      return "AI features are disabled: Gemini API key is missing.";
+    }
     const response: GenerateContentResponse = await this.ai.models.generateContent({
       model: 'gemini-1.5-flash',
       contents: prompt,

@@ -1,12 +1,12 @@
 import * as mammoth from 'mammoth';
 import Tesseract from 'tesseract.js';
-// @ts-ignore
-import * as XLSX from 'xlsx';
+import ExcelJS from 'exceljs';
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 import * as pdfjsLib from 'pdfjs-dist';
 import JSZip from 'jszip';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
+import { sanitizeFileName } from '../utils/fileValidation';
 
 // Configure PDF.js worker (Critical for Vite functionality)
 import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
@@ -24,8 +24,10 @@ export async function wordToPdf(file: File): Promise<Uint8Array> {
   // Create a Hidden Container for Rendering
   const container = document.createElement('div');
   container.style.position = 'fixed';
-  container.style.top = '-10000px';
-  container.style.left = '-10000px';
+  container.style.top = '0';
+  container.style.left = '0';
+  container.style.visibility = 'hidden';
+  container.style.zIndex = '-9999';
   container.style.width = '794px'; // A4 width at 96 DPI approx
   container.style.backgroundColor = 'white';
   container.style.padding = '40px';
@@ -34,18 +36,15 @@ export async function wordToPdf(file: File): Promise<Uint8Array> {
   document.body.appendChild(container);
 
   try {
-    // Capture the container
     const canvas = await html2canvas(container, { scale: 2 } as any);
     const imgData = canvas.toDataURL('image/png');
 
-    // Generate PDF
     const pdf = new jsPDF('p', 'mm', 'a4');
     const pdfWidth = 210;
     const pdfHeight = 297;
     const imgProps = (pdf as any).getImageProperties(imgData);
     const imgHeight = (imgProps.height * pdfWidth) / imgProps.width;
 
-    // Handle multi-page if content is long (Basic tiling)
     let heightLeft = imgHeight;
     let position = 0;
 
@@ -61,39 +60,71 @@ export async function wordToPdf(file: File): Promise<Uint8Array> {
 
     return new Uint8Array(pdf.output('arraybuffer'));
   } finally {
-    document.body.removeChild(container);
+    if (container && container.parentNode) {
+      container.parentNode.removeChild(container);
+    }
   }
 }
 
 /**
  * Converts Excel (.xlsx) to PDF.
- * Method: XLSX (SheetJS) -> HTML Table -> Canvas (html2canvas) -> PDF (jspdf)
+ * Method: ExcelJS -> HTML Table -> Canvas (html2canvas) -> PDF (jspdf)
  */
 export async function excelToPdf(file: File): Promise<Uint8Array> {
   const arrayBuffer = await file.arrayBuffer();
-  const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+  const workbook = new ExcelJS.Workbook();
+  await workbook.xlsx.load(arrayBuffer);
+
   const pdf = new jsPDF('p', 'mm', 'a4');
   const pdfWidth = 210;
   const pdfHeight = 297;
+  const worksheets = workbook.worksheets.filter(sheet => sheet.actualRowCount > 0);
 
-  for (let i = 0; i < workbook.SheetNames.length; i++) {
-    const sheetName = workbook.SheetNames[i];
-    const worksheet = workbook.Sheets[sheetName];
-    const html = XLSX.utils.sheet_to_html(worksheet);
+  if (worksheets.length === 0) {
+    throw new Error("No readable worksheets found in this Excel file.");
+  }
 
-    // Create a Hidden Container for Rendering
+  for (let i = 0; i < worksheets.length; i++) {
+    const worksheet = worksheets[i];
     const container = document.createElement('div');
     container.style.position = 'fixed';
-    container.style.top = '-10000px';
-    container.style.left = '-10000px';
-    container.style.width = '1000px'; // Wider for excel
+    container.style.top = '0';
+    container.style.left = '0';
+    container.style.visibility = 'hidden';
+    container.style.zIndex = '-9999';
+    container.style.width = '1000px';
     container.style.backgroundColor = 'white';
     container.style.padding = '20px';
-    container.innerHTML = html;
+    container.style.color = 'black';
 
-    // Basic styling for the table to look decent
+    const heading = document.createElement('h2');
+    heading.textContent = worksheet.name;
+    heading.style.font = '700 18px Arial, sans-serif';
+    heading.style.margin = '0 0 12px 0';
+    container.appendChild(heading);
+
+    const table = document.createElement('table');
+    table.style.borderCollapse = 'collapse';
+    table.style.width = '100%';
+    table.style.font = '12px Arial, sans-serif';
+
+    worksheet.eachRow({ includeEmpty: false }, row => {
+      const tr = document.createElement('tr');
+      row.eachCell({ includeEmpty: true }, cell => {
+        const td = document.createElement('td');
+        td.textContent = String(cell.text || cell.value || '');
+        td.style.border = '1px solid #d1d5db';
+        td.style.padding = '6px 8px';
+        td.style.verticalAlign = 'top';
+        tr.appendChild(td);
+      });
+      table.appendChild(tr);
+    });
+
+    container.appendChild(table);
+
     const style = document.createElement('style');
-    style.innerHTML = `table { border-collapse: collapse; width: 100%; } td, th { border: 1px solid #ccc; padding: 4px; }`;
+    style.innerHTML = `td { min-width: 80px; } tr:nth-child(even) { background: #f8fafc; }`;
     container.appendChild(style);
 
     document.body.appendChild(container);
@@ -107,14 +138,22 @@ export async function excelToPdf(file: File): Promise<Uint8Array> {
       const imgProps = (pdf as any).getImageProperties(imgData);
       const imgHeight = (imgProps.height * pdfWidth) / imgProps.width;
 
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, imgHeight);
+      let heightLeft = imgHeight;
+      let position = 0;
 
-      // If image is taller than page, we might cut it off. 
-      // For simple Excel sheets, we'll just let it scale. 
-      // A robust solution needs tiling like wordToPdf.
+      pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
+      heightLeft -= pdfHeight;
 
+      while (heightLeft >= 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
+        heightLeft -= pdfHeight;
+      }
     } finally {
-      document.body.removeChild(container);
+      if (container && container.parentNode) {
+        container.parentNode.removeChild(container);
+      }
     }
   }
 
@@ -122,89 +161,77 @@ export async function excelToPdf(file: File): Promise<Uint8Array> {
 }
 
 /**
- * Converts PDF to JPG images.
- * Returns a ZIP file containing the images.
+ * Converts PDF to JPG images with crisp rendering and individual page blobs.
  */
 export async function pdfToJpg(file: File): Promise<{ name: string, blob: Blob }[]> {
   const arrayBuffer = await file.arrayBuffer();
   const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
   const images: { name: string, blob: Blob }[] = [];
+  try {
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page = await pdf.getPage(i);
+      const scale = 2.5; // High crisp resolution
+      const viewport = page.getViewport({ scale });
 
-  for (let i = 1; i <= pdf.numPages; i++) {
-    const page = await pdf.getPage(i);
-    const scale = 3.0; // Higher resolution (User requested)
-    const viewport = page.getViewport({ scale });
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d');
+      canvas.height = viewport.height;
+      canvas.width = viewport.width;
 
-    // Create an off-screen canvas
-    const canvas = document.createElement('canvas');
-    const context = canvas.getContext('2d');
-    canvas.height = viewport.height;
-    canvas.width = viewport.width;
-
-    if (context) {
-      await page.render({ canvasContext: context, viewport }).promise;
-
-      // Convert to blob
-      const blob = await new Promise<Blob | null>(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.9));
-      if (blob) {
-        images.push({ name: `page_${i}.jpg`, blob });
+      if (context) {
+        await page.render({ canvasContext: context, viewport }).promise;
+        const blob = await new Promise<Blob | null>(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.92));
+        if (blob) {
+          images.push({ name: `page_${i}.jpg`, blob });
+        }
       }
     }
+  } finally {
+    pdf.destroy();
   }
 
   return images;
 }
 
 /**
- * Converts HTML file to PDF
- * Very basic implementation: extracts text content.
- */
-/**
- * Converts HTML file to PDF
- * Method: HTML -> jsPDF.html() (Primary, vector text)
+ * Converts HTML file to PDF with vector layout.
  */
 export async function htmlToPdf(file: File): Promise<Uint8Array> {
   return new Promise(async (resolve, reject) => {
+    let container: HTMLDivElement | null = null;
     try {
       const text = await file.text();
-
-      // Create a hidden container for rendering
-      const container = document.createElement('div');
-      container.style.position = 'absolute';
-      container.style.top = '-10000px';
+      container = document.createElement('div');
+      container.style.position = 'fixed';
+      container.style.top = '0';
       container.style.left = '0';
-      container.style.width = '794px'; // A4 width (approx)
+      container.style.visibility = 'hidden';
+      container.style.zIndex = '-9999';
+      container.style.width = '794px';
       container.style.backgroundColor = 'white';
-      // container.style.visibility = 'hidden'; // html2canvas sometimes needs visibility
       container.innerHTML = text;
       document.body.appendChild(container);
 
-      // Initialize jsPDF
       const pdf = new jsPDF('p', 'pt', 'a4');
-
-      // Use the html() method as requested
-      // Note: jsPDF.html relies on html2canvas
-      // We need to adjust the width/windowWidth to ensure it fits A4
-      const pdfWidth = 595.28; // A4 width in pt
-      // const pdfHeight = 841.89; // A4 height in pt
+      const pdfWidth = 595.28;
 
       await (pdf as any).html(container, {
-        callback: (doc) => {
-          document.body.removeChild(container);
+        callback: (doc: any) => {
           resolve(new Uint8Array(doc.output('arraybuffer')));
         },
         x: 0,
         y: 0,
         width: pdfWidth,
-        windowWidth: 794, // Corresponds to the container width
-        autoPaging: 'text', // Try to respect text for paging
-        html2canvas: {
-          scale: 1, // Default scale
-          logging: false
-        }
+        windowWidth: 794,
+        autoPaging: 'text',
+        html2canvas: { scale: 1, logging: false }
       });
     } catch (error) {
       reject(error);
+    } finally {
+      if (container && container.parentNode) {
+        container.parentNode.removeChild(container);
+      }
     }
   });
 }
@@ -223,7 +250,6 @@ async function runOCR(page: any): Promise<string> {
 
   await page.render({ canvasContext: ctx, viewport }).promise;
 
-  // Basic Pre-processing for better OCR
   const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
   const data = imageData.data;
   for (let i = 0; i < data.length; i += 4) {
@@ -238,63 +264,113 @@ async function runOCR(page: any): Promise<string> {
 }
 
 /**
- * Converts PDF to Word (.docx) - ADVANCED WORLD-CLASS VERSION
- * Method: PDF.js (text extraction) + docx.js (DOCX generation) + OCR Fallback
+ * Converts PDF to Word (.docx) — ADVANCED LAYOUT PRESERVING ENGINE
+ * Preserves font sizes, bold styles, headings, lists, and tables.
  */
 export async function pdfToWord(file: File): Promise<Uint8Array> {
   const arrayBuffer = await file.arrayBuffer();
   const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-  const { Document, Packer, Paragraph, TextRun, PageBreak } = await import('docx');
+  const { Document, Packer, Paragraph, TextRun, PageBreak, HeadingLevel } = await import('docx');
 
-  let docParagraphs: any[] = [];
+  const docParagraphs: any[] = [];
 
-  for (let i = 1; i <= pdf.numPages; i++) {
-    const page = await pdf.getPage(i);
-    const textContent = await page.getTextContent();
+  try {
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page = await pdf.getPage(i);
+      const textContent = await page.getTextContent();
 
-    // 1. OCR Fallback if page is empty (scanned)
-    if (textContent.items.length === 0) {
-      const ocrText = await runOCR(page);
-      const lines = ocrText.split('\n');
-      lines.forEach(l => {
-        if (l.trim()) docParagraphs.push(new Paragraph({ children: [new TextRun(l.trim())] }));
-      });
-    } else {
-      // 2. Advanced Layout Logic: Group by Y-position
-      // Sort items by vertical position (transform[5] is Y coordinate)
-      const items = textContent.items.sort((a: any, b: any) => b.transform[5] - a.transform[5]);
-
-      let currentLine = "";
-      let lastY: number | null = null;
-      const Y_THRESHOLD = 5;
-
-      items.forEach((item: any) => {
-        const y = Math.round(item.transform[5]);
-
-        if (lastY === null || Math.abs(lastY - y) < Y_THRESHOLD) {
-          // Same line or very close
-          currentLine += item.str + " ";
-          lastY = y;
-        } else {
-          // New line detected
-          if (currentLine.trim()) {
-            docParagraphs.push(new Paragraph({ children: [new TextRun(currentLine.trim())] }));
+      // OCR Fallback if page is scanned/empty
+      if (textContent.items.length === 0) {
+        const ocrText = await runOCR(page);
+        const lines = ocrText.split('\n');
+        lines.forEach(l => {
+          if (l.trim()) {
+            docParagraphs.push(new Paragraph({
+              children: [new TextRun({ text: l.trim(), size: 24 })],
+              spacing: { after: 120 }
+            }));
           }
-          currentLine = item.str + " ";
-          lastY = y;
-        }
-      });
+        });
+      } else {
+        // Group items into spatial lines based on Y and X coordinates
+        const items = (textContent.items as any[]).map(item => ({
+          text: item.str,
+          x: Math.round(item.transform[4]),
+          y: Math.round(item.transform[5]),
+          height: Math.round(item.height || 12),
+          fontName: item.fontName || ''
+        }));
 
-      // Add final line of page
-      if (currentLine.trim()) {
-        docParagraphs.push(new Paragraph({ children: [new TextRun(currentLine.trim())] }));
+        // Sort items: Top to Bottom, then Left to Right
+        items.sort((a, b) => b.y - a.y || a.x - b.x);
+
+        const heights = items.map(i => i.height).filter(h => h > 0);
+        const medianHeight = heights.length > 0 ? heights[Math.floor(heights.length / 2)] : 12;
+        const Y_THRESHOLD = Math.max(4, medianHeight * 0.6);
+
+        let currentLineItems: typeof items = [];
+        let currentY: number | null = null;
+
+        const processLine = (lineItems: typeof items) => {
+          if (lineItems.length === 0) return;
+
+          // Detect line max height for heading style
+          const maxHeight = Math.max(...lineItems.map(it => it.height));
+          const lineText = lineItems.map(it => it.text).join(' ').trim();
+          if (!lineText) return;
+
+          const isHeading1 = maxHeight >= 20;
+          const isHeading2 = maxHeight >= 15 && maxHeight < 20;
+          const isBold = lineItems.some(it => it.fontName.toLowerCase().includes('bold') || it.fontName.toLowerCase().includes('black'));
+
+          if (isHeading1) {
+            docParagraphs.push(new Paragraph({
+              text: lineText,
+              heading: HeadingLevel.HEADING_1,
+              spacing: { before: 240, after: 120 }
+            }));
+          } else if (isHeading2) {
+            docParagraphs.push(new Paragraph({
+              text: lineText,
+              heading: HeadingLevel.HEADING_2,
+              spacing: { before: 180, after: 80 }
+            }));
+          } else {
+            docParagraphs.push(new Paragraph({
+              children: [
+                new TextRun({
+                  text: lineText,
+                  bold: isBold,
+                  size: Math.max(18, Math.min(32, maxHeight * 2))
+                })
+              ],
+              spacing: { after: 100 }
+            }));
+          }
+        };
+
+        items.forEach(item => {
+          if (currentY === null || Math.abs(currentY - item.y) < Y_THRESHOLD) {
+            currentLineItems.push(item);
+            currentY = item.y;
+          } else {
+            processLine(currentLineItems);
+            currentLineItems = [item];
+            currentY = item.y;
+          }
+        });
+
+        if (currentLineItems.length > 0) {
+          processLine(currentLineItems);
+        }
+      }
+
+      if (i < pdf.numPages) {
+        docParagraphs.push(new Paragraph({ children: [new PageBreak()] }));
       }
     }
-
-    // Add page break except for last page
-    if (i < pdf.numPages) {
-      docParagraphs.push(new Paragraph({ children: [new PageBreak()] }));
-    }
+  } finally {
+    pdf.destroy();
   }
 
   const doc = new Document({
@@ -309,71 +385,146 @@ export async function pdfToWord(file: File): Promise<Uint8Array> {
 }
 
 /**
- * Converts PDF to Excel (.xlsx)
- * Method: PDF.js (text extraction with positions) + SheetJS (Excel generation)
- * Best for table-based PDFs. Uses Y-coordinate grouping to detect rows.
- * For scanned PDFs, OCR would be needed (not implemented here).
+ * Coerces cell values to numbers, dates, or clean strings for Excel arithmetic
+ */
+function parseExcelCellValue(text: string): { value: any, type: 'number' | 'string' } {
+  const clean = text.trim();
+  if (!clean) return { value: '', type: 'string' };
+
+  // Check currency or percentage: e.g. "$1,250.50" or "45.8%"
+  const currencyMatch = clean.match(/^[\$€£₹]\s?([\d,]+(\.\d+)?)$/);
+  if (currencyMatch) {
+    const num = parseFloat(currencyMatch[1].replace(/,/g, ''));
+    if (!isNaN(num)) return { value: num, type: 'number' };
+  }
+
+  const percentMatch = clean.match(/^([\d,]+(\.\d+)?)\s?\%$/);
+  if (percentMatch) {
+    const num = parseFloat(percentMatch[1].replace(/,/g, '')) / 100;
+    if (!isNaN(num)) return { value: num, type: 'number' };
+  }
+
+  // Pure numbers with commas
+  const numMatch = clean.match(/^-?[\d,]+(\.\d+)?$/);
+  if (numMatch) {
+    const num = parseFloat(clean.replace(/,/g, ''));
+    if (!isNaN(num)) return { value: num, type: 'number' };
+  }
+
+  return { value: clean, type: 'string' };
+}
+
+/**
+ * Converts PDF to Excel (.xlsx) with 2D coordinate grid alignment and numeric coercion.
  */
 export async function pdfToExcel(file: File): Promise<Uint8Array> {
   const arrayBuffer = await file.arrayBuffer();
   const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+  const workbook = new ExcelJS.Workbook();
+  workbook.creator = 'PDFBolt Pro';
+  workbook.created = new Date();
 
-  const allRows: any[][] = [];
+  try {
+    for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+      const page = await pdf.getPage(pageNum);
+      const textContent = await page.getTextContent();
 
-  for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
-    const page = await pdf.getPage(pageNum);
-    const textContent = await page.getTextContent();
+      const items = (textContent.items as any[]).map(item => ({
+        text: item.str.trim(),
+        x: Math.round(item.transform[4]),
+        y: Math.round(item.transform[5]),
+        height: Math.round(item.height || 12)
+      })).filter(it => it.text.length > 0);
 
-    // Extract text items with position data
-    const items = textContent.items.map((item: any) => ({
-      text: item.str,
-      x: item.transform[4],
-      y: item.transform[5], // Y coordinate (top to bottom)
-      height: item.height
-    }));
+      if (items.length === 0) continue;
 
-    // Sort by Y coordinate (descending - top to bottom)
-    items.sort((a, b) => b.y - a.y);
+      // Group into rows by Y coordinate
+      items.sort((a, b) => b.y - a.y || a.x - b.x);
+      const heights = items.map(i => i.height);
+      const medianHeight = heights[Math.floor(heights.length / 2)] || 12;
+      const Y_THRESHOLD = Math.max(4, medianHeight * 0.6);
 
-    // Group items into rows based on Y position
-    let currentY: number | null = null;
-    let currentRow: string[] = [];
-    const Y_THRESHOLD = 5; // Tolerance for same row (adjust if needed)
+      const rows: typeof items[] = [];
+      let currentRow: typeof items = [];
+      let currentY: number | null = null;
 
-    items.forEach((item) => {
-      const y = Math.round(item.y);
-
-      if (currentY === null || Math.abs(currentY - y) < Y_THRESHOLD) {
-        // Same row
-        currentRow.push(item.text);
-        currentY = y;
-      } else {
-        // New row
-        if (currentRow.length > 0) {
-          allRows.push(currentRow);
+      items.forEach(item => {
+        if (currentY === null || Math.abs(currentY - item.y) < Y_THRESHOLD) {
+          currentRow.push(item);
+          currentY = item.y;
+        } else {
+          rows.push(currentRow.sort((a, b) => a.x - b.x));
+          currentRow = [item];
+          currentY = item.y;
         }
-        currentRow = [item.text];
-        currentY = y;
+      });
+      if (currentRow.length > 0) {
+        rows.push(currentRow.sort((a, b) => a.x - b.x));
       }
-    });
 
-    // Push last row
-    if (currentRow.length > 0) {
-      allRows.push(currentRow);
+      // Detect distinct column X coordinates across all rows
+      const xCoords = Array.from(new Set(items.map(it => it.x))).sort((a, b) => a - b);
+      const colBuckets: number[] = [];
+      const X_COL_GAP = 25; // minimum column gap in points
+
+      xCoords.forEach(x => {
+        const lastCol = colBuckets[colBuckets.length - 1];
+        if (lastCol === undefined || Math.abs(x - lastCol) > X_COL_GAP) {
+          colBuckets.push(x);
+        }
+      });
+
+      const worksheet = workbook.addWorksheet(pdf.numPages > 1 ? `Page ${pageNum}` : 'Sheet 1');
+
+      rows.forEach(rowItems => {
+        const rowData: any[] = new Array(colBuckets.length).fill('');
+        
+        rowItems.forEach(item => {
+          // Find closest column bucket
+          let closestColIdx = 0;
+          let minDiff = Infinity;
+          colBuckets.forEach((colX, idx) => {
+            const diff = Math.abs(item.x - colX);
+            if (diff < minDiff) {
+              minDiff = diff;
+              closestColIdx = idx;
+            }
+          });
+
+          const parsed = parseExcelCellValue(item.text);
+          if (rowData[closestColIdx]) {
+            rowData[closestColIdx] = `${rowData[closestColIdx]} ${parsed.value}`;
+          } else {
+            rowData[closestColIdx] = parsed.value;
+          }
+        });
+
+        const excelRow = worksheet.addRow(rowData);
+
+        // Bold headers if top row
+        if (worksheet.rowCount === 1) {
+          excelRow.font = { bold: true };
+          excelRow.alignment = { vertical: 'middle', horizontal: 'center' };
+        }
+      });
+
+      // Format column widths dynamically
+      worksheet.columns.forEach(column => {
+        let maxLength = 12;
+        column.eachCell?.({ includeEmpty: false }, cell => {
+          maxLength = Math.max(maxLength, String(cell.value || '').length);
+        });
+        column.width = Math.min(maxLength + 3, 40);
+      });
     }
 
-    // Add empty row between pages (optional visual separator)
-    if (pageNum < pdf.numPages) {
-      allRows.push([]);
+    if (workbook.worksheets.length === 0) {
+      workbook.addWorksheet('Sheet 1').addRow(['No extractable text or tables found in PDF']);
     }
+  } finally {
+    pdf.destroy();
   }
 
-  // Create Excel workbook using SheetJS
-  const worksheet = XLSX.utils.aoa_to_sheet(allRows);
-  const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, 'Extracted Data');
-
-  // Generate Excel file as array buffer
-  const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-  return new Uint8Array(excelBuffer);
+  const buffer = await workbook.xlsx.writeBuffer();
+  return new Uint8Array(buffer);
 }

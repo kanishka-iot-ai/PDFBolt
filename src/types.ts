@@ -1,4 +1,3 @@
-
 export interface PDFFile {
   id: string;
   file: File;
@@ -35,6 +34,7 @@ export enum ToolType {
   COMPARE = 'compare',
   PDF_TO_QR = 'pdf-to-qr',
   SCAN_HANDWRITING = 'scan-handwriting',
+  ANALYZER = 'analyze',
 }
 
 export interface FAQ {
@@ -42,18 +42,131 @@ export interface FAQ {
   a: string;
 }
 
+export interface HowToStep {
+  name: string;
+  text: string;
+  image?: string;
+}
+
+export interface UseCase {
+  title: string;
+  description: string;
+  icon?: string;
+}
+
 export interface ToolMetadata {
   id: ToolType;
   title: string;
   seoTitle?: string;
+  canonicalPath: string; // e.g. /pdf-to-word, /merge-pdf
+  path: string; // clean short path / legacy path
+  seoPath?: string;
   description: string;
   icon: string;
   category: 'edit' | 'convert-to' | 'convert-from' | 'security' | 'utilities' | 'extra';
-  path: string;
-  seoPath?: string;
   longDescription?: string;
+  quickAnswer?: string; // Instant answer for AI / Google snippet
   features?: string[];
+  useCases?: UseCase[];
+  howToSteps?: HowToStep[];
   faqs?: FAQ[];
+  relatedTools?: string[]; // array of tool IDs for semantic cross-linking
+  relatedGuides?: string[]; // array of guide slugs
+  targetFileTypes?: string;
+}
+
+export interface Guide {
+  slug: string;
+  title: string;
+  metaTitle: string;
+  metaDescription: string;
+  category: 'convert' | 'manage' | 'edit' | 'security' | 'ocr';
+  readTime: string;
+  difficulty: 'Beginner' | 'Intermediate' | 'Advanced';
+  updatedAt: string;
+  summary: string;
+  quickAnswer: string;
+  toolId?: ToolType;
+  steps: HowToStep[];
+  detailedContent: {
+    heading: string;
+    paragraphs: string[];
+    proTips?: string[];
+  }[];
+  faqs: FAQ[];
+  relatedGuides: string[];
+  relatedTools: string[];
+}
+
+export interface EncyclopediaArticle {
+  slug: string;
+  title: string;
+  metaTitle: string;
+  metaDescription: string;
+  category: 'standards' | 'technology' | 'comparison' | 'security';
+  readTime: string;
+  updatedAt: string;
+  summary: string;
+  keyTakeaways: string[];
+  sections: {
+    heading: string;
+    content: string[];
+    table?: {
+      headers: string[];
+      rows: string[][];
+    };
+  }[];
+  relatedArticles: string[];
+  relatedTools: string[];
+}
+
+export interface WorkflowStep {
+  order: number;
+  toolId: ToolType;
+  title: string;
+  description: string;
+  actionLabel: string;
+}
+
+export interface Workflow {
+  slug: string;
+  title: string;
+  metaTitle: string;
+  metaDescription: string;
+  audience: 'Students & Educators' | 'Business & Finance' | 'Software Developers';
+  heroBadge: string;
+  heroHeadline: string;
+  heroSubheadline: string;
+  diagram: {
+    steps: string[];
+  };
+  steps: WorkflowStep[];
+  benefits: {
+    title: string;
+    description: string;
+  }[];
+  faqs: FAQ[];
+  relatedTools: string[];
+  relatedGuides: string[];
+}
+
+export interface ComparisonFeature {
+  name: string;
+  pdfBolt: string | boolean;
+  serverCompetitor: string | boolean;
+  desktopAcrobat: string | boolean;
+  notes: string;
+}
+
+export interface TestFileItem {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+  size: string;
+  pageCount: number;
+  idealFor: string[];
+  generatorType: 'text' | 'scanned' | 'table' | 'slides' | 'protected';
 }
 
 export interface NotifySystem {

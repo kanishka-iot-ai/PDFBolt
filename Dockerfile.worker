@@ -1,0 +1,48 @@
+# ==============================================================================
+# PDFBolt Production Document Worker Container (Google Cloud Run Worker Pool)
+# Includes Mature Document Processing Engines (qpdf, tesseract, ghostscript, libreoffice)
+# ==============================================================================
+
+FROM python:3.11-slim AS worker-base
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    APP_ENV=production
+
+# Install mature system document engines & fonts
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    qpdf \
+    tesseract-ocr \
+    tesseract-ocr-eng \
+    ghostscript \
+    libreoffice-nogui \
+    libreoffice-writer \
+    libreoffice-calc \
+    libreoffice-impress \
+    fonts-liberation \
+    fonts-dejavu-core \
+    libmagic1 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create unprivileged worker user
+RUN addgroup --system --gid 10002 pdfworker && \
+    adduser --system --uid 10002 --ingroup pdfworker --no-create-home pdfworker
+
+WORKDIR /app
+
+# Install Python requirements
+COPY requirements.txt /app/requirements.txt
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
+
+# Copy source code
+COPY backend /app/backend
+
+# Create working directory
+RUN mkdir -p /app/backend/storage && \
+    chown -R pdfworker:pdfworker /app
+
+USER pdfworker:pdfworker
+
+CMD ["python", "-m", "backend.app.main"]

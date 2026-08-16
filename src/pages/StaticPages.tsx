@@ -22,9 +22,9 @@ export const ContactPage: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
     setLoading(true);
 
     // TODO: Replace with your actual keys from emailjs.com
-    const SERVICE_ID = 'service_lrshcpf';
-    const TEMPLATE_ID = 'template_ykqay24';
-    const PUBLIC_KEY = 'JE-e7n6wYODP3qdSW';
+    const SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID || 'service_lrshcpf';
+    const TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID || 'template_ykqay24';
+    const PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY || 'JE-e7n6wYODP3qdSW';
 
     // Configuration check removed as keys are set
 
@@ -139,28 +139,58 @@ export const ContactPage: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
 
 export const PrivacyPage: React.FC<{ darkMode: boolean }> = ({ darkMode }) => (
   <PageLayout title="Privacy Policy" darkMode={darkMode}>
-    <p>Your privacy is our top priority. Unlike traditional PDF websites, <strong>PDFBolt does not upload your files to any server.</strong></p>
-    <h3>Local Processing</h3>
-    <p>Every operation performed on this website happens entirely within your browser using JavaScript and WebAssembly. Your sensitive data never leaves your computer.</p>
+    <p className="lead text-lg font-medium text-slate-600 dark:text-slate-300">
+      Your privacy and data security are the foundational pillars of PDFBolt. This Privacy Policy details how we handle your documents, cookies, and digital preferences.
+    </p>
+
+    <h3>1. Client-Side Document Processing</h3>
+    <p>
+      Unlike traditional cloud converter websites, <strong>PDFBolt processes all standard PDF conversions and manipulations directly within your web browser</strong> using JavaScript and WebAssembly (Wasm). 
+    </p>
     <ul>
-      <li>No data storage</li>
-      <li>No file logging</li>
-      <li>No third-party tracking</li>
+      <li><strong>Zero Server Uploads:</strong> Your documents remain in your computer or mobile device's local memory and are never transmitted to our servers during standard operations.</li>
+      <li><strong>Immediate Memory Release:</strong> As soon as you navigate away, download your output, or close your browser tab, all temporary document memory is wiped immediately.</li>
+      <li><strong>Optional Cloud Sharing (QR Code Tool):</strong> If you explicitly choose the "Share via QR Code" feature, your encrypted PDF is stored temporarily in our secure AWS S3 bucket with an automatic 30-day lifecycle expiration policy, after which it is permanently purged.</li>
     </ul>
-    <h3>Contact Us</h3>
-    <p>If you have questions about our security model, contact us at <span className="text-yellow-600 font-bold">privacy@pdfbolt.com</span>.</p>
+
+    <h3>2. Advertising & Google AdSense Cookies</h3>
+    <p>
+      To keep PDFBolt free, high-performance, and accessible worldwide without subscription paywalls, we partner with <strong>Google AdSense</strong> to display non-intrusive advertisements.
+    </p>
+    <ul>
+      <li>Google, as a third-party vendor, uses cookies (including the DoubleClick cookie) to serve ads based on a user's prior visits to this and other websites on the Internet.</li>
+      <li>Users may opt out of personalized advertising by visiting Google's <a href="https://adssettings.google.com" target="_blank" rel="noopener noreferrer" className="text-yellow-600 font-bold underline">Ads Settings</a> or by configuring preferences in our on-site Cookie Consent banner.</li>
+      <li>AdSense scripts are loaded asynchronously and strictly isolated from all document processing and file reader APIs. Advertisers have zero access to your document contents, file names, or metadata.</li>
+    </ul>
+
+    <h3>3. Essential Cookies & Local Storage</h3>
+    <p>
+      We use lightweight browser storage strictly for essential user preferences:
+    </p>
+    <ul>
+      <li>Theme selection (Dark Mode / Light Mode)</li>
+      <li>Sound effect toggles</li>
+      <li>Cookie and advertising personalization consent choices</li>
+    </ul>
+
+    <h3>4. Contact & Inquiries</h3>
+    <p>
+      If you have questions about our privacy practices, security model, or cookie preferences, please contact our privacy compliance team at <a href="mailto:support@pdfbolt.com" className="text-yellow-600 font-bold">support@pdfbolt.com</a>.
+    </p>
   </PageLayout>
 );
 
 export const TermsPage: React.FC<{ darkMode: boolean }> = ({ darkMode }) => (
   <PageLayout title="Terms of Service" darkMode={darkMode}>
-    <p>By using PDFBolt, you agree to the following terms:</p>
-    <h3>1. Free Use</h3>
-    <p>PDFBolt is 100% free for personal and commercial use. There are no hidden fees or subscriptions.</p>
-    <h3>2. "As-Is" Service</h3>
-    <p>While we strive for 100% accuracy, we are not responsible for any data loss or formatting issues resulting from document processing.</p>
-    <h3>3. No Redistribution</h3>
-    <p>You may not scrape or redistribute our browser-based tools without written consent.</p>
+    <p className="lead text-lg font-medium text-slate-600 dark:text-slate-300">
+      By accessing or utilizing PDFBolt, you acknowledge and agree to these terms:
+    </p>
+    <h3>1. Free & Unlimited Service</h3>
+    <p>PDFBolt is 100% free for personal, educational, and commercial document workflows. There are no hidden fees, recurring subscriptions, or forced feature paywalls.</p>
+    <h3>2. "As-Is" Document Processing</h3>
+    <p>While PDFBolt employs battle-tested PDF engines and strict regression checks, document processing is provided on an "as-is" and "as-available" basis without warranties of any kind.</p>
+    <h3>3. Prohibited Usage & Automated Scraping</h3>
+    <p>You agree not to reverse engineer, disrupt server integrity, spam automated bot requests, or create deceptive wrappers intended to mislead users or manipulate advertising metrics.</p>
   </PageLayout>
 );
 

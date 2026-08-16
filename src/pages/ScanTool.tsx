@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Camera, RefreshCw, FileText, Download, X, Scan as ScanIcon, Flashlight, CheckCircle2, ChevronLeft, ChevronRight, Plus, Trash2, Zap, ZapOff } from 'lucide-react';
 import { soundEngine } from '../utils/sounds';
+import { useActiveWork } from '../context/ActiveWorkContext';
 
 interface ScanToolProps {
     darkMode: boolean;
@@ -8,6 +9,7 @@ interface ScanToolProps {
 }
 
 const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
+    const { setHasActiveWork } = useActiveWork();
     const videoRef = useRef<HTMLVideoElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [capturedImages, setCapturedImages] = useState<string[]>([]);
@@ -15,6 +17,12 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
     const [loading, setLoading] = useState(false);
     const [processing, setProcessing] = useState(false);
     const [cameraError, setCameraError] = useState<string | null>(null);
+
+    // Sync active work state
+    useEffect(() => {
+        setHasActiveWork(isCameraActive || capturedImages.length > 0);
+        return () => setHasActiveWork(false);
+    }, [isCameraActive, capturedImages.length, setHasActiveWork]);
 
     // Overlay Canvas for detection feedback
     const overlayCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -234,6 +242,21 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
         }
     };
 
+    const applyFilter = (sourceCanvas: HTMLCanvasElement): string => {
+        if (activeFilter === 'none') return sourceCanvas.toDataURL("image/jpeg", 0.95);
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = sourceCanvas.width;
+        tempCanvas.height = sourceCanvas.height;
+        const tctx = tempCanvas.getContext('2d');
+        if (tctx) {
+            if (activeFilter === 'bw') tctx.filter = 'grayscale(100%)';
+            if (activeFilter === 'contrast') tctx.filter = 'contrast(150%) grayscale(100%)';
+            tctx.drawImage(sourceCanvas, 0, 0);
+            tctx.filter = 'none';
+        }
+        return tempCanvas.toDataURL("image/jpeg", 0.95);
+    };
+
     // Capture Image with Perspective Correction
     const captureImage = () => {
         if (!videoRef.current || !canvasRef.current) return;
@@ -251,7 +274,7 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
             try {
                 // Professional Perspective Warp (Extracts perfectly rectangular document)
                 const resultCanvas = scannerRef.current.extractPaper(video, 1200, 1600);
-                const imageData = resultCanvas.toDataURL("image/jpeg", 0.95);
+                const imageData = applyFilter(resultCanvas);
                 setCapturedImages(prev => [...prev, imageData]);
                 setProcessing(false);
                 if (notify && notify.success) notify.success("Document area detected and cropped!");
@@ -266,14 +289,7 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
         canvas.height = video.videoHeight;
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-        if (activeFilter !== 'none') {
-            if (activeFilter === 'bw') ctx.filter = 'grayscale(100%)';
-            if (activeFilter === 'contrast') ctx.filter = 'contrast(150%) grayscale(100%)';
-            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-            ctx.filter = 'none';
-        }
-
-        const imageData = canvas.toDataURL("image/jpeg", 0.9);
+        const imageData = applyFilter(canvas);
         setCapturedImages(prev => [...prev, imageData]);
         setProcessing(false);
         if (notify && notify.success) notify.success("Captured!");

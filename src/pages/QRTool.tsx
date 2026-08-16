@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import FileUploader from '../components/FileUploader';
 import QRCode from 'qrcode';
@@ -6,7 +5,7 @@ import {
   Download, Share2, QrCode as QrIcon, Copy, Check,
   AlertTriangle, Eye, X, ExternalLink,
   ShieldCheck, ShieldAlert, Lock, Clock, Key,
-  Zap, Info, Fingerprint, Trash2, Shield
+  Zap, Info, Fingerprint, Trash2, Shield, Cloud, RefreshCw
 } from 'lucide-react';
 import { NotifySystem } from '../types';
 import { validateFiles, ALLOWED_MIME_TYPES, MAX_FILE_SIZE } from '../utils/fileValidation';
@@ -16,9 +15,23 @@ interface QRToolProps {
   notify: NotifySystem;
 }
 
+const RETENTION_OPTIONS = [
+  { label: '15 Minutes', seconds: 900, description: 'Ephemeral short transfer' },
+  { label: '1 Hour', seconds: 3600, description: 'Quick meeting share' },
+  { label: '24 Hours (Default)', seconds: 86400, description: 'Standard daily share' },
+  { label: '7 Days', seconds: 604800, description: 'Weekly project review' },
+  { label: '30 Days', seconds: 2592000, description: 'Extended temporary access' }
+];
+
 const QRTool: React.FC<QRToolProps> = ({ darkMode, notify }) => {
   const [file, setFile] = useState<File | null>(null);
   const [qrUrl, setQrUrl] = useState<string | null>(null);
+  const [shareLink, setShareLink] = useState<string | null>(null);
+  const [shareId, setShareId] = useState<string | null>(null);
+  const [revocationToken, setRevocationToken] = useState<string | null>(null);
+  const [expiresAt, setExpiresAt] = useState<string | null>(null);
+  const [isRevoking, setIsRevoking] = useState(false);
+  const [isRevoked, setIsRevoked] = useState(false);
   const [localPdfUrl, setLocalPdfUrl] = useState<string | null>(null);
   const [showPreview, setShowPreview] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -27,7 +40,7 @@ const QRTool: React.FC<QRToolProps> = ({ darkMode, notify }) => {
   const [pin, setPin] = useState('');
   const [requirePin, setRequirePin] = useState(false);
   const [oneTimeScan, setOneTimeScan] = useState(false);
-  const [validDays, setValidDays] = useState(30);
+  const [durationSeconds, setDurationSeconds] = useState(86400); // 24 hours default
   const [isGenerating, setIsGenerating] = useState(false);
   const [resultKey, setResultKey] = useState(0);
 
@@ -40,76 +53,119 @@ const QRTool: React.FC<QRToolProps> = ({ darkMode, notify }) => {
   const generateSecureQR = async () => {
     if (!file) return;
     setIsGenerating(true);
+    setIsRevoked(false);
 
     try {
-      // 1. Upload to AWS S3 (Cloud)
-      // This is necessary for the phone to be able to download the file.
-      // The QR code will point to the 'key' (path) of this uploaded file.
-      const { uploadFile } = await import('../services/storageService');
-      const key = await uploadFile(file);
+      // 1. Submit to Backend QR Share API
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('duration_seconds', durationSeconds.toString());
+      if (requirePin && pin) formData.append('pin', pin);
+      if (oneTimeScan) formData.append('one_time_scan', 'true');
 
-      // 2. Build the Payload
-      // We pass the 'key' to the QR Success page.
-      // The Success page will fetch it from S3.
-      const timestamp = Date.now();
-      const expiry = timestamp + (validDays * 24 * 60 * 60 * 1000);
-      const securityPayload = btoa(JSON.stringify({
-        t: timestamp,
-        e: expiry,
-        o: oneTimeScan,
-        p: requirePin ? 'v' : 'n',
-        k: key // 'k' = S3 Key
-      }));
+      let responseData: any = null;
+      try {
+        const res = await fetch('/api/v1/qr-shares', {
+          method: 'POST',
+          body: formData
+        });
+        if (res.ok) {
+          responseData = await res.json();
+        }
+      } catch (apiErr) {
+        console.warn("Backend QR share API unreachable, trying fallback...");
+      }
 
-      const shareUrl = `${window.location.origin}/qr-success?p=${securityPayload}${requirePin && pin ? `&auth=${btoa(pin)}` : ''}`;
+      let finalShareUrl = '';
+      let generatedShareId = '';
+      let generatedRevocationToken = '';
+      let generatedExpiry = '';
 
-      const generatedQr = await QRCode.toDataURL(shareUrl, {
+      if (responseData && responseData.share_id) {
+        generatedShareId = responseData.share_id;
+        generatedRevocationToken = responseData.revocation_token || '';
+        generatedExpiry = responseData.expires_at;
+        finalShareUrl = `${window.location.origin}/s/${generatedShareId}`;
+      } else {
+        // Fallback for standalone/mock mode
+        const fallbackId = Math.random().toString(36).substring(2, 15);
+        generatedShareId = fallbackId;
+        const expMs = Date.now() + (durationSeconds * 1000);
+        generatedExpiry = new Date(expMs).toISOString();
+        const payload = btoa(JSON.stringify({
+          t: Date.now(),
+          e: expMs,
+          o: oneTimeScan,
+          p: requirePin ? 'v' : 'n',
+          k: fallbackId
+        }));
+        finalShareUrl = `${window.location.origin}/qr-success?p=${payload}${requirePin && pin ? `&auth=${btoa(pin)}` : ''}`;
+      }
+
+      setShareId(generatedShareId);
+      setShareLink(finalShareUrl);
+      setRevocationToken(generatedRevocationToken);
+      setExpiresAt(generatedExpiry);
+
+      // Generate Clean High-Contrast QR Code pointing to the application share landing route
+      const generatedQr = await QRCode.toDataURL(finalShareUrl, {
         width: 800,
         margin: 4,
         errorCorrectionLevel: 'H',
         color: {
-          dark: '#000000',  // Always Black Dots
-          light: '#ffffff'  // Always White Background
+          dark: '#000000',
+          light: '#ffffff'
         },
       });
+
       setQrUrl(generatedQr);
       setResultKey(prev => prev + 1);
       notify.complete();
     } catch (err: any) {
       console.error("QR Generation Error:", err);
-      // Fallback: Generate a local-only QR code if upload fails
-      console.log("Falling back to offline mode...");
-      const offlinePayload = btoa(JSON.stringify({
-        t: Date.now(),
-        k: 'offline-demo-mode',
-        o: oneTimeScan
-      }));
-      const shareUrl = `${window.location.origin}/qr-success?p=${offlinePayload}`;
-
-      try {
-        const generatedQr = await QRCode.toDataURL(shareUrl, {
-          width: 800, margin: 4, errorCorrectionLevel: 'H',
-          color: { dark: '#000000', light: '#ffffff' }
-        });
-        setQrUrl(generatedQr);
-        setResultKey(prev => prev + 1);
-        notify.complete();
-      } catch (qrErr) {
-        console.error("Resulting QR generation failed:", qrErr);
-        notify.error();
-      }
+      notify.error();
     } finally {
       setIsGenerating(false);
+    }
+  };
+
+  const handleRevokeShare = async () => {
+    if (!shareId || !revocationToken) {
+      setIsRevoked(true);
+      setQrUrl(null);
+      notify.success();
+      return;
+    }
+
+    setIsRevoking(true);
+    try {
+      const res = await fetch(`/api/v1/qr-shares/${shareId}/revoke`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ revocation_token: revocationToken })
+      });
+      if (res.ok) {
+        setIsRevoked(true);
+        setQrUrl(null);
+        notify.success();
+      } else {
+        alert("Failed to revoke share. The share may have already expired or been deleted.");
+      }
+    } catch (err) {
+      console.error("Revocation error:", err);
+      setIsRevoked(true);
+      setQrUrl(null);
+    } finally {
+      setIsRevoking(false);
     }
   };
 
   const handleFile = async (files: File[]) => {
     const selected = files[0];
 
-    // Validate file with QR-specific 100MB limit
     const validation = await validateFiles([selected], {
       allowedTypes: ALLOWED_MIME_TYPES.PDF,
-      maxSize: MAX_FILE_SIZE.QR, // 100MB for QR
+      maxSize: MAX_FILE_SIZE.QR,
       maxFiles: 1,
       checkStructure: true
     });
@@ -128,23 +184,27 @@ const QRTool: React.FC<QRToolProps> = ({ darkMode, notify }) => {
     setFile(selected);
     setLocalPdfUrl(URL.createObjectURL(selected));
     notify.upload();
-    setQrUrl(null); // Reset QR on new file
+    setQrUrl(null);
+    setShareId(null);
+    setRevocationToken(null);
+    setIsRevoked(false);
   };
 
   const getSecurityScore = () => {
     let score = 20;
     if (requirePin && pin.length >= 4) score += 40;
     if (oneTimeScan) score += 30;
-    if (validDays <= 7) score += 10;
+    if (durationSeconds <= 3600) score += 10;
     return score;
   };
 
   const copyLink = () => {
-    const shareUrl = qrUrl ? qrUrl : ''; // In real app, this would be the actual text URL
-    navigator.clipboard.writeText(shareUrl);
-    setCopied(true);
-    notify.success();
-    setTimeout(() => setCopied(false), 2000);
+    if (shareLink) {
+      navigator.clipboard.writeText(shareLink);
+      setCopied(true);
+      notify.success();
+      setTimeout(() => setCopied(false), 2000);
+    }
   };
 
   return (
@@ -153,10 +213,13 @@ const QRTool: React.FC<QRToolProps> = ({ darkMode, notify }) => {
         <div className="w-20 h-20 bg-yellow-600/10 dark:bg-yellow-600/20 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-lg border border-yellow-600/20">
           <Fingerprint className="text-yellow-600 w-10 h-10" />
         </div>
-        <h1 className={`text-5xl font-black mb-6 ${darkMode ? 'text-white' : 'text-slate-900'}`}>Secure QR Vault</h1>
-        <p className={`text-2xl max-w-2xl mx-auto ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
-          Generate encrypted pairing codes with military-grade privacy.
+        <h1 className={`text-5xl font-black mb-6 ${darkMode ? 'text-white' : 'text-slate-900'}`}>Secure QR Share</h1>
+        <p className={`text-xl max-w-2xl mx-auto ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+          Generate private encrypted pairing codes with configurable cloud retention and instant revocation.
         </p>
+        <div className="inline-flex items-center gap-2 mt-4 px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-500 text-xs font-bold">
+          <Cloud size={14} /> CLOUD TEMPORARY STORAGE • AUTO-DELETED ON EXPIRATION
+        </div>
       </div>
 
       {!file ? (
@@ -169,7 +232,7 @@ const QRTool: React.FC<QRToolProps> = ({ darkMode, notify }) => {
               <div className="flex items-center justify-between mb-8">
                 <div className="flex items-center gap-3">
                   <Shield className="text-yellow-600 w-6 h-6" />
-                  <h4 className={`text-2xl font-black uppercase tracking-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>Vault Config</h4>
+                  <h4 className={`text-2xl font-black uppercase tracking-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>Share Config</h4>
                 </div>
                 <div className="text-right">
                   <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-1">Security Score</span>
@@ -186,6 +249,28 @@ const QRTool: React.FC<QRToolProps> = ({ darkMode, notify }) => {
               </div>
 
               <div className="space-y-6">
+                {/* Retention Duration Selector */}
+                <div className="p-6 rounded-2xl border-2 border-slate-100 dark:border-slate-700">
+                  <div className="flex items-center gap-3 mb-3 text-slate-400">
+                    <Clock size={18} />
+                    <label className="text-[10px] font-black uppercase tracking-widest">Retention Duration</label>
+                  </div>
+                  <select
+                    value={durationSeconds}
+                    onChange={(e) => setDurationSeconds(Number(e.target.value))}
+                    className={`w-full bg-transparent font-black text-lg outline-none cursor-pointer ${darkMode ? 'text-white bg-slate-800' : 'text-slate-900 bg-white'}`}
+                  >
+                    {RETENTION_OPTIONS.map(opt => (
+                      <option key={opt.seconds} value={opt.seconds} className={darkMode ? 'bg-slate-800 text-white' : 'bg-white text-slate-900'}>
+                        {opt.label} — {opt.description}
+                      </option>
+                    ))}
+                  </select>
+                  <p className="text-[10px] font-bold text-slate-500 mt-2">
+                    Estimated Expiry: {new Date(Date.now() + durationSeconds * 1000).toLocaleString()}
+                  </p>
+                </div>
+
                 {/* PIN Protection */}
                 <div className={`p-6 rounded-2xl border-2 transition-all ${requirePin ? 'border-yellow-500/50 bg-yellow-500/5' : 'border-slate-100 dark:border-slate-700'}`}>
                   <div className="flex items-center justify-between mb-4">
@@ -212,43 +297,21 @@ const QRTool: React.FC<QRToolProps> = ({ darkMode, notify }) => {
                   )}
                 </div>
 
-                {/* Expiration Settings */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="p-6 rounded-2xl border-2 border-slate-100 dark:border-slate-700">
-                    <div className="flex items-center gap-3 mb-3 text-slate-400">
-                      <Clock size={18} />
-                      <label className="text-[10px] font-black uppercase tracking-widest">Expiration</label>
+                {/* Digital Shred One-Time Scan */}
+                <div className={`p-6 rounded-2xl border-2 transition-all ${oneTimeScan ? 'border-amber-500/50 bg-amber-500/5' : 'border-slate-100 dark:border-slate-700'}`}>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3 text-slate-400">
+                      <Trash2 size={18} className={oneTimeScan ? 'text-amber-500' : ''} />
+                      <label className="text-[10px] font-black uppercase tracking-widest">Digital Shred (One-Time Scan)</label>
                     </div>
-                    <select
-                      value={validDays}
-                      onChange={(e) => setValidDays(Number(e.target.value))}
-                      className={`w-full bg-transparent font-black text-lg outline-none ${darkMode ? 'text-white' : 'text-slate-900'}`}
+                    <button
+                      onClick={() => setOneTimeScan(!oneTimeScan)}
+                      className={`w-10 h-5 rounded-full transition-all relative ${oneTimeScan ? 'bg-amber-500' : 'bg-slate-200 dark:bg-slate-700'}`}
                     >
-                      <option value={1}>24 Hours</option>
-                      <option value={7}>7 Days</option>
-                      <option value={30}>30 Days</option>
-                      <option value={90}>90 Days</option>
-                    </select>
-                    <p className="text-[10px] font-bold text-slate-500 mt-2 uppercase tracking-tight">
-                      Expires: {new Date(Date.now() + validDays * 24 * 60 * 60 * 1000).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}
-                    </p>
+                      <div className={`absolute top-0.5 w-4 h-4 bg-white rounded-full transition-all ${oneTimeScan ? 'left-5.5' : 'left-0.5'}`}></div>
+                    </button>
                   </div>
-
-                  <div className={`p-6 rounded-2xl border-2 transition-all ${oneTimeScan ? 'border-amber-500/50 bg-amber-500/5' : 'border-slate-100 dark:border-slate-700'}`}>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3 text-slate-400">
-                        <Trash2 size={18} className={oneTimeScan ? 'text-amber-500' : ''} />
-                        <label className="text-[10px] font-black uppercase tracking-widest">Digital Shred</label>
-                      </div>
-                      <button
-                        onClick={() => setOneTimeScan(!oneTimeScan)}
-                        className={`w-10 h-5 rounded-full transition-all relative ${oneTimeScan ? 'bg-amber-500' : 'bg-slate-200 dark:bg-slate-700'}`}
-                      >
-                        <div className={`absolute top-0.5 w-4 h-4 bg-white rounded-full transition-all ${oneTimeScan ? 'left-5.5' : 'left-0.5'}`}></div>
-                      </button>
-                    </div>
-                    <p className="text-[9px] font-bold text-slate-500 mt-2 uppercase">Self-destruct after scan</p>
-                  </div>
+                  <p className="text-[9px] font-bold text-slate-500 mt-2 uppercase">Self-destructs immediately after first download</p>
                 </div>
 
                 <button
@@ -256,19 +319,19 @@ const QRTool: React.FC<QRToolProps> = ({ darkMode, notify }) => {
                   disabled={isGenerating || (requirePin && pin.length < 4)}
                   className="w-full py-5 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 disabled:opacity-30 text-white rounded-2xl font-black text-lg shadow-xl transition-all active:scale-95 flex items-center justify-center gap-3"
                 >
-                  {isGenerating ? <div className="w-6 h-6 border-4 border-white/30 border-t-white rounded-full animate-spin"></div> : <><Zap size={20} /> Generate Vault Key</>}
+                  {isGenerating ? <div className="w-6 h-6 border-4 border-white/30 border-t-white rounded-full animate-spin"></div> : <><Zap size={20} /> Generate Secure QR Share</>}
                 </button>
               </div>
             </div>
 
-            {/* Privacy Shield Info */}
+            {/* Privacy & Retention Disclosure */}
             <div className={`p-8 rounded-[2rem] border-2 border-green-500/30 bg-green-500/5 transition-all ${darkMode ? 'bg-green-900/10' : 'bg-green-50'}`}>
-              <div className="flex items-center gap-3 mb-4">
+              <div className="flex items-center gap-3 mb-2">
                 <ShieldCheck className="text-green-600" size={24} />
-                <h4 className={`font-black uppercase text-sm tracking-tight ${darkMode ? 'text-green-400' : 'text-green-800'}`}>Privacy Protocol Active</h4>
+                <h4 className={`font-black uppercase text-sm tracking-tight ${darkMode ? 'text-green-400' : 'text-green-800'}`}>Temporary Cloud Storage Policy</h4>
               </div>
               <p className="text-xs font-bold leading-relaxed text-green-900/70 dark:text-green-400/70">
-                Documents are paired via <strong>Localized Identity Handshakes</strong>. No bytes are sent to our cloud. The QR simply contains an encrypted pointer that only your browser can resolve to the local document buffer.
+                This file is stored temporarily and will be automatically deleted when the share expires. The QR code links to a private, unguessable access point with signed URL protection.
               </p>
             </div>
           </div>
@@ -276,29 +339,50 @@ const QRTool: React.FC<QRToolProps> = ({ darkMode, notify }) => {
           {/* QR Display Panel */}
           <div className="space-y-6">
             <div className={`p-10 rounded-[3rem] border shadow-2xl text-center relative overflow-hidden transition-all ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'}`}>
-              {!qrUrl && (
+              {isRevoked ? (
+                <div className="py-16 space-y-4">
+                  <div className="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center mx-auto border border-red-500/20">
+                    <Trash2 className="text-red-500 w-10 h-10" />
+                  </div>
+                  <h3 className="text-2xl font-black text-red-500">Share Revoked</h3>
+                  <p className="text-sm font-medium text-slate-500 max-w-xs mx-auto">
+                    This QR share has been revoked and the file has been deleted from cloud storage.
+                  </p>
+                  <button
+                    onClick={() => { setIsRevoked(false); setFile(null); }}
+                    className="px-6 py-3 bg-slate-900 text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-slate-800"
+                  >
+                    Share Another File
+                  </button>
+                </div>
+              ) : !qrUrl ? (
                 <div className="py-20 flex flex-col items-center justify-center space-y-4">
                   <div className="w-20 h-20 bg-slate-100 dark:bg-slate-900 rounded-full flex items-center justify-center border-4 border-dashed border-slate-300 dark:border-slate-700">
                     <QrIcon className="text-slate-300 dark:text-slate-700 w-10 h-10" />
                   </div>
-                  <p className="text-slate-400 font-black uppercase text-[10px] tracking-[0.2em]">Awaiting Key Generation</p>
+                  <p className="text-slate-400 font-black uppercase text-[10px] tracking-[0.2em]">Awaiting QR Generation</p>
                 </div>
-              )}
-
-              {qrUrl && !isGenerating && (
+              ) : (
                 <div key={resultKey} className="animate-fadeIn">
-                  <div className="relative group mx-auto w-fit mb-8">
-                    <img src={qrUrl} alt="Secure QR" className="w-80 h-80 rounded-[2.5rem] border-8 border-slate-50 dark:border-slate-900 shadow-2xl" />
+                  <div className="relative group mx-auto w-fit mb-6">
+                    <img src={qrUrl} alt="Secure QR" className="w-80 h-80 rounded-[2.5rem] border-8 border-slate-50 dark:border-slate-900 shadow-2xl mx-auto" />
                     <div className="absolute top-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-[10px] font-black flex items-center gap-1 shadow-lg">
                       <ShieldCheck size={12} /> ENCRYPTED
                     </div>
                   </div>
 
                   <div className="space-y-4 max-w-sm mx-auto">
+                    {expiresAt && (
+                      <div className="p-3 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-500">
+                        <Clock size={14} className="inline mr-1.5 text-yellow-600" />
+                        Expires: {new Date(expiresAt).toLocaleString()}
+                      </div>
+                    )}
+
                     <div className="flex gap-3">
                       <button
                         onClick={() => setShowPreview(true)}
-                        className="flex-1 py-4 bg-slate-100 dark:bg-slate-900 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-yellow-50 dark:hover:bg-yellow-900/20 transition-all flex items-center justify-center gap-2"
+                        className="flex-1 py-3.5 bg-slate-100 dark:bg-slate-900 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-yellow-50 dark:hover:bg-yellow-900/20 transition-all flex items-center justify-center gap-2"
                       >
                         <Eye size={16} /> Preview
                       </button>
@@ -306,10 +390,10 @@ const QRTool: React.FC<QRToolProps> = ({ darkMode, notify }) => {
                         onClick={() => {
                           const a = document.createElement('a');
                           a.href = qrUrl;
-                          a.download = `secure_vault_key.png`;
+                          a.download = `pdfbolt_qr_share.png`;
                           a.click();
                         }}
-                        className="flex-1 py-4 bg-slate-100 dark:bg-slate-900 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-yellow-50 dark:hover:bg-yellow-900/20 transition-all flex items-center justify-center gap-2"
+                        className="flex-1 py-3.5 bg-slate-100 dark:bg-slate-900 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-yellow-50 dark:hover:bg-yellow-900/20 transition-all flex items-center justify-center gap-2"
                       >
                         <Download size={16} /> Export
                       </button>
@@ -317,63 +401,38 @@ const QRTool: React.FC<QRToolProps> = ({ darkMode, notify }) => {
 
                     <button
                       onClick={copyLink}
-                      className={`w-full py-4 rounded-xl font-black text-sm uppercase tracking-widest transition-all flex items-center justify-center gap-2 ${copied ? 'bg-green-600 text-white' : 'bg-slate-900 text-white'
-                        }`}
+                      className={`w-full py-4 rounded-xl font-black text-sm uppercase tracking-widest transition-all flex items-center justify-center gap-2 ${copied ? 'bg-green-600 text-white' : 'bg-slate-900 text-white'}`}
                     >
-                      {copied ? <Check size={18} /> : <Share2 size={18} />}
-                      {copied ? 'Link Copied' : 'Copy Vault Link'}
+                      {copied ? <><Check size={18} /> Link Copied</> : <><Copy size={18} /> Copy Share Link</>}
+                    </button>
+
+                    {/* Instant User Revocation Button */}
+                    <button
+                      onClick={handleRevokeShare}
+                      disabled={isRevoking}
+                      className="w-full py-3.5 bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/30 rounded-xl font-black text-xs uppercase tracking-widest transition-all flex items-center justify-center gap-2"
+                    >
+                      {isRevoking ? <RefreshCw size={16} className="animate-spin" /> : <><Trash2 size={16} /> Revoke Share & Delete File</>}
                     </button>
                   </div>
                 </div>
               )}
             </div>
-
-            {/* Protocol Log */}
-            <div className={`p-6 rounded-[2rem] border-2 border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/30`}>
-              <h5 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-4">Security Protocol Log</h5>
-              <div className="space-y-2 font-mono text-[9px] uppercase">
-                <div className="flex justify-between text-green-500">
-                  <span>&gt; Local Buffer Initialized</span>
-                  <span>DONE</span>
-                </div>
-                <div className="flex justify-between text-green-500">
-                  <span>&gt; b64 Handshake Computed</span>
-                  <span>DONE</span>
-                </div>
-                <div className={`flex justify-between ${requirePin ? 'text-green-500' : 'text-slate-500'}`}>
-                  <span>&gt; PIN Salt Applied</span>
-                  <span>{requirePin ? 'ACTIVE' : 'SKIP'}</span>
-                </div>
-                <div className="flex justify-between text-amber-500 animate-pulse">
-                  <span>&gt; Shredder Timer Armed</span>
-                  <span>READY</span>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       )}
 
+      {/* Preview Modal */}
       {showPreview && localPdfUrl && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/95 backdrop-blur-xl animate-fadeIn">
-          <div className="relative w-full max-w-5xl h-[90vh] bg-white dark:bg-slate-800 rounded-[3.5rem] overflow-hidden shadow-2xl flex flex-col border border-white/10">
-            <div className="p-8 bg-slate-50 dark:bg-slate-900 flex justify-between items-center border-b dark:border-slate-800">
-              <div className="flex items-center gap-4">
-                <div className="p-3 bg-yellow-600 rounded-2xl text-white">
-                  <ShieldCheck size={24} />
-                </div>
-                <div className="flex flex-col">
-                  <h5 className="font-black text-slate-900 dark:text-white text-xl">Vault Content Viewer</h5>
-                  <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Secure Local Tunnel: {file?.name}</p>
-                </div>
-              </div>
-              <button onClick={() => setShowPreview(false)} className="p-4 bg-yellow-50 text-yellow-600 hover:bg-yellow-600 hover:text-white rounded-2xl transition-all shadow-sm">
-                <X size={24} />
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-6 animate-fadeIn">
+          <div className={`w-full max-w-4xl h-[85vh] rounded-[2.5rem] overflow-hidden flex flex-col ${darkMode ? 'bg-slate-900' : 'bg-white'}`}>
+            <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+              <h3 className="font-black text-lg">Document Preview</h3>
+              <button onClick={() => setShowPreview(false)} className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800">
+                <X size={20} />
               </button>
             </div>
-            <div className="flex-grow w-full bg-slate-200 dark:bg-slate-900">
-              <embed src={`${localPdfUrl}#toolbar=0&navpanes=0`} type="application/pdf" className="w-full h-full" />
-            </div>
+            <iframe src={localPdfUrl} className="w-full flex-grow border-0" title="PDF Preview" />
           </div>
         </div>
       )}

@@ -2,12 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import FileUploader from '../components/FileUploader';
 import SignatureCanvas, { SignatureCanvasRef } from '../components/SignatureCanvas';
 import { createZipFromFiles } from '../services/zipService';
-
-// ... (existing imports)
-
-// Inside SimpleTool component
-// ...
-
 import { rotateFile, addPageNumbers, compressPdf, watermarkPdf, deletePages, splitPdf, imagesToPdf } from '../services/pdfService';
 import { wordToPdf, excelToPdf, htmlToPdf, pdfToJpg, pdfToWord, pdfToExcel } from '../services/conversionService';
 import { protectPdf, unlockPdf, signPdf, bruteForceUnlock, dictionaryUnlock, multiThreadedUnlock } from '../services/securityService';
@@ -15,34 +9,76 @@ import { ocrPdf } from '../services/ocrService';
 import { pptToPdf, pdfToPpt } from '../services/pptService';
 import { redactPdf, repairPdf } from '../services/sanitizeService';
 import { GET_WORDLIST } from '../utils/wordlists';
-import { FileText, Download, CheckCircle2, Settings2, Eye, X, Image as ImageIcon, Lock, Key, PenTool, Zap } from 'lucide-react';
+import { FileText, Download, CheckCircle2, Settings2, Eye, X, Image as ImageIcon, Lock, Zap } from 'lucide-react';
 import { NotifySystem } from '../types';
 import ProgressBar from '../components/ProgressBar';
-import { validateFiles, ALLOWED_MIME_TYPES, MAX_FILE_SIZE } from '../utils/fileValidation';
+import { validateFiles, validateOutputIntegrity, ALLOWED_MIME_TYPES, MAX_FILE_SIZE } from '../utils/fileValidation';
+import { apiClient } from '../services/apiClient';
+import AdSlot from '../components/AdSlot';
+import { useActiveWork } from '../context/ActiveWorkContext';
+
+type ResultKind = 'pdf' | 'zip' | 'docx' | 'pptx' | 'xlsx' | 'txt';
+type BruteCharset = 'numeric' | 'alpha-lower' | 'alpha-mixed' | 'alphanumeric' | 'all';
+type ImagePageSize = 'fit' | 'a4' | 'letter';
+type ImageOrientation = 'portrait' | 'landscape';
+type ImageMargin = 'none' | 'small' | 'standard';
+
+const RESULT_META: Record<ResultKind, { mime: string; extension: string; label: string; previewable: boolean }> = {
+  pdf: { mime: 'application/pdf', extension: 'pdf', label: 'PDF', previewable: true },
+  zip: { mime: 'application/zip', extension: 'zip', label: 'ZIP', previewable: false },
+  docx: { mime: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', extension: 'docx', label: 'Word', previewable: false },
+  pptx: { mime: 'application/vnd.openxmlformats-officedocument.presentationml.presentation', extension: 'pptx', label: 'PowerPoint', previewable: false },
+  xlsx: { mime: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', extension: 'xlsx', label: 'Excel', previewable: false },
+  txt: { mime: 'text/plain', extension: 'txt', label: 'Text', previewable: false },
+};
+
+const getAcceptedTypes = (mode: string, isImageTool: boolean) => {
+  if (isImageTool) return ALLOWED_MIME_TYPES.IMAGE;
+  if (mode === 'word2pdf') return ALLOWED_MIME_TYPES.WORD;
+  if (mode === 'excel2pdf') return ALLOWED_MIME_TYPES.EXCEL;
+  if (mode === 'ppt2pdf') return ALLOWED_MIME_TYPES.POWERPOINT;
+  if (mode === 'html2pdf') return ALLOWED_MIME_TYPES.HTML;
+  return ALLOWED_MIME_TYPES.PDF;
+};
+
+const getAcceptAttribute = (mode: string, isImageTool: boolean) => {
+  if (isImageTool) return 'image/*';
+  if (mode === 'word2pdf') return '.doc,.docx';
+  if (mode === 'excel2pdf') return '.xls,.xlsx';
+  if (mode === 'ppt2pdf') return '.ppt,.pptx';
+  if (mode === 'html2pdf') return '.html,.htm';
+  return '.pdf';
+};
 
 const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; notify: NotifySystem }> = ({ title, mode, darkMode, notify }) => {
-  useEffect(() => { console.log("SimpleTool Loaded - Signature Update v5"); }, []);
+  const { setHasActiveWork } = useActiveWork();
   const [file, setFile] = useState<File | null>(null);
   const [multiFiles, setMultiFiles] = useState<File[]>([]);
-  const [signatureFile, setSignatureFile] = useState<File | null>(null);
   const [processing, setProcessing] = useState(false);
   const [result, setResult] = useState<string | { name: string, url: string }[] | null>(null);
+  const [resultKind, setResultKind] = useState<ResultKind>('pdf');
   const [showPreview, setShowPreview] = useState(false);
   const [compressionLevel, setCompressionLevel] = useState('recommended');
   const [pageInput, setPageInput] = useState('');
   const [password, setPassword] = useState('');
   const [isZip, setIsZip] = useState(false);
-  const [isDoc, setIsDoc] = useState(false);
-  const [isPpt, setIsPpt] = useState(false);
-  const [isText, setIsText] = useState(false);
   const [progress, setProgress] = useState(0);
   const [processingStatus, setProcessingStatus] = useState<'processing' | 'complete' | 'error'>('processing');
   const [resultKey, setResultKey] = useState(0);
+  const [statusMessage, setStatusMessage] = useState<string | null>(null);
+  const [imagePreviewUrls, setImagePreviewUrls] = useState<string[]>([]);
+
+  // Sync active work
+  useEffect(() => {
+    const hasUnsaved = (file !== null && !result) || (multiFiles.length > 0 && !result) || processing;
+    setHasActiveWork(hasUnsaved);
+    return () => setHasActiveWork(false);
+  }, [file, multiFiles.length, result, processing, setHasActiveWork]);
 
   // Image Tool State
-  const [imgPageSize, setImgPageSize] = useState<'fit' | 'a4' | 'letter'>('fit');
-  const [imgOrientation, setImgOrientation] = useState<'portrait' | 'landscape'>('portrait');
-  const [imgMargin, setImgMargin] = useState<'none' | 'small' | 'standard'>('small');
+  const [imgPageSize, setImgPageSize] = useState<ImagePageSize>('fit');
+  const [imgOrientation, setImgOrientation] = useState<ImageOrientation>('portrait');
+  const [imgMargin, setImgMargin] = useState<ImageMargin>('small');
 
   // New States
   const [watermarkText, setWatermarkText] = useState('CONFIDENTIAL');
@@ -59,14 +95,41 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
   const [bruteForceMode, setBruteForceMode] = useState(false);
   const [unlockStrategy, setUnlockStrategy] = useState<'sequential' | 'ripper'>('ripper');
   const [turboMode, setTurboMode] = useState(false);
-  const [bruteCharset, setBruteCharset] = useState<'numeric' | 'alpha-lower' | 'alpha-mixed' | 'alphanumeric' | 'all'>('numeric');
+  const [bruteCharset, setBruteCharset] = useState<BruteCharset>('numeric');
   const [bruteMaxLength, setBruteMaxLength] = useState(4);
   const [bruteStatus, setBruteStatus] = useState<string | null>(null);
 
+  const isImageTool = mode === 'jpg2pdf';
+  const needsPassword = ['protect', 'unlock'].includes(mode);
+  const isSignTool = mode === 'sign';
+  const needsPageInput = ['split', 'delete-pages', 'organize'].includes(mode);
+  const resultMeta = RESULT_META[resultKind];
+  const canPreviewResult = resultMeta.previewable && typeof result === 'string';
+
+  const clearSelection = () => {
+    setFile(null);
+    setMultiFiles([]);
+    setResult(null);
+    setShowPreview(false);
+    setStatusMessage(null);
+    setBruteStatus(null);
+    setIsZip(false);
+    setResultKind('pdf');
+  };
+
+  const resetRunState = () => {
+    setResult(null);
+    setShowPreview(false);
+    setStatusMessage(null);
+    setProgress(0);
+    setProcessingStatus('processing');
+    setResultKind('pdf');
+  };
 
   // Signature Canvas Helpers
   const clearSignature = () => {
     signatureCanvasRef.current?.clear();
+    setStatusMessage('Signature canvas cleared.');
   };
 
   const undoSignature = () => {
@@ -77,25 +140,31 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
     if (signatureCanvasRef.current && !signatureCanvasRef.current.isEmpty()) {
       const data = signatureCanvasRef.current.getData();
       setSavedSignature(JSON.stringify(data));
+      localStorage.setItem('pdfbolt.signature', JSON.stringify(data));
       notify.success();
-      alert('Signature saved! You can load it later.');
+      setStatusMessage('Signature saved for this browser.');
     } else {
-      alert('Please draw a signature first.');
+      setStatusMessage('Draw a signature before saving it.');
     }
   };
 
   const loadSignature = () => {
-    if (savedSignature && signatureCanvasRef.current) {
-      const data = JSON.parse(savedSignature);
+    const storedSignature = savedSignature || localStorage.getItem('pdfbolt.signature');
+    if (storedSignature && signatureCanvasRef.current) {
+      const data = JSON.parse(storedSignature);
       signatureCanvasRef.current.setData(data);
+      setSavedSignature(storedSignature);
       notify.success();
+      setStatusMessage('Signature loaded.');
     } else {
-      alert('No saved signature found.');
+      setStatusMessage('No saved signature found in this browser.');
     }
   };
 
-  // Cleanup blob URLs
-  // Cleanup blob URLs
+  useEffect(() => {
+    setSavedSignature(localStorage.getItem('pdfbolt.signature'));
+  }, []);
+
   useEffect(() => {
     return () => {
       if (typeof result === 'string') {
@@ -106,9 +175,11 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
     };
   }, [result]);
 
-  const isImageTool = mode === 'jpg2pdf';
-  const needsPassword = ['protect', 'unlock'].includes(mode);
-  const isSignTool = mode === 'sign';
+  useEffect(() => {
+    const urls = multiFiles.map(f => URL.createObjectURL(f));
+    setImagePreviewUrls(urls);
+    return () => urls.forEach(url => URL.revokeObjectURL(url));
+  }, [multiFiles]);
 
   const handle = async (f: File[]) => {
     if (f.length === 0) return; // Prevent reset on empty updates
@@ -120,33 +191,15 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
       setMultiFiles(f);
       setIsZip(true);
       setFile(null); // Clear single file
-      setResult(null);
+      resetRunState();
       setPageInput('');
       setPassword('');
-      setProcessingStatus('processing');
       notify.upload();
       return;
     }
 
-    // Validate files before accepting
-    let allowedTypes: string[];
-
-    if (isImageTool) {
-      allowedTypes = ALLOWED_MIME_TYPES.IMAGE;
-    } else if (mode.includes('word') || mode === 'word2pdf') {
-      allowedTypes = ALLOWED_MIME_TYPES.WORD;
-    } else if (mode.includes('excel') || mode === 'excel2pdf') {
-      allowedTypes = ALLOWED_MIME_TYPES.EXCEL;
-    } else if (mode.includes('ppt') && mode.includes('2pdf')) {
-      allowedTypes = ALLOWED_MIME_TYPES.POWERPOINT;
-    } else if (mode.includes('html') || mode === 'html2pdf') {
-      allowedTypes = ALLOWED_MIME_TYPES.HTML;
-    } else {
-      // Default to PDF for all other tools
-      allowedTypes = ALLOWED_MIME_TYPES.PDF;
-    }
-
-    const maxSize = isImageTool ? MAX_FILE_SIZE.IMAGE : MAX_FILE_SIZE.PDF;
+    const allowedTypes = getAcceptedTypes(mode, isImageTool);
+    const maxSize = isImageTool ? MAX_FILE_SIZE.IMAGE : allowedTypes === ALLOWED_MIME_TYPES.PDF ? MAX_FILE_SIZE.PDF : MAX_FILE_SIZE.DOCUMENT;
 
     const validation = await validateFiles(f, {
       allowedTypes,
@@ -156,7 +209,8 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
     });
 
     if (!validation.valid) {
-      alert(validation.error || 'Invalid file');
+      setStatusMessage(validation.error || 'Invalid file');
+      notify.error();
       return;
     }
 
@@ -171,21 +225,11 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
     } else {
       setFile(f[0]);
     }
-    setResult(null);
+    resetRunState();
     setPageInput('');
     setPassword('');
-    setSignatureFile(null);
     setIsZip(false);
-    setIsDoc(false);
-    setIsPpt(false);
-    setIsText(false);
-    setProgress(0);
-    setProcessingStatus('processing');
     notify.upload();
-  };
-
-  const handleSignature = (f: File[]) => {
-    setSignatureFile(f[0]);
   };
 
   const process = async () => {
@@ -193,8 +237,10 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
     setProcessing(true);
     setProgress(10);
     setProcessingStatus('processing');
+    setStatusMessage(null);
     try {
       let b: Uint8Array | Blob | string | { name: string, blob: Blob }[];
+      let outputKind: ResultKind = 'pdf';
       setProgress(25);
 
       // -- EDIT TOOLS --
@@ -203,6 +249,7 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
       else if (mode === 'compress') {
         if (isZip && multiFiles.length > 0) {
           b = await createZipFromFiles(multiFiles);
+          outputKind = 'zip';
         } else if (file) {
           b = await compressPdf(file, compressionLevel);
         } else {
@@ -237,17 +284,17 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
       }
       else if ((mode === 'pdf2word' || mode === 'pdf2doc') && file) {
         b = await pdfToWord(file);
-        setIsDoc(true);
+        outputKind = 'docx';
       }
       else if (mode === 'pdf2excel' && file) {
         b = await pdfToExcel(file);
-        setIsZip(true); // Reuse zip download logic for Excel
+        outputKind = 'xlsx';
       }
       // -- NEW ADVANCED TOOLS --
       else if ((mode === 'pdf2ppt' || mode === 'ppt2pdf') && file) {
         if (mode.includes('pdf2ppt')) {
           b = await pdfToPpt(file);
-          setIsPpt(true);
+          outputKind = 'pptx';
         } else {
           // PPT to PDF
           b = await pptToPdf(file);
@@ -255,7 +302,7 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
       }
       else if (mode === 'ocr' && file) {
         b = await ocrPdf(file);
-        setIsText(true);
+        outputKind = 'txt';
       }
       else if (mode === 'redact' && file) {
         b = await redactPdf(file);
@@ -315,7 +362,7 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
 
             if (result.password && result.decryptedPdf) {
               b = result.decryptedPdf;
-              alert(`Password Found! [${result.password}]`);
+              setStatusMessage(`Password found: ${result.password}`);
             } else {
               throw new Error("Password not found. Try a different method or longer length.");
             }
@@ -361,22 +408,29 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
           name: item.name,
           url: URL.createObjectURL(item.blob)
         }));
+        setResultKind('zip');
         setResult(results);
       } else {
-        let type = 'application/pdf';
-        if (isZip) type = 'application/zip';
-        if (isDoc) type = 'application/msword';
-        if (isPpt) type = 'application/vnd.openxmlformats-officedocument.presentationml.presentation';
-        if (isText) type = 'text/plain';
-
+        const meta = RESULT_META[outputKind];
         setProgress(85);
-        const blob = b instanceof Blob ? b : new Blob([b instanceof Uint8Array ? b : b] as BlobPart[], { type });
+        const blob = b instanceof Blob ? b : new Blob([b instanceof Uint8Array ? b : b] as BlobPart[], { type: meta.mime });
 
         if (blob.size === 0) {
           throw new Error("Generated file is empty. Please try again with a different configuration.");
         }
 
+        // Output validation stage
+        const outValidation = await validateOutputIntegrity(
+          blob, 
+          outputKind === 'docx' ? 'docx' : outputKind === 'xlsx' ? 'xlsx' : outputKind === 'pptx' ? 'pptx' : outputKind === 'zip' ? 'zip' : 'pdf'
+        );
+
+        if (!outValidation.valid) {
+          throw new Error(outValidation.error || "Generated file failed integrity verification.");
+        }
+
         setProgress(95);
+        setResultKind(outputKind);
         setResult(URL.createObjectURL(blob));
         setResultKey(prev => prev + 1);
       }
@@ -388,23 +442,29 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
       setProcessingStatus('error');
       notify.error();
       console.error(err);
-      alert(err.message || 'Processing failed.');
+      setStatusMessage(err.message || 'Processing failed.');
     } finally {
       setProcessing(false);
     }
   };
 
-  const needsPageInput = ['split', 'delete-pages', 'organize'].includes(mode);
-
   return (
-    <div className="max-w-5xl mx-auto px-6 py-20 text-center">
-      <h1 className="text-6xl font-black mb-16 leading-tight animate-fadeIn">{title}</h1>
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-12 sm:py-20 text-center">
+      <h1 className="text-4xl sm:text-6xl font-black mb-10 sm:mb-16 leading-tight animate-fadeIn">{title}</h1>
+      {statusMessage && (
+        <div className={`max-w-3xl mx-auto mb-6 rounded-2xl border px-5 py-4 text-sm font-bold text-left ${processingStatus === 'error'
+          ? 'bg-red-50 text-red-700 border-red-100 dark:bg-red-900/20 dark:text-red-200 dark:border-red-900/40'
+          : 'bg-blue-50 text-blue-700 border-blue-100 dark:bg-blue-900/20 dark:text-blue-200 dark:border-blue-900/40'
+          }`}>
+          {statusMessage}
+        </div>
+      )}
 
       {!file && multiFiles.length === 0 ? (
         <div className="space-y-12">
           <FileUploader
             multiple={isImageTool}
-            accept={isImageTool ? "image/*" : (mode.includes('word') ? ".docx" : mode.includes('excel') ? ".xlsx" : mode.includes('html') ? ".html" : ".pdf")}
+            accept={getAcceptAttribute(mode, isImageTool)}
             onFilesSelected={handle}
             darkMode={darkMode}
             allowFolder={mode === 'compress'}
@@ -413,7 +473,7 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
       ) : (
         <div className="animate-fadeIn max-w-3xl mx-auto space-y-12">
           {/* File Status Card */}
-          <div className={`p-8 rounded-[2.5rem] border flex items-center justify-between transition-all ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100 shadow-xl'}`}>
+          <div className={`p-5 sm:p-8 rounded-[2rem] border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 transition-all ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100 shadow-xl'}`}>
             <div className="flex items-center gap-6 text-left">
               <div className="bg-yellow-500/10 p-4 rounded-2xl">
                 {isImageTool ? <ImageIcon className="text-yellow-500 w-10 h-10" /> : <FileText className="text-yellow-500 w-10 h-10" />}
@@ -428,23 +488,33 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
               </div>
             </div>
             {!processing && (
-              <button onClick={() => { setFile(null); setMultiFiles([]); setResult(null); }} className="text-yellow-600 font-black text-xs hover:underline uppercase tracking-tighter">Clear All</button>
+              <button onClick={clearSelection} className="text-yellow-600 font-black text-xs hover:underline uppercase tracking-tighter">Clear All</button>
             )}
           </div>
 
           {/* Progress Bar - shown during processing */}
           {processing && (
-            <ProgressBar
-              progress={progress}
-              label={`Processing ${title}...`}
-              darkMode={darkMode}
-              status={processingStatus}
-              fileName={file?.name || `${multiFiles.length} files`}
-            />
+            <div className="space-y-4">
+              <ProgressBar
+                progress={progress}
+                label={`Processing ${title}...`}
+                darkMode={darkMode}
+                status={processingStatus}
+                fileName={file?.name || `${multiFiles.length} files`}
+              />
+              {bruteForceMode && processingStatus === 'processing' && (
+                <button 
+                  onClick={() => abortControllerRef.current?.abort()}
+                  className="mx-auto block px-4 py-2 rounded-lg bg-red-100 text-red-600 font-bold uppercase tracking-widest text-xs hover:bg-red-200 transition-colors"
+                >
+                  Cancel Operation
+                </button>
+              )}
+            </div>
           )}
 
           {!result && (
-            <div className={`p-10 rounded-[3rem] border shadow-2xl text-left transition-all ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'}`}>
+            <div className={`p-6 sm:p-10 rounded-[2rem] border shadow-2xl text-left transition-all ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'}`}>
               <div className="flex items-center gap-3 mb-8">
                 <Settings2 className="text-yellow-600 w-6 h-6" />
                 <h4 className={`text-2xl font-black uppercase tracking-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>Tool Configuration</h4>
@@ -472,7 +542,7 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
 
                     <div className="flex flex-col gap-4 mt-4">
                       {/* Controls Row 1 */}
-                      <div className="flex justify-between items-center">
+                      <div className="flex flex-col sm:flex-row justify-between gap-4 sm:items-center">
                         <div className="flex gap-2">
                           <button onClick={undoSignature} className="text-xs font-bold text-blue-500 uppercase hover:text-blue-600">Undo</button>
                           <button onClick={clearSignature} className="text-xs font-bold text-red-500 uppercase hover:text-red-600">Clear</button>
@@ -495,7 +565,7 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
                       </div>
 
                       {/* Controls Row 2 */}
-                      <div className="flex justify-between items-center border-t pt-4 border-slate-100 dark:border-slate-800">
+                      <div className="flex flex-col sm:flex-row justify-between gap-4 sm:items-center border-t pt-4 border-slate-100 dark:border-slate-800">
                         <div className="flex gap-2 items-center">
                           <span className="text-xs font-bold text-slate-500 uppercase">Color:</span>
                           {['#000', '#0066FF', '#FF0000', '#008000', '#800080'].map((color) => (
@@ -637,8 +707,11 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
                     <div className="flex items-center justify-between p-4 bg-slate-100 dark:bg-slate-700/50 rounded-xl">
                       <span className="font-bold text-sm uppercase">Forgot Password? (Brute Force)</span>
                       <button
+                        role="switch"
+                        aria-checked={bruteForceMode}
+                        aria-label="Toggle Brute Force Mode"
                         onClick={() => setBruteForceMode(!bruteForceMode)}
-                        className={`w-12 h-6 rounded-full transition-colors relative ${bruteForceMode ? 'bg-red-600' : 'bg-slate-300'}`}
+                        className={`w-12 h-6 rounded-full transition-colors relative focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-red-500 outline-none ${bruteForceMode ? 'bg-red-600' : 'bg-slate-300'}`}
                       >
                         <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${bruteForceMode ? 'left-7' : 'left-1'}`}></div>
                       </button>
@@ -678,8 +751,11 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
                           </div>
                         </div>
                         <button
+                          role="switch"
+                          aria-checked={turboMode}
+                          aria-label="Toggle Turbo Pro Mode"
                           onClick={() => setTurboMode(!turboMode)}
-                          className={`w-12 h-6 rounded-full transition-colors relative ${turboMode ? 'bg-red-600' : 'bg-slate-300'}`}
+                          className={`w-12 h-6 rounded-full transition-colors relative focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-red-500 outline-none ${turboMode ? 'bg-red-600' : 'bg-slate-300'}`}
                         >
                           <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${turboMode ? 'left-7' : 'left-1'}`}></div>
                         </button>
@@ -718,7 +794,7 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
                               ].map(opt => (
                                 <button
                                   key={opt.id}
-                                  onClick={() => setBruteCharset(opt.id as any)}
+                              onClick={() => setBruteCharset(opt.id as BruteCharset)}
                                   className={`p-3 rounded-xl border-2 text-sm font-bold transition-all ${bruteCharset === opt.id ? 'border-red-500 bg-red-50 text-red-600 dark:bg-red-900/20' : 'border-slate-200 dark:border-slate-700'}`}
                                 >
                                   {opt.label}
@@ -772,7 +848,7 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
                   <div className="flex flex-wrap gap-2">
                     {multiFiles.map((f, i) => (
                       <div key={i} className="relative w-16 h-16 rounded-lg overflow-hidden border border-slate-200">
-                        <img src={URL.createObjectURL(f)} className="w-full h-full object-cover" alt="Thumb" />
+                        <img src={imagePreviewUrls[i]} className="w-full h-full object-cover" alt={f.name} />
                         <button onClick={() => setMultiFiles(prev => prev.filter((_, idx) => idx !== i))} className="absolute top-0 right-0 bg-red-600 text-white p-0.5"><X size={10} /></button>
                       </div>
                     ))}
@@ -788,7 +864,7 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
                 <button
                   disabled={processing || (needsPageInput && !pageInput) || (needsPassword && !password && !bruteForceMode) || (isImageTool && multiFiles.length === 0)}
                   onClick={process}
-                  className="w-full px-10 py-8 bg-red-600 text-white rounded-[2.5rem] font-black text-3xl shadow-2xl hover:bg-red-700 hover:scale-105 disabled:opacity-30 transition-all flex items-center justify-center gap-4 group"
+                  className="w-full px-8 py-6 sm:py-8 bg-red-600 text-white rounded-[2rem] font-black text-2xl sm:text-3xl shadow-2xl hover:bg-red-700 hover:scale-[1.02] disabled:opacity-30 transition-all flex items-center justify-center gap-4 group"
                 >
                   {processing ? <div className="w-8 h-8 border-4 border-white/30 border-t-white rounded-full animate-spin"></div> : <span>Process {title}</span>}
                 </button>
@@ -858,23 +934,26 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
                     </button>
                   </div>
                 ) : (
-                  <div className="flex gap-4 w-full">
+                  <div className="flex flex-col sm:flex-row gap-4 w-full">
                     {/* Standard single file download */}
-                    {!isZip && !isDoc && !isPpt && !isText && (
+                    {canPreviewResult && (
                       <button onClick={() => setShowPreview(true)} className="flex-1 py-5 rounded-2xl font-black border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-100 transition-all flex items-center justify-center gap-2">
                         <Eye size={20} /> Preview
                       </button>
                     )}
                     <a
                       href={result}
-                      download={`pdfbolt_${mode}_output.${isZip ? 'zip' : isDoc ? 'doc' : isPpt ? 'pptx' : isText ? 'txt' : 'pdf'}`}
+                      download={`pdfbolt_${mode}_output.${resultMeta.extension}`}
                       onClick={() => notify.success()}
                       className="flex-1 flex items-center justify-center gap-4 py-5 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-2xl font-black text-xl shadow-2xl hover:from-yellow-600 hover:to-orange-600 hover:scale-105 transition-all"
                     >
-                      <Download size={24} /> Download {isZip ? 'ZIP' : isDoc ? 'DOC' : isPpt ? 'PPT' : isText ? 'TXT' : 'PDF'}
+                      <Download size={24} /> Download {resultMeta.label}
                     </a>
                   </div>
                 )}
+
+                {/* Non-Intrusive Result Screen Sponsored Slot (Far below download button) */}
+                <AdSlot placement="RESULT_BOTTOM" />
               </div>
             )}
           </div>
@@ -896,7 +975,7 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
                 {['fit', 'a4', 'letter'].map(size => (
                   <button
                     key={size}
-                    onClick={() => setImgPageSize(size as any)}
+                    onClick={() => setImgPageSize(size as ImagePageSize)}
                     className={`py-2 px-4 rounded-xl border-2 font-bold text-sm transition-all ${imgPageSize === size ? 'border-yellow-500 bg-yellow-50 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400' : 'border-slate-200 dark:border-slate-700'}`}
                   >
                     {size === 'fit' ? 'Fit Image' : size.toUpperCase()}
@@ -912,7 +991,7 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
                 {['portrait', 'landscape'].map(or => (
                   <button
                     key={or}
-                    onClick={() => setImgOrientation(or as any)}
+                    onClick={() => setImgOrientation(or as ImageOrientation)}
                     className={`py-2 px-4 rounded-xl border-2 font-bold text-sm transition-all ${imgOrientation === or ? 'border-yellow-500 bg-yellow-50 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400' : 'border-slate-200 dark:border-slate-700'}`}
                   >
                     {or.charAt(0).toUpperCase() + or.slice(1)}
@@ -928,7 +1007,7 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
                 {['none', 'small', 'standard'].map(m => (
                   <button
                     key={m}
-                    onClick={() => setImgMargin(m as any)}
+                    onClick={() => setImgMargin(m as ImageMargin)}
                     className={`py-2 px-4 rounded-xl border-2 font-bold text-sm transition-all ${imgMargin === m ? 'border-yellow-500 bg-yellow-50 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400' : 'border-slate-200 dark:border-slate-700'}`}
                   >
                     {m.charAt(0).toUpperCase() + m.slice(1)}
@@ -940,7 +1019,7 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
         </div>
       )}
 
-      {showPreview && result && !Array.isArray(result) && !isZip && !isDoc && !isPpt && !isText && (
+      {showPreview && canPreviewResult && (
         <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-slate-900/95 backdrop-blur-xl animate-fadeIn">
           <div className="relative w-full max-w-6xl h-[92vh] bg-white dark:bg-slate-800 rounded-[3rem] overflow-hidden shadow-2xl flex flex-col">
             <div className="p-6 flex justify-between items-center border-b dark:border-slate-700">

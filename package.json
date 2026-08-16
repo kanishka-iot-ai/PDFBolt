@@ -1,23 +1,20 @@
 {
-  "name": "pdfmaster---pro-pdf-toolkit",
+  "name": "pdfbolt-pro",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "test": "vitest",
-    "build:docker": "docker build -t pdfmaster-pro .",
-    "docker:run": "docker run -d -p 80:80 --name pdfmaster pdfmaster-pro",
-    "docker:stop": "docker stop pdfmaster && docker rm pdfmaster",
+    "build:docker": "docker build -t pdfbolt-pro .",
+    "docker:run": "docker run -d -p 80:80 --name pdfbolt pdfbolt-pro",
+    "docker:stop": "docker stop pdfbolt && docker rm pdfbolt",
     "deploy:docker": "npm run build:docker && npm run docker:run",
     "clean": "rm -rf dist node_modules"
   },
   "dependencies": {
-    "@aws-sdk/client-cloudfront": "^3.989.0",
-    "@aws-sdk/client-s3": "^3.500.0",
-    "@aws-sdk/s3-request-presigner": "^3.986.0",
     "@emailjs/browser": "^4.4.1",
     "@google/genai": "^1.38.0",
     "docx": "^9.5.1",
@@ -32,7 +29,6 @@
     "pdf-lib": "1.17.1",
     "pdf-lib-plus-encrypt": "^1.1.0",
     "pdfjs-dist": "^4.0.379",
-    "pptxgenjs": "^3.12.0",
     "qrcode": "1.5.4",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
@@ -41,8 +37,7 @@
     "save": "^2.9.0",
     "signature_pad": "^5.1.3",
     "tailwindcss-animate": "^1.0.7",
-    "tesseract.js": "^5.0.0",
-    "xlsx": "^0.18.5"
+    "tesseract.js": "^5.0.0"
   },
   "devDependencies": {
     "@testing-library/dom": "^10.4.1",
@@ -61,5 +56,8 @@
     "typescript": "~5.8.2",
     "vite": "^6.2.0",
     "vitest": "^4.0.18"
+  },
+  "overrides": {
+    "uuid": "^11.1.1"
   }
 }

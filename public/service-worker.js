@@ -7,7 +7,10 @@ const CACHE_NAME = 'pdfbolt-v1.0.0';
 const STATIC_ASSETS = [
     '/',
     '/index.html',
-    '/logo.jpg',
+    '/pdfbolt-logo-transparent.png',
+    '/favicon.ico',
+    '/favicon-32x32.png',
+    '/apple-touch-icon.png',
     '/manifest.json',
     '/lib/opencv.js',
     '/lib/jscanify.min.js',

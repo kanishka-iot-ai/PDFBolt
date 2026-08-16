@@ -1,0 +1,33 @@
+# 301 Permanent SEO Redirects for Canonical URL Consolidation
+/merge                  /merge-pdf                  301!
+/split                  /split-pdf                  301!
+/compress               /compress-pdf               301!
+/pdf-analyzer           /analyze-pdf                301!
+/analyze                /analyze-pdf                301!
+/tools/pdf-analyzer     /analyze-pdf                301!
+/pdf-editor             /edit-pdf                   301!
+/edit                   /edit-pdf                   301!
+/qr-pdf-share           /pdf-to-qr-code             301!
+/pdf-to-qr              /pdf-to-qr-code             301!
+/extract-pages          /split-pdf                  301!
+/extract-pdf-pages      /split-pdf                  301!
+/organize               /organize-pdf               301!
+/reorder-pages          /organize-pdf               301!
+/rotate                 /rotate-pdf                 301!
+/watermark              /watermark-pdf              301!
+/delete-pages           /delete-pdf-pages           301!
+/page-numbers           /add-page-numbers-to-pdf    301!
+/add-page-numbers       /add-page-numbers-to-pdf    301!
+/protect                /protect-pdf                301!
+/unlock                 /unlock-pdf                 301!
+/sign                   /sign-pdf                   301!
+/redact                 /redact-pdf                 301!
+/repair                 /repair-pdf                 301!
+/ocr                    /ocr-pdf                    301!
+/scan-pdf               /scan-to-pdf                301!
+/scan-handwriting       /scan-handwriting-to-pdf    301!
+/compare                /compare-pdf                301!
+/pdf-to-images          /pdf-to-jpg                 301!
+
+# SPA Client-Side Routing Fallback
+/*                      /index.html                 200

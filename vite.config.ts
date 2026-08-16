@@ -3,17 +3,34 @@ import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
 
 export default defineConfig(({ mode }) => {
-  const env = loadEnv(mode, '.', '');
+  const rootDir = __dirname;
+  const env = loadEnv(mode, rootDir, '');
   return {
+    root: rootDir,
+    envDir: rootDir,
     server: {
-      port: 3000,
+      port: 5173,
       host: '0.0.0.0',
+      proxy: {
+        '/api/v1': {
+          target: 'http://127.0.0.1:8000',
+          changeOrigin: true,
+        },
+        '/api/gemini': {
+          target: 'https://generativelanguage.googleapis.com',
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/api\/gemini/, ''),
+          configure: (proxy, options) => {
+            proxy.on('proxyReq', (proxyReq, req, res) => {
+              if (env.GEMINI_API_KEY) {
+                proxyReq.setHeader('x-goog-api-key', env.GEMINI_API_KEY);
+              }
+            });
+          }
+        }
+      }
     },
     plugins: [react()],
-    define: {
-      'process.env.API_KEY': JSON.stringify(env.GEMINI_API_KEY),
-      'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY)
-    },
     resolve: {
       alias: {
         '@': path.resolve(__dirname, './src'),
@@ -34,14 +51,11 @@ export default defineConfig(({ mode }) => {
             'react-vendor': ['react', 'react-dom', 'react-router-dom'],
             'pdf-lib': ['pdf-lib'],
             'pdfjs-dist': ['pdfjs-dist'],
-            'aws-sdk': ['@aws-sdk/client-s3'],
-            'xlsx-vendor': ['xlsx'],
             'docx-vendor': ['docx'],
             'html2canvas-vendor': ['html2canvas'],
             'jspdf-vendor': ['jspdf'],
             'tesseract': ['tesseract.js'],
             'mammoth': ['mammoth'],
-            'pptxgenjs': ['pptxgenjs'],
           },
         },
       },

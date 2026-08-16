@@ -1,6 +1,6 @@
-
 import React, { useState, useRef } from 'react';
-import { Upload, FileText, X } from 'lucide-react';
+import { Upload, FileText, X, AlertTriangle, CheckCircle2, ShieldCheck, Folder } from 'lucide-react';
+import { formatFileSize, sanitizeFileName, HumanError } from '../utils/fileValidation';
 
 interface FileUploaderProps {
   onFilesSelected: (files: File[]) => void | Promise<void>;
@@ -8,21 +8,23 @@ interface FileUploaderProps {
   multiple?: boolean;
   maxSizeMB?: number;
   darkMode: boolean;
-  mini?: boolean;
   allowFolder?: boolean;
+  error?: HumanError | string | null;
+  onClearError?: () => void;
 }
 
 const FileUploader: React.FC<FileUploaderProps> = ({
   onFilesSelected,
   accept = ".pdf",
   multiple = true,
-  maxSizeMB = 30,
+  maxSizeMB = 100,
   darkMode,
-  allowFolder
+  allowFolder = true,
+  error,
+  onClearError
 }) => {
   const [isDragging, setIsDragging] = useState(false);
-  const [uploading, setUploading] = useState(false);
-  const [progress, setProgress] = useState(0);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const folderInputRef = useRef<HTMLInputElement>(null);
 
@@ -35,166 +37,190 @@ const FileUploader: React.FC<FileUploaderProps> = ({
     setIsDragging(false);
   };
 
-  const handleDrop = (e: React.DragEvent) => {
+  const handleDrop = async (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
+    onClearError?.();
 
-    // Improved handling for dropped items (including folders)
     const items = Array.from(e.dataTransfer.items);
     if (items && items.length > 0 && items[0].webkitGetAsEntry) {
-      // Detailed recursive scanning is complex for a simple drop handler without more logic
-      // For now fallback to standard file list which might be flat or empty for folders in some browsers
-      // But often 'files' property contains files inside folders if dropped.
-      // Yet, webkitRelativePath is often missing on Drop.
-      // For "Compress Folder", the "Choose Folder" button is the most reliable way to get relative paths.
+      const allFiles: File[] = [];
+      
+      const scanEntry = async (entry: any) => {
+        if (entry.isFile) {
+          return new Promise<void>((resolve) => {
+            entry.file((file: File) => {
+              allFiles.push(file);
+              resolve();
+            });
+          });
+        } else if (entry.isDirectory) {
+          const dirReader = entry.createReader();
+          const entries = await new Promise<any[]>((resolve) => {
+            dirReader.readEntries(resolve);
+          });
+          for (const childEntry of entries) {
+            await scanEntry(childEntry);
+          }
+        }
+      };
+
+      for (const item of items) {
+        const entry = item.webkitGetAsEntry();
+        if (entry) {
+          await scanEntry(entry);
+        }
+      }
+
+      if (allFiles.length > 0) {
+        processFiles(allFiles);
+        return;
+      }
     }
 
     const files = Array.from(e.dataTransfer.files) as File[];
-    validateAndProcessFiles(files);
+    processFiles(files);
   };
 
   const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      validateAndProcessFiles(Array.from(e.target.files) as File[]);
+      onClearError?.();
+      processFiles(Array.from(e.target.files) as File[]);
     }
   };
 
-  const validateAndProcessFiles = async (files: File[]) => {
-    // Remove built-in validation - let parent components handle it
-    // Just pass all files to the parent
-    if (files.length > 0) {
-      await simulateUpload(files);
-    }
+  const processFiles = (files: File[]) => {
+    if (files.length === 0) return;
+    setSelectedFiles(files);
+    onFilesSelected(files);
   };
 
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
-  const isMounted = useRef(true);
-
-  React.useEffect(() => {
-    isMounted.current = true;
-    return () => {
-      isMounted.current = false;
-      if (timerRef.current) clearTimeout(timerRef.current);
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
-  }, []);
-
-  const simulateUpload = async (files: File[]) => {
-    setUploading(true);
-    setProgress(0);
-    intervalRef.current = setInterval(() => {
-      setProgress(prev => {
-        if (prev >= 100) {
-          if (intervalRef.current) clearInterval(intervalRef.current);
-          timerRef.current = setTimeout(async () => {
-            if (isMounted.current) {
-              setUploading(false);
-              await onFilesSelected(files);
-            }
-          }, 400);
-          return 100;
-        }
-        return prev + 12;
-      });
-    }, 80);
-  };
+  // Supported format tags
+  const formatBadge = accept.includes('pdf') ? 'PDF' : accept.toUpperCase().replace(/\./g, ' ');
 
   return (
-    <div className="w-full max-w-4xl mx-auto">
-      {!uploading ? (
-        <div
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
-          onDrop={handleDrop}
-          onClick={() => fileInputRef.current?.click()}
-          className={`relative border-3 border-dashed rounded-[2rem] p-16 text-center cursor-pointer transition-all duration-300 transform active:scale-[0.98] ${isDragging
-            ? 'border-yellow-500 bg-yellow-500/10'
-            : darkMode
-              ? 'border-slate-700 bg-slate-800/50 hover:border-slate-500'
-              : 'border-slate-200 bg-white hover:border-yellow-300 hover:shadow-2xl'
-            }`}
-        >
-          <input
-            type="file"
-            ref={fileInputRef}
-            onChange={handleFileInput}
-            accept={accept}
-            multiple={multiple}
-            className="hidden"
-          />
-          <input
-            type="file"
-            ref={folderInputRef}
-            onChange={handleFileInput}
-            // @ts-ignore - webkitdirectory is not standard in React types yet
-            webkitdirectory="true"
-            directory=""
-            multiple
-            className="hidden"
-          />
-          <div className="flex flex-col items-center">
-            <div className={`p-6 rounded-3xl mb-8 ${darkMode ? 'bg-slate-700' : 'bg-yellow-50'}`}>
-              <Upload className="w-12 h-12 text-yellow-600" />
-            </div>
-            <h2 className={`text-3xl font-bold mb-4 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
-              Select Files
-            </h2>
-            <p className={`text-slate-500 mb-10 max-w-sm mx-auto text-lg`}>
-              Drag and drop your files here, or click to choose from your computer.
-            </p>
-            <div className="flex gap-4 justify-center">
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  fileInputRef.current?.click();
-                }}
-                className="bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white font-extrabold py-4 px-8 rounded-2xl shadow-xl transition-all hover:translate-y-[-2px]"
-              >
-                Choose {multiple ? 'Files' : 'File'}
-              </button>
-
-              {allowFolder && (
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    folderInputRef.current?.click();
-                  }}
-                  className="bg-white border-2 border-slate-200 text-slate-700 hover:bg-slate-50 font-extrabold py-4 px-8 rounded-2xl shadow-sm transition-all hover:translate-y-[-2px]"
-                >
-                  Choose Folder
-                </button>
+    <div className="w-full max-w-4xl mx-auto space-y-4">
+      {/* Error Banner */}
+      {error && (
+        <div className="p-5 rounded-2xl border border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-950/40 text-red-900 dark:text-red-200 animate-slideDown flex items-start gap-4">
+          <AlertTriangle className="w-6 h-6 text-red-500 flex-shrink-0 mt-0.5" />
+          <div className="flex-grow">
+            <div className="flex items-center justify-between">
+              <h4 className="font-bold text-sm">
+                {typeof error === 'string' ? error : error.title}
+              </h4>
+              {typeof error !== 'string' && error.code && (
+                <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-red-200 dark:bg-red-900 text-red-800 dark:text-red-200">
+                  {error.code}
+                </span>
               )}
             </div>
-
-            <div className="mt-8 flex gap-6 text-sm font-medium text-slate-400">
-              <span>Max {maxSizeMB}MB</span>
-              <span>Free Forever</span>
-              <span>Secure</span>
-            </div>
+            <p className="text-xs mt-1 leading-relaxed opacity-90">
+              {typeof error === 'string' ? 'Please check your file and try again.' : error.description}
+            </p>
+            {typeof error !== 'string' && error.suggestion && (
+              <p className="text-xs font-semibold mt-2 text-red-700 dark:text-red-300">
+                💡 Tip: {error.suggestion}
+              </p>
+            )}
           </div>
-        </div>
-      ) : (
-        <div className={`rounded-[2rem] p-20 text-center border shadow-2xl ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'}`}>
-          <div className="mb-10 relative h-6 w-full bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
-            <div
-              className="h-full bg-gradient-to-r from-yellow-500 to-orange-500 transition-all duration-500 ease-out"
-              style={{ width: `${progress}%` }}
-            />
-          </div>
-          <h3 className={`text-3xl font-bold mb-4 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
-            Processing Upload... {progress}%
-          </h3>
-          <p className="text-slate-500 text-lg">Encrypting and preparing your secure workspace.</p>
-          <button
-            onClick={() => setUploading(false)}
-            className="mt-12 flex items-center gap-2 mx-auto text-yellow-600 font-bold hover:bg-yellow-50 px-6 py-2 rounded-xl transition-colors"
-          >
-            <X size={20} />
-            Cancel
-          </button>
+          {onClearError && (
+            <button onClick={onClearError} className="text-red-400 hover:text-red-600">
+              <X size={18} />
+            </button>
+          )}
         </div>
       )}
+
+      {/* Main Upload Dropzone */}
+      <div
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+        onClick={() => fileInputRef.current?.click()}
+        className={`relative border-3 border-dashed rounded-[2.5rem] p-12 md:p-16 text-center cursor-pointer transition-all duration-300 transform active:scale-[0.99] ${
+          isDragging
+            ? 'border-yellow-500 bg-yellow-500/10 scale-[1.01]'
+            : darkMode
+              ? 'border-slate-700 bg-slate-800/40 hover:border-yellow-500/50 hover:bg-slate-800/60'
+              : 'border-slate-200 bg-white hover:border-yellow-400 hover:shadow-2xl shadow-sm'
+        }`}
+      >
+        <input
+          type="file"
+          ref={fileInputRef}
+          onChange={handleFileInput}
+          accept={accept}
+          multiple={multiple}
+          className="hidden"
+        />
+        <input
+          type="file"
+          ref={folderInputRef}
+          onChange={handleFileInput}
+          // @ts-ignore
+          webkitdirectory="true"
+          directory=""
+          multiple
+          className="hidden"
+        />
+
+        <div className="flex flex-col items-center">
+          <div className={`w-20 h-20 rounded-3xl mb-6 flex items-center justify-center transition-transform group-hover:scale-110 ${
+            darkMode ? 'bg-slate-700/60 text-yellow-400' : 'bg-yellow-50 text-yellow-600'
+          }`}>
+            <Upload className="w-10 h-10" />
+          </div>
+
+          <h2 className={`text-2xl sm:text-4xl font-black mb-3 tracking-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+            Drop your {formatBadge} here
+          </h2>
+
+          <p className={`text-sm sm:text-base mb-8 max-w-md mx-auto ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+            Drag & drop from your desktop, or click below to browse files.
+          </p>
+
+          {/* Action Buttons */}
+          <div className="flex flex-col sm:flex-row gap-3 justify-center w-full sm:w-auto">
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                fileInputRef.current?.click();
+              }}
+              className="px-8 py-4 bg-yellow-500 hover:bg-yellow-400 text-slate-950 font-black text-sm uppercase tracking-wider rounded-2xl shadow-lg transition-all transform hover:-translate-y-0.5"
+            >
+              Select {multiple ? 'Files' : 'File'}
+            </button>
+
+            {allowFolder && multiple && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  folderInputRef.current?.click();
+                }}
+                className={`px-6 py-4 rounded-2xl font-bold text-sm uppercase tracking-wider transition-all flex items-center justify-center gap-2 border ${
+                  darkMode ? 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700' : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
+                }`}
+              >
+                <Folder size={16} /> Choose Folder
+              </button>
+            )}
+          </div>
+
+          {/* Trust Badges */}
+          <div className="mt-10 flex flex-wrap justify-center items-center gap-6 text-xs font-semibold text-slate-400">
+            <span className="flex items-center gap-1.5">
+              <ShieldCheck size={16} className="text-emerald-500" /> 100% Client-Side Privacy
+            </span>
+            <span>•</span>
+            <span>Max {maxSizeMB}MB</span>
+            <span>•</span>
+            <span>Batch Upload Supported</span>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

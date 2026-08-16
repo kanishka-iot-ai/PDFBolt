@@ -4,6 +4,7 @@ import * as pdfjsLib from 'pdfjs-dist';
 import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
 import FileUploader from '../components/FileUploader';
 import { ChevronLeft, ChevronRight, ZoomIn, ZoomOut, Eraser, MousePointer, Hand } from 'lucide-react';
+import { useActiveWork } from '../context/ActiveWorkContext';
 
 // Initialize Worker
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
@@ -14,11 +15,18 @@ interface RedactToolProps {
 }
 
 const RedactTool: React.FC<RedactToolProps> = ({ darkMode, notify }) => {
+    const { setHasActiveWork } = useActiveWork();
     const [file, setFile] = useState<File | null>(null);
     const [pdfDoc, setPdfDoc] = useState<any>(null); // pdfjs types can be tricky
     const [currentPage, setCurrentPage] = useState(1);
     const [scale, setScale] = useState(1.0);
     const [loading, setLoading] = useState(false);
+
+    // Sync active work
+    useEffect(() => {
+        setHasActiveWork(file !== null);
+        return () => setHasActiveWork(false);
+    }, [file, setHasActiveWork]);
 
     // Redaction State
     const [redactions, setRedactions] = useState<{ page: number; x: number; y: number; w: number; h: number }[]>([]);
@@ -146,40 +154,61 @@ const RedactTool: React.FC<RedactToolProps> = ({ darkMode, notify }) => {
     };
 
     const applyRedactions = async () => {
-        if (!file || redactions.length === 0) return;
+        if (!file || redactions.length === 0 || !pdfDoc) return;
         if (!confirm('This will permanently remove the selected areas and metadata. Continue?')) return;
 
         setLoading(true);
         try {
-            const { PDFDocument, rgb } = await import('pdf-lib');
-            const arrayBuffer = await file.arrayBuffer();
-            const pdf = await PDFDocument.load(arrayBuffer);
+            const { PDFDocument } = await import('pdf-lib');
+            const newPdf = await PDFDocument.create();
 
-            redactions.forEach(r => {
-                const page = pdf.getPage(r.page - 1); // pdf-lib is 0-indexed
-                const { height } = page.getSize();
-                // Convert Top-Left (Canvas) to Bottom-Left (PDF)
-                // Also adjust logic because pdf-lib coordinates are from bottom-left
-                page.drawRectangle({
-                    x: r.x,
-                    y: height - r.y - r.h,
-                    width: r.w,
-                    height: r.h,
-                    color: rgb(0, 0, 0),
+            for (let i = 1; i <= pdfDoc.numPages; i++) {
+                const page = await pdfDoc.getPage(i);
+                const viewport = page.getViewport({ scale: 2.0 });
+                const canvas = document.createElement('canvas');
+                const context = canvas.getContext('2d');
+                if (!context) continue;
+
+                canvas.width = viewport.width;
+                canvas.height = viewport.height;
+
+                await page.render({ canvasContext: context, viewport }).promise;
+
+                const pageRedactions = redactions.filter(r => r.page === i);
+                context.fillStyle = 'black';
+                pageRedactions.forEach(r => {
+                    context.fillRect(r.x * 2.0, r.y * 2.0, r.w * 2.0, r.h * 2.0);
                 });
-            });
+
+                const imgDataUrl = canvas.toDataURL('image/jpeg', 0.95);
+                let embeddedImage;
+                if (imgDataUrl.startsWith('data:image/jpeg')) {
+                    embeddedImage = await newPdf.embedJpg(imgDataUrl);
+                } else {
+                    embeddedImage = await newPdf.embedPng(imgDataUrl);
+                }
+
+                const { width, height } = page.getViewport({ scale: 1.0 });
+                const newPage = newPdf.addPage([width, height]);
+                newPage.drawImage(embeddedImage, {
+                    x: 0,
+                    y: 0,
+                    width: width,
+                    height: height,
+                });
+            }
 
             // Metadata cleaning
-            pdf.setTitle('');
-            pdf.setAuthor('');
-            pdf.setSubject('');
-            pdf.setKeywords([]);
-            pdf.setProducer('PDFBolt Redactor');
-            pdf.setCreator('PDFBolt');
-            pdf.setCreationDate(new Date());
-            pdf.setModificationDate(new Date());
+            newPdf.setTitle('');
+            newPdf.setAuthor('');
+            newPdf.setSubject('');
+            newPdf.setKeywords([]);
+            newPdf.setProducer('PDFBolt Redactor');
+            newPdf.setCreator('PDFBolt');
+            newPdf.setCreationDate(new Date());
+            newPdf.setModificationDate(new Date());
 
-            const pdfBytes = await pdf.save();
+            const pdfBytes = await newPdf.save();
             const blob = new Blob([pdfBytes], { type: 'application/pdf' });
             const url = URL.createObjectURL(blob);
 

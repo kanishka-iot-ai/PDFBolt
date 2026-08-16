@@ -18,30 +18,34 @@ export async function ocrPdf(file: File): Promise<string> {
 
     const worker = await Tesseract.createWorker('eng');
 
-    for (let i = 1; i <= pdf.numPages; i++) {
-        const page = await pdf.getPage(i);
-        const viewport = page.getViewport({ scale: 2.5 });
+    try {
+        for (let i = 1; i <= pdf.numPages; i++) {
+            const page = await pdf.getPage(i);
+            const viewport = page.getViewport({ scale: 2.5 });
 
-        const canvas = document.createElement('canvas');
-        const context = canvas.getContext('2d');
-        canvas.height = viewport.height;
-        canvas.width = viewport.width;
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+            canvas.height = viewport.height;
+            canvas.width = viewport.width;
 
-        if (context) {
-            await page.render({ canvasContext: context, viewport }).promise;
+            if (context) {
+                await page.render({ canvasContext: context, viewport }).promise;
 
-            // PRODUCTION-LEVEL PREPROCESSING (OpenCV.js)
-            const processedDataUrl = await enhanceImageWithOpenCV(canvas);
+                // PRODUCTION-LEVEL PREPROCESSING (OpenCV.js)
+                const processedDataUrl = await enhanceImageWithOpenCV(canvas);
 
-            const { data: { text } } = await worker.recognize(processedDataUrl);
+                const { data: { text } } = await worker.recognize(processedDataUrl);
 
-            // Structure & Clean
-            const structured = structureText(text);
-            fullText += `\n--- Page ${i} ---\n${structured}\n`;
+                // Structure & Clean
+                const structured = structureText(text);
+                fullText += `\n--- Page ${i} ---\n${structured}\n`;
+            }
         }
+    } finally {
+        await worker.terminate();
+        pdf.destroy();
     }
 
-    await worker.terminate();
     return fullText;
 }
 
@@ -51,14 +55,16 @@ export async function ocrPdf(file: File): Promise<string> {
 export async function ocrImage(imageSource: string | Blob): Promise<string> {
     const worker = await Tesseract.createWorker('eng');
 
-    // If it's an image, we still want to enhance it if possible
-    // For now, Tesseract is good, but OCR improves 2-3x with thresholding
-    const { data: { text } } = await worker.recognize(imageSource);
+    try {
+        // If it's an image, we still want to enhance it if possible
+        // For now, Tesseract is good, but OCR improves 2-3x with thresholding
+        const { data: { text } } = await worker.recognize(imageSource);
 
-    const structured = structureText(text);
-
-    await worker.terminate();
-    return structured;
+        const structured = structureText(text);
+        return structured;
+    } finally {
+        await worker.terminate();
+    }
 }
 
 /**
@@ -73,27 +79,28 @@ export async function enhanceImageWithOpenCV(sourceCanvas: HTMLCanvasElement): P
         let src = cv.imread(sourceCanvas);
         let dst = new cv.Mat();
 
-        // 1. Convert to Grayscale
-        cv.cvtColor(src, src, cv.COLOR_RGBA2GRAY, 0);
+        try {
+            // 1. Convert to Grayscale
+            cv.cvtColor(src, src, cv.COLOR_RGBA2GRAY, 0);
 
-        // 2. Reduce noise with Gaussian Blur
-        let ksize = new cv.Size(5, 5);
-        cv.GaussianBlur(src, src, ksize, 0, 0, cv.BORDER_DEFAULT);
+            // 2. Reduce noise with Gaussian Blur
+            let ksize = new cv.Size(5, 5);
+            cv.GaussianBlur(src, src, ksize, 0, 0, cv.BORDER_DEFAULT);
 
-        // 3. Adaptive Thresholding (The magic part for handwriting/shadows)
-        cv.adaptiveThreshold(src, dst, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY, 11, 2);
+            // 3. Adaptive Thresholding (The magic part for handwriting/shadows)
+            cv.adaptiveThreshold(src, dst, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY, 11, 2);
 
-        // 4. Output back to a temporary canvas
-        const outputCanvas = document.createElement('canvas');
-        cv.imshow(outputCanvas, dst);
+            // 4. Output back to a temporary canvas
+            const outputCanvas = document.createElement('canvas');
+            cv.imshow(outputCanvas, dst);
 
-        const dataUrl = outputCanvas.toDataURL('image/jpeg', 0.95);
-
-        // Cleanup
-        src.delete();
-        dst.delete();
-
-        return dataUrl;
+            const dataUrl = outputCanvas.toDataURL('image/jpeg', 0.95);
+            return dataUrl;
+        } finally {
+            // Cleanup
+            src.delete();
+            dst.delete();
+        }
     } catch (e) {
         console.warn("OpenCV enhancement failed, falling back to raw", e);
         return sourceCanvas.toDataURL('image/jpeg', 0.9);

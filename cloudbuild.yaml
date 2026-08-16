@@ -1,0 +1,95 @@
+# ==============================================================================
+# Google Cloud Build CI/CD Pipeline for PDFBolt
+# Builds, tests, containers, and deploys API & Worker to Google Cloud Run
+# ==============================================================================
+
+steps:
+  # 1. Run Backend Pytest Suite
+  - name: 'python:3.11-slim'
+    id: 'backend-unit-tests'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        pip install -r requirements.txt pytest
+        python -m pytest backend/tests -v
+
+  # 2. Build PDFBolt API Image
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'build-api-image'
+    args:
+      - 'build'
+      - '-f'
+      - 'Dockerfile.api'
+      - '-t'
+      - '$_REGION-docker.pkg.dev/$PROJECT_ID/$_REPO_NAME/pdfbolt-api:$COMMIT_SHA'
+      - '-t'
+      - '$_REGION-docker.pkg.dev/$PROJECT_ID/$_REPO_NAME/pdfbolt-api:latest'
+      - '.'
+
+  # 3. Build PDFBolt Worker Image
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'build-worker-image'
+    args:
+      - 'build'
+      - '-f'
+      - 'Dockerfile.worker'
+      - '-t'
+      - '$_REGION-docker.pkg.dev/$PROJECT_ID/$_REPO_NAME/pdfbolt-worker:$COMMIT_SHA'
+      - '-t'
+      - '$_REGION-docker.pkg.dev/$PROJECT_ID/$_REPO_NAME/pdfbolt-worker:latest'
+      - '.'
+
+  # 4. Push Images to Google Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'push-api-image'
+    args:
+      - 'push'
+      - '$_REGION-docker.pkg.dev/$PROJECT_ID/$_REPO_NAME/pdfbolt-api:$COMMIT_SHA'
+
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'push-worker-image'
+    args:
+      - 'push'
+      - '$_REGION-docker.pkg.dev/$PROJECT_ID/$_REPO_NAME/pdfbolt-worker:$COMMIT_SHA'
+
+  # 5. Deploy API to Google Cloud Run with safe concurrency and autoscaling limits
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    id: 'deploy-api-cloud-run'
+    entrypoint: 'gcloud'
+    args:
+      - 'run'
+      - 'deploy'
+      - 'pdfbolt-api'
+      - '--image'
+      - '$_REGION-docker.pkg.dev/$PROJECT_ID/$_REPO_NAME/pdfbolt-api:$COMMIT_SHA'
+      - '--region'
+      - '$_REGION'
+      - '--platform'
+      - 'managed'
+      - '--allow-unauthenticated'
+      - '--min-instances'
+      - '1'
+      - '--max-instances'
+      - '20'
+      - '--concurrency'
+      - '80'
+      - '--cpu'
+      - '2'
+      - '--memory'
+      - '2Gi'
+      - '--timeout'
+      - '60s'
+      - '--service-account'
+      - 'pdfbolt-api-sa@$PROJECT_ID.iam.gserviceaccount.com'
+
+images:
+  - '$_REGION-docker.pkg.dev/$PROJECT_ID/$_REPO_NAME/pdfbolt-api:$COMMIT_SHA'
+  - '$_REGION-docker.pkg.dev/$PROJECT_ID/$_REPO_NAME/pdfbolt-worker:$COMMIT_SHA'
+
+substitutions:
+  _REGION: 'us-central1'
+  _REPO_NAME: 'pdfbolt-repo'
+
+options:
+  logging: CLOUD_LOGGING_ONLY
