@@ -14,7 +14,7 @@ const WorkflowPage: React.FC<WorkflowPageProps> = ({ workflowSlug, darkMode }) =
   const slug = workflowSlug || params.slug || 'student-pdf-tools';
   const workflow = WORKFLOWS.find(w => w.slug === slug) || WORKFLOWS[0];
 
-  const baseUrl = 'https://pdfbolt.com';
+  const baseUrl = 'https://pdfbolt.in';
   const canonicalUrl = `${baseUrl}/${workflow.slug}`;
 
   // Structured Data

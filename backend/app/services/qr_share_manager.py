@@ -84,7 +84,7 @@ class QRShareManager:
             created_at=now_dt.isoformat(),
             expires_at=expires_dt.isoformat(),
             status=QRShareStatus.ACTIVE,
-            share_url=f"https://pdfbolt.com/s/{share_id}",
+            share_url=f"https://pdfbolt.in/s/{share_id}",
             download_url=f"/api/v1/qr-shares/{share_id}/download",
             revocation_token=revocation_token,
             one_time_scan=one_time_scan,
@@ -125,7 +125,7 @@ class QRShareManager:
             created_at=share["created_at"],
             expires_at=share["expires_at"],
             status=share["status"],
-            share_url=f"https://pdfbolt.com/s/{share_id}",
+            share_url=f"https://pdfbolt.in/s/{share_id}",
             download_url=f"/api/v1/qr-shares/{share_id}/download",
             revocation_token=None,  # Do not expose revocation token publicly
             one_time_scan=share["one_time_scan"],

@@ -1,4 +1,4 @@
-# robots.txt for PDFBolt (https://pdfbolt.com)
+# robots.txt for PDFBolt (https://pdfbolt.in)
 User-agent: *
 Allow: /
 Allow: /tools
@@ -17,4 +17,4 @@ Disallow: /qr-success
 Disallow: /test-files
 
 # Sitemaps
-Sitemap: https://pdfbolt.com/sitemap.xml
+Sitemap: https://pdfbolt.in/sitemap.xml

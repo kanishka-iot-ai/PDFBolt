@@ -17,7 +17,7 @@ const SEOLandingPage: React.FC<SEOLandingPageProps> = ({ toolId, darkMode, child
 
   if (!tool) return <>{children}</>;
 
-  const baseUrl = 'https://pdfbolt.com';
+  const baseUrl = 'https://pdfbolt.in';
   const canonicalUrl = `${baseUrl}${tool.canonicalPath || location.pathname}`;
 
   // Software Application Schema

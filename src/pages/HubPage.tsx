@@ -41,7 +41,7 @@ const HubPage: React.FC<HubPageProps> = ({ darkMode }) => {
       <Helmet>
         <title>PDF Tools Hub – All 25+ Free Online PDF Converters & Editors | PDFBolt</title>
         <meta name="description" content="Discover the complete PDFBolt toolkit: Merge, Split, Compress, OCR, Convert to Word, Excel, PowerPoint, Protect, Sign, and Redact PDFs with 100% client-side privacy." />
-        <link rel="canonical" href="https://pdfbolt.com/tools" />
+        <link rel="canonical" href="https://pdfbolt.in/tools" />
       </Helmet>
 
       {/* Hero Header */}

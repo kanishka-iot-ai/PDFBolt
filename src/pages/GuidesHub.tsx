@@ -33,7 +33,7 @@ const GuidesHub: React.FC<GuidesHubProps> = ({ darkMode }) => {
       <Helmet>
         <title>PDF Knowledge Base & How-To Guides | PDFBolt</title>
         <meta name="description" content="Comprehensive step-by-step guides on converting, compressing, merging, redacting, signing, and editing PDF files online with 100% privacy." />
-        <link rel="canonical" href="https://pdfbolt.com/guides" />
+        <link rel="canonical" href="https://pdfbolt.in/guides" />
       </Helmet>
 
       {/* Hero Header */}

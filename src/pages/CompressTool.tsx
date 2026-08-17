@@ -225,7 +225,7 @@ const CompressTool: React.FC<CompressToolProps> = ({ darkMode, notify }) => {
       <Helmet>
         <title>Professional PDF Compressor – Multi-Profile & Target Size | PDFBolt</title>
         <meta name="description" content="Intelligent client-side PDF compression with automatic document analysis, 5 professional compression profiles, target-size constraints, and quality preview comparison." />
-        <link rel="canonical" href="https://pdfbolt.com/compress-pdf" />
+        <link rel="canonical" href="https://pdfbolt.in/compress-pdf" />
       </Helmet>
 
       {/* Hero Header */}

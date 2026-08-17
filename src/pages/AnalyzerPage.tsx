@@ -152,7 +152,7 @@ ${analysis.keyFindings.map((kf, i) => `${i + 1}. ${kf}`).join('\n')}
       <Helmet>
         <title>AI PDF Analyzer & Multi-Output Builder | PDFBolt</title>
         <meta name="description" content="Deep structural PDF intelligence: Extract word counts, tables, topics, executive summaries, interactive Q&A, and 1-click generation of PPTX presentations and Word reports." />
-        <link rel="canonical" href="https://pdfbolt.com/analyze-pdf" />
+        <link rel="canonical" href="https://pdfbolt.in/analyze-pdf" />
       </Helmet>
 
       {/* Hero Header */}

@@ -46,7 +46,7 @@ services:
       - key: STORAGE_BACKEND
         value: local
       - key: CORS_ORIGINS
-        value: '["https://pdfbolt.com","https://www.pdfbolt.com","https://pdfbolt.onrender.com","https://pdfbolt-web.onrender.com"]'
+        value: '["https://pdfbolt.in","https://www.pdfbolt.in","https://pdfbolt.com","https://www.pdfbolt.com","https://pdfbolt.onrender.com","https://pdfbolt-web.onrender.com"]'
       - key: MAX_UPLOAD_SIZE_BYTES
         value: "104857600"
       - key: PROCESSING_FILE_TTL_SECONDS

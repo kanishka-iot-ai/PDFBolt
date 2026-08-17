@@ -92,7 +92,7 @@ def test_robots_txt_rules():
     
     # No overly broad wildcard query blocking
     assert "Disallow: /*?*" not in content, "Wildcard /*?* should not be present"
-    assert "Sitemap: https://pdfbolt.com/sitemap.xml" in content
+    assert "Sitemap: https://pdfbolt.in/sitemap.xml" in content
 
 
 def test_sitemap_contains_only_canonical_urls():
@@ -103,9 +103,12 @@ def test_sitemap_contains_only_canonical_urls():
     with open(sitemap_path, "r", encoding="utf-8") as f:
         sitemap_content = f.read()
 
+    # Ensure all sitemap index locations point to pdfbolt.in
+    assert "https://pdfbolt.in/sitemap-tools.xml" in sitemap_content
+
     # Ensure no alias exists in the sitemap
     for alias in LEGACY_ALIASES.keys():
-        assert f"https://pdfbolt.com{alias}</loc>" not in sitemap_content, f"Alias {alias} must not be in sitemap"
+        assert f"https://pdfbolt.in{alias}</loc>" not in sitemap_content, f"Alias {alias} must not be in sitemap"
 
     # Ensure all primary tools are represented
     tools_sitemap_path = os.path.join(BASE_DIR, "public", "sitemap-tools.xml")
@@ -113,14 +116,14 @@ def test_sitemap_contains_only_canonical_urls():
         with open(tools_sitemap_path, "r", encoding="utf-8") as f:
             tools_content = f.read()
         for tool in CANONICAL_TOOLS:
-            assert f"https://pdfbolt.com{tool}</loc>" in tools_content or f"https://pdfbolt.com{tool}</loc>" in sitemap_content, f"Canonical tool {tool} must be in sitemap"
+            assert f"https://pdfbolt.in{tool}</loc>" in tools_content or f"https://pdfbolt.in{tool}</loc>" in sitemap_content, f"Canonical tool {tool} must be in sitemap"
 
     # Ensure disallowed /test-files is not in any sitemap
     workflows_sitemap_path = os.path.join(BASE_DIR, "public", "sitemap-workflows.xml")
     if os.path.exists(workflows_sitemap_path):
         with open(workflows_sitemap_path, "r", encoding="utf-8") as f:
             wf_content = f.read()
-        assert "https://pdfbolt.com/test-files" not in wf_content, "Blocked path /test-files must not be in sitemap"
+        assert "https://pdfbolt.in/test-files" not in wf_content, "Blocked path /test-files must not be in sitemap"
 
 
 def test_redirects_are_one_hop_permanent():
@@ -150,15 +153,16 @@ def test_redirects_are_one_hop_permanent():
 
 
 def test_domain_301_migration_configuration():
-    """Verify nginx.conf configures direct 1-hop 301 redirect from pdfbolt.in to pdfbolt.com."""
+    """Verify nginx.conf configures direct 1-hop 301 redirect from legacy domains to https://pdfbolt.in."""
     nginx_path = os.path.join(BASE_DIR, "nginx.conf")
     assert os.path.exists(nginx_path), "nginx.conf must exist"
 
     with open(nginx_path, "r", encoding="utf-8") as f:
         nginx_content = f.read()
 
-    assert "server_name pdfbolt.in www.pdfbolt.in;" in nginx_content
-    assert "return 301 https://pdfbolt.com$request_uri;" in nginx_content
+    assert "server_name pdfbolt.com www.pdfbolt.com;" in nginx_content
+    assert "return 301 https://pdfbolt.in$request_uri;" in nginx_content
+    assert "server_name pdfbolt.in www.pdfbolt.in _;" in nginx_content
 
 
 def test_api_x_robots_tag():
@@ -183,6 +187,8 @@ def test_json_ld_schemas_in_index_html():
         data = json.loads(script_str.strip())
         assert data.get("@context") == "https://schema.org", "Schema must use https://schema.org context"
         assert "@type" in data, "Schema must contain @type field"
+        if data.get("@type") in ("WebApplication", "WebSite", "Organization"):
+            assert "https://pdfbolt.in" in data.get("url", ""), "Schema URL must point to https://pdfbolt.in"
 
 
 def test_azure_swa_routes_and_redirects():

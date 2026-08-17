@@ -71,9 +71,9 @@ const SEOManager: React.FC = () => {
   const location = useLocation();
 
   useEffect(() => {
-    const baseUrl = 'https://pdfbolt.com';
-    let title = "PDFBolt - Free Online PDF Tools & AI PDF Analyzer";
-    let description = "Lightning-fast online browser-based PDF toolkit. Merge, split, compress, protect, and convert PDFs without uploading to a server. 100% private and blazing fast.";
+    const baseUrl = 'https://pdfbolt.in';
+    let title = "Free Online PDF Tools – Merge, Compress, Convert & Edit PDFs | PDFBolt";
+    let description = "Use free online PDF tools to merge, compress, split, convert, edit and protect PDF files. Fast, private and easy-to-use PDF tools with PDFBolt.";
 
     // Match Tool Pages
     const tool = TOOLS.find(t => t.canonicalPath === location.pathname || t.path === location.pathname || t.seoPath === location.pathname);

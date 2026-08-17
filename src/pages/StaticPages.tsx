@@ -77,7 +77,7 @@ export const ContactPage: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
           </p>
 
           <div className="space-y-6">
-            <a href="mailto:support@pdfbolt.com" className={`p-6 rounded-3xl border flex items-center gap-6 transition-all hover:scale-[1.02] ${darkMode ? 'bg-slate-800 border-slate-700 hover:bg-slate-700' : 'bg-slate-50 border-slate-200 hover:bg-slate-100'}`}>
+            <a href="mailto:support@pdfbolt.in" className={`p-6 rounded-3xl border flex items-center gap-6 transition-all hover:scale-[1.02] ${darkMode ? 'bg-slate-800 border-slate-700 hover:bg-slate-700' : 'bg-slate-50 border-slate-200 hover:bg-slate-100'}`}>
               <div className="p-4 bg-white dark:bg-slate-900 rounded-2xl text-yellow-500 shadow-sm"><Mail size={24} /></div>
               <div>
                 <h4 className={`font-black uppercase text-xs tracking-widest mb-1 ${darkMode ? 'text-white' : 'text-slate-900'}`}>Email Support</h4>
@@ -175,7 +175,7 @@ export const PrivacyPage: React.FC<{ darkMode: boolean }> = ({ darkMode }) => (
 
     <h3>4. Contact & Inquiries</h3>
     <p>
-      If you have questions about our privacy practices, security model, or cookie preferences, please contact our privacy compliance team at <a href="mailto:support@pdfbolt.com" className="text-yellow-600 font-bold">support@pdfbolt.com</a>.
+      If you have questions about our privacy practices, security model, or cookie preferences, please contact our privacy compliance team at <a href="mailto:support@pdfbolt.in" className="text-yellow-600 font-bold">support@pdfbolt.in</a>.
     </p>
   </PageLayout>
 );

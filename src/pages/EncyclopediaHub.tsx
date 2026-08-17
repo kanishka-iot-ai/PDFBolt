@@ -14,7 +14,7 @@ const EncyclopediaHub: React.FC<EncyclopediaHubProps> = ({ darkMode }) => {
       <Helmet>
         <title>PDF Format Encyclopedia & Standards Guide | PDFBolt</title>
         <meta name="description" content="Explore the deep technical architecture of PDF standards: PDF/A archival compliance, WebAssembly OCR, Vector vs Raster rendering, and security cryptography." />
-        <link rel="canonical" href="https://pdfbolt.com/encyclopedia" />
+        <link rel="canonical" href="https://pdfbolt.in/encyclopedia" />
       </Helmet>
 
       {/* Hero Header */}

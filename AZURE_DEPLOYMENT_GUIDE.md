@@ -124,10 +124,10 @@ Open any deep-link in your browser:
 
 ---
 
-## Custom Domain Setup (`pdfbolt.com`)
+## Custom Domain Setup (`pdfbolt.in`)
 
 1. In Azure Static Web App (`pdfbolt-web`), go to **Custom domains** ➔ **+ Add**.
 2. Select **Custom domain on other DNS**.
-3. Enter `pdfbolt.com` and `www.pdfbolt.com`.
+3. Enter `pdfbolt.in` and `www.pdfbolt.in`.
 4. Update your DNS provider (Cloudflare / Namecheap / GoDaddy) with the CNAME or ALIAS/TXT records provided by Azure.
 5. Azure will automatically provision a free managed SSL/TLS certificate!

@@ -56,7 +56,7 @@ const CalculatorPage: React.FC<CalculatorPageProps> = ({ darkMode }) => {
       <Helmet>
         <title>Interactive PDF File Size & Compression Calculator | PDFBolt</title>
         <meta name="description" content="Calculate and estimate how much file size you can save when compressing PDF documents based on page count, image DPI, and content type." />
-        <link rel="canonical" href="https://pdfbolt.com/tools/pdf-size-calculator" />
+        <link rel="canonical" href="https://pdfbolt.in/tools/pdf-size-calculator" />
       </Helmet>
 
       {/* Hero Header */}

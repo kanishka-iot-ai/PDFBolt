@@ -20,7 +20,7 @@ param storageAccountPrefix string = 'pdfbolt'
 param containerImage string = 'ghcr.io/kanishka-iot-ai/pdfbolt-api:latest'
 
 @description('Custom domain name for production')
-param customDomain string = 'pdfbolt.com'
+param customDomain string = 'pdfbolt.in'
 
 // Suffix for globally unique names
 var uniqueSuffix = uniqueString(resourceGroup().id)

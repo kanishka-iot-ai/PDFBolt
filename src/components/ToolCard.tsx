@@ -2,92 +2,113 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { ToolMetadata } from '../types';
 import { getIcon } from '../constants';
-import { ArrowUpRight, Star } from 'lucide-react';
+import { ArrowRight, Star } from 'lucide-react';
 
 const getCategoryStyles = (category: string, darkMode: boolean) => {
   if (darkMode) {
     switch (category) {
-      case 'edit': return 'group-hover:bg-red-900/10 group-hover:border-red-500/30';
-      case 'convert-to': return 'group-hover:bg-blue-900/10 group-hover:border-blue-500/30';
-      case 'convert-from': return 'group-hover:bg-green-900/10 group-hover:border-green-500/30';
-      case 'security': return 'group-hover:bg-orange-900/10 group-hover:border-orange-500/30';
+      case 'edit': return 'hover:border-red-500/40 hover:bg-slate-900/90';
+      case 'convert-to': return 'hover:border-blue-500/40 hover:bg-slate-900/90';
+      case 'convert-from': return 'hover:border-green-500/40 hover:bg-slate-900/90';
+      case 'security': return 'hover:border-orange-500/40 hover:bg-slate-900/90';
       case 'utilities':
-      case 'extra': return 'group-hover:bg-slate-800 group-hover:border-slate-500/30';
-      default: return 'group-hover:bg-slate-800 group-hover:border-slate-500/30';
+      case 'extra': return 'hover:border-yellow-500/40 hover:bg-slate-900/90';
+      default: return 'hover:border-yellow-500/40 hover:bg-slate-900/90';
     }
   } else {
     switch (category) {
-      case 'edit': return 'group-hover:bg-red-50 group-hover:border-red-200';
-      case 'convert-to': return 'group-hover:bg-blue-50 group-hover:border-blue-200';
-      case 'convert-from': return 'group-hover:bg-green-50 group-hover:border-green-200';
-      case 'security': return 'group-hover:bg-orange-50 group-hover:border-orange-200';
+      case 'edit': return 'hover:border-red-400 hover:shadow-lg hover:shadow-red-500/5';
+      case 'convert-to': return 'hover:border-blue-400 hover:shadow-lg hover:shadow-blue-500/5';
+      case 'convert-from': return 'hover:border-green-400 hover:shadow-lg hover:shadow-green-500/5';
+      case 'security': return 'hover:border-orange-400 hover:shadow-lg hover:shadow-orange-500/5';
       case 'utilities':
-      case 'extra': return 'group-hover:bg-slate-50 group-hover:border-slate-300';
-      default: return 'group-hover:bg-slate-50 group-hover:border-slate-300';
+      case 'extra': return 'hover:border-yellow-400 hover:shadow-lg hover:shadow-yellow-500/5';
+      default: return 'hover:border-yellow-400 hover:shadow-lg hover:shadow-yellow-500/5';
     }
   }
 };
 
 const getIconStyles = (category: string) => {
   switch (category) {
-    case 'edit': return 'text-red-500 bg-red-100 dark:bg-red-500/20';
-    case 'convert-to': return 'text-blue-500 bg-blue-100 dark:bg-blue-500/20';
-    case 'convert-from': return 'text-green-500 bg-green-100 dark:bg-green-500/20';
-    case 'security': return 'text-orange-500 bg-orange-100 dark:bg-orange-500/20';
+    case 'edit': return 'text-red-500 bg-red-500/10 border-red-500/20';
+    case 'convert-to': return 'text-blue-500 bg-blue-500/10 border-blue-500/20';
+    case 'convert-from': return 'text-green-500 bg-green-500/10 border-green-500/20';
+    case 'security': return 'text-orange-500 bg-orange-500/10 border-orange-500/20';
     case 'utilities':
-    case 'extra': return 'text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700';
-    default: return 'text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700';
+    case 'extra': return 'text-yellow-500 bg-yellow-500/10 border-yellow-500/20';
+    default: return 'text-yellow-500 bg-yellow-500/10 border-yellow-500/20';
   }
 };
 
-const ToolCard: React.FC<{ tool: ToolMetadata; darkMode: boolean }> = ({ tool, darkMode }) => {
+interface ToolCardProps {
+  tool: ToolMetadata;
+  darkMode: boolean;
+  compact?: boolean;
+}
+
+const ToolCard: React.FC<ToolCardProps> = ({ tool, darkMode, compact = false }) => {
   const isCore = ['merge', 'split', 'compress'].includes(tool.id);
+  const targetPath = tool.canonicalPath || tool.path;
   const categoryStyle = getCategoryStyles(tool.category, darkMode);
   const iconStyle = getIconStyles(tool.category);
 
   return (
     <Link
-      to={tool.path}
-      className="block h-full group outline-none focus-visible:ring-2 focus-visible:ring-yellow-500 rounded-2xl"
+      to={targetPath}
+      aria-label={`Open ${tool.title} tool: ${tool.description}`}
+      className="block h-full group outline-none focus-visible:ring-2 focus-visible:ring-yellow-500 focus-visible:ring-offset-2 rounded-2xl transition-transform duration-200 hover:-translate-y-1"
     >
-      <div className={`pdf-card p-6 flex flex-col justify-between rounded-2xl transition-all duration-300 ${categoryStyle} ${darkMode
-        ? `bg-slate-900/80 border border-slate-800`
-        : `bg-white border border-slate-100 shadow-md`
-        }`}>
-
-        <div className="relative z-10 w-full flex flex-col h-full">
-          <div className="flex justify-between items-start mb-5">
-            {/* Icon */}
-            <div className={`p-3 rounded-xl transition-transform duration-300 group-hover:scale-110 ${iconStyle}`}>
-              {React.cloneElement(getIcon(tool.icon) as React.ReactElement, { className: 'w-6 h-6' })}
+      <div
+        className={`h-full p-4 sm:p-5 md:p-6 flex flex-col justify-between rounded-2xl border transition-all duration-200 ${categoryStyle} ${
+          darkMode
+            ? 'bg-slate-900/70 border-slate-800 text-white'
+            : 'bg-white border-slate-200 text-slate-900 shadow-sm'
+        }`}
+      >
+        <div>
+          {/* Header Row: Icon & Optional Core Badge */}
+          <div className="flex items-center justify-between mb-3 sm:mb-4">
+            <div className={`p-2.5 sm:p-3 rounded-xl border transition-transform duration-200 group-hover:scale-105 ${iconStyle}`}>
+              {React.cloneElement(getIcon(tool.icon) as React.ReactElement, { className: 'w-5 h-5 sm:w-6 sm:h-6' })}
             </div>
 
-            {/* Arrow */}
-            <div className={`p-1.5 rounded-full opacity-0 -translate-x-2 translate-y-2 group-hover:opacity-100 group-hover:translate-x-0 group-hover:translate-y-0 transition-all duration-300 ${darkMode ? 'bg-slate-800 text-white' : 'bg-slate-100 text-slate-900'}`}>
-              <ArrowUpRight className="w-4 h-4" />
-            </div>
-          </div>
-
-          <div className="flex-grow">
-            {/* Title */}
-            <h3 className={`text-lg font-black mb-2 transition-colors ${darkMode ? 'text-white group-hover:text-yellow-400' : 'text-slate-900 group-hover:text-yellow-600'}`}>
-              {tool.title}
-            </h3>
-
-            {/* Description */}
-            <p className={`text-xs font-medium leading-relaxed line-clamp-2 ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
-              {tool.description}
-            </p>
-          </div>
-
-          {/* Core Badge */}
-          {isCore && (
-            <div className="mt-4 pt-4 border-t border-slate-200 dark:border-slate-800/50">
-              <span className={`inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded-md ${darkMode ? 'bg-yellow-500/10 text-yellow-500' : 'bg-yellow-50 text-yellow-600'}`}>
-                <Star size={10} className="fill-current" /> Core Feature
+            {isCore && !compact && (
+              <span
+                className={`inline-flex items-center gap-1 text-[9px] sm:text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full ${
+                  darkMode ? 'bg-yellow-500/15 text-yellow-400 border border-yellow-500/30' : 'bg-yellow-100 text-yellow-700'
+                }`}
+              >
+                <Star size={10} className="fill-current" /> Core
               </span>
-            </div>
-          )}
+            )}
+          </div>
+
+          {/* Tool Title */}
+          <h3
+            className={`text-sm sm:text-base md:text-lg font-bold tracking-tight mb-1 sm:mb-1.5 transition-colors group-hover:text-yellow-500 line-clamp-1`}
+          >
+            {tool.title}
+          </h3>
+
+          {/* Benefit Description */}
+          <p
+            className={`text-xs leading-relaxed line-clamp-2 ${
+              darkMode ? 'text-slate-400' : 'text-slate-600'
+            }`}
+          >
+            {tool.description}
+          </p>
+        </div>
+
+        {/* CTA Row */}
+        <div className="mt-3 sm:mt-4 pt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
+          <span className="text-[11px] sm:text-xs font-bold text-yellow-600 dark:text-yellow-400 group-hover:text-yellow-500 inline-flex items-center gap-1">
+            Open tool
+            <ArrowRight size={13} className="transition-transform duration-200 group-hover:translate-x-1" />
+          </span>
+          <span className="text-[10px] uppercase font-semibold text-slate-400 tracking-wider hidden sm:inline">
+            Free
+          </span>
         </div>
       </div>
     </Link>

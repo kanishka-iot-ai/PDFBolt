@@ -80,7 +80,7 @@ const TestFilesPage: React.FC<TestFilesPageProps> = ({ darkMode }) => {
       <Helmet>
         <title>Download Free Sample PDF Test Files | PDFBolt Playground</title>
         <meta name="description" content="Download free sample PDF files for testing: multi-page documents, tables, scanned receipts, and slides ready for testing PDF conversion and editing tools." />
-        <link rel="canonical" href="https://pdfbolt.com/test-files" />
+        <link rel="canonical" href="https://pdfbolt.in/test-files" />
       </Helmet>
 
       {/* Hero Header */}

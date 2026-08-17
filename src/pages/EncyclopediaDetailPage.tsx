@@ -13,7 +13,7 @@ const EncyclopediaDetailPage: React.FC<EncyclopediaDetailPageProps> = ({ darkMod
   const { slug } = useParams<{ slug: string }>();
   const article = ENCYCLOPEDIA.find(a => a.slug === slug) || ENCYCLOPEDIA[0];
 
-  const baseUrl = 'https://pdfbolt.com';
+  const baseUrl = 'https://pdfbolt.in';
   const canonicalUrl = `${baseUrl}/encyclopedia/${article.slug}`;
 
   // TechArticle Schema

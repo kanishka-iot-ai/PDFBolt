@@ -14,7 +14,7 @@ const GuideDetailPage: React.FC<GuideDetailPageProps> = ({ darkMode }) => {
   const guide = GUIDES.find(g => g.slug === slug) || GUIDES[0];
   const tool = guide.toolId ? TOOLS.find(t => t.id === guide.toolId) : null;
 
-  const baseUrl = 'https://pdfbolt.com';
+  const baseUrl = 'https://pdfbolt.in';
   const canonicalUrl = `${baseUrl}/guides/${guide.slug}`;
 
   // Article Schema

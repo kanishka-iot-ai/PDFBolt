@@ -31,7 +31,7 @@ def test_qr_share_creation_with_durations():
     data = resp.json()
     assert data["status"] == "ACTIVE"
     assert data["duration_seconds"] == 86400
-    assert "https://pdfbolt.com/s/" in data["share_url"]
+    assert "https://pdfbolt.in/s/" in data["share_url"]
     assert data["revocation_token"] is not None
     assert data["retention_notice"] == "This file is stored temporarily and will be automatically deleted when the share expires."
 

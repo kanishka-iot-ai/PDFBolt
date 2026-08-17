@@ -78,7 +78,7 @@ class ErrorBoundary extends Component<Props, State> {
                             </button>
                             
                             <a 
-                                href="mailto:support@pdfbolt.com?subject=App%20Crash%20Report" 
+                                href="mailto:support@pdfbolt.in?subject=App%20Crash%20Report" 
                                 className="px-8 py-4 bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white rounded-2xl font-bold text-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition-all flex items-center justify-center gap-2 border border-slate-200 dark:border-slate-700"
                             >
                                 <Mail size={20} />
