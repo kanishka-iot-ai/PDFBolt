@@ -45,7 +45,13 @@ class ErrorBoundary extends Component<Props, State> {
                 <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950 p-6 font-sans">
                     <div className="max-w-xl w-full bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-2xl p-10 text-center border border-slate-200 dark:border-slate-800 animate-scaleIn">
                         <a href="/" className="inline-block mb-6" aria-label="PDFBolt Home">
-                            <img src="/pdfbolt-logo.svg" alt="PDFBolt" width="160" height="40" className="h-10 mx-auto object-contain" />
+                            <img 
+                                src="/pdfbolt-logo.webp" 
+                                alt="PDFBolt" 
+                                width="150" 
+                                height="40" 
+                                className="h-10 mx-auto object-contain mb-4" 
+                            />
                         </a>
                         <div className="inline-flex p-5 rounded-full bg-red-50 dark:bg-red-500/10 mb-6 border-8 border-red-100 dark:border-red-500/5">
                             <AlertTriangle className="text-red-500 w-12 h-12" />

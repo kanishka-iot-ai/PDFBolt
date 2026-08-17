@@ -79,7 +79,7 @@ const AIChatbot: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
       <div className="p-4 bg-yellow-500 text-white flex justify-between items-center shrink-0">
         <div className="flex items-center gap-3">
           <div className="p-1 bg-white/20 rounded-lg flex items-center justify-center">
-            <img src="/pdfbolt-logo.svg" alt="PDFBolt AI" width="24" height="24" className="h-6 w-auto object-contain" />
+            <img src="/pdfbolt-logo.webp" alt="PDFBolt AI" width="24" height="24" className="h-6 w-auto object-contain" />
           </div>
           <div>
             <h4 className="font-bold text-sm tracking-tight">PDFBolt AI</h4>

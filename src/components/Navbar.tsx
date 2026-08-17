@@ -115,11 +115,11 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
             aria-label="Go to PDFBolt home"
           >
             <img 
-              src="/pdfbolt-logo.svg" 
+              src="/pdfbolt-logo.webp" 
               alt="PDFBolt" 
-              width="160"
+              width="150"
               height="40"
-              className="h-9 md:h-10 w-auto max-w-[150px] md:max-w-[170px] object-contain transition-transform duration-300 group-hover:scale-105" 
+              className="h-9 md:h-10 w-auto object-contain transition-transform duration-300 group-hover:scale-105" 
             />
           </Link>
           
