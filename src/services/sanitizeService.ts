@@ -1,15 +1,13 @@
-import { PDFDocument } from 'pdf-lib';
-import * as pdfjsLib from 'pdfjs-dist';
-
-import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
-
-pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
-
 /**
  * "Redacts" a PDF by flattening it to images.
  * This ensures no hidden text or interactive elements remain.
  */
 export async function redactPdf(file: File): Promise<Uint8Array> {
+    const pdfjsLib = await import('pdfjs-dist');
+    const pdfjsWorker = (await import('pdfjs-dist/build/pdf.worker.min.mjs?url')).default;
+    pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
+    const { PDFDocument } = await import('pdf-lib');
+
     const arrayBuffer = await file.arrayBuffer();
     const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
 
@@ -53,6 +51,7 @@ export async function redactPdf(file: File): Promise<Uint8Array> {
  * PDF-lib's 'load' is often robust enough to fix malformed XRef tables.
  */
 export async function repairPdf(file: File): Promise<Uint8Array> {
+    const { PDFDocument } = await import('pdf-lib');
     const arrayBuffer = await file.arrayBuffer();
     try {
         // Just loading and saving standardizes the structure

@@ -22,9 +22,11 @@ const Footer: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
         <div className="lg:col-span-1">
           <Link to="/" className="inline-block mb-4 group" aria-label="PDFBolt Home">
             <img 
-              src="/pdfbolt-logo-transparent.png" 
+              src="/pdfbolt-logo.svg" 
               alt="PDFBolt" 
-              className="h-12 w-auto max-w-[180px] object-contain transition-transform duration-300 group-hover:scale-105" 
+              width="160"
+              height="40"
+              className="h-10 w-auto max-w-[180px] object-contain transition-transform duration-300 group-hover:scale-105" 
             />
           </Link>
           <p className="text-xs font-medium leading-relaxed mb-6">

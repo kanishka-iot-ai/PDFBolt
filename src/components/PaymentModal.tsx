@@ -40,6 +40,7 @@ const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, darkMode }
             >
                 <button
                     onClick={onClose}
+                    aria-label="Close donation dialog"
                     className="absolute top-6 right-6 p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
                 >
                     <X size={24} />

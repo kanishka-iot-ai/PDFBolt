@@ -233,7 +233,7 @@ const QRTool: React.FC<QRToolProps> = ({ darkMode, notify }) => {
               <div className="flex items-center justify-between mb-8">
                 <div className="flex items-center gap-3">
                   <Shield className="text-yellow-600 w-6 h-6" />
-                  <h4 className={`text-2xl font-black uppercase tracking-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>Share Config</h4>
+                  <h2 className={`text-2xl font-black uppercase tracking-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>Share Config</h2>
                 </div>
                 <div className="text-right">
                   <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-1">Security Score</span>
@@ -329,7 +329,7 @@ const QRTool: React.FC<QRToolProps> = ({ darkMode, notify }) => {
             <div className={`p-8 rounded-[2rem] border-2 border-green-500/30 bg-green-500/5 transition-all ${darkMode ? 'bg-green-900/10' : 'bg-green-50'}`}>
               <div className="flex items-center gap-3 mb-2">
                 <ShieldCheck className="text-green-600" size={24} />
-                <h4 className={`font-black uppercase text-sm tracking-tight ${darkMode ? 'text-green-400' : 'text-green-800'}`}>Temporary Cloud Storage Policy</h4>
+                <h2 className={`font-black uppercase text-sm tracking-tight ${darkMode ? 'text-green-400' : 'text-green-800'}`}>Temporary Cloud Storage Policy</h2>
               </div>
               <p className="text-xs font-bold leading-relaxed text-green-900/70 dark:text-green-400/70">
                 This file is stored temporarily and will be automatically deleted when the share expires. The QR code links to a private, unguessable access point with signed URL protection.

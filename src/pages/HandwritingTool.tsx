@@ -438,9 +438,9 @@ const HandwritingTool: React.FC<HandwritingToolProps> = ({ darkMode, notify }) =
                   <div className="w-16 h-16 rounded-2xl bg-blue-500/10 text-blue-500 flex items-center justify-center mb-6">
                     <Upload size={32} />
                   </div>
-                  <h3 className={`text-2xl font-black mb-2 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+                  <h2 className={`text-2xl font-black mb-2 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
                     Upload Files or PDF
-                  </h3>
+                  </h2>
                   <p className={`text-xs sm:text-sm mb-6 ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
                     Select multi-page PDFs, scanned notes, JPG, PNG, or WEBP images directly from your device.
                   </p>
@@ -462,9 +462,9 @@ const HandwritingTool: React.FC<HandwritingToolProps> = ({ darkMode, notify }) =
                   <div className="w-16 h-16 rounded-2xl bg-yellow-500/10 text-yellow-500 flex items-center justify-center mb-6">
                     <Camera size={32} />
                   </div>
-                  <h3 className={`text-2xl font-black mb-2 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+                  <h2 className={`text-2xl font-black mb-2 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
                     Use Device Camera
-                  </h3>
+                  </h2>
                   <p className={`text-xs sm:text-sm mb-6 ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
                     Snap handwritten workbook or notebook pages one by one with live alignment assistance.
                   </p>

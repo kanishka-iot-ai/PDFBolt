@@ -1,11 +1,6 @@
-import * as pdfjsLib from 'pdfjs-dist';
-import { PDFDocument } from 'pdf-lib';
 import { aiService } from './aiService';
 import { generatePptxFromStructuredSlides, StructuredSlide } from './pptService';
 import { pdfToWord, pdfToExcel } from './conversionService';
-
-import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
-pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
 export interface DocumentAnalysis {
     fileName: string;
@@ -29,24 +24,30 @@ export interface DocumentAnalysis {
  */
 function extractTopTopics(text: string): string[] {
     const stopWords = new Set([
-        'the', 'and', 'for', 'that', 'this', 'with', 'from', 'have', 'more', 'will', 'your', 'about',
-        'there', 'their', 'which', 'would', 'these', 'other', 'into', 'first', 'could', 'after', 'than',
-        'then', 'them', 'been', 'when', 'also', 'over', 'page', 'document', 'report', 'section', 'using',
-        'between', 'under', 'through', 'where', 'should', 'without', 'because', 'each', 'such'
+        'about', 'above', 'after', 'again', 'against', 'all', 'and', 'any', 'are', 'because',
+        'been', 'before', 'being', 'below', 'between', 'both', 'but', 'by', 'could', 'did',
+        'does', 'doing', 'down', 'during', 'each', 'few', 'for', 'from', 'further', 'had',
+        'has', 'have', 'having', 'her', 'here', 'hers', 'herself', 'him', 'himself', 'his',
+        'how', 'into', 'its', 'itself', 'just', 'more', 'most', 'not', 'now', 'off', 'once',
+        'only', 'other', 'our', 'ours', 'ourselves', 'out', 'over', 'own', 'same', 'should',
+        'some', 'such', 'than', 'that', 'the', 'their', 'theirs', 'them', 'themselves', 'then',
+        'there', 'these', 'they', 'this', 'those', 'through', 'too', 'under', 'until', 'very',
+        'was', 'were', 'what', 'when', 'where', 'which', 'while', 'who', 'whom', 'why', 'will',
+        'with', 'would', 'your', 'yours', 'yourself', 'yourselves'
     ]);
 
-    const words = text.toLowerCase().match(/\b[a-zA-Z]{4,}\b/g) || [];
-    const frequencyMap: Record<string, number> = {};
+    const words = text
+        .toLowerCase()
+        .replace(/[^a-z0-9\s]/g, ' ')
+        .split(/\s+/)
+        .filter(w => w.length > 3 && !stopWords.has(w) && !/^\d+$/.test(w));
 
-    words.forEach(word => {
-        if (!stopWords.has(word)) {
-            frequencyMap[word] = (frequencyMap[word] || 0) + 1;
-        }
-    });
+    const freq: Record<string, number> = {};
+    words.forEach(w => { freq[w] = (freq[w] || 0) + 1; });
 
-    return Object.entries(frequencyMap)
+    return Object.entries(freq)
         .sort((a, b) => b[1] - a[1])
-        .slice(0, 6)
+        .slice(0, 8)
         .map(([word]) => word.charAt(0).toUpperCase() + word.slice(1));
 }
 
@@ -74,6 +75,10 @@ function generateHeuristicKeyFindings(text: string): string[] {
  * Performs deep client-side structural analysis of any PDF
  */
 export async function analyzePdfDocument(file: File): Promise<DocumentAnalysis> {
+    const pdfjsLib = await import('pdfjs-dist');
+    const pdfjsWorker = (await import('pdfjs-dist/build/pdf.worker.min.mjs?url')).default;
+    pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
+
     const arrayBuffer = await file.arrayBuffer();
     const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
 

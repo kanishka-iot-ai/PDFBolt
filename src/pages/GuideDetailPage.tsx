@@ -217,9 +217,9 @@ const GuideDetailPage: React.FC<GuideDetailPageProps> = ({ darkMode }) => {
               <div className={`p-5 rounded-2xl border mt-6 ${
                 darkMode ? 'bg-blue-950/20 border-blue-800 text-blue-200' : 'bg-blue-50 border-blue-200 text-blue-900'
               }`}>
-                <h4 className="font-bold text-xs uppercase tracking-wider mb-2 flex items-center gap-2">
+                <h3 className="font-bold text-xs uppercase tracking-wider mb-2 flex items-center gap-2">
                   <AlertCircle size={16} /> Pro Tips
-                </h4>
+                </h3>
                 <ul className="space-y-1 text-sm list-disc pl-5">
                   {sec.proTips.map((tip, tIdx) => (
                     <li key={tIdx}>{tip}</li>

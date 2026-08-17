@@ -479,9 +479,9 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
                 {isImageTool ? <ImageIcon className="text-yellow-500 w-10 h-10" /> : <FileText className="text-yellow-500 w-10 h-10" />}
               </div>
               <div className="overflow-hidden">
-                <h3 className={`text-xl font-black truncate max-w-[250px] ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+                <h2 className={`text-xl font-black truncate max-w-[250px] ${darkMode ? 'text-white' : 'text-slate-900'}`}>
                   {isImageTool ? `${multiFiles.length} Images Selected` : isZip ? `${multiFiles.length} Files (Folder)` : file?.name}
-                </h3>
+                </h2>
                 <p className="text-slate-500 font-bold uppercase text-[10px] tracking-widest">
                   {result ? 'FILE READY' : 'AWAITING CONFIGURATION'}
                 </p>
@@ -517,7 +517,7 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
             <div className={`p-6 sm:p-10 rounded-[2rem] border shadow-2xl text-left transition-all ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'}`}>
               <div className="flex items-center gap-3 mb-8">
                 <Settings2 className="text-yellow-600 w-6 h-6" />
-                <h4 className={`text-2xl font-black uppercase tracking-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>Tool Configuration</h4>
+                <h2 className={`text-2xl font-black uppercase tracking-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>Tool Configuration</h2>
               </div>
 
               {isSignTool && (
@@ -963,9 +963,9 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
 
       {isImageTool && !result && multiFiles.length > 0 && (
         <div className="max-w-3xl mx-auto mt-8 p-8 rounded-[2.5rem] border shadow-xl bg-white dark:bg-slate-800 dark:border-slate-700 text-left">
-          <h4 className="text-xl font-black uppercase mb-6 flex items-center gap-3">
+          <h2 className="text-xl font-black uppercase mb-6 flex items-center gap-3">
             <Settings2 className="w-6 h-6 text-yellow-500" /> PDF Layout Settings
-          </h4>
+          </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Page Size */}
@@ -1023,8 +1023,8 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
         <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-slate-900/95 backdrop-blur-xl animate-fadeIn">
           <div className="relative w-full max-w-6xl h-[92vh] bg-white dark:bg-slate-800 rounded-[3rem] overflow-hidden shadow-2xl flex flex-col">
             <div className="p-6 flex justify-between items-center border-b dark:border-slate-700">
-              <h5 className="font-black text-xl">Result Preview</h5>
-              <button onClick={() => setShowPreview(false)} className="p-3 bg-yellow-50 text-yellow-600 hover:bg-yellow-600 hover:text-white rounded-2xl transition-all"><X size={28} /></button>
+              <h2 className="font-black text-xl">Result Preview</h2>
+              <button onClick={() => setShowPreview(false)} aria-label="Close result preview" className="p-3 bg-yellow-50 text-yellow-600 hover:bg-yellow-600 hover:text-white rounded-2xl transition-all"><X size={28} /></button>
             </div>
             <div className="flex-grow w-full bg-slate-200 dark:bg-slate-900 relative">
               <embed src={`${result}#toolbar=1`} type="application/pdf" className="w-full h-full" />

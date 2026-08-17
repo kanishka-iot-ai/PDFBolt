@@ -125,7 +125,7 @@ const FileUploader: React.FC<FileUploaderProps> = ({
             )}
           </div>
           {onClearError && (
-            <button onClick={onClearError} className="text-red-400 hover:text-red-600">
+            <button onClick={onClearError} aria-label="Dismiss error notification" className="text-red-400 hover:text-red-600">
               <X size={18} />
             </button>
           )}

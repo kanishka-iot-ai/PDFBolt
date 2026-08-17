@@ -1,7 +1,4 @@
-import Tesseract from 'tesseract.js';
-import * as pdfjsLib from 'pdfjs-dist';
-import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
-import { Document, Paragraph as DocxParagraph, TextRun, AlignmentType, HeadingLevel, Packer } from 'docx';
+// Dynamic processing engines imported on-demand inside methods
 import {
   HandwritingPage,
   PDFDesignSettings,
@@ -10,9 +7,7 @@ import {
 } from '../types/handwriting';
 import { API_BASE_URL } from './apiClient';
 
-// Configure PDF.js worker
-import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
-pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
+
 
 /**
  * Generates a unique ID for a page.
@@ -25,6 +20,10 @@ export function generatePageId(): string {
  * Extracts and renders each page of an uploaded PDF into individual HandwritingPage objects.
  */
 export async function renderPdfToPages(file: File): Promise<HandwritingPage[]> {
+  const pdfjsLib = await import('pdfjs-dist');
+  const pdfjsWorker = (await import('pdfjs-dist/build/pdf.worker.min.mjs?url')).default;
+  pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
+
   const arrayBuffer = await file.arrayBuffer();
   const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
   const pages: HandwritingPage[] = [];
@@ -286,6 +285,7 @@ export async function rotateImageDataUrl(dataUrl: string, degrees: number): Prom
  * Local In-Browser Tesseract.js OCR execution.
  */
 export async function runLocalOCR(imageDataUrl: string): Promise<{ text: string; confidence: number; hasHandwriting: boolean }> {
+  const Tesseract = (await import('tesseract.js')).default;
   const worker = await Tesseract.createWorker('eng');
   try {
     const { data: { text, confidence } } = await worker.recognize(imageDataUrl);
@@ -401,6 +401,7 @@ export async function generateClientPDF(
   pages: HandwritingPage[],
   design: PDFDesignSettings
 ): Promise<Uint8Array> {
+  const { PDFDocument, rgb, StandardFonts } = await import('pdf-lib');
   const pdfDoc = await PDFDocument.create();
   const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
   const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
@@ -566,8 +567,9 @@ export async function generateClientDOCX(
   pages: HandwritingPage[],
   design: PDFDesignSettings
 ): Promise<Blob> {
+  const { Document, Paragraph: DocxParagraph, TextRun, HeadingLevel, Packer } = await import('docx');
   const docSections = pages.map((page, idx) => {
-    const paragraphs: DocxParagraph[] = [];
+    const paragraphs: any[] = [];
 
     if (idx === 0 && design.documentTitle) {
       paragraphs.push(

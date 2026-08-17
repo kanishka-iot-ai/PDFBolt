@@ -1,16 +1,4 @@
-import * as mammoth from 'mammoth';
-import Tesseract from 'tesseract.js';
-import ExcelJS from 'exceljs';
-import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
-import * as pdfjsLib from 'pdfjs-dist';
-import JSZip from 'jszip';
-import html2canvas from 'html2canvas';
-import jsPDF from 'jspdf';
 import { sanitizeFileName } from '../utils/fileValidation';
-
-// Configure PDF.js worker (Critical for Vite functionality)
-import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
-pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
 /**
  * Converts a Word (.docx) file to PDF.
@@ -18,6 +6,10 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
  * Preserves layout better than raw text extraction.
  */
 export async function wordToPdf(file: File): Promise<Uint8Array> {
+  const mammoth = await import('mammoth');
+  const html2canvas = (await import('html2canvas')).default;
+  const jsPDF = (await import('jspdf')).default;
+
   const arrayBuffer = await file.arrayBuffer();
   const { value: html } = await mammoth.convertToHtml({ arrayBuffer });
 
@@ -71,6 +63,10 @@ export async function wordToPdf(file: File): Promise<Uint8Array> {
  * Method: ExcelJS -> HTML Table -> Canvas (html2canvas) -> PDF (jspdf)
  */
 export async function excelToPdf(file: File): Promise<Uint8Array> {
+  const ExcelJS = (await import('exceljs')).default;
+  const html2canvas = (await import('html2canvas')).default;
+  const jsPDF = (await import('jspdf')).default;
+
   const arrayBuffer = await file.arrayBuffer();
   const workbook = new ExcelJS.Workbook();
   await workbook.xlsx.load(arrayBuffer);
@@ -164,6 +160,10 @@ export async function excelToPdf(file: File): Promise<Uint8Array> {
  * Converts PDF to JPG images with crisp rendering and individual page blobs.
  */
 export async function pdfToJpg(file: File): Promise<{ name: string, blob: Blob }[]> {
+  const pdfjsLib = await import('pdfjs-dist');
+  const pdfjsWorker = (await import('pdfjs-dist/build/pdf.worker.min.mjs?url')).default;
+  pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
+
   const arrayBuffer = await file.arrayBuffer();
   const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
   const images: { name: string, blob: Blob }[] = [];
@@ -197,6 +197,7 @@ export async function pdfToJpg(file: File): Promise<{ name: string, blob: Blob }
  * Converts HTML file to PDF with vector layout.
  */
 export async function htmlToPdf(file: File): Promise<Uint8Array> {
+  const jsPDF = (await import('jspdf')).default;
   return new Promise(async (resolve, reject) => {
     let container: HTMLDivElement | null = null;
     try {
@@ -240,6 +241,7 @@ export async function htmlToPdf(file: File): Promise<Uint8Array> {
  * OCR Fallback for Scanned PDFs
  */
 async function runOCR(page: any): Promise<string> {
+  const Tesseract = (await import('tesseract.js')).default;
   const viewport = page.getViewport({ scale: 2.0 });
   const canvas = document.createElement("canvas");
   const ctx = canvas.getContext("2d");
@@ -268,6 +270,10 @@ async function runOCR(page: any): Promise<string> {
  * Preserves font sizes, bold styles, headings, lists, and tables.
  */
 export async function pdfToWord(file: File): Promise<Uint8Array> {
+  const pdfjsLib = await import('pdfjs-dist');
+  const pdfjsWorker = (await import('pdfjs-dist/build/pdf.worker.min.mjs?url')).default;
+  pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
+
   const arrayBuffer = await file.arrayBuffer();
   const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
   const { Document, Packer, Paragraph, TextRun, PageBreak, HeadingLevel } = await import('docx');
@@ -418,6 +424,11 @@ function parseExcelCellValue(text: string): { value: any, type: 'number' | 'stri
  * Converts PDF to Excel (.xlsx) with 2D coordinate grid alignment and numeric coercion.
  */
 export async function pdfToExcel(file: File): Promise<Uint8Array> {
+  const pdfjsLib = await import('pdfjs-dist');
+  const pdfjsWorker = (await import('pdfjs-dist/build/pdf.worker.min.mjs?url')).default;
+  pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
+  const ExcelJS = (await import('exceljs')).default;
+
   const arrayBuffer = await file.arrayBuffer();
   const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
   const workbook = new ExcelJS.Workbook();

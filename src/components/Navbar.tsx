@@ -115,9 +115,11 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
             aria-label="Go to PDFBolt home"
           >
             <img 
-              src="/pdfbolt-logo-transparent.png" 
+              src="/pdfbolt-logo.svg" 
               alt="PDFBolt" 
-              className="h-10 md:h-11 w-auto max-w-[150px] md:max-w-[170px] object-contain transition-transform duration-300 group-hover:scale-105" 
+              width="160"
+              height="40"
+              className="h-9 md:h-10 w-auto max-w-[150px] md:max-w-[170px] object-contain transition-transform duration-300 group-hover:scale-105" 
             />
           </Link>
           
@@ -266,10 +268,18 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
             <div className="h-4 w-px bg-slate-200 dark:bg-slate-700"></div>
             
             <div className="flex items-center gap-1">
-              <button onClick={toggleSound} className={`p-2 rounded-full transition-colors ${darkMode ? 'hover:bg-slate-800 text-slate-400' : 'hover:bg-slate-100 text-slate-500'}`}>
+              <button 
+                onClick={toggleSound} 
+                aria-label={soundEnabled ? "Mute audio effects" : "Enable audio effects"}
+                className={`p-2 rounded-full transition-colors ${darkMode ? 'hover:bg-slate-800 text-slate-300' : 'hover:bg-slate-100 text-slate-700'}`}
+              >
                 {soundEnabled ? <Volume2 size={18} /> : <VolumeX size={18} />}
               </button>
-              <button onClick={toggleDarkMode} className={`p-2 rounded-full transition-colors ${darkMode ? 'bg-slate-800 text-yellow-400' : 'bg-slate-100 text-slate-600'}`}>
+              <button 
+                onClick={toggleDarkMode} 
+                aria-label={darkMode ? "Switch to light mode" : "Switch to dark mode"}
+                className={`p-2 rounded-full transition-colors ${darkMode ? 'bg-slate-800 text-yellow-400' : 'bg-slate-100 text-slate-700'}`}
+              >
                 {darkMode ? <Sun size={18} /> : <Moon size={18} />}
               </button>
             </div>
@@ -285,10 +295,18 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
             >
               <Home size={16} /> Home
             </Link>
-            <button onClick={toggleDarkMode} className={`p-2 rounded-full ${darkMode ? 'text-yellow-400' : 'text-slate-600'}`}>
+            <button 
+              onClick={toggleDarkMode} 
+              aria-label={darkMode ? "Switch to light mode" : "Switch to dark mode"}
+              className={`p-2 rounded-full ${darkMode ? 'text-yellow-400' : 'text-slate-700'}`}
+            >
               {darkMode ? <Sun size={18} /> : <Moon size={18} />}
             </button>
-            <button onClick={() => setIsOpen(!isOpen)} className={`p-2 rounded-xl ${darkMode ? 'text-white' : 'text-slate-900'}`} aria-label="Toggle menu">
+            <button 
+              onClick={() => setIsOpen(!isOpen)} 
+              className={`p-2 rounded-xl ${darkMode ? 'text-white' : 'text-slate-900'}`} 
+              aria-label={isOpen ? "Close navigation menu" : "Open navigation menu"}
+            >
               {isOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
           </div>

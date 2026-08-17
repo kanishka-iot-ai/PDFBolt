@@ -251,6 +251,7 @@ const CameraCaptureModal: React.FC<CameraCaptureModalProps> = ({
 
               <button
                 onClick={handleSnap}
+                aria-label="Take photograph"
                 disabled={isCapturing || !!cameraError}
                 className="w-16 h-16 rounded-full bg-yellow-500 hover:bg-yellow-400 p-1.5 shadow-xl transition-all transform active:scale-90 flex items-center justify-center ring-4 ring-yellow-500/30"
               >

@@ -84,29 +84,34 @@ const ComparisonPage: React.FC<ComparisonPageProps> = ({ darkMode }) => {
         </div>
 
         {/* Why Zero-Upload Architecture Matters */}
-        <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className={`p-8 rounded-3xl border ${darkMode ? 'bg-slate-800/40 border-slate-700' : 'bg-white border-slate-200 shadow-sm'}`}>
-            <ShieldCheck className="w-8 h-8 text-emerald-500 mb-4" />
-            <h3 className={`font-bold text-xl mb-2 ${darkMode ? 'text-white' : 'text-slate-900'}`}>Zero Server Exposure</h3>
-            <p className={`text-sm leading-relaxed ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
-              With traditional cloud PDF converters, your confidential invoices and medical records travel across the public internet to third-party servers. PDFBolt keeps all bytes inside your browser RAM.
-            </p>
-          </div>
+        <div className="mt-16">
+          <h2 className={`text-2xl md:text-3xl font-black mb-8 text-center ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+            Why Zero-Upload Architecture Matters
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className={`p-8 rounded-3xl border ${darkMode ? 'bg-slate-800/40 border-slate-700' : 'bg-white border-slate-200 shadow-sm'}`}>
+              <ShieldCheck className="w-8 h-8 text-emerald-500 mb-4" />
+              <h3 className={`font-bold text-xl mb-2 ${darkMode ? 'text-white' : 'text-slate-900'}`}>Zero Server Exposure</h3>
+              <p className={`text-sm leading-relaxed ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+                With traditional cloud PDF converters, your confidential invoices and medical records travel across the public internet to third-party servers. PDFBolt keeps all bytes inside your browser RAM.
+              </p>
+            </div>
 
-          <div className={`p-8 rounded-3xl border ${darkMode ? 'bg-slate-800/40 border-slate-700' : 'bg-white border-slate-200 shadow-sm'}`}>
-            <Zap className="w-8 h-8 text-amber-500 mb-4" />
-            <h3 className={`font-bold text-xl mb-2 ${darkMode ? 'text-white' : 'text-slate-900'}`}>Zero Upload Latency</h3>
-            <p className={`text-sm leading-relaxed ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
-              Uploading a 200MB PDF on a slow connection can take minutes. With local WebAssembly execution, processing starts instantly the moment you select your file.
-            </p>
-          </div>
+            <div className={`p-8 rounded-3xl border ${darkMode ? 'bg-slate-800/40 border-slate-700' : 'bg-white border-slate-200 shadow-sm'}`}>
+              <Zap className="w-8 h-8 text-amber-500 mb-4" />
+              <h3 className={`font-bold text-xl mb-2 ${darkMode ? 'text-white' : 'text-slate-900'}`}>Zero Upload Latency</h3>
+              <p className={`text-sm leading-relaxed ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+                Uploading a 200MB PDF on a slow connection can take minutes. With local WebAssembly execution, processing starts instantly the moment you select your file.
+              </p>
+            </div>
 
-          <div className={`p-8 rounded-3xl border ${darkMode ? 'bg-slate-800/40 border-slate-700' : 'bg-white border-slate-200 shadow-sm'}`}>
-            <Lock className="w-8 h-8 text-blue-500 mb-4" />
-            <h3 className={`font-bold text-xl mb-2 ${darkMode ? 'text-white' : 'text-slate-900'}`}>True Permanent Redaction</h3>
-            <p className={`text-sm leading-relaxed ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
-              Many web tools only paint a superficial black box over selectable text. PDFBolt permanently rasterizes redacted sectors to ensure text cannot be recovered via DevTools or copy-paste.
-            </p>
+            <div className={`p-8 rounded-3xl border ${darkMode ? 'bg-slate-800/40 border-slate-700' : 'bg-white border-slate-200 shadow-sm'}`}>
+              <Lock className="w-8 h-8 text-blue-500 mb-4" />
+              <h3 className={`font-bold text-xl mb-2 ${darkMode ? 'text-white' : 'text-slate-900'}`}>True Permanent Redaction</h3>
+              <p className={`text-sm leading-relaxed ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+                Many web tools only paint a superficial black box over selectable text. PDFBolt permanently rasterizes redacted sectors to ensure text cannot be recovered via DevTools or copy-paste.
+              </p>
+            </div>
           </div>
         </div>
 

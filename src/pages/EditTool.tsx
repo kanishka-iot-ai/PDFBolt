@@ -450,6 +450,7 @@ const EditTool: React.FC<EditToolProps> = ({ darkMode, notify }) => {
                         <div className={`w-16 flex flex-col items-center py-6 gap-4 border-r ${darkMode ? 'border-slate-700 bg-slate-800' : 'border-slate-200 bg-white'}`}>
                             <button
                                 onClick={() => setMode('select')}
+                                aria-label="Select and move elements"
                                 className={`p-3 rounded-xl transition-all ${mode === 'select' ? 'bg-yellow-500 text-white' : 'hover:bg-slate-100 dark:hover:bg-slate-700'}`}
                                 title="Select / Move"
                             >
@@ -457,17 +458,19 @@ const EditTool: React.FC<EditToolProps> = ({ darkMode, notify }) => {
                             </button>
                             <button
                                 onClick={handleAddText}
+                                aria-label="Add text element"
                                 className={`p-3 rounded-xl transition-all ${mode === 'text' ? 'bg-yellow-500 text-white' : 'hover:bg-slate-100 dark:hover:bg-slate-700'}`}
                                 title="Add Text"
                             >
                                 <Type size={20} />
                             </button>
-                            <label className={`p-3 rounded-xl transition-all cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700`}>
+                            <label className={`p-3 rounded-xl transition-all cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700`} aria-label="Upload and insert image">
                                 <ImageIcon size={20} />
                                 <input type="file" accept="image/*" className="hidden" onChange={handleAddImage} />
                             </label>
                             <button
                                 onClick={() => setMode('draw')}
+                                aria-label="Freehand drawing tool"
                                 className={`p-3 rounded-xl transition-all ${mode === 'draw' ? 'bg-yellow-500 text-white' : 'hover:bg-slate-100 dark:hover:bg-slate-700'}`}
                                 title="Free Hand Draw"
                             >
@@ -477,7 +480,7 @@ const EditTool: React.FC<EditToolProps> = ({ darkMode, notify }) => {
                             <div className="w-8 h-px bg-slate-200 dark:bg-slate-700 my-2"></div>
 
                             {selectedElementId && (
-                                <button onClick={deleteSelected} className="p-3 text-red-500 hover:bg-red-50 rounded-xl" title="Delete Selected">
+                                <button onClick={deleteSelected} aria-label="Delete selected element" className="p-3 text-red-500 hover:bg-red-50 rounded-xl" title="Delete Selected">
                                     <Trash2 size={20} />
                                 </button>
                             )}

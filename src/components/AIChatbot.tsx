@@ -79,7 +79,7 @@ const AIChatbot: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
       <div className="p-4 bg-yellow-500 text-white flex justify-between items-center shrink-0">
         <div className="flex items-center gap-3">
           <div className="p-1 bg-white/20 rounded-lg flex items-center justify-center">
-            <img src="/pdfbolt-logo-transparent.png" alt="PDFBolt AI" className="h-6 w-auto object-contain" />
+            <img src="/pdfbolt-logo.svg" alt="PDFBolt AI" width="24" height="24" className="h-6 w-auto object-contain" />
           </div>
           <div>
             <h4 className="font-bold text-sm tracking-tight">PDFBolt AI</h4>
@@ -92,6 +92,7 @@ const AIChatbot: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
         <div className="flex items-center gap-1">
           <button
             title="Clear History"
+            aria-label="Clear chat history"
             onClick={() => setMessages([{ role: 'model', text: 'History cleared. How can I help?' }])}
             className="p-2 hover:bg-white/20 rounded-md transition-colors"
           >
@@ -99,6 +100,7 @@ const AIChatbot: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
           </button>
           <button
             title="Close Chat"
+            aria-label="Close chat window"
             onClick={() => setIsOpen(false)}
             className="p-2 hover:bg-white/20 rounded-md transition-colors"
           >
@@ -136,6 +138,7 @@ const AIChatbot: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
           />
           <button
             onClick={handleSend}
+            aria-label="Send message"
             disabled={!input.trim() || isTyping}
             className="absolute right-1.5 top-1/2 -translate-y-1/2 p-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 disabled:opacity-50 transition-all"
           >

@@ -1,10 +1,4 @@
-import * as pdfjsLib from 'pdfjs-dist';
-import html2canvas from 'html2canvas';
-import jsPDF from 'jspdf';
-import JSZip from 'jszip';
 
-import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
-pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
 const SLIDE_WIDTH_EMU = 12192000; // 16:9 Widescreen width
 const SLIDE_HEIGHT_EMU = 6858000; // 16:9 Widescreen height
@@ -29,6 +23,7 @@ async function createPptxFromImages(images: Uint8Array[]): Promise<Blob> {
         throw new Error("No PDF pages were rendered for the PowerPoint file.");
     }
 
+    const JSZip = (await import('jszip')).default;
     const zip = new JSZip();
 
     zip.file('[Content_Types].xml', `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
@@ -124,6 +119,10 @@ async function createPptxFromImages(images: Uint8Array[]): Promise<Blob> {
  * Converts PDF to PowerPoint (.pptx) by rendering high-resolution slide images.
  */
 export async function pdfToPpt(file: File): Promise<Blob> {
+    const pdfjsLib = await import('pdfjs-dist');
+    const pdfjsWorker = (await import('pdfjs-dist/build/pdf.worker.min.mjs?url')).default;
+    pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
+
     const arrayBuffer = await file.arrayBuffer();
     const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
     const slideImages: Uint8Array[] = [];
@@ -205,6 +204,8 @@ export async function pptToPdf(file: File): Promise<Uint8Array> {
             }, 30000);
         }));
 
+        const html2canvas = (await import('html2canvas')).default;
+        const jsPDF = (await import('jspdf')).default;
         const slides = container.querySelectorAll('.slide');
         const pdf = new jsPDF('l', 'mm', 'a4');
         const pdfWidth = 297;
@@ -245,6 +246,8 @@ export async function generatePptxFromStructuredSlides(
     slides: StructuredSlide[],
     presentationTitle: string = "Executive Presentation"
 ): Promise<Blob> {
+    const JSZip = (await import('jszip')).default;
+    const html2canvas = (await import('html2canvas')).default;
     const zip = new JSZip();
 
     zip.file('[Content_Types].xml', `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>

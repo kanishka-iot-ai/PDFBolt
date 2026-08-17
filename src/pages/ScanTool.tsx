@@ -409,12 +409,14 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
                                     <div className="flex gap-3">
                                         <button
                                             onClick={toggleTorch}
+                                            aria-label={isTorchOn ? "Turn off camera flash" : "Turn on camera flash"}
                                             className="pointer-events-auto p-3.5 bg-black/60 text-white rounded-full backdrop-blur-xl border border-white/10 active:scale-90"
                                         >
                                             {isTorchOn ? <Zap className="text-yellow-400 fill-current" size={24} /> : <ZapOff size={24} />}
                                         </button>
                                         <button
                                             onClick={stopCamera}
+                                            aria-label="Close camera scanner"
                                             className="pointer-events-auto p-3.5 bg-black/60 text-white rounded-full backdrop-blur-xl border border-white/10 active:scale-90"
                                         >
                                             <X size={24} />

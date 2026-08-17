@@ -1,17 +1,13 @@
-import Tesseract from 'tesseract.js';
-import * as pdfjsLib from 'pdfjs-dist';
-
-// Configure PDF.js worker
-import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
-
-// Configure PDF.js worker
-pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
-
 /**
  * Performs OCR on a PDF file.
  * Strategy: Render PDF pages as images -> OpenCV Preprocessing -> Run Tesseract.
  */
 export async function ocrPdf(file: File): Promise<string> {
+    const pdfjsLib = await import('pdfjs-dist');
+    const pdfjsWorker = (await import('pdfjs-dist/build/pdf.worker.min.mjs?url')).default;
+    pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
+    const Tesseract = (await import('tesseract.js')).default;
+
     const arrayBuffer = await file.arrayBuffer();
     const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
     let fullText = "";
@@ -53,6 +49,7 @@ export async function ocrPdf(file: File): Promise<string> {
  * Performs OCR on a single image (data URL or Blob).
  */
 export async function ocrImage(imageSource: string | Blob): Promise<string> {
+    const Tesseract = (await import('tesseract.js')).default;
     const worker = await Tesseract.createWorker('eng');
 
     try {

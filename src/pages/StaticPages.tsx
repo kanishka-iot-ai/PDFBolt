@@ -80,14 +80,14 @@ export const ContactPage: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
             <a href="mailto:support@pdfbolt.in" className={`p-6 rounded-3xl border flex items-center gap-6 transition-all hover:scale-[1.02] ${darkMode ? 'bg-slate-800 border-slate-700 hover:bg-slate-700' : 'bg-slate-50 border-slate-200 hover:bg-slate-100'}`}>
               <div className="p-4 bg-white dark:bg-slate-900 rounded-2xl text-yellow-500 shadow-sm"><Mail size={24} /></div>
               <div>
-                <h4 className={`font-black uppercase text-xs tracking-widest mb-1 ${darkMode ? 'text-white' : 'text-slate-900'}`}>Email Support</h4>
+                <h2 className={`font-black uppercase text-xs tracking-widest mb-1 ${darkMode ? 'text-white' : 'text-slate-900'}`}>Email Support</h2>
                 <p className="text-sm font-bold text-slate-500">Click to Send Email</p>
               </div>
             </a>
             <a href="tel:993234232" className={`p-6 rounded-3xl border flex items-center gap-6 transition-all hover:scale-[1.02] ${darkMode ? 'bg-slate-800 border-slate-700 hover:bg-slate-700' : 'bg-slate-50 border-slate-200 hover:bg-slate-100'}`}>
               <div className="p-4 bg-white dark:bg-slate-900 rounded-2xl text-orange-500 shadow-sm"><Headphones size={24} /></div>
               <div>
-                <h4 className={`font-black uppercase text-xs tracking-widest mb-1 ${darkMode ? 'text-white' : 'text-slate-900'}`}>Phone Support</h4>
+                <h2 className={`font-black uppercase text-xs tracking-widest mb-1 ${darkMode ? 'text-white' : 'text-slate-900'}`}>Phone Support</h2>
                 <p className="text-sm font-bold text-slate-500">Click to Call Us</p>
               </div>
             </a>
