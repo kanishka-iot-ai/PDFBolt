@@ -143,7 +143,7 @@ export const PrivacyPage: React.FC<{ darkMode: boolean }> = ({ darkMode }) => (
       Your privacy and data security are the foundational pillars of PDFBolt. This Privacy Policy details how we handle your documents, cookies, and digital preferences.
     </p>
 
-    <h3>1. Client-Side Document Processing</h3>
+    <h2>1. Client-Side Document Processing</h2>
     <p>
       Unlike traditional cloud converter websites, <strong>PDFBolt processes all standard PDF conversions and manipulations directly within your web browser</strong> using JavaScript and WebAssembly (Wasm). 
     </p>
@@ -153,7 +153,7 @@ export const PrivacyPage: React.FC<{ darkMode: boolean }> = ({ darkMode }) => (
       <li><strong>Optional Cloud Sharing (QR Code Tool):</strong> If you explicitly choose the "Share via QR Code" feature, your encrypted PDF is stored temporarily in our secure AWS S3 bucket with an automatic 30-day lifecycle expiration policy, after which it is permanently purged.</li>
     </ul>
 
-    <h3>2. Advertising & Google AdSense Cookies</h3>
+    <h2>2. Advertising & Google AdSense Cookies</h2>
     <p>
       To keep PDFBolt free, high-performance, and accessible worldwide without subscription paywalls, we partner with <strong>Google AdSense</strong> to display non-intrusive advertisements.
     </p>
@@ -163,7 +163,7 @@ export const PrivacyPage: React.FC<{ darkMode: boolean }> = ({ darkMode }) => (
       <li>AdSense scripts are loaded asynchronously and strictly isolated from all document processing and file reader APIs. Advertisers have zero access to your document contents, file names, or metadata.</li>
     </ul>
 
-    <h3>3. Essential Cookies & Local Storage</h3>
+    <h2>3. Essential Cookies & Local Storage</h2>
     <p>
       We use lightweight browser storage strictly for essential user preferences:
     </p>
@@ -173,7 +173,7 @@ export const PrivacyPage: React.FC<{ darkMode: boolean }> = ({ darkMode }) => (
       <li>Cookie and advertising personalization consent choices</li>
     </ul>
 
-    <h3>4. Contact & Inquiries</h3>
+    <h2>4. Contact & Inquiries</h2>
     <p>
       If you have questions about our privacy practices, security model, or cookie preferences, please contact our privacy compliance team at <a href="mailto:support@pdfbolt.in" className="text-yellow-600 font-bold">support@pdfbolt.in</a>.
     </p>
@@ -185,11 +185,11 @@ export const TermsPage: React.FC<{ darkMode: boolean }> = ({ darkMode }) => (
     <p className="lead text-lg font-medium text-slate-600 dark:text-slate-300">
       By accessing or utilizing PDFBolt, you acknowledge and agree to these terms:
     </p>
-    <h3>1. Free & Unlimited Service</h3>
+    <h2>1. Free & Unlimited Service</h2>
     <p>PDFBolt is 100% free for personal, educational, and commercial document workflows. There are no hidden fees, recurring subscriptions, or forced feature paywalls.</p>
-    <h3>2. "As-Is" Document Processing</h3>
+    <h2>2. "As-Is" Document Processing</h2>
     <p>While PDFBolt employs battle-tested PDF engines and strict regression checks, document processing is provided on an "as-is" and "as-available" basis without warranties of any kind.</p>
-    <h3>3. Prohibited Usage & Automated Scraping</h3>
+    <h2>3. Prohibited Usage & Automated Scraping</h2>
     <p>You agree not to reverse engineer, disrupt server integrity, spam automated bot requests, or create deceptive wrappers intended to mislead users or manipulate advertising metrics.</p>
   </PageLayout>
 );
@@ -204,7 +204,7 @@ export const AboutPage: React.FC<{ darkMode: boolean }> = ({ darkMode }) => (
       ].map((item, i) => (
         <div key={i} className={`p-8 rounded-3xl border ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-slate-50 border-slate-200'}`}>
           <div className="text-yellow-500 mb-4">{item.icon}</div>
-          <h4 className={`text-xl font-black mb-2 ${darkMode ? 'text-white' : 'text-slate-900'}`}>{item.title}</h4>
+          <h2 className={`text-xl font-black mb-2 ${darkMode ? 'text-white' : 'text-slate-900'}`}>{item.title}</h2>
           <p className="text-sm font-medium text-slate-500">{item.desc}</p>
         </div>
       ))}

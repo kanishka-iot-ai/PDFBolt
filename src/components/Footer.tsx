@@ -44,9 +44,9 @@ const Footer: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
 
         {/* Popular Tools */}
         <nav aria-label="Popular PDF Tools">
-          <h4 className={`font-black uppercase text-xs tracking-widest mb-4 ${darkMode ? 'text-slate-200' : 'text-slate-900'}`}>PDF Tools</h4>
+          <p className={`font-black uppercase text-xs tracking-widest mb-4 ${darkMode ? 'text-slate-200' : 'text-slate-900'}`}>PDF Tools</p>
           <ul className="space-y-2.5 text-xs font-semibold">
-            <li><Link to="/analyze-pdf" className="text-yellow-500 font-bold hover:underline">✨ AI PDF Analyzer</Link></li>
+            <li><Link to="/analyze-pdf" className="text-yellow-700 dark:text-yellow-400 font-bold hover:underline">✨ AI PDF Analyzer</Link></li>
             <li><Link to="/merge-pdf" className="hover:text-yellow-500 transition-colors">Merge PDF</Link></li>
             <li><Link to="/split-pdf" className="hover:text-yellow-500 transition-colors">Split PDF</Link></li>
             <li><Link to="/compress-pdf" className="hover:text-yellow-500 transition-colors">Compress PDF</Link></li>
@@ -54,26 +54,26 @@ const Footer: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
             <li><Link to="/pdf-to-excel" className="hover:text-yellow-500 transition-colors">PDF to Excel</Link></li>
             <li><Link to="/redact-pdf" className="hover:text-yellow-500 transition-colors">Redact PDF</Link></li>
             <li><Link to="/ocr-pdf" className="hover:text-yellow-500 transition-colors">OCR PDF</Link></li>
-            <li><Link to="/tools" className="text-yellow-500 font-bold hover:underline">View All 25+ Tools →</Link></li>
+            <li><Link to="/tools" className="text-yellow-700 dark:text-yellow-400 font-bold hover:underline">View All 25+ Tools →</Link></li>
           </ul>
         </nav>
 
         {/* How-To Guides */}
         <nav aria-label="PDF How-To Guides">
-          <h4 className={`font-black uppercase text-xs tracking-widest mb-4 ${darkMode ? 'text-slate-200' : 'text-slate-900'}`}>Knowledge Base</h4>
+          <p className={`font-black uppercase text-xs tracking-widest mb-4 ${darkMode ? 'text-slate-200' : 'text-slate-900'}`}>Knowledge Base</p>
           <ul className="space-y-2.5 text-xs font-semibold">
             <li><Link to="/guides/how-to-convert-pdf-to-word" className="hover:text-yellow-500 transition-colors">Convert PDF to Word</Link></li>
             <li><Link to="/guides/how-to-compress-a-pdf" className="hover:text-yellow-500 transition-colors">Compress Below 2MB</Link></li>
             <li><Link to="/guides/how-to-merge-pdf-files" className="hover:text-yellow-500 transition-colors">Combine Multiple PDFs</Link></li>
             <li><Link to="/guides/how-to-redact-a-pdf" className="hover:text-yellow-500 transition-colors">Permanently Redact Data</Link></li>
             <li><Link to="/guides/how-to-protect-a-pdf" className="hover:text-yellow-500 transition-colors">Password Protect PDF</Link></li>
-            <li><Link to="/guides" className="text-yellow-500 font-bold hover:underline">All How-To Guides →</Link></li>
+            <li><Link to="/guides" className="text-yellow-700 dark:text-yellow-400 font-bold hover:underline">All How-To Guides →</Link></li>
           </ul>
         </nav>
 
         {/* Workflows & Reference */}
         <nav aria-label="Workflows & Encyclopedia">
-          <h4 className={`font-black uppercase text-xs tracking-widest mb-4 ${darkMode ? 'text-slate-200' : 'text-slate-900'}`}>Ecosystem</h4>
+          <p className={`font-black uppercase text-xs tracking-widest mb-4 ${darkMode ? 'text-slate-200' : 'text-slate-900'}`}>Ecosystem</p>
           <ul className="space-y-2.5 text-xs font-semibold">
             <li><Link to="/student-pdf-tools" className="hover:text-yellow-500 transition-colors">Student Study Workflow</Link></li>
             <li><Link to="/business-pdf-tools" className="hover:text-yellow-500 transition-colors">Business Legal Workflow</Link></li>
@@ -87,7 +87,7 @@ const Footer: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
 
         {/* Company & Support */}
         <div>
-          <h4 className={`font-black uppercase text-xs tracking-widest mb-4 ${darkMode ? 'text-slate-200' : 'text-slate-900'}`}>Support & Legal</h4>
+          <p className={`font-black uppercase text-xs tracking-widest mb-4 ${darkMode ? 'text-slate-200' : 'text-slate-900'}`}>Support & Legal</p>
           <ul className="space-y-2.5 text-xs font-semibold mb-6">
             <li><Link to="/" aria-label="Go to PDFBolt home" className="hover:text-yellow-500 transition-colors">Home</Link></li>
             <li><Link to="/about" className="hover:text-yellow-500 transition-colors">About PDFBolt</Link></li>

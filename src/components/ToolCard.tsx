@@ -102,11 +102,11 @@ const ToolCard: React.FC<ToolCardProps> = ({ tool, darkMode, compact = false }) 
 
         {/* CTA Row */}
         <div className="mt-3 sm:mt-4 pt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
-          <span className="text-[11px] sm:text-xs font-bold text-yellow-600 dark:text-yellow-400 group-hover:text-yellow-500 inline-flex items-center gap-1">
+          <span className="text-[11px] sm:text-xs font-bold text-yellow-700 dark:text-yellow-400 group-hover:text-yellow-500 inline-flex items-center gap-1">
             Open tool
             <ArrowRight size={13} className="transition-transform duration-200 group-hover:translate-x-1" />
           </span>
-          <span className="text-[10px] uppercase font-semibold text-slate-400 tracking-wider hidden sm:inline">
+          <span className="text-[10px] uppercase font-semibold text-slate-500 tracking-wider hidden sm:inline">
             Free
           </span>
         </div>

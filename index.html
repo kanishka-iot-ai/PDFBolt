@@ -112,9 +112,9 @@
 
     <!-- Loading fallback visible before React hydrates -->
     <div id="loading-fallback"
-      style="display: flex; align-items: center; justify-content: center; min-height: 100vh; font-family: system-ui, -apple-system, sans-serif;">
+      style="display: flex; align-items: center; justify-content: center; min-height: 60vh; font-family: system-ui, -apple-system, sans-serif;">
       <div style="text-align: center; padding: 20px;">
-        <img src="/pdfbolt-logo.webp" alt="PDFBolt" width="150" height="40" style="height: 40px; width: auto; margin: 0 auto 1.5rem auto; display: block;" />
+        <img src="/pdfbolt-logo.webp" alt="PDFBolt" width="150" height="40" fetchpriority="high" decoding="async" style="height: 40px; width: auto; margin: 0 auto 1.5rem auto; display: block;" />
         <p style="color: #64748b; margin-bottom: 2rem;">Lightning Fast PDF Tools</p>
         <div
           style="width: 40px; height: 40px; border: 3px solid #eab308; border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto;">
@@ -198,16 +198,13 @@
 
   <script type="module" src="/src/index.tsx"></script>
 
-  <!-- Hide loading fallback once React loads -->
+  <!-- Hide loading fallback immediately once React mounts -->
   <script>
     window.addEventListener('DOMContentLoaded', () => {
-      setTimeout(() => {
-        const fallback = document.getElementById('loading-fallback');
-        if (fallback) {
-          fallback.style.opacity = '0';
-          setTimeout(() => fallback.remove(), 300);
-        }
-      }, 100);
+      const fallback = document.getElementById('loading-fallback');
+      if (fallback) {
+        fallback.style.display = 'none';
+      }
     });
   </script>
 

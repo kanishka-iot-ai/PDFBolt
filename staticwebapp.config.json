@@ -165,7 +165,7 @@
   },
   "mimeTypes": {
     ".wasm": "application/wasm",
-    ".mjs": "application/javascript",
+    ".mjs": "text/javascript",
     ".json": "application/json"
   },
   "responseOverrides": {

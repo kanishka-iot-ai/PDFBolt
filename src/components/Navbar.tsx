@@ -119,6 +119,8 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
               alt="PDFBolt" 
               width="150"
               height="40"
+              fetchPriority="high"
+              decoding="async"
               className="h-9 md:h-10 w-auto object-contain transition-transform duration-300 group-hover:scale-105" 
             />
           </Link>
@@ -147,7 +149,7 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
                     <div className="col-span-2 p-6 grid grid-cols-2 gap-6">
                       {toolCategories.slice(0, 4).map(cat => (
                         <div key={cat.id}>
-                          <h3 className={`text-xs font-black uppercase tracking-widest mb-3 ${cat.color}`}>{cat.name}</h3>
+                          <p className={`text-xs font-black uppercase tracking-widest mb-3 ${cat.color}`}>{cat.name}</p>
                           <ul className="space-y-1">
                             {getCategorizedTools(cat.id).slice(0, 5).map(tool => (
                               <li key={tool.id}>
@@ -174,7 +176,7 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
                     </div>
                     <div className={`p-6 border-l flex flex-col justify-between ${darkMode ? 'bg-slate-800/50 border-slate-700' : 'bg-slate-50 border-slate-100'}`}>
                       <div>
-                        <h3 className="text-xs font-black uppercase tracking-widest mb-3 text-slate-500">Utilities & Calculators</h3>
+                        <p className="text-xs font-black uppercase tracking-widest mb-3 text-slate-500">Utilities & Calculators</p>
                         <ul className="space-y-1 mb-6">
                           <li>
                             <Link 

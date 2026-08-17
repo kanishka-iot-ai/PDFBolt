@@ -11,8 +11,10 @@ import AdSenseScript from './components/AdSenseScript';
 import CookieConsent from './components/CookieConsent';
 import { ActiveWorkProvider } from './context/ActiveWorkContext';
 
+// Eagerly import Home to prevent CLS from Suspense fallback displacement
+import Home from './pages/Home';
+
 // Lazy load core tools
-const Home = lazy(() => import('./pages/Home'));
 const MergeTool = lazy(() => import('./pages/MergeTool'));
 const QRTool = lazy(() => import('./pages/QRTool'));
 const SimpleTool = lazy(() => import('./pages/SimpleTool'));

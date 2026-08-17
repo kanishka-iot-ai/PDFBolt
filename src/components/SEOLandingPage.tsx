@@ -125,7 +125,7 @@ const SEOLandingPage: React.FC<SEOLandingPageProps> = ({ toolId, darkMode, child
             <span>/</span>
             <Link to="/tools" className="hover:text-yellow-500 transition-colors">PDF Tools</Link>
             <span>/</span>
-            <span className="text-yellow-500 font-bold">{tool.title}</span>
+            <span className="text-yellow-700 dark:text-yellow-400 font-bold">{tool.title}</span>
           </nav>
 
           <h1 className={`text-4xl md:text-5xl font-black mb-4 tracking-tight leading-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>
@@ -290,7 +290,7 @@ const SEOLandingPage: React.FC<SEOLandingPageProps> = ({ toolId, darkMode, child
                       {rt.description}
                     </p>
                   </div>
-                  <span className="inline-flex items-center gap-1 text-xs font-bold text-yellow-500 mt-3">
+                  <span className="inline-flex items-center gap-1 text-xs font-bold text-yellow-700 dark:text-yellow-400 mt-3">
                     Open Tool <ArrowRight size={12} />
                   </span>
                 </Link>
@@ -315,7 +315,7 @@ const SEOLandingPage: React.FC<SEOLandingPageProps> = ({ toolId, darkMode, child
                   }`}
                 >
                   <div>
-                    <span className="text-[10px] font-black uppercase tracking-widest text-yellow-500 bg-yellow-500/10 px-2 py-0.5 rounded">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-yellow-700 dark:text-yellow-400 bg-yellow-500/10 px-2 py-0.5 rounded">
                       {guide.readTime}
                     </span>
                     <h3 className={`font-bold text-base mt-2 mb-1 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
@@ -325,7 +325,7 @@ const SEOLandingPage: React.FC<SEOLandingPageProps> = ({ toolId, darkMode, child
                       {guide.summary}
                     </p>
                   </div>
-                  <span className="inline-flex items-center gap-1 text-xs font-bold text-yellow-500 mt-4">
+                  <span className="inline-flex items-center gap-1 text-xs font-bold text-yellow-700 dark:text-yellow-400 mt-4">
                     Read Full Guide <ArrowRight size={12} />
                   </span>
                 </Link>

@@ -98,7 +98,7 @@ const Home: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
 
         <div className="max-w-4xl mx-auto px-4 sm:px-6 relative z-10">
           {/* Small Badge */}
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-yellow-500/10 dark:bg-yellow-500/15 border border-yellow-500/30 text-yellow-600 dark:text-yellow-400 font-bold text-[11px] uppercase tracking-widest mb-3 animate-slideDown">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-yellow-500/10 dark:bg-yellow-500/15 border border-yellow-500/30 text-yellow-700 dark:text-yellow-400 font-bold text-[11px] uppercase tracking-widest mb-3 animate-slideDown">
             <Star size={12} className="fill-current" /> PROFESSIONAL PDF TOOLKIT
           </div>
 
@@ -325,8 +325,8 @@ const Home: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
       </section>
 
       {/* Non-Intrusive Sponsored Slot */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 my-10">
-        <AdSlot placement="HOME_CONTENT" />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+        <AdSlot placement="HOME_CONTENT" className="my-10" />
       </div>
 
       {/* 4. EDUCATIONAL GUIDES & KNOWLEDGE HUB */}
@@ -371,7 +371,7 @@ const Home: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
                   Convert PDF to editable DOCX format with native font reconstruction and margin preservation.
                 </p>
               </div>
-              <span className="text-xs font-bold text-yellow-600 dark:text-yellow-400 mt-4 inline-flex items-center gap-1">
+              <span className="text-xs font-bold text-yellow-700 dark:text-yellow-400 mt-4 inline-flex items-center gap-1">
                 Read Guide &rarr;
               </span>
             </Link>
@@ -393,7 +393,7 @@ const Home: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
                   Shrink heavy documents for email attachments and portal submissions while keeping text crisp.
                 </p>
               </div>
-              <span className="text-xs font-bold text-yellow-600 dark:text-yellow-400 mt-4 inline-flex items-center gap-1">
+              <span className="text-xs font-bold text-yellow-700 dark:text-yellow-400 mt-4 inline-flex items-center gap-1">
                 Read Guide &rarr;
               </span>
             </Link>
@@ -415,7 +415,7 @@ const Home: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
                   Combine reports, contracts, and receipts in custom order with 100% in-browser privacy.
                 </p>
               </div>
-              <span className="text-xs font-bold text-yellow-600 dark:text-yellow-400 mt-4 inline-flex items-center gap-1">
+              <span className="text-xs font-bold text-yellow-700 dark:text-yellow-400 mt-4 inline-flex items-center gap-1">
                 Read Guide &rarr;
               </span>
             </Link>
@@ -504,7 +504,7 @@ const Home: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
                     : 'border-slate-300 text-slate-700 hover:bg-white'
                 }`}
               >
-                Learn More
+                Learn more about PDF Bolt
               </Link>
             </div>
           </div>
