@@ -15,7 +15,9 @@ openpyxl>=3.1.2,<4.0.0
 python-pptx>=0.6.23,<1.0.0
 pytesseract>=0.3.10,<1.0.0
 
-# Storage & Utilities (Google Cloud Services)
+# Storage & Cloud Providers (Azure & Google Cloud)
+azure-storage-blob>=12.19.0
+azure-identity>=1.15.0
 google-cloud-storage>=2.14.0,<3.0.0
 google-cloud-pubsub>=2.19.0,<3.0.0
 aiofiles>=23.2.1,<24.0.0

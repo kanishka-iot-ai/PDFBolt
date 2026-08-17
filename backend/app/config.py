@@ -43,9 +43,15 @@ class Settings(BaseSettings):
     RATE_LIMIT_PER_MINUTE: int = 60
 
     # Storage & Temporary Document Retention Policy
-    STORAGE_BACKEND: str = "local"  # 'local' or 'gcs'
+    STORAGE_BACKEND: str = "local"  # 'local', 'azure', or 'gcs'
     LOCAL_STORAGE_DIR: str = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "storage"))
     
+    # Azure Blob Storage Configuration
+    AZURE_STORAGE_CONNECTION_STRING: str = ""
+    AZURE_STORAGE_ACCOUNT_NAME: str = ""
+    AZURE_STORAGE_ACCOUNT_KEY: str = ""
+    AZURE_STORAGE_CONTAINER_NAME: str = "pdfbolt-documents"
+
     # Google Cloud Storage (GCS) Configuration
     GCS_PROJECT_ID: str = ""
     GCS_BUCKET_NAME: str = "pdfbolt-documents"

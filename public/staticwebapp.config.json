@@ -1,0 +1,174 @@
+{
+  "$schema": "https://json.schemastore.org/staticwebapp.config.json",
+  "navigationFallback": {
+    "rewrite": "/index.html",
+    "exclude": [
+      "/assets/*",
+      "/*.{png,jpg,jpeg,gif,svg,ico,webp,woff,woff2,ttf,eot,json,xml,txt,wasm,mjs,pdf}"
+    ]
+  },
+  "routes": [
+    {
+      "route": "/merge",
+      "redirect": "/merge-pdf",
+      "statusCode": 301
+    },
+    {
+      "route": "/split",
+      "redirect": "/split-pdf",
+      "statusCode": 301
+    },
+    {
+      "route": "/compress",
+      "redirect": "/compress-pdf",
+      "statusCode": 301
+    },
+    {
+      "route": "/pdf-analyzer",
+      "redirect": "/analyze-pdf",
+      "statusCode": 301
+    },
+    {
+      "route": "/analyze",
+      "redirect": "/analyze-pdf",
+      "statusCode": 301
+    },
+    {
+      "route": "/tools/pdf-analyzer",
+      "redirect": "/analyze-pdf",
+      "statusCode": 301
+    },
+    {
+      "route": "/pdf-editor",
+      "redirect": "/edit-pdf",
+      "statusCode": 301
+    },
+    {
+      "route": "/edit",
+      "redirect": "/edit-pdf",
+      "statusCode": 301
+    },
+    {
+      "route": "/qr-pdf-share",
+      "redirect": "/pdf-to-qr-code",
+      "statusCode": 301
+    },
+    {
+      "route": "/pdf-to-qr",
+      "redirect": "/pdf-to-qr-code",
+      "statusCode": 301
+    },
+    {
+      "route": "/extract-pages",
+      "redirect": "/split-pdf",
+      "statusCode": 301
+    },
+    {
+      "route": "/extract-pdf-pages",
+      "redirect": "/split-pdf",
+      "statusCode": 301
+    },
+    {
+      "route": "/organize",
+      "redirect": "/organize-pdf",
+      "statusCode": 301
+    },
+    {
+      "route": "/reorder-pages",
+      "redirect": "/organize-pdf",
+      "statusCode": 301
+    },
+    {
+      "route": "/rotate",
+      "redirect": "/rotate-pdf",
+      "statusCode": 301
+    },
+    {
+      "route": "/watermark",
+      "redirect": "/watermark-pdf",
+      "statusCode": 301
+    },
+    {
+      "route": "/delete-pages",
+      "redirect": "/delete-pdf-pages",
+      "statusCode": 301
+    },
+    {
+      "route": "/page-numbers",
+      "redirect": "/add-page-numbers-to-pdf",
+      "statusCode": 301
+    },
+    {
+      "route": "/add-page-numbers",
+      "redirect": "/add-page-numbers-to-pdf",
+      "statusCode": 301
+    },
+    {
+      "route": "/protect",
+      "redirect": "/protect-pdf",
+      "statusCode": 301
+    },
+    {
+      "route": "/unlock",
+      "redirect": "/unlock-pdf",
+      "statusCode": 301
+    },
+    {
+      "route": "/sign",
+      "redirect": "/sign-pdf",
+      "statusCode": 301
+    },
+    {
+      "route": "/redact",
+      "redirect": "/redact-pdf",
+      "statusCode": 301
+    },
+    {
+      "route": "/repair",
+      "redirect": "/repair-pdf",
+      "statusCode": 301
+    },
+    {
+      "route": "/ocr",
+      "redirect": "/ocr-pdf",
+      "statusCode": 301
+    },
+    {
+      "route": "/scan-pdf",
+      "redirect": "/scan-to-pdf",
+      "statusCode": 301
+    },
+    {
+      "route": "/scan-handwriting",
+      "redirect": "/scan-handwriting-to-pdf",
+      "statusCode": 301
+    },
+    {
+      "route": "/compare",
+      "redirect": "/compare-pdf",
+      "statusCode": 301
+    },
+    {
+      "route": "/pdf-to-images",
+      "redirect": "/pdf-to-jpg",
+      "statusCode": 301
+    }
+  ],
+  "globalHeaders": {
+    "X-Content-Type-Options": "nosniff",
+    "X-Frame-Options": "DENY",
+    "Referrer-Policy": "strict-origin-when-cross-origin",
+    "Permissions-Policy": "camera=(self), microphone=(), geolocation=()"
+  },
+  "mimeTypes": {
+    ".wasm": "application/wasm",
+    ".mjs": "text/javascript",
+    ".json": "application/json"
+  },
+  "responseOverrides": {
+    "404": {
+      "rewrite": "/index.html",
+      "statusCode": 200
+    }
+  }
+}
