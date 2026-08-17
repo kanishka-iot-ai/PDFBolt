@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { CheckCircle, ShieldCheck, Laptop, Phone, ArrowRight, Lock, Key, AlertCircle, Download, Clock, Cloud, FileText } from 'lucide-react';
 import { Link, useSearchParams, useParams } from 'react-router-dom';
+import { API_BASE_URL } from '../services/apiClient';
 
 const QRSuccess: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
   const { shareId } = useParams<{ shareId?: string }>();
@@ -35,7 +36,7 @@ const QRSuccess: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
       if (shareId) {
         try {
           const pinParam = pin ? `?pin=${encodeURIComponent(pin)}` : '';
-          const res = await fetch(`/api/v1/qr-shares/${shareId}${pinParam}`);
+          const res = await fetch(`${API_BASE_URL}/qr-shares/${shareId}${pinParam}`);
 
           if (res.status === 410) {
             setIsExpired(true);
@@ -60,7 +61,7 @@ const QRSuccess: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
           setFilename(data.filename || 'document.pdf');
           setFileSizeBytes(data.file_size_bytes || null);
           setExpiresAt(new Date(data.expires_at));
-          setDownloadUrl(`/api/v1/qr-shares/${shareId}/download${pinParam}`);
+          setDownloadUrl(`${API_BASE_URL}/qr-shares/${shareId}/download${pinParam}`);
           setIsVerified(true);
           setRequirePin(false);
         } catch (err: any) {
@@ -123,13 +124,13 @@ const QRSuccess: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
 
     if (shareId) {
       try {
-        const res = await fetch(`/api/v1/qr-shares/${shareId}?pin=${encodeURIComponent(pin)}`);
+        const res = await fetch(`${API_BASE_URL}/qr-shares/${shareId}?pin=${encodeURIComponent(pin)}`);
         if (res.ok) {
           const data = await res.json();
           setFilename(data.filename || 'document.pdf');
           setFileSizeBytes(data.file_size_bytes || null);
           setExpiresAt(new Date(data.expires_at));
-          setDownloadUrl(`/api/v1/qr-shares/${shareId}/download?pin=${encodeURIComponent(pin)}`);
+          setDownloadUrl(`${API_BASE_URL}/qr-shares/${shareId}/download?pin=${encodeURIComponent(pin)}`);
           setIsVerified(true);
           setRequirePin(false);
         } else if (res.status === 403) {

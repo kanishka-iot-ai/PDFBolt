@@ -29,8 +29,13 @@ export interface BackendJobResult {
   metrics: BackendJobMetrics;
 }
 
+const rawHost = (typeof import.meta !== 'undefined' && import.meta.env && (import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL)) || 'https://pdfbolt-api.onrender.com';
+export const API_BASE_URL = rawHost.endsWith('/api/v1') 
+  ? rawHost.replace(/\/$/, '') 
+  : `${rawHost.replace(/\/$/, '')}/api/v1`;
+
 class ApiClient {
-  private baseUrl: string = '/api/v1';
+  private baseUrl: string = API_BASE_URL;
   private backendAvailable: boolean | null = null;
   private lastHealthCheck: number = 0;
 

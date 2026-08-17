@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { NotifySystem } from '../types';
 import { validateFiles, ALLOWED_MIME_TYPES, MAX_FILE_SIZE } from '../utils/fileValidation';
+import { API_BASE_URL } from '../services/apiClient';
 
 interface QRToolProps {
   darkMode: boolean;
@@ -16,11 +17,11 @@ interface QRToolProps {
 }
 
 const RETENTION_OPTIONS = [
-  { label: '15 Minutes', seconds: 900, description: 'Ephemeral short transfer' },
+  { label: '15 Minutes (Recommended)', seconds: 900, description: 'Ephemeral zero-retention transfer' },
   { label: '1 Hour', seconds: 3600, description: 'Quick meeting share' },
-  { label: '24 Hours (Default)', seconds: 86400, description: 'Standard daily share' },
-  { label: '7 Days', seconds: 604800, description: 'Weekly project review' },
-  { label: '30 Days', seconds: 2592000, description: 'Extended temporary access' }
+  { label: '24 Hours', seconds: 86400, description: 'Single session temporary access' },
+  { label: '7 Days (Cloud Storage Required)', seconds: 604800, description: 'Requires persistent cloud bucket', disabled: true },
+  { label: '30 Days (Cloud Storage Required)', seconds: 2592000, description: 'Requires persistent cloud bucket', disabled: true }
 ];
 
 const QRTool: React.FC<QRToolProps> = ({ darkMode, notify }) => {
@@ -65,7 +66,7 @@ const QRTool: React.FC<QRToolProps> = ({ darkMode, notify }) => {
 
       let responseData: any = null;
       try {
-        const res = await fetch('/api/v1/qr-shares', {
+        const res = await fetch(`${API_BASE_URL}/qr-shares`, {
           method: 'POST',
           body: formData
         });
@@ -139,7 +140,7 @@ const QRTool: React.FC<QRToolProps> = ({ darkMode, notify }) => {
 
     setIsRevoking(true);
     try {
-      const res = await fetch(`/api/v1/qr-shares/${shareId}/revoke`, {
+      const res = await fetch(`${API_BASE_URL}/qr-shares/${shareId}/revoke`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ revocation_token: revocationToken })

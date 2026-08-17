@@ -1,6 +1,6 @@
 # PDFBolt REST API Specification (v1)
 
-Base URL: `http://localhost:8000/api/v1`
+Base URL: `https://pdfbolt-api.onrender.com/api/v1`
 
 ---
 

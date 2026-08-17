@@ -8,6 +8,7 @@ import {
   QualityCheckReport,
   ConfidenceTier
 } from '../types/handwriting';
+import { API_BASE_URL } from './apiClient';
 
 // Configure PDF.js worker
 import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
@@ -320,7 +321,7 @@ export async function runCloudAIOCR(
     preserve_structure: true
   };
 
-  const response = await fetch('/api/v1/handwriting/recognize', {
+  const response = await fetch(`${API_BASE_URL}/handwriting/recognize`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload)
@@ -340,7 +341,7 @@ export async function enhanceTranscriptionAPI(
   text: string,
   action: 'improve_recognition' | 'fix_ocr_errors' | 'preserve_exact' = 'improve_recognition'
 ): Promise<string> {
-  const response = await fetch('/api/v1/handwriting/enhance', {
+  const response = await fetch(`${API_BASE_URL}/handwriting/enhance`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ text, action, language: 'eng' })

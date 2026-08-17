@@ -4,6 +4,8 @@
  * All cloud storage credentials (Google Cloud Storage / Render) are held strictly server-side.
  */
 
+import { API_BASE_URL } from './apiClient';
+
 /**
  * Uploads a file via the backend QR Share / Storage endpoint and returns the share ID or key.
  */
@@ -13,7 +15,7 @@ export async function uploadFile(file: File, durationSeconds: number = 86400): P
     formData.append('duration_seconds', durationSeconds.toString());
 
     try {
-        const res = await fetch('/api/v1/qr-shares', {
+        const res = await fetch(`${API_BASE_URL}/qr-shares`, {
             method: 'POST',
             body: formData
         });
@@ -39,7 +41,7 @@ export async function getSecureDownloadUrl(shareId: string): Promise<string> {
         return "javascript:alert('DEMO MODE: Simulated document transfer.')";
     }
 
-    return `/api/v1/qr-shares/${shareId}/download`;
+    return `${API_BASE_URL}/qr-shares/${shareId}/download`;
 }
 
 /**
