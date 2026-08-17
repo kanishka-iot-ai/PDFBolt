@@ -1,5 +1,6 @@
 import os
 import re
+import json
 import xml.etree.ElementTree as ET
 import pytest
 from fastapi.testclient import TestClient
@@ -114,6 +115,13 @@ def test_sitemap_contains_only_canonical_urls():
         for tool in CANONICAL_TOOLS:
             assert f"https://pdfbolt.com{tool}</loc>" in tools_content or f"https://pdfbolt.com{tool}</loc>" in sitemap_content, f"Canonical tool {tool} must be in sitemap"
 
+    # Ensure disallowed /test-files is not in any sitemap
+    workflows_sitemap_path = os.path.join(BASE_DIR, "public", "sitemap-workflows.xml")
+    if os.path.exists(workflows_sitemap_path):
+        with open(workflows_sitemap_path, "r", encoding="utf-8") as f:
+            wf_content = f.read()
+        assert "https://pdfbolt.com/test-files" not in wf_content, "Blocked path /test-files must not be in sitemap"
+
 
 def test_redirects_are_one_hop_permanent():
     """Verify _redirects file configures direct 301 rules without redirect chains."""
@@ -159,3 +167,36 @@ def test_api_x_robots_tag():
     assert response.status_code == 200
     assert response.headers.get("x-robots-tag") == "noindex, nofollow, noarchive"
 
+
+def test_json_ld_schemas_in_index_html():
+    """Verify JSON-LD scripts in index.html are valid JSON and adhere to schema.org context."""
+    index_path = os.path.join(BASE_DIR, "index.html")
+    assert os.path.exists(index_path), "index.html must exist"
+
+    with open(index_path, "r", encoding="utf-8") as f:
+        content = f.read()
+
+    json_ld_matches = re.findall(r'<script type="application/ld\+json">(.*?)</script>', content, re.DOTALL)
+    assert len(json_ld_matches) >= 3, "index.html must contain WebApplication, WebSite, and Organization schemas"
+
+    for script_str in json_ld_matches:
+        data = json.loads(script_str.strip())
+        assert data.get("@context") == "https://schema.org", "Schema must use https://schema.org context"
+        assert "@type" in data, "Schema must contain @type field"
+
+
+def test_azure_swa_routes_and_redirects():
+    """Verify staticwebapp.config.json has valid SPA fallback and 301 redirects."""
+    config_path = os.path.join(BASE_DIR, "staticwebapp.config.json")
+    assert os.path.exists(config_path), "staticwebapp.config.json must exist"
+
+    with open(config_path, "r", encoding="utf-8") as f:
+        config = json.load(f)
+
+    assert config.get("navigationFallback", {}).get("rewrite") == "/index.html"
+    routes = config.get("routes", [])
+    redirect_map = {r["route"]: r.get("redirect") for r in routes if r.get("statusCode") == 301}
+
+    for alias, target in LEGACY_ALIASES.items():
+        assert alias in redirect_map, f"SWA config must redirect legacy alias {alias}"
+        assert redirect_map[alias] == target, f"SWA alias {alias} must point to {target}"

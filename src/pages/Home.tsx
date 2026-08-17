@@ -145,6 +145,138 @@ const Home: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
         <AdSlot placement="HOME_CONTENT" />
       </div>
 
+      {/* Educational Guides & Knowledge Hub */}
+      <section className={`py-16 border-t ${darkMode ? 'border-slate-800 bg-slate-900/40' : 'border-slate-200 bg-white'}`}>
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
+            <div>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 font-bold text-xs uppercase tracking-widest mb-3">
+                <FileText size={14} /> Knowledge Base & Tutorials
+              </div>
+              <h2 className={`text-3xl md:text-4xl font-black ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+                Learn How to Master Your PDFs
+              </h2>
+            </div>
+            <Link to="/guides" className="inline-flex items-center gap-2 font-bold text-sm text-yellow-500 hover:text-yellow-600">
+              View All 13+ Guides <Globe size={16} />
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <Link
+              to="/guides/how-to-convert-pdf-to-word"
+              className={`p-6 rounded-2xl border transition-all duration-200 hover:-translate-y-1 hover:border-yellow-500/50 flex flex-col justify-between ${
+                darkMode ? 'bg-slate-800/60 border-slate-700' : 'bg-slate-50 border-slate-200'
+              }`}
+            >
+              <div>
+                <span className="text-[10px] font-black uppercase tracking-widest text-yellow-500 bg-yellow-500/10 px-2 py-0.5 rounded">
+                  4 min read
+                </span>
+                <h3 className={`font-bold text-lg mt-3 mb-2 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+                  How to Convert PDF to Word Without Losing Formatting
+                </h3>
+                <p className={`text-xs leading-relaxed ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+                  Convert PDF to editable DOCX format with native font reconstruction and margin preservation.
+                </p>
+              </div>
+              <span className="text-xs font-bold text-yellow-500 mt-4 inline-flex items-center gap-1">
+                Read Guide &rarr;
+              </span>
+            </Link>
+
+            <Link
+              to="/guides/how-to-compress-a-pdf"
+              className={`p-6 rounded-2xl border transition-all duration-200 hover:-translate-y-1 hover:border-yellow-500/50 flex flex-col justify-between ${
+                darkMode ? 'bg-slate-800/60 border-slate-700' : 'bg-slate-50 border-slate-200'
+              }`}
+            >
+              <div>
+                <span className="text-[10px] font-black uppercase tracking-widest text-yellow-500 bg-yellow-500/10 px-2 py-0.5 rounded">
+                  3 min read
+                </span>
+                <h3 className={`font-bold text-lg mt-3 mb-2 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+                  How to Compress a PDF Below 10MB or 2MB
+                </h3>
+                <p className={`text-xs leading-relaxed ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+                  Shrink heavy documents for email attachments and portal submissions while keeping text crisp.
+                </p>
+              </div>
+              <span className="text-xs font-bold text-yellow-500 mt-4 inline-flex items-center gap-1">
+                Read Guide &rarr;
+              </span>
+            </Link>
+
+            <Link
+              to="/guides/how-to-merge-pdf-files"
+              className={`p-6 rounded-2xl border transition-all duration-200 hover:-translate-y-1 hover:border-yellow-500/50 flex flex-col justify-between ${
+                darkMode ? 'bg-slate-800/60 border-slate-700' : 'bg-slate-50 border-slate-200'
+              }`}
+            >
+              <div>
+                <span className="text-[10px] font-black uppercase tracking-widest text-yellow-500 bg-yellow-500/10 px-2 py-0.5 rounded">
+                  2 min read
+                </span>
+                <h3 className={`font-bold text-lg mt-3 mb-2 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+                  How to Merge Multiple PDF Files into One Document
+                </h3>
+                <p className={`text-xs leading-relaxed ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+                  Combine reports, contracts, and receipts in custom order with 100% in-browser privacy.
+                </p>
+              </div>
+              <span className="text-xs font-bold text-yellow-500 mt-4 inline-flex items-center gap-1">
+                Read Guide &rarr;
+              </span>
+            </Link>
+          </div>
+
+          {/* Persona Workflows & Encyclopedia Sub-Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+            <Link
+              to="/student-pdf-tools"
+              className={`p-6 rounded-2xl border transition-all hover:border-yellow-500/40 ${
+                darkMode ? 'bg-slate-800/30 border-slate-800' : 'bg-white border-slate-200 shadow-sm'
+              }`}
+            >
+              <h3 className={`font-bold text-base mb-1 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+                🎓 Student PDF Suite
+              </h3>
+              <p className={`text-xs ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+                Merge lecture slides, compress lab reports, and convert handwritten notes.
+              </p>
+            </Link>
+
+            <Link
+              to="/business-pdf-tools"
+              className={`p-6 rounded-2xl border transition-all hover:border-yellow-500/40 ${
+                darkMode ? 'bg-slate-800/30 border-slate-800' : 'bg-white border-slate-200 shadow-sm'
+              }`}
+            >
+              <h3 className={`font-bold text-base mb-1 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+                💼 Business & Legal Toolkit
+              </h3>
+              <p className={`text-xs ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+                Sign NDAs, redact sensitive data, password protect contracts, and OCR invoices.
+              </p>
+            </Link>
+
+            <Link
+              to="/encyclopedia"
+              className={`p-6 rounded-2xl border transition-all hover:border-yellow-500/40 ${
+                darkMode ? 'bg-slate-800/30 border-slate-800' : 'bg-white border-slate-200 shadow-sm'
+              }`}
+            >
+              <h3 className={`font-bold text-base mb-1 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+                📖 PDF Encyclopedia
+              </h3>
+              <p className={`text-xs ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+                Deep technical dives into PDF/A archiving standards, OCR engines, and font rendering.
+              </p>
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* Customer Care Section */}
       <section className="max-w-7xl mx-auto px-6 py-24">
         <div className={`p-12 md:p-16 rounded-[3rem] border relative overflow-hidden text-center transition-all ${darkMode ? 'bg-yellow-900/10 border-yellow-500/20' : 'bg-yellow-50 border-yellow-100'}`}>
