@@ -221,7 +221,7 @@ const QRSuccess: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
   if (isExpired || isRevoked) {
     return (
       <div className="min-h-[80vh] flex flex-col items-center justify-start sm:justify-center px-4 sm:px-6 py-6 sm:py-12 pb-36">
-        <div className={`max-w-md w-full p-6 sm:p-10 rounded-3xl sm:rounded-[3.5rem] border text-center shadow-2xl animate-fadeInUp ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'}`}>
+        <div className={`max-w-md w-full p-6 sm:p-10 rounded-3xl sm:rounded-[3.5rem] border text-center shadow-2xl animate-fadeIn ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'}`}>
           <div className="inline-flex p-4 sm:p-5 rounded-3xl bg-amber-500/10 mb-6 sm:mb-8 border border-amber-500/20">
             <Clock className="text-amber-500 w-8 h-8 sm:w-10 sm:h-10" />
           </div>
@@ -241,7 +241,7 @@ const QRSuccess: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
   if (errorMessage) {
     return (
       <div className="min-h-[80vh] flex flex-col items-center justify-start sm:justify-center px-4 sm:px-6 py-6 sm:py-12 pb-36">
-        <div className={`max-w-md w-full p-6 sm:p-10 rounded-3xl sm:rounded-[3.5rem] border text-center shadow-2xl animate-fadeInUp ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'}`}>
+        <div className={`max-w-md w-full p-6 sm:p-10 rounded-3xl sm:rounded-[3.5rem] border text-center shadow-2xl animate-fadeIn ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'}`}>
           <div className="inline-flex p-4 sm:p-5 rounded-3xl bg-red-500/10 mb-6 sm:mb-8 border border-red-500/20">
             <AlertCircle className="text-red-500 w-8 h-8 sm:w-10 sm:h-10" />
           </div>
@@ -273,7 +273,7 @@ const QRSuccess: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
   if (requirePin && !isVerified) {
     return (
       <div className="min-h-[80vh] flex flex-col items-center justify-start sm:justify-center px-4 sm:px-6 py-6 sm:py-12 pb-36">
-        <div className={`max-w-md w-full p-6 sm:p-10 rounded-3xl sm:rounded-[3.5rem] border text-center shadow-2xl animate-fadeInUp ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'}`}>
+        <div className={`max-w-md w-full p-6 sm:p-10 rounded-3xl sm:rounded-[3.5rem] border text-center shadow-2xl animate-fadeIn ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'}`}>
           <div className="inline-flex p-4 sm:p-5 rounded-3xl bg-red-600/10 mb-6 sm:mb-8 border border-red-600/20">
             <Lock className="text-red-600 w-8 h-8 sm:w-10 sm:h-10" />
           </div>
@@ -313,10 +313,11 @@ const QRSuccess: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
   // State: Verified & Ready for Download
   return (
     <div className="min-h-[80vh] flex flex-col items-center justify-start sm:justify-center px-4 sm:px-6 py-6 sm:py-12 pb-36">
-      <div className={`max-w-xl w-full p-6 sm:p-12 rounded-3xl sm:rounded-[3.5rem] border text-center shadow-2xl animate-fadeInUp ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'}`}>
+      <div className={`max-w-xl w-full p-6 sm:p-12 rounded-3xl sm:rounded-[3.5rem] border text-center shadow-2xl animate-fadeIn ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'}`}>
         <div className="inline-flex p-4 sm:p-6 rounded-full bg-green-50 dark:bg-green-900/20 mb-6 sm:mb-8 border-4 border-green-100 dark:border-green-800 animate-pulse">
           <CheckCircle className="text-green-500 w-12 h-12 sm:w-16 sm:h-16" />
         </div>
+
 
         <h1 className={`text-2xl sm:text-4xl font-black mb-3 sm:mb-4 ${darkMode ? 'text-white' : 'text-slate-900'}`}>Secure Document Ready</h1>
         <p className={`text-base sm:text-lg font-medium mb-6 sm:mb-8 leading-relaxed ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
