@@ -1,7 +1,46 @@
 import React, { useState, useEffect } from 'react';
-import { CheckCircle, ShieldCheck, Laptop, Phone, ArrowRight, Lock, Key, AlertCircle, Download, Clock, Cloud, FileText } from 'lucide-react';
+import { CheckCircle, ShieldCheck, ArrowRight, Lock, Key, AlertCircle, Download, Clock, FileText } from 'lucide-react';
 import { Link, useSearchParams, useParams } from 'react-router-dom';
 import { API_BASE_URL } from '../services/apiClient';
+
+/**
+ * Parses dates safely across all mobile engines (Safari, Android WebView, Chrome).
+ * Handles ISO strings with microsecond fractions (e.g. .431290+00:00).
+ */
+const parseSafeDate = (val: any): Date | null => {
+  if (!val) return null;
+  if (typeof val === 'number') {
+    const d = new Date(val);
+    return isNaN(d.getTime()) ? null : d;
+  }
+  if (typeof val === 'string') {
+    try {
+      // Normalize microsecond precision to millisecond precision for Safari / WebKit compatibility
+      const cleaned = val.replace(/\.(\d{3})\d+([+-Z]|$)/, '.$1$2');
+      const d = new Date(cleaned);
+      if (!isNaN(d.getTime())) return d;
+      const fallback = new Date(val);
+      if (!isNaN(fallback.getTime())) return fallback;
+    } catch {
+      return null;
+    }
+  }
+  return null;
+};
+
+const formatSafeDate = (d: Date | null): string => {
+  if (!d || isNaN(d.getTime())) return 'Temporary Link';
+  try {
+    return d.toLocaleString([], {
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  } catch {
+    return d.toISOString();
+  }
+};
 
 const QRSuccess: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
   const { shareId } = useParams<{ shareId?: string }>();
@@ -28,6 +67,8 @@ const QRSuccess: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
   const authHash = searchParams.get('auth');
 
   useEffect(() => {
+    let isMounted = true;
+
     const fetchShareInfo = async () => {
       setIsLoading(true);
       setErrorMessage(null);
@@ -37,6 +78,8 @@ const QRSuccess: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
         try {
           const pinParam = pin ? `?pin=${encodeURIComponent(pin)}` : '';
           const res = await fetch(`${API_BASE_URL}/qr-shares/${shareId}${pinParam}`);
+
+          if (!isMounted) return;
 
           if (res.status === 410) {
             setIsExpired(true);
@@ -58,17 +101,21 @@ const QRSuccess: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
           }
 
           const data = await res.json();
+          if (!isMounted) return;
+
           setFilename(data.filename || 'document.pdf');
           setFileSizeBytes(data.file_size_bytes || null);
-          setExpiresAt(new Date(data.expires_at));
+          setExpiresAt(parseSafeDate(data.expires_at));
           setDownloadUrl(`${API_BASE_URL}/qr-shares/${shareId}/download${pinParam}`);
           setIsVerified(true);
           setRequirePin(false);
         } catch (err: any) {
           console.error("Failed to load QR share:", err);
-          setErrorMessage("Failed to connect to server. Please check your connection.");
+          if (isMounted) {
+            setErrorMessage("Failed to connect to server. Please check your connection.");
+          }
         } finally {
-          setIsLoading(false);
+          if (isMounted) setIsLoading(false);
         }
         return;
       }
@@ -78,44 +125,56 @@ const QRSuccess: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
         try {
           const data = JSON.parse(atob(legacyPayload));
           if (data.e) {
-            const exp = new Date(data.e);
-            setExpiresAt(exp);
-            if (Date.now() > data.e) {
-              setIsExpired(true);
-              setIsLoading(false);
-              return;
+            const exp = parseSafeDate(data.e);
+            if (exp) {
+              setExpiresAt(exp);
+              if (Date.now() > exp.getTime()) {
+                if (isMounted) {
+                  setIsExpired(true);
+                  setIsLoading(false);
+                }
+                return;
+              }
             }
           }
 
-          if (authHash) {
-            setRequirePin(true);
-            setIsVerified(false);
-          } else {
-            setIsVerified(true);
-          }
+          if (isMounted) {
+            if (authHash) {
+              setRequirePin(true);
+              setIsVerified(false);
+            } else {
+              setIsVerified(true);
+            }
 
-          if (data.k) {
-            const { getSecureDownloadUrl } = await import('../services/storageService');
-            try {
-              const url = await getSecureDownloadUrl(data.k);
-              setDownloadUrl(url);
-            } catch (err) {
-              setDownloadUrl(null);
+            if (data.k) {
+              try {
+                const { getSecureDownloadUrl } = await import('../services/storageService');
+                const url = await getSecureDownloadUrl(data.k);
+                setDownloadUrl(url);
+              } catch {
+                setDownloadUrl(null);
+              }
             }
           }
         } catch (e) {
-          setErrorMessage("Invalid share token.");
+          if (isMounted) setErrorMessage("Invalid share token.");
         } finally {
-          setIsLoading(false);
+          if (isMounted) setIsLoading(false);
         }
         return;
       }
 
-      setIsLoading(false);
-      setErrorMessage("No share ID provided.");
+      if (isMounted) {
+        setIsLoading(false);
+        setErrorMessage("No share ID provided.");
+      }
     };
 
     fetchShareInfo();
+
+    return () => {
+      isMounted = false;
+    };
   }, [shareId, legacyPayload]);
 
   const handlePinSubmit = async () => {
@@ -129,7 +188,7 @@ const QRSuccess: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
           const data = await res.json();
           setFilename(data.filename || 'document.pdf');
           setFileSizeBytes(data.file_size_bytes || null);
-          setExpiresAt(new Date(data.expires_at));
+          setExpiresAt(parseSafeDate(data.expires_at));
           setDownloadUrl(`${API_BASE_URL}/qr-shares/${shareId}/download?pin=${encodeURIComponent(pin)}`);
           setIsVerified(true);
           setRequirePin(false);
@@ -251,7 +310,6 @@ const QRSuccess: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
     );
   }
 
-
   // State: Verified & Ready for Download
   return (
     <div className="min-h-[80vh] flex flex-col items-center justify-start sm:justify-center px-4 sm:px-6 py-6 sm:py-12 pb-36">
@@ -264,7 +322,6 @@ const QRSuccess: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
         <p className={`text-base sm:text-lg font-medium mb-6 sm:mb-8 leading-relaxed ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
           You have established a secure link to download <span className="text-yellow-600 font-bold">{filename}</span>.
         </p>
-
 
         {/* Document Info Card */}
         <div className={`p-6 rounded-2xl mb-8 text-left border ${darkMode ? 'bg-slate-900 border-slate-700' : 'bg-slate-50 border-slate-200'}`}>
@@ -280,7 +337,7 @@ const QRSuccess: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
           {expiresAt && (
             <p className="text-xs text-slate-500 font-bold ml-8 flex items-center gap-1.5">
               <Clock size={12} className="text-amber-500" />
-              Valid until: {expiresAt.toLocaleString()}
+              Valid until: {formatSafeDate(expiresAt)}
             </p>
           )}
         </div>
@@ -291,15 +348,17 @@ const QRSuccess: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
             <a
               href={downloadUrl}
               download={filename}
-              className="w-full py-6 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-3xl font-black text-2xl shadow-xl hover:from-yellow-600 hover:to-orange-600 transition-all flex items-center justify-center gap-4 active:scale-95"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full py-5 sm:py-6 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-3xl font-black text-xl sm:text-2xl shadow-xl hover:from-yellow-600 hover:to-orange-600 transition-all flex items-center justify-center gap-4 active:scale-95"
             >
-              <Download size={32} /> Download PDF
+              <Download size={28} /> Download PDF
             </a>
           </div>
         )}
 
         {/* Retention Policy Notice */}
-        <div className={`p-6 rounded-2xl text-left mb-8 border-2 border-green-500/20 ${darkMode ? 'bg-green-950/20' : 'bg-green-50/50'}`}>
+        <div className={`p-5 sm:p-6 rounded-2xl text-left mb-8 border-2 border-green-500/20 ${darkMode ? 'bg-green-950/20' : 'bg-green-50/50'}`}>
           <div className="flex items-start gap-3">
             <ShieldCheck className="text-green-600 shrink-0 w-5 h-5 mt-0.5" />
             <p className="text-xs font-bold leading-relaxed text-green-900/70 dark:text-green-400/70">
@@ -320,3 +379,4 @@ const QRSuccess: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
 };
 
 export default QRSuccess;
+
