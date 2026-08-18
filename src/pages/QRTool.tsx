@@ -214,23 +214,11 @@ const QRTool: React.FC<QRToolProps> = ({ darkMode, notify }) => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-16 animate-fadeIn">
-      <div className="text-center mb-16">
-        <div className="w-20 h-20 bg-yellow-600/10 dark:bg-yellow-600/20 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-lg border border-yellow-600/20">
-          <Fingerprint className="text-yellow-600 w-10 h-10" />
-        </div>
-        <h1 className={`text-5xl font-black mb-6 ${darkMode ? 'text-white' : 'text-slate-900'}`}>Secure QR Share</h1>
-        <p className={`text-xl max-w-2xl mx-auto ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
-          Generate private encrypted pairing codes with configurable cloud retention and instant revocation.
-        </p>
-        <div className="inline-flex items-center gap-2 mt-4 px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-500 text-xs font-bold">
-          <Cloud size={14} /> CLOUD TEMPORARY STORAGE • AUTO-DELETED ON EXPIRATION
-        </div>
-      </div>
-
+    <div className="max-w-4xl mx-auto px-4 py-2 animate-fadeIn">
       {!file ? (
         <FileUploader multiple={false} onFilesSelected={handleFile} darkMode={darkMode} maxSizeMB={100} />
       ) : (
+
         <div className="grid lg:grid-cols-2 gap-12 items-start">
           {/* Configuration Panel */}
           <div className="space-y-6">

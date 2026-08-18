@@ -221,31 +221,11 @@ const CompressTool: React.FC<CompressToolProps> = ({ darkMode, notify }) => {
   ];
 
   return (
-    <div className="animate-fadeIn pb-24">
-      <Helmet>
-        <title>Professional PDF Compressor – Multi-Profile & Target Size | PDFBolt</title>
-        <meta name="description" content="Intelligent client-side PDF compression with automatic document analysis, 5 professional compression profiles, target-size constraints, and quality preview comparison." />
-        <link rel="canonical" href="https://pdfbolt.in/compress-pdf" />
-      </Helmet>
-
-      {/* Hero Header */}
-      <section className={`py-14 border-b ${darkMode ? 'border-slate-800 bg-slate-900/40' : 'border-slate-100 bg-slate-50/70'}`}>
-        <div className="max-w-5xl mx-auto px-6 text-center">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 font-black text-xs uppercase tracking-widest mb-4">
-            <Zap size={14} /> Professional PDF Compressor
-          </div>
-          <h1 className={`text-3xl md:text-5xl font-black mb-4 tracking-tight leading-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>
-            Compress PDF with Intelligent Profiles
-          </h1>
-          <p className={`text-base md:text-lg max-w-2xl mx-auto ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
-            Reduce document weight while keeping text and images crystal-clear. Inspect metrics, choose target file sizes, and preview quality before downloading.
-          </p>
-        </div>
-      </section>
-
-      <div className="max-w-5xl mx-auto px-6 py-12">
+    <div className="animate-fadeIn">
+      <div className="max-w-4xl mx-auto px-4 py-2">
         {/* Upload State */}
         {!stats && !result && (
+
           <div className="max-w-2xl mx-auto">
             {inspecting ? (
               <div className={`p-16 rounded-[2.5rem] border text-center ${darkMode ? 'bg-slate-800/50 border-slate-700' : 'bg-white border-slate-200 shadow-xl'}`}>

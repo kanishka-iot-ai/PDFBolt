@@ -115,12 +115,12 @@ const SEOLandingPage: React.FC<SEOLandingPageProps> = ({ toolId, darkMode, child
         {faqSchema && <script type="application/ld+json">{JSON.stringify(faqSchema)}</script>}
       </Helmet>
 
-      {/* 1. HERO HEADER */}
-      <div className={`py-12 border-b ${darkMode ? 'border-slate-800 bg-slate-900/50' : 'border-slate-100 bg-slate-50'}`}>
-        <div className="max-w-5xl mx-auto px-6 text-center">
+      {/* 1. HERO HEADER (Compact & Modern) */}
+      <div className={`pt-6 pb-6 sm:pt-8 sm:pb-8 border-b ${darkMode ? 'border-slate-800 bg-slate-900/50' : 'border-slate-100 bg-slate-50'}`}>
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
           
           {/* Breadcrumb Visual Navigation */}
-          <nav className="flex justify-center items-center gap-2 text-xs font-semibold mb-6 text-slate-500">
+          <nav className="flex justify-center items-center gap-2 text-xs font-semibold mb-3 text-slate-500">
             <Link to="/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Home</Link>
             <span>/</span>
             <Link to="/tools" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">PDF Tools</Link>
@@ -128,36 +128,36 @@ const SEOLandingPage: React.FC<SEOLandingPageProps> = ({ toolId, darkMode, child
             <span className="text-yellow-700 dark:text-yellow-400 font-bold">{tool.title}</span>
           </nav>
 
-
-          <h1 className={`text-4xl md:text-5xl font-black mb-4 tracking-tight leading-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>
-            {tool.seoTitle?.split('–')[0] || tool.title}
+          <h1 className={`text-3xl sm:text-4xl md:text-5xl font-black mb-3 tracking-tight leading-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+            {tool.title}
           </h1>
-          <p className={`text-lg md:text-xl max-w-3xl mx-auto mb-8 font-medium ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+          <p className={`text-sm sm:text-base md:text-lg max-w-2xl mx-auto mb-5 font-medium ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
             {tool.description}
           </p>
 
-          {/* Privacy Badges */}
-          <div className="flex flex-wrap justify-center gap-3 md:gap-6 mb-2">
-            <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold text-xs">
-              <ShieldCheck size={16} /> {tool.id === 'pdf-to-qr' ? 'Encrypted Cloud Storage' : '100% Local In-Browser Privacy'}
+          {/* Privacy & Speed Badges */}
+          <div className="flex flex-wrap justify-center gap-2 sm:gap-4">
+            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold text-xs">
+              <ShieldCheck size={14} /> {tool.id === 'pdf-to-qr' ? 'Encrypted Ephemeral Cloud' : '100% Local In-Browser Privacy'}
             </div>
-            <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 font-bold text-xs">
-              <UserX size={16} /> No Sign-Up or Fees
+            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 font-bold text-xs">
+              <UserX size={14} /> Free & No Sign-Up
             </div>
-            <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 font-bold text-xs">
-              <Clock size={16} /> Instant Processing
+            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 font-bold text-xs">
+              <Clock size={14} /> Instant Processing
             </div>
           </div>
         </div>
       </div>
 
-      {/* 2. THE WORKING INTERACTIVE TOOL */}
-      <div className="relative z-10 -mt-6">
+      {/* 2. THE WORKING INTERACTIVE TOOL (Prominently Above The Fold) */}
+      <div className="relative z-10 py-6 sm:py-8">
         {children}
       </div>
 
-      {/* 3. COMPREHENSIVE PEOPLE-FIRST CONTENT SECTION */}
-      <div className="max-w-4xl mx-auto px-6 py-16 space-y-16">
+      {/* 3. COMPREHENSIVE PEOPLE-FIRST CONTENT SECTION (Below The Tool For SEO) */}
+      <div className="max-w-4xl mx-auto px-6 py-12 sm:py-16 space-y-12 sm:space-y-16">
+
 
         {/* Quick Answer Snippet Box (For Google Search & AI Optimization) */}
         {tool.quickAnswer && (
