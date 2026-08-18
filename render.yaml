@@ -33,8 +33,9 @@ services:
     env: docker
     dockerfilePath: ./Dockerfile.api
     region: oregon
-    plan: standard
+    plan: free
     healthCheckPath: /health
+
     envVars:
       - key: APP_ENV
         value: production
