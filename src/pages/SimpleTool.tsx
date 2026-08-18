@@ -449,8 +449,8 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
   };
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-12 sm:py-20 text-center">
-      <h1 className="text-4xl sm:text-6xl font-black mb-10 sm:mb-16 leading-tight animate-fadeIn">{title}</h1>
+    <div className="max-w-4xl mx-auto px-4 py-2 text-center animate-fadeIn">
+
       {statusMessage && (
         <div className={`max-w-3xl mx-auto mb-6 rounded-2xl border px-5 py-4 text-sm font-bold text-left ${processingStatus === 'error'
           ? 'bg-red-50 text-red-700 border-red-100 dark:bg-red-900/20 dark:text-red-200 dark:border-red-900/40'

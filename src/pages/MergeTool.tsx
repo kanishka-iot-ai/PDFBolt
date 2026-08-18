@@ -111,10 +111,9 @@ const MergeTool: React.FC<{ darkMode: boolean; notify: NotifySystem }> = ({ dark
   };
 
   return (
-    <div className="max-w-5xl mx-auto px-6 py-20 animate-fadeIn">
-      <h1 className="text-6xl font-black text-center mb-16 leading-tight">Merge PDFs</h1>
-
+    <div className="max-w-4xl mx-auto px-4 py-2 animate-fadeIn">
       <div className="space-y-8">
+
         {files.length > 0 && (
           <div className="space-y-4 max-w-3xl mx-auto">
             {files.map((f, i) => (

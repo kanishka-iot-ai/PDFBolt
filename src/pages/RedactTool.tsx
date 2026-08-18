@@ -247,11 +247,8 @@ const RedactTool: React.FC<RedactToolProps> = ({ darkMode, notify }) => {
             <div className="flex-1 flex overflow-hidden">
 
                 {!file ? (
-                    <div className="max-w-4xl mx-auto w-full p-10 flex flex-col items-center justify-center">
-                        <div className="text-center mb-10">
-                            <h2 className="text-4xl font-black mb-4">Secure PDF Redaction</h2>
-                            <p className="text-slate-500 text-lg">Permanently remove sensitive information. 100% Offline.</p>
-                        </div>
+                    <div className="max-w-4xl mx-auto w-full p-4 flex flex-col items-center justify-center">
+
                         <FileUploader
                             onFilesSelected={handleFilesSelected}
                             accept=".pdf"

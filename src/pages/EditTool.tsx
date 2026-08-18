@@ -440,11 +440,11 @@ const EditTool: React.FC<EditToolProps> = ({ darkMode, notify }) => {
 
             <div className="flex-1 flex overflow-hidden">
                 {!file ? (
-                    <div className="max-w-xl mx-auto flex flex-col items-center justify-center p-10">
-                        <h2 className="text-3xl font-black mb-4">Upload PDF to Edit</h2>
+                    <div className="max-w-xl mx-auto flex flex-col items-center justify-center p-4">
                         <FileUploader onFilesSelected={handleFilesSelected} accept=".pdf" darkMode={darkMode} />
                     </div>
                 ) : (
+
                     <>
                         {/* Toolbar */}
                         <div className={`w-16 flex flex-col items-center py-6 gap-4 border-r ${darkMode ? 'border-slate-700 bg-slate-800' : 'border-slate-200 bg-white'}`}>

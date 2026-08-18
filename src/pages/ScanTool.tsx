@@ -350,14 +350,14 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
 
             {/* Initial State - Start Button */}
             {!isCameraActive && capturedImages.length === 0 && (
-                <div className="flex flex-col items-center justify-center p-8 text-center max-w-md animate-fadeIn mt-12">
-                    <div className={`w-28 h-28 mx-auto rounded-full flex items-center justify-center mb-8 ${darkMode ? 'bg-slate-800' : 'bg-white shadow-xl'}`}>
-                        <Camera size={56} className="text-blue-500" />
+                <div className="flex flex-col items-center justify-center p-6 text-center max-w-md animate-fadeIn">
+                    <div className={`w-20 h-20 mx-auto rounded-full flex items-center justify-center mb-6 ${darkMode ? 'bg-slate-800' : 'bg-white shadow-xl'}`}>
+                        <Camera size={40} className="text-yellow-600" />
                     </div>
-                    <h2 className="text-3xl font-black mb-4 tracking-tight">Professional AI Scanner</h2>
-                    <p className="mb-10 opacity-70 text-lg leading-relaxed">
-                        Features <span className="text-blue-500 font-bold">Auto Area Detection</span> and <span className="text-green-500 font-bold">Smart Perspective Correction</span> just like OKEN Scanner.
+                    <p className="mb-6 text-sm text-slate-500 font-medium leading-relaxed">
+                        Automatic edge detection, perspective correction, and high-clarity PDF export.
                     </p>
+
 
                     {cameraError && (
                         <div className="mb-6 p-4 bg-red-500/10 border border-red-500/50 rounded-xl text-red-500 text-sm font-bold">
