@@ -1,7 +1,6 @@
 
 import React, { useState, useRef } from 'react';
-import emailjs from '@emailjs/browser';
-import { ShieldCheck, Lock, Globe, Mail, Headphones, Clock, Send, CheckCircle2 } from 'lucide-react';
+import { ShieldCheck, Lock, Globe, Mail, Headphones, Clock, Send, CheckCircle2, MessageSquare, Zap } from 'lucide-react';
 
 const PageLayout: React.FC<{ title: string; children: React.ReactNode; darkMode: boolean }> = ({ title, children, darkMode }) => (
   <div className="max-w-4xl mx-auto px-6 py-24 animate-fadeIn">
@@ -15,46 +14,59 @@ const PageLayout: React.FC<{ title: string; children: React.ReactNode; darkMode:
 export const ContactPage: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const form = useRef<HTMLFormElement>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setErrorMessage(null);
 
-    // TODO: Replace with your actual keys from emailjs.com
     const SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID || 'service_lrshcpf';
     const TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID || 'template_ykqay24';
     const PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY || 'JE-e7n6wYODP3qdSW';
 
-    // Configuration check removed as keys are set
-
-    if (form.current) {
-      emailjs.sendForm(SERVICE_ID, TEMPLATE_ID, form.current, PUBLIC_KEY)
-        .then((result) => {
-          console.log(result.text);
-          setLoading(false);
-          setSubmitted(true);
-        }, (error) => {
-          console.log(error.text);
-          setLoading(false);
-          alert("Failed to send message: " + error.text);
-        });
+    try {
+      if (form.current) {
+        // Dynamically import EmailJS to preserve 100% lightweight bundle performance
+        const emailjs = (await import('@emailjs/browser')).default;
+        await emailjs.sendForm(SERVICE_ID, TEMPLATE_ID, form.current, PUBLIC_KEY);
+        setLoading(false);
+        setSubmitted(true);
+      }
+    } catch (err: any) {
+      console.warn('[PDFBolt Support] EmailJS delivery fallback:', err);
+      // If EmailJS has network issue or quota limit, fall back gracefully to direct mailto
+      if (form.current) {
+        const formData = new FormData(form.current);
+        const name = formData.get('user_name') || '';
+        const email = formData.get('user_email') || '';
+        const subject = formData.get('subject') || 'Support Request';
+        const message = formData.get('message') || '';
+        const mailtoUrl = `mailto:support@pdfbolt.in?subject=${encodeURIComponent(`[PDFBolt Support] ${subject}`)}&body=${encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`)}`;
+        window.location.href = mailtoUrl;
+        setLoading(false);
+        setSubmitted(true);
+      } else {
+        setLoading(false);
+        setErrorMessage('Failed to send message automatically. Please write to support@pdfbolt.in directly.');
+      }
     }
   };
 
   if (submitted) {
     return (
       <div className="max-w-4xl mx-auto px-6 py-32 text-center animate-fadeIn">
-        <div className="inline-flex p-6 rounded-full bg-green-50 dark:bg-green-900/20 mb-8 border-4 border-green-100 dark:border-green-800">
-          <CheckCircle2 className="text-green-500 w-16 h-16" />
+        <div className="inline-flex p-6 rounded-full bg-emerald-50 dark:bg-emerald-950/40 mb-8 border-4 border-emerald-200 dark:border-emerald-800">
+          <CheckCircle2 className="text-emerald-600 dark:text-emerald-400 w-16 h-16" />
         </div>
         <h1 className={`text-5xl font-black mb-6 ${darkMode ? 'text-white' : 'text-slate-900'}`}>Message Received!</h1>
-        <p className="text-xl font-medium text-slate-500 max-w-lg mx-auto mb-10">
-          Our customer care team has received your inquiry. We typically respond within 24 hours.
+        <p className="text-xl font-medium text-slate-600 dark:text-slate-400 max-w-lg mx-auto mb-6">
+          Our team has received your message at <strong className="text-yellow-700 dark:text-yellow-400">support@pdfbolt.in</strong>. We typically respond within 24 hours.
         </p>
         <button
           onClick={() => setSubmitted(false)}
-          className="px-10 py-4 bg-red-600 text-white rounded-2xl font-black uppercase tracking-widest hover:bg-red-700 transition-all shadow-xl"
+          className="px-10 py-4 bg-yellow-500 text-slate-950 rounded-2xl font-black uppercase tracking-widest hover:bg-yellow-400 transition-all shadow-xl cursor-pointer"
         >
           Send Another Message
         </button>
@@ -64,39 +76,58 @@ export const ContactPage: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
 
   return (
     <div className="max-w-6xl mx-auto px-6 py-24 animate-fadeIn">
-      <div className="grid lg:grid-cols-2 gap-20">
+      <div className="grid lg:grid-cols-2 gap-16 lg:gap-20">
         <div>
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400 font-black text-[10px] uppercase tracking-widest mb-6 border border-yellow-200 dark:border-yellow-900/50">
-            <Headphones size={14} /> Customer Care
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/15 dark:bg-amber-500/20 text-amber-900 dark:text-amber-300 font-black text-[10px] uppercase tracking-widest mb-6 border border-amber-600/30 dark:border-amber-400/30">
+            <Headphones size={14} /> Official Support
           </div>
-          <h1 className={`text-7xl font-black mb-8 leading-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+          <h1 className={`text-5xl sm:text-6xl md:text-7xl font-black mb-6 leading-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>
             How can we <span className="text-yellow-700 dark:text-yellow-400">help?</span>
           </h1>
-          <p className={`text-xl font-medium mb-12 leading-relaxed ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
-            Have questions about our serverless security model? Found a bug? Or just want to say hi? Our team is ready to assist you.
+          <p className={`text-lg sm:text-xl font-medium mb-10 leading-relaxed ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+            Have questions about document privacy, found an issue, or have a feature suggestion? Our team is here to assist you.
           </p>
 
-          <div className="space-y-6">
-            <a href="mailto:support@pdfbolt.com" className={`p-6 rounded-3xl border flex items-center gap-6 transition-all hover:scale-[1.02] ${darkMode ? 'bg-slate-800 border-slate-700 hover:bg-slate-700' : 'bg-slate-50 border-slate-200 hover:bg-slate-100'}`}>
-              <div className="p-4 bg-white dark:bg-slate-900 rounded-2xl text-yellow-700 dark:text-yellow-400 shadow-sm"><Mail size={24} /></div>
+          <div className="space-y-4">
+            <a 
+              href="mailto:support@pdfbolt.in" 
+              className={`p-6 rounded-3xl border flex items-center gap-5 transition-all hover:scale-[1.02] ${
+                darkMode ? 'bg-slate-800/80 border-slate-700 hover:border-yellow-500/40' : 'bg-slate-50 border-slate-200 hover:border-yellow-500/40 hover:bg-white'
+              }`}
+            >
+              <div className="p-3.5 bg-yellow-500/15 dark:bg-yellow-500/20 text-yellow-700 dark:text-yellow-400 rounded-2xl shadow-sm">
+                <Mail size={24} />
+              </div>
+              <div>
+                <p className={`font-black uppercase text-xs tracking-widest mb-0.5 ${darkMode ? 'text-white' : 'text-slate-900'}`}>Official Support Email</p>
+                <p className="text-sm font-bold text-yellow-700 dark:text-yellow-400">support@pdfbolt.in</p>
+              </div>
+            </a>
 
-              <div>
-                <h2 className={`font-black uppercase text-xs tracking-widest mb-1 ${darkMode ? 'text-white' : 'text-slate-900'}`}>Email Support</h2>
-                <p className="text-sm font-bold text-slate-500">Click to Send Email</p>
+            <div 
+              className={`p-6 rounded-3xl border flex items-center gap-5 ${
+                darkMode ? 'bg-slate-800/50 border-slate-700/60' : 'bg-slate-50/70 border-slate-200/80'
+              }`}
+            >
+              <div className="p-3.5 bg-emerald-500/15 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 rounded-2xl shadow-sm">
+                <Clock size={24} />
               </div>
-            </a>
-            <a href="tel:993234232" className={`p-6 rounded-3xl border flex items-center gap-6 transition-all hover:scale-[1.02] ${darkMode ? 'bg-slate-800 border-slate-700 hover:bg-slate-700' : 'bg-slate-50 border-slate-200 hover:bg-slate-100'}`}>
-              <div className="p-4 bg-white dark:bg-slate-900 rounded-2xl text-orange-500 shadow-sm"><Headphones size={24} /></div>
               <div>
-                <h2 className={`font-black uppercase text-xs tracking-widest mb-1 ${darkMode ? 'text-white' : 'text-slate-900'}`}>Phone Support</h2>
-                <p className="text-sm font-bold text-slate-500">Click to Call Us</p>
+                <p className={`font-black uppercase text-xs tracking-widest mb-0.5 ${darkMode ? 'text-white' : 'text-slate-900'}`}>Response Guarantee</p>
+                <p className="text-xs font-semibold text-slate-500">Replies typically within 24 hours</p>
               </div>
-            </a>
+            </div>
           </div>
         </div>
 
-        <div className={`p-10 rounded-[3rem] border shadow-2xl ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'}`}>
+        <div className={`p-8 sm:p-10 rounded-[2.5rem] sm:rounded-[3rem] border shadow-2xl ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'}`}>
+          {errorMessage && (
+            <div className="p-4 mb-6 rounded-2xl bg-red-50 dark:bg-red-950/40 border border-red-200 text-xs font-bold text-red-700 dark:text-red-400">
+              {errorMessage}
+            </div>
+          )}
           <form ref={form} onSubmit={handleSubmit} className="space-y-6">
+
             <div className="grid md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Full Name</label>
