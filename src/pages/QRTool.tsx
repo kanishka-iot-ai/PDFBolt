@@ -66,16 +66,21 @@ const QRTool: React.FC<QRToolProps> = ({ darkMode, notify }) => {
 
       let responseData: any = null;
       try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 25000);
         const res = await fetch(`${API_BASE_URL}/qr-shares`, {
           method: 'POST',
-          body: formData
+          body: formData,
+          signal: controller.signal
         });
+        clearTimeout(timeoutId);
         if (res.ok) {
           responseData = await res.json();
         }
       } catch (apiErr) {
-        console.warn("Backend QR share API unreachable, trying fallback...");
+        console.warn("Backend QR share API unreachable, trying fallback...", apiErr);
       }
+
 
       let finalShareUrl = '';
       let generatedShareId = '';

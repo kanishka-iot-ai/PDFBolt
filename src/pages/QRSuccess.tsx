@@ -161,16 +161,16 @@ const QRSuccess: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
   // State: Expired / Revoked
   if (isExpired || isRevoked) {
     return (
-      <div className="min-h-[80vh] flex items-center justify-center px-6 py-12">
-        <div className={`max-w-md w-full p-10 rounded-[3.5rem] border text-center shadow-2xl animate-fadeInUp ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'}`}>
-          <div className="inline-flex p-5 rounded-3xl bg-amber-500/10 mb-8 border border-amber-500/20">
-            <Clock className="text-amber-500 w-10 h-10" />
+      <div className="min-h-[80vh] flex flex-col items-center justify-start sm:justify-center px-4 sm:px-6 py-6 sm:py-12 pb-36">
+        <div className={`max-w-md w-full p-6 sm:p-10 rounded-3xl sm:rounded-[3.5rem] border text-center shadow-2xl animate-fadeInUp ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'}`}>
+          <div className="inline-flex p-4 sm:p-5 rounded-3xl bg-amber-500/10 mb-6 sm:mb-8 border border-amber-500/20">
+            <Clock className="text-amber-500 w-8 h-8 sm:w-10 sm:h-10" />
           </div>
-          <h1 className={`text-3xl font-black mb-4 ${darkMode ? 'text-white' : 'text-slate-900'}`}>Share Expired</h1>
+          <h1 className={`text-2xl sm:text-3xl font-black mb-3 sm:mb-4 ${darkMode ? 'text-white' : 'text-slate-900'}`}>Share Expired</h1>
           <p className="text-sm font-semibold text-slate-500 mb-8 leading-relaxed">
             This QR share has expired and the file has been deleted.
           </p>
-          <Link to="/" className="w-full py-5 bg-slate-900 text-white rounded-2xl font-black text-lg shadow-xl hover:bg-slate-800 transition-all flex items-center justify-center gap-3">
+          <Link to="/" className="w-full py-4 sm:py-5 bg-slate-900 text-white rounded-2xl font-black text-base sm:text-lg shadow-xl hover:bg-slate-800 transition-all flex items-center justify-center gap-3">
             Return to PDFBolt
           </Link>
         </div>
@@ -181,16 +181,16 @@ const QRSuccess: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
   // State: Error / Not Found
   if (errorMessage) {
     return (
-      <div className="min-h-[80vh] flex items-center justify-center px-6 py-12">
-        <div className={`max-w-md w-full p-10 rounded-[3.5rem] border text-center shadow-2xl animate-fadeInUp ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'}`}>
-          <div className="inline-flex p-5 rounded-3xl bg-red-500/10 mb-8 border border-red-500/20">
-            <AlertCircle className="text-red-500 w-10 h-10" />
+      <div className="min-h-[80vh] flex flex-col items-center justify-start sm:justify-center px-4 sm:px-6 py-6 sm:py-12 pb-36">
+        <div className={`max-w-md w-full p-6 sm:p-10 rounded-3xl sm:rounded-[3.5rem] border text-center shadow-2xl animate-fadeInUp ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'}`}>
+          <div className="inline-flex p-4 sm:p-5 rounded-3xl bg-red-500/10 mb-6 sm:mb-8 border border-red-500/20">
+            <AlertCircle className="text-red-500 w-8 h-8 sm:w-10 sm:h-10" />
           </div>
-          <h1 className={`text-3xl font-black mb-4 ${darkMode ? 'text-white' : 'text-slate-900'}`}>Unavailable</h1>
+          <h1 className={`text-2xl sm:text-3xl font-black mb-3 sm:mb-4 ${darkMode ? 'text-white' : 'text-slate-900'}`}>Unavailable</h1>
           <p className="text-sm font-semibold text-slate-500 mb-8 leading-relaxed">
             {errorMessage}
           </p>
-          <Link to="/" className="w-full py-5 bg-slate-900 text-white rounded-2xl font-black text-lg shadow-xl hover:bg-slate-800 transition-all flex items-center justify-center gap-3">
+          <Link to="/" className="w-full py-4 sm:py-5 bg-slate-900 text-white rounded-2xl font-black text-base sm:text-lg shadow-xl hover:bg-slate-800 transition-all flex items-center justify-center gap-3">
             Return to PDFBolt
           </Link>
         </div>
@@ -201,7 +201,7 @@ const QRSuccess: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
   // State: Loading
   if (isLoading) {
     return (
-      <div className="min-h-[80vh] flex items-center justify-center px-6 py-12">
+      <div className="min-h-[80vh] flex flex-col items-center justify-center px-4 py-12 pb-36">
         <div className="text-center space-y-4">
           <div className="w-12 h-12 border-4 border-yellow-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
           <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">Verifying Secure Share...</p>
@@ -213,13 +213,13 @@ const QRSuccess: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
   // State: PIN Verification Required
   if (requirePin && !isVerified) {
     return (
-      <div className="min-h-[80vh] flex items-center justify-center px-6 py-12">
-        <div className={`max-w-md w-full p-10 rounded-[3.5rem] border text-center shadow-2xl animate-fadeInUp ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'}`}>
-          <div className="inline-flex p-5 rounded-3xl bg-red-600/10 mb-8 border border-red-600/20">
-            <Lock className="text-red-600 w-10 h-10" />
+      <div className="min-h-[80vh] flex flex-col items-center justify-start sm:justify-center px-4 sm:px-6 py-6 sm:py-12 pb-36">
+        <div className={`max-w-md w-full p-6 sm:p-10 rounded-3xl sm:rounded-[3.5rem] border text-center shadow-2xl animate-fadeInUp ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'}`}>
+          <div className="inline-flex p-4 sm:p-5 rounded-3xl bg-red-600/10 mb-6 sm:mb-8 border border-red-600/20">
+            <Lock className="text-red-600 w-8 h-8 sm:w-10 sm:h-10" />
           </div>
-          <h1 className={`text-3xl font-black mb-4 ${darkMode ? 'text-white' : 'text-slate-900'}`}>PIN Required</h1>
-          <p className="text-sm font-medium text-slate-500 mb-8 uppercase tracking-widest">The sender protected this document with a PIN</p>
+          <h1 className={`text-2xl sm:text-3xl font-black mb-3 sm:mb-4 ${darkMode ? 'text-white' : 'text-slate-900'}`}>PIN Required</h1>
+          <p className="text-xs sm:text-sm font-medium text-slate-500 mb-6 sm:mb-8 uppercase tracking-widest">The sender protected this document with a PIN</p>
 
           <div className="space-y-6">
             <div className="relative">
@@ -229,7 +229,7 @@ const QRSuccess: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
                 value={pin}
                 onChange={(e) => setPin(e.target.value.replace(/\D/g, ''))}
                 placeholder="0 0 0 0"
-                className={`w-full p-6 rounded-2xl border-2 outline-none font-mono text-center text-3xl tracking-[0.5em] transition-all ${pinError ? 'border-red-500 bg-red-500/5 ring-4 ring-red-500/10' : darkMode ? 'bg-slate-900 border-slate-700 text-white focus:border-red-600' : 'bg-slate-50 border-slate-200 focus:border-red-600'}`}
+                className={`w-full p-4 sm:p-6 rounded-2xl border-2 outline-none font-mono text-center text-2xl sm:text-3xl tracking-[0.5em] transition-all ${pinError ? 'border-red-500 bg-red-500/5 ring-4 ring-red-500/10' : darkMode ? 'bg-slate-900 border-slate-700 text-white focus:border-red-600' : 'bg-slate-50 border-slate-200 focus:border-red-600'}`}
               />
               {pinError && (
                 <div className="absolute -bottom-6 left-0 w-full text-[10px] font-black text-red-500 flex items-center justify-center gap-1 uppercase">
@@ -241,7 +241,7 @@ const QRSuccess: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
             <button
               onClick={handlePinSubmit}
               disabled={pin.length < 4 || isAuthenticating}
-              className="w-full py-5 bg-red-600 text-white rounded-2xl font-black text-lg shadow-xl hover:bg-red-700 transition-all flex items-center justify-center gap-3 disabled:opacity-30"
+              className="w-full py-4 sm:py-5 bg-red-600 text-white rounded-2xl font-black text-base sm:text-lg shadow-xl hover:bg-red-700 transition-all flex items-center justify-center gap-3 disabled:opacity-30"
             >
               {isAuthenticating ? <div className="w-6 h-6 border-4 border-white/30 border-t-white rounded-full animate-spin"></div> : <><Key size={20} /> Unlock Document</>}
             </button>
@@ -251,18 +251,20 @@ const QRSuccess: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
     );
   }
 
+
   // State: Verified & Ready for Download
   return (
-    <div className="min-h-[80vh] flex items-center justify-center px-6 py-12">
-      <div className={`max-w-xl w-full p-12 rounded-[3.5rem] border text-center shadow-2xl animate-fadeInUp ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'}`}>
-        <div className="inline-flex p-6 rounded-full bg-green-50 dark:bg-green-900/20 mb-8 border-4 border-green-100 dark:border-green-800 animate-pulse">
-          <CheckCircle className="text-green-500 w-16 h-16" />
+    <div className="min-h-[80vh] flex flex-col items-center justify-start sm:justify-center px-4 sm:px-6 py-6 sm:py-12 pb-36">
+      <div className={`max-w-xl w-full p-6 sm:p-12 rounded-3xl sm:rounded-[3.5rem] border text-center shadow-2xl animate-fadeInUp ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'}`}>
+        <div className="inline-flex p-4 sm:p-6 rounded-full bg-green-50 dark:bg-green-900/20 mb-6 sm:mb-8 border-4 border-green-100 dark:border-green-800 animate-pulse">
+          <CheckCircle className="text-green-500 w-12 h-12 sm:w-16 sm:h-16" />
         </div>
 
-        <h1 className={`text-4xl font-black mb-4 ${darkMode ? 'text-white' : 'text-slate-900'}`}>Secure Document Ready</h1>
-        <p className={`text-lg font-medium mb-8 leading-relaxed ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+        <h1 className={`text-2xl sm:text-4xl font-black mb-3 sm:mb-4 ${darkMode ? 'text-white' : 'text-slate-900'}`}>Secure Document Ready</h1>
+        <p className={`text-base sm:text-lg font-medium mb-6 sm:mb-8 leading-relaxed ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
           You have established a secure link to download <span className="text-yellow-600 font-bold">{filename}</span>.
         </p>
+
 
         {/* Document Info Card */}
         <div className={`p-6 rounded-2xl mb-8 text-left border ${darkMode ? 'bg-slate-900 border-slate-700' : 'bg-slate-50 border-slate-200'}`}>
