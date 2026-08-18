@@ -151,13 +151,19 @@ const SEOLandingPage: React.FC<SEOLandingPageProps> = ({ toolId, darkMode, child
       </div>
 
       {/* 2. THE WORKING INTERACTIVE TOOL */}
-      <div className="relative z-10 py-6 sm:py-8">
+      <div className="relative z-10 py-4 sm:py-6">
         {children}
       </div>
 
-      {/* 3. RELATED PDF TOOLS */}
+      {/* 3. NON-INTRUSIVE HIGH-VISIBILITY AD PLACEMENT (BELOW UPLOADER) */}
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 my-4 sm:my-6">
+        <AdSlot placement="TOOL_CONTENT_BOTTOM" />
+      </div>
+
+      {/* 4. RELATED PDF TOOLS */}
       {relatedToolsList.length > 0 && (
-        <div className="max-w-4xl mx-auto px-6 py-12">
+        <div className="max-w-4xl mx-auto px-6 py-8 sm:py-12">
+
           <section className="pt-8 border-t border-slate-200 dark:border-slate-800">
             <h2 className={`text-xl font-black mb-6 flex items-center gap-2 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
               <Layers className="text-yellow-500" /> Related PDF Tools
