@@ -14,8 +14,24 @@ const PageLayout: React.FC<{ title: string; children: React.ReactNode; darkMode:
 export const ContactPage: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [selectedTopic, setSelectedTopic] = useState('General Support');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const form = useRef<HTMLFormElement>(null);
+
+  const handleCopyEmail = () => {
+    navigator.clipboard.writeText('support@pdfbolt.in');
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2500);
+  };
+
+  const topics = [
+    { label: 'General Support', icon: '❓' },
+    { label: 'Bug Report', icon: '🛠️' },
+    { label: 'Feature Request', icon: '💡' },
+    { label: 'Privacy & Security', icon: '🔒' },
+    { label: 'Business Inquiry', icon: '💼' }
+  ];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,146 +44,259 @@ export const ContactPage: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
 
     try {
       if (form.current) {
-        // Dynamically import EmailJS to preserve 100% lightweight bundle performance
         const emailjs = (await import('@emailjs/browser')).default;
         await emailjs.sendForm(SERVICE_ID, TEMPLATE_ID, form.current, PUBLIC_KEY);
         setLoading(false);
         setSubmitted(true);
       }
     } catch (err: any) {
-      console.warn('[PDFBolt Support] EmailJS delivery fallback:', err);
-      // If EmailJS has network issue or quota limit, fall back gracefully to direct mailto
+      console.warn('[PDFBolt Support] Fallback to direct mailto:', err);
       if (form.current) {
         const formData = new FormData(form.current);
         const name = formData.get('user_name') || '';
         const email = formData.get('user_email') || '';
-        const subject = formData.get('subject') || 'Support Request';
         const message = formData.get('message') || '';
-        const mailtoUrl = `mailto:support@pdfbolt.in?subject=${encodeURIComponent(`[PDFBolt Support] ${subject}`)}&body=${encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`)}`;
+        const mailtoUrl = `mailto:support@pdfbolt.in?subject=${encodeURIComponent(`[PDFBolt Support] ${selectedTopic}`)}&body=${encodeURIComponent(`Name: ${name}\nEmail: ${email}\nTopic: ${selectedTopic}\n\nMessage:\n${message}`)}`;
         window.location.href = mailtoUrl;
         setLoading(false);
         setSubmitted(true);
       } else {
         setLoading(false);
-        setErrorMessage('Failed to send message automatically. Please write to support@pdfbolt.in directly.');
+        setErrorMessage('Could not send automatically. Please write to support@pdfbolt.in directly.');
       }
     }
   };
 
   if (submitted) {
     return (
-      <div className="max-w-4xl mx-auto px-6 py-32 text-center animate-fadeIn">
-        <div className="inline-flex p-6 rounded-full bg-emerald-50 dark:bg-emerald-950/40 mb-8 border-4 border-emerald-200 dark:border-emerald-800">
+      <div className="max-w-4xl mx-auto px-6 py-28 text-center animate-fadeIn">
+        <div className="inline-flex p-6 rounded-full bg-emerald-50 dark:bg-emerald-950/40 mb-8 border-4 border-emerald-200 dark:border-emerald-800 shadow-lg">
           <CheckCircle2 className="text-emerald-600 dark:text-emerald-400 w-16 h-16" />
         </div>
-        <h1 className={`text-5xl font-black mb-6 ${darkMode ? 'text-white' : 'text-slate-900'}`}>Message Received!</h1>
-        <p className="text-xl font-medium text-slate-600 dark:text-slate-400 max-w-lg mx-auto mb-6">
-          Our team has received your message at <strong className="text-yellow-700 dark:text-yellow-400">support@pdfbolt.in</strong>. We typically respond within 24 hours.
+        <h1 className={`text-4xl sm:text-5xl font-black mb-4 ${darkMode ? 'text-white' : 'text-slate-900'}`}>Message Received!</h1>
+        <p className="text-lg sm:text-xl font-medium text-slate-600 dark:text-slate-400 max-w-lg mx-auto mb-8 leading-relaxed">
+          Your inquiry has been delivered directly to <strong className="text-yellow-700 dark:text-yellow-400">support@pdfbolt.in</strong>. Our team will get back to you within 24 hours.
         </p>
-        <button
-          onClick={() => setSubmitted(false)}
-          className="px-10 py-4 bg-yellow-500 text-slate-950 rounded-2xl font-black uppercase tracking-widest hover:bg-yellow-400 transition-all shadow-xl cursor-pointer"
-        >
-          Send Another Message
-        </button>
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <button
+            onClick={() => setSubmitted(false)}
+            className="px-8 py-3.5 bg-yellow-500 text-slate-950 rounded-2xl font-black uppercase tracking-wider hover:bg-yellow-400 transition-all shadow-md cursor-pointer text-sm"
+          >
+            Send Another Message
+          </button>
+          <a
+            href="/"
+            className={`px-8 py-3.5 rounded-2xl font-bold transition-all text-sm ${
+              darkMode ? 'bg-slate-800 text-slate-200 hover:bg-slate-700' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+            }`}
+          >
+            Back to Home
+          </a>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-6 py-24 animate-fadeIn">
-      <div className="grid lg:grid-cols-2 gap-16 lg:gap-20">
-        <div>
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/15 dark:bg-amber-500/20 text-amber-900 dark:text-amber-300 font-black text-[10px] uppercase tracking-widest mb-6 border border-amber-600/30 dark:border-amber-400/30">
-            <Headphones size={14} /> Official Support
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-16 sm:py-24 animate-fadeIn">
+      <div className="grid lg:grid-cols-12 gap-12 lg:gap-16 items-start">
+        
+        {/* Left Column: Direct Info & Quick Copy */}
+        <div className="lg:col-span-5 space-y-6">
+          <div>
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/15 dark:bg-amber-500/20 text-amber-900 dark:text-amber-300 font-black text-[11px] uppercase tracking-widest mb-4 border border-amber-600/30 dark:border-amber-400/30">
+              <Mail size={13} /> Official Email Support
+            </div>
+            <h1 className={`text-4xl sm:text-5xl font-black tracking-tight mb-4 leading-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+              Get in <span className="text-yellow-700 dark:text-yellow-400">touch</span> with us
+            </h1>
+            <p className={`text-sm sm:text-base font-medium leading-relaxed ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+              Need assistance, have feedback, or want to report a technical issue? Send us a message and our team will assist you promptly.
+            </p>
           </div>
-          <h1 className={`text-5xl sm:text-6xl md:text-7xl font-black mb-6 leading-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>
-            How can we <span className="text-yellow-700 dark:text-yellow-400">help?</span>
-          </h1>
-          <p className={`text-lg sm:text-xl font-medium mb-10 leading-relaxed ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
-            Have questions about document privacy, found an issue, or have a feature suggestion? Our team is here to assist you.
-          </p>
 
-          <div className="space-y-4">
-            <a 
-              href="mailto:support@pdfbolt.in" 
-              className={`p-6 rounded-3xl border flex items-center gap-5 transition-all hover:scale-[1.02] ${
-                darkMode ? 'bg-slate-800/80 border-slate-700 hover:border-yellow-500/40' : 'bg-slate-50 border-slate-200 hover:border-yellow-500/40 hover:bg-white'
-              }`}
-            >
-              <div className="p-3.5 bg-yellow-500/15 dark:bg-yellow-500/20 text-yellow-700 dark:text-yellow-400 rounded-2xl shadow-sm">
-                <Mail size={24} />
+          {/* Primary Email Card with 1-Click Copy */}
+          <div className={`p-6 rounded-3xl border transition-all shadow-sm ${
+            darkMode ? 'bg-slate-900/80 border-slate-800' : 'bg-white border-slate-200/80'
+          }`}>
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex items-center gap-3.5 min-w-0">
+                <div className="p-3 bg-yellow-500/15 dark:bg-yellow-500/20 text-yellow-700 dark:text-yellow-400 rounded-2xl shrink-0">
+                  <Mail size={22} />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 mb-0.5">Support Inbox</p>
+                  <p className="text-sm sm:text-base font-bold text-slate-900 dark:text-white truncate">support@pdfbolt.in</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={handleCopyEmail}
+                className={`px-3 py-2 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer ${
+                  copied 
+                    ? 'bg-emerald-500 text-white' 
+                    : darkMode 
+                      ? 'bg-slate-800 hover:bg-slate-700 text-slate-300' 
+                      : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
+                }`}
+                title="Copy email address"
+              >
+                {copied ? '✓ Copied' : 'Copy'}
+              </button>
+            </div>
+          </div>
+
+          {/* Response Time Guarantee */}
+          <div className={`p-6 rounded-3xl border ${
+            darkMode ? 'bg-slate-900/40 border-slate-800/60 text-slate-300' : 'bg-slate-50 border-slate-200/60 text-slate-600'
+          }`}>
+            <div className="flex items-center gap-3.5">
+              <div className="p-3 bg-emerald-500/15 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 rounded-2xl shrink-0">
+                <Clock size={20} />
               </div>
               <div>
-                <p className={`font-black uppercase text-xs tracking-widest mb-0.5 ${darkMode ? 'text-white' : 'text-slate-900'}`}>Official Support Email</p>
-                <p className="text-sm font-bold text-yellow-700 dark:text-yellow-400">support@pdfbolt.in</p>
+                <p className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white mb-0.5">24-Hour Response Guarantee</p>
+                <p className="text-xs text-slate-600 dark:text-slate-400">All inquiries are handled directly by our engineering and product team.</p>
               </div>
-            </a>
+            </div>
+          </div>
 
-            <div 
-              className={`p-6 rounded-3xl border flex items-center gap-5 ${
-                darkMode ? 'bg-slate-800/50 border-slate-700/60' : 'bg-slate-50/70 border-slate-200/80'
-              }`}
-            >
-              <div className="p-3.5 bg-emerald-500/15 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 rounded-2xl shadow-sm">
-                <Clock size={24} />
+          {/* 100% Privacy Note */}
+          <div className={`p-6 rounded-3xl border ${
+            darkMode ? 'bg-slate-900/40 border-slate-800/60 text-slate-300' : 'bg-slate-50 border-slate-200/60 text-slate-600'
+          }`}>
+            <div className="flex items-center gap-3.5">
+              <div className="p-3 bg-blue-500/15 dark:bg-blue-500/20 text-blue-700 dark:text-blue-400 rounded-2xl shrink-0">
+                <ShieldCheck size={20} />
               </div>
               <div>
-                <p className={`font-black uppercase text-xs tracking-widest mb-0.5 ${darkMode ? 'text-white' : 'text-slate-900'}`}>Response Guarantee</p>
-                <p className="text-xs font-semibold text-slate-500">Replies typically within 24 hours</p>
+                <p className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white mb-0.5">Zero Document Retention</p>
+                <p className="text-xs text-slate-600 dark:text-slate-400">Never send private credentials in emails. PDFBolt processes files locally in your browser.</p>
               </div>
             </div>
           </div>
         </div>
 
-        <div className={`p-8 sm:p-10 rounded-[2.5rem] sm:rounded-[3rem] border shadow-2xl ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'}`}>
+        {/* Right Column: Interactive Clean Email Form */}
+        <div className={`lg:col-span-7 p-6 sm:p-10 rounded-[2.5rem] border shadow-xl ${
+          darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/80'
+        }`}>
           {errorMessage && (
             <div className="p-4 mb-6 rounded-2xl bg-red-50 dark:bg-red-950/40 border border-red-200 text-xs font-bold text-red-700 dark:text-red-400">
               {errorMessage}
             </div>
           )}
-          <form ref={form} onSubmit={handleSubmit} className="space-y-6">
 
-            <div className="grid md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Full Name</label>
-                <input required name="user_name" type="text" className={`w-full p-4 rounded-2xl border-2 outline-none focus:ring-4 transition-all ${darkMode ? 'bg-slate-900 border-slate-700 text-white focus:ring-red-600/10 focus:border-red-600' : 'bg-slate-50 border-slate-200 text-slate-900 focus:ring-red-50 focus:border-red-600'}`} placeholder="John Doe" />
-              </div>
-              <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Email Address</label>
-                <input required name="user_email" type="email" className={`w-full p-4 rounded-2xl border-2 outline-none focus:ring-4 transition-all ${darkMode ? 'bg-slate-900 border-slate-700 text-white focus:ring-red-600/10 focus:border-red-600' : 'bg-slate-50 border-slate-200 text-slate-900 focus:ring-red-50 focus:border-red-600'}`} placeholder="john@example.com" />
-              </div>
-            </div>
+          <form ref={form} onSubmit={handleSubmit} className="space-y-6">
+            {/* Quick Topic Selector Pills */}
             <div className="space-y-2">
-              <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Subject</label>
-              <select required name="subject" className={`w-full p-4 rounded-2xl border-2 outline-none focus:ring-4 transition-all ${darkMode ? 'bg-slate-900 border-slate-700 text-white focus:ring-red-600/10 focus:border-red-600' : 'bg-slate-50 border-slate-200 text-slate-900 focus:ring-red-50 focus:border-red-600'}`}>
-                <option value="">Select an option</option>
-                <option value="support">Technical Support</option>
-                <option value="bug">Bug Report</option>
-                <option value="feature">Feature Request</option>
-                <option value="business">Business Inquiry</option>
-              </select>
+              <label className="text-[11px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 ml-1">
+                Select Topic
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {topics.map(t => (
+                  <button
+                    key={t.label}
+                    type="button"
+                    onClick={() => setSelectedTopic(t.label)}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 border ${
+                      selectedTopic === t.label
+                        ? 'bg-yellow-500 text-slate-950 border-yellow-500 shadow-sm'
+                        : darkMode
+                          ? 'bg-slate-800 border-slate-700 text-slate-300 hover:border-slate-600'
+                          : 'bg-slate-100 border-slate-200 text-slate-700 hover:border-slate-300'
+                    }`}
+                  >
+                    <span>{t.icon}</span>
+                    <span>{t.label}</span>
+                  </button>
+                ))}
+              </div>
+              <input type="hidden" name="subject" value={selectedTopic} />
             </div>
-            <div className="space-y-2">
-              <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Message</label>
-              <textarea required name="message" rows={5} className={`w-full p-4 rounded-2xl border-2 outline-none focus:ring-4 transition-all resize-none ${darkMode ? 'bg-slate-900 border-slate-700 text-white focus:ring-red-600/10 focus:border-red-600' : 'bg-slate-50 border-slate-200 text-slate-900 focus:ring-red-50 focus:border-red-600'}`} placeholder="How can we help you master your PDFs?"></textarea>
+
+            {/* Name & Email Fields */}
+            <div className="grid sm:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 ml-1">
+                  Your Name
+                </label>
+                <input 
+                  required 
+                  name="user_name" 
+                  type="text" 
+                  className={`w-full px-4 py-3.5 rounded-2xl border outline-none text-sm font-medium transition-all ${
+                    darkMode 
+                      ? 'bg-slate-800/80 border-slate-700 text-white focus:border-yellow-500 focus:ring-2 focus:ring-yellow-500/20' 
+                      : 'bg-slate-50 border-slate-200 text-slate-900 focus:border-yellow-500 focus:ring-2 focus:ring-yellow-500/20 focus:bg-white'
+                  }`} 
+                  placeholder="e.g. John Doe" 
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 ml-1">
+                  Your Email
+                </label>
+                <input 
+                  required 
+                  name="user_email" 
+                  type="email" 
+                  className={`w-full px-4 py-3.5 rounded-2xl border outline-none text-sm font-medium transition-all ${
+                    darkMode 
+                      ? 'bg-slate-800/80 border-slate-700 text-white focus:border-yellow-500 focus:ring-2 focus:ring-yellow-500/20' 
+                      : 'bg-slate-50 border-slate-200 text-slate-900 focus:border-yellow-500 focus:ring-2 focus:ring-yellow-500/20 focus:bg-white'
+                  }`} 
+                  placeholder="name@example.com" 
+                />
+              </div>
             </div>
+
+            {/* Message Area */}
+            <div className="space-y-1.5">
+              <label className="text-[11px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 ml-1">
+                Your Message
+              </label>
+              <textarea 
+                required 
+                name="message" 
+                rows={5} 
+                className={`w-full p-4 rounded-2xl border outline-none text-sm font-medium transition-all resize-none ${
+                  darkMode 
+                    ? 'bg-slate-800/80 border-slate-700 text-white focus:border-yellow-500 focus:ring-2 focus:ring-yellow-500/20' 
+                    : 'bg-slate-50 border-slate-200 text-slate-900 focus:border-yellow-500 focus:ring-2 focus:ring-yellow-500/20 focus:bg-white'
+                }`} 
+                placeholder="Describe your question, bug details, or suggestion..."
+              ></textarea>
+            </div>
+
+            {/* Submit Button */}
             <button
               disabled={loading}
-              className="w-full py-5 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-2xl font-black text-lg shadow-xl hover:from-yellow-600 hover:to-orange-600 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-3 disabled:opacity-50"
+              type="submit"
+              className="w-full py-4 bg-gradient-to-r from-yellow-500 to-amber-500 text-slate-950 rounded-2xl font-black text-sm uppercase tracking-wider shadow-lg hover:from-yellow-400 hover:to-amber-400 hover:scale-[1.01] active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
             >
               {loading ? (
-                <div className="w-6 h-6 border-4 border-white/30 border-t-white rounded-full animate-spin"></div>
+                <div className="w-5 h-5 border-3 border-slate-950/30 border-t-slate-950 rounded-full animate-spin"></div>
               ) : (
-                <>Send Message <Send size={20} /></>
+                <>
+                  <span>Send Message</span>
+                  <Send size={16} />
+                </>
               )}
             </button>
+
+            <p className="text-center text-[11px] text-slate-600 dark:text-slate-400">
+              Or email us directly at <a href="mailto:support@pdfbolt.in" className="font-bold underline text-yellow-700 dark:text-yellow-400">support@pdfbolt.in</a>
+            </p>
           </form>
         </div>
+
       </div>
     </div>
   );
 };
+
 
 export const PrivacyPage: React.FC<{ darkMode: boolean }> = ({ darkMode }) => (
   <PageLayout title="Privacy Policy" darkMode={darkMode}>
