@@ -45,39 +45,34 @@ export default defineConfig(({ mode }) => {
           drop_debugger: true,
         },
       },
-      modulePreload: {
-        polyfill: false,
-        resolveDependencies: (filename, deps) => {
-          // Never preload heavy processing chunks on landing/initial page load
-          const heavyPatterns = [
-            'jspdf',
-            'pdf-lib',
-            'pdfjs-dist',
-            'docx',
-            'html2canvas',
-            'tesseract',
-            'mammoth',
-            'exceljs'
-          ];
-          return deps.filter(dep => !heavyPatterns.some(pattern => dep.includes(pattern)));
-        },
-      },
+      modulePreload: false,
       rollupOptions: {
         output: {
-          manualChunks: {
-            'react-vendor': ['react', 'react-dom', 'react-router-dom'],
-            'pdf-lib': ['pdf-lib'],
-            'pdfjs-dist': ['pdfjs-dist'],
-            'docx-vendor': ['docx'],
-            'html2canvas-vendor': ['html2canvas'],
-            'jspdf-vendor': ['jspdf'],
-            'tesseract': ['tesseract.js'],
-            'mammoth': ['mammoth'],
+          chunkFileNames: 'assets/[name]-[hash].js',
+          entryFileNames: 'assets/[name]-[hash].js',
+          assetFileNames: 'assets/[name]-[hash].[ext]',
+          manualChunks(id) {
+            if (id.includes('node_modules')) {
+              if (
+                id.includes('react') || 
+                id.includes('react-dom') || 
+                id.includes('react-router') || 
+                id.includes('react-helmet') ||
+                id.includes('scheduler')
+              ) {
+                return 'vendor-core';
+              }
+              if (id.includes('lucide-react')) {
+                return 'vendor-icons';
+              }
+            }
           },
         },
       },
       chunkSizeWarningLimit: 1000,
       sourcemap: false,
+
+
 
     },
     test: {

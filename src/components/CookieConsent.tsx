@@ -66,8 +66,9 @@ const CookieConsent: React.FC<CookieConsentProps> = ({ darkMode }) => {
             <Cookie size={20} />
           </div>
           <div>
-            <h4 className="text-sm font-black tracking-tight">Privacy & Advertising Preferences</h4>
+            <p className="text-sm font-black tracking-tight">Privacy & Advertising Preferences</p>
             <p className="text-xs text-slate-600 dark:text-slate-400 mt-1 leading-relaxed">
+
               PDFBolt processes all documents <strong>100% locally in your browser</strong>. We use cookies to enhance navigation and deliver relevant advertisements.
             </p>
           </div>
