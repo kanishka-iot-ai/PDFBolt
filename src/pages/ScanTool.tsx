@@ -2,6 +2,8 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Camera, RefreshCw, FileText, Download, X, Scan as ScanIcon, Flashlight, CheckCircle2, ChevronLeft, ChevronRight, Plus, Trash2, Zap, ZapOff } from 'lucide-react';
 import { soundEngine } from '../utils/sounds';
 import { useActiveWork } from '../context/ActiveWorkContext';
+import { loadJscanify } from '../services/openCVLoader';
+
 
 interface ScanToolProps {
     darkMode: boolean;
@@ -43,29 +45,24 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
     // Filter State
     const [activeFilter, setActiveFilter] = useState<'none' | 'bw' | 'contrast'>('none');
 
-    // Load OpenCV and jscanify dynamically
+    // Load OpenCV and jscanify dynamically on-demand
     const loadLibraries = useCallback(async () => {
-        if ((window as any).cv && scannerRef.current) return;
+        if ((window as any).jscanify && scannerRef.current) return;
         setIsLibLoading(true);
-
-        return new Promise<void>((resolve) => {
-            const scriptCv = document.createElement('script');
-            scriptCv.src = '/lib/opencv.js';
-            scriptCv.async = true;
-            scriptCv.onload = () => {
-                const scriptJscanify = document.createElement('script');
-                scriptJscanify.src = '/lib/jscanify.min.js';
-                scriptJscanify.onload = () => {
-                    // @ts-ignore
-                    scannerRef.current = new jscanify();
-                    setIsLibLoading(false);
-                    resolve();
-                };
-                document.body.appendChild(scriptJscanify);
-            };
-            document.body.appendChild(scriptCv);
-        });
+        try {
+            await loadJscanify();
+            // @ts-ignore
+            if ((window as any).jscanify && !scannerRef.current) {
+                // @ts-ignore
+                scannerRef.current = new jscanify();
+            }
+        } catch (err) {
+            console.warn('[PDFBolt] Scanner library load failed:', err);
+        } finally {
+            setIsLibLoading(false);
+        }
     }, []);
+
 
     // Detection Loop - Professional Area Detection Logic
     const detectionLoop = useCallback(() => {

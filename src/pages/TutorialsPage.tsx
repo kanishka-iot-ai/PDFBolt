@@ -10,7 +10,7 @@ const TutorialSection: React.FC<{
 }> = ({ title, icon, steps, darkMode }) => (
     <div className={`p-8 rounded-[2.5rem] border mb-8 transition-all hover:scale-[1.01] ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100 shadow-lg'}`}>
         <div className="flex items-center gap-4 mb-6">
-            <div className="p-3 bg-yellow-100 dark:bg-yellow-900/30 rounded-2xl text-yellow-600 dark:text-yellow-400">
+            <div className="p-3 bg-yellow-100 dark:bg-yellow-900/30 rounded-2xl text-yellow-700 dark:text-yellow-400">
                 {icon}
             </div>
             <h3 className={`text-2xl font-black ${darkMode ? 'text-white' : 'text-slate-900'}`}>{title}</h3>
@@ -32,16 +32,17 @@ const TutorialsPage: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
     return (
         <div className="max-w-4xl mx-auto px-6 py-24 animate-fadeIn">
             <div className="text-center mb-16">
-                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400 font-black text-[10px] uppercase tracking-widest mb-6">
+                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 font-black text-[10px] uppercase tracking-widest mb-6">
                     <BookOpen size={14} /> Learning Center
                 </div>
                 <h1 className={`text-6xl font-black mb-6 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
-                    How to Use <span className="text-yellow-500">PDFBolt</span>
+                    How to Use <span className="text-yellow-700 dark:text-yellow-400">PDFBolt</span>
                 </h1>
-                <p className={`text-xl font-medium max-w-2xl mx-auto ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+                <p className={`text-xl font-medium max-w-2xl mx-auto ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
                     Master your documents in seconds. Follow these simple guides to get the most out of our tools.
                 </p>
             </div>
+
 
             <TutorialSection
                 darkMode={darkMode}

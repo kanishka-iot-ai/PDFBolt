@@ -62,12 +62,12 @@ const CookieConsent: React.FC<CookieConsentProps> = ({ darkMode }) => {
         darkMode ? 'bg-slate-900/95 border-slate-700 text-white' : 'bg-white/95 border-slate-200 text-slate-900'
       }`}>
         <div className="flex items-start gap-3.5 mb-3">
-          <div className="p-2.5 rounded-2xl bg-yellow-500/10 text-yellow-500 shrink-0 mt-0.5">
+          <div className="p-2.5 rounded-2xl bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 shrink-0 mt-0.5">
             <Cookie size={20} />
           </div>
           <div>
             <h4 className="text-sm font-black tracking-tight">Privacy & Advertising Preferences</h4>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
+            <p className="text-xs text-slate-600 dark:text-slate-400 mt-1 leading-relaxed">
               PDFBolt processes all documents <strong>100% locally in your browser</strong>. We use cookies to enhance navigation and deliver relevant advertisements.
             </p>
           </div>
@@ -90,11 +90,12 @@ const CookieConsent: React.FC<CookieConsentProps> = ({ darkMode }) => {
           </button>
           <Link
             to="/privacy"
-            className="text-[11px] font-semibold text-slate-400 hover:text-yellow-500 underline ml-1"
+            className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 hover:text-yellow-700 dark:hover:text-yellow-400 underline ml-1"
           >
             Privacy
           </Link>
         </div>
+
       </div>
     </aside>
   );

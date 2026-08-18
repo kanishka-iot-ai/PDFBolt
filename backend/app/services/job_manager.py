@@ -31,10 +31,12 @@ class JobManager:
         expires_at = (now_dt + datetime.timedelta(seconds=settings.PROCESSING_FILE_TTL_SECONDS)).isoformat()
         hard_delete_at = (now_dt + datetime.timedelta(seconds=settings.HARD_SAFETY_TTL_SECONDS)).isoformat()
 
+        op_val = operation.value if hasattr(operation, "value") else str(operation)
         self.jobs[job_id] = {
             "job_id": job_id,
-            "operation": operation.value,
+            "operation": op_val,
             "status": JobStatus.QUEUED,
+
             "progress": 0,
             "created_at": now_iso,
             "expires_at": expires_at,
@@ -154,18 +156,19 @@ class JobManager:
 
         except PDFProcessingException as pex:
             job["status"] = JobStatus.FAILED
+            code_str = pex.error_code.value if hasattr(pex.error_code, "value") else str(pex.error_code)
             job["error"] = {
-                "code": pex.error_code.value,
+                "code": code_str,
                 "message": pex.message,
-                "suggestion": pex.human_suggestion,
-                "details": pex.details
+                "suggestion": getattr(pex, "human_suggestion", ""),
+                "details": getattr(pex, "details", {})
             }
             cleanup_service.handle_job_failure(job_id, self)
             raise
         except Exception as e:
             job["status"] = JobStatus.FAILED
             job["error"] = {
-                "code": ErrorCode.PROCESSING_FAILED.value,
+                "code": "PROCESSING_FAILED",
                 "message": str(e),
                 "suggestion": "An unexpected error occurred during document processing.",
                 "details": {}
@@ -176,6 +179,7 @@ class JobManager:
                 message=str(e),
                 status_code=500
             )
+
 
 
 job_manager = JobManager()

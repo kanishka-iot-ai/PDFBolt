@@ -86,7 +86,7 @@ const TestFilesPage: React.FC<TestFilesPageProps> = ({ darkMode }) => {
       {/* Hero Header */}
       <section className={`py-16 border-b ${darkMode ? 'border-slate-800 bg-slate-900/40' : 'border-slate-100 bg-slate-50/70'}`}>
         <div className="max-w-4xl mx-auto px-6 text-center">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 font-black text-xs uppercase tracking-widest mb-4">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 font-black text-xs uppercase tracking-widest mb-4">
             <Sparkles size={14} /> Sample Document Playground
           </div>
           <h1 className={`text-3xl md:text-5xl font-black mb-4 tracking-tight leading-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>
@@ -110,13 +110,14 @@ const TestFilesPage: React.FC<TestFilesPageProps> = ({ darkMode }) => {
             >
               <div>
                 <div className="flex items-center justify-between gap-2 mb-3">
-                  <span className="text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded bg-yellow-500/10 text-yellow-600 dark:text-yellow-400">
+                  <span className="text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded bg-yellow-500/10 text-yellow-700 dark:text-yellow-400">
                     {file.category}
                   </span>
-                  <span className="text-xs font-semibold text-slate-400">
+                  <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
                     {file.pageCount} Pages • ~{file.size}
                   </span>
                 </div>
+
                 <h2 className={`text-xl font-bold mb-2 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
                   {file.name}
                 </h2>

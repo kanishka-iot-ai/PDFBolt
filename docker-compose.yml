@@ -1,45 +1,25 @@
-version: '3.8'
-
 services:
-  pdfbolt-backend:
+  api:
     build:
       context: .
-      dockerfile: backend/Dockerfile
+      dockerfile: Dockerfile.api
     container_name: pdfbolt-api
-    restart: unless-stopped
     ports:
       - "8000:8000"
     environment:
       - APP_ENV=production
-      - DEBUG=false
       - PORT=8000
-      - HOST=0.0.0.0
       - STORAGE_BACKEND=local
-      - LOCAL_STORAGE_DIR=/app/storage
+      - QUEUE_BACKEND=local
+      - TEMP_DIR=/tmp/pdfbolt
     volumes:
-      - pdf_storage:/app/storage
+      - pdfbolt-storage:/tmp/pdfbolt
+    restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 30s
-      timeout: 5s
+      timeout: 10s
       retries: 3
 
-  pdfbolt-frontend:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: pdfbolt-ui
-    restart: unless-stopped
-    ports:
-      - "80:80"
-    depends_on:
-      - pdfbolt-backend
-    environment:
-      - NODE_ENV=production
-    labels:
-      - "com.pdfbolt.description=PDFBolt Pro - Intelligent Document Processing Platform"
-      - "com.pdfbolt.version=2.0.0"
-
 volumes:
-  pdf_storage:
-    driver: local
+  pdfbolt-storage:

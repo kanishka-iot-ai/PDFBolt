@@ -1,194 +1,176 @@
 import os
-import time
 import shutil
-import datetime
+import time
 import asyncio
-from typing import Dict, Any, List, Optional
+import datetime
+from pathlib import Path
+from typing import Any, Optional
 from backend.app.config import settings
 from backend.app.core.logging import logger
 from backend.app.models.schemas import JobStatus
 
+TTL_MINUTES = 15
+HARD_DELETE_MINUTES = 20
+
 
 class CleanupService:
-    """
-    15-Minute Document Auto-Deletion Engine & 20-Minute Hard Safety Purge.
-    Enforces strict zero-retention ephemeral document lifecycle across
-    local filesystem, temporary worker caches, and Google Cloud Storage (GCS).
-    """
+    """Automated, robust lifecycle manager for ephemeral document retention."""
 
-    def __init__(self):
-        self.local_storage_dir = settings.LOCAL_STORAGE_DIR
-        self.ttl_seconds = settings.PROCESSING_FILE_TTL_SECONDS  # 15 minutes (900s)
-        self.hard_ttl_seconds = settings.HARD_SAFETY_TTL_SECONDS # 20 minutes (1200s)
-        self._running = False
-        self._worker_task: Optional[asyncio.Task] = None
+    def __init__(self, storage_dir: Optional[str] = None):
+        self.storage_dir = Path(storage_dir or settings.LOCAL_STORAGE_DIR)
+        self.is_running = False
+        self._task: Optional[asyncio.Task] = None
 
-    def delete_job_files(self, job_id: str, storage_provider=None) -> bool:
-        """
-        Idempotently deletes all input, output, and partial temporary files for a job.
-        Safe against race conditions, missing directories, or multiple calls.
-        """
-        deleted_anything = False
+    def run_startup_cleanup(self) -> int:
+        """Purges any orphaned files or leftover artifacts from prior crashes on server boot."""
+        return self.run_20min_hard_safety_cleanup()
 
-        # 1. Local filesystem cleanup
-        job_dir = os.path.join(self.local_storage_dir, "jobs", job_id)
-        if os.path.exists(job_dir):
-            try:
-                shutil.rmtree(job_dir, ignore_errors=True)
-                deleted_anything = True
-            except Exception as e:
-                logger.warning(f"Error removing local job dir {job_id}: {str(e)}", extra={"job_id": job_id})
-
-        # Also check /tmp/pdfbolt/jobs/{job_id} if configured
-        tmp_job_dir = os.path.join("/tmp", "pdfbolt", "jobs", job_id)
-        if os.path.exists(tmp_job_dir):
-            try:
-                shutil.rmtree(tmp_job_dir, ignore_errors=True)
-                deleted_anything = True
-            except Exception:
-                pass
-
-        # 2. Cloud Storage Provider Cleanup if available
-        if storage_provider:
-            try:
-                storage_provider.cleanup_job(job_id)
-                deleted_anything = True
-            except Exception as e:
-                logger.warning(f"Error purging cloud storage for job {job_id}: {str(e)}", extra={"job_id": job_id})
-
-        return deleted_anything
-
-    def handle_job_cancellation(self, job_id: str, job_manager) -> bool:
-        """
-        Immediately deletes all input/output files and marks job CANCELLED.
-        """
-        job = job_manager.jobs.get(job_id)
-        if not job:
-            return False
-
-        job["status"] = JobStatus.CANCELLED
-        job["deleted_at"] = datetime.datetime.now(datetime.timezone.utc).isoformat()
-        job["output_path"] = None
-
-        self.delete_job_files(job_id)
-        logger.info(f"Job {job_id} cancelled by user. Temporary files purged immediately.", extra={"job_id": job_id})
-        return True
-
-    def handle_job_failure(self, job_id: str, job_manager) -> None:
-        """
-        Immediately purges temporary input/partial artifacts upon processing failure.
-        """
-        self.delete_job_files(job_id)
-        job = job_manager.jobs.get(job_id)
-        if job:
-            job["deleted_at"] = datetime.datetime.now(datetime.timezone.utc).isoformat()
-            job["output_path"] = None
-        logger.info(f"Failed job {job_id} artifacts purged.", extra={"job_id": job_id})
-
-    def handle_post_download_cleanup(self, job_id: str, job_manager) -> None:
-        """
-        Purges output file immediately following user download.
-        """
-        self.delete_job_files(job_id)
-        job = job_manager.jobs.get(job_id)
-        if job:
-            job["deleted_at"] = datetime.datetime.now(datetime.timezone.utc).isoformat()
-            job["output_path"] = None
-        logger.info(f"Job {job_id} downloaded by user. Temporary files purged.", extra={"job_id": job_id})
-
-    def run_15min_ttl_cleanup(self, job_manager) -> int:
-        """
-        Scans all active job metadata. Purges files for any job older than 15 minutes (900s).
-        Returns number of expired jobs purged.
-        """
-        now = datetime.datetime.now(datetime.timezone.utc)
-        purged_count = 0
-
-        for job_id, job in list(job_manager.jobs.items()):
-            try:
-                created_dt = datetime.datetime.fromisoformat(job["created_at"])
-                age_seconds = (now - created_dt).total_seconds()
-
-                if age_seconds >= self.ttl_seconds and job["status"] != JobStatus.DELETED:
-                    self.delete_job_files(job_id)
-                    job["status"] = JobStatus.EXPIRED
-                    job["deleted_at"] = now.isoformat()
-                    job["output_path"] = None
-                    purged_count += 1
-                    logger.info(f"Job {job_id} reached 15-minute TTL ({int(age_seconds)}s). Auto-deleted.", extra={"job_id": job_id})
-            except Exception as e:
-                logger.error(f"Error checking TTL for job {job_id}: {str(e)}", extra={"job_id": job_id})
-
-        return purged_count
-
-    def run_20min_hard_safety_cleanup(self) -> int:
-        """
-        Hard Safety Emergency Purge (independent of application state / in-memory jobs).
-        Directly scans local storage directories and cloud buckets for any temporary directory
-        created > 20 minutes ago (1200s). Purges abandoned/crashed worker directories.
-        Returns number of physical directories purged.
-        """
-        now_ts = time.time()
-        purged_count = 0
-
-        jobs_base = os.path.join(self.local_storage_dir, "jobs")
-        if os.path.exists(jobs_base):
-            for entry in os.listdir(jobs_base):
-                entry_path = os.path.join(jobs_base, entry)
-                if os.path.isdir(entry_path):
-                    try:
-                        mtime = os.path.getmtime(entry_path)
-                        age_seconds = now_ts - mtime
-                        if age_seconds >= self.hard_ttl_seconds:
-                            def _onerror(func, path, exc_info):
-                                import stat
-                                try:
-                                    os.chmod(path, stat.S_IWRITE)
-                                    func(path)
-                                except Exception:
-                                    pass
-                            shutil.rmtree(entry_path, onerror=_onerror)
-                            purged_count += 1
-                            logger.info(f"[Hard Safety 20-Min Cleanup] Purged abandoned directory: {entry} (Age: {int(age_seconds)}s)")
-                    except Exception as e:
-                        logger.warning(f"Failed to inspect/purge {entry_path}: {str(e)}")
-
-        return purged_count
-
-    def run_qr_share_cleanup(self) -> int:
-        """
-        Scans all QR shares and purges expired cloud objects.
-        """
-        try:
-            from backend.app.services.qr_share_manager import qr_share_manager
-            return qr_share_manager.cleanup_expired_shares()
-        except Exception as e:
-            logger.error(f"Error running QR share cleanup: {str(e)}")
+    def run_15min_ttl_cleanup(self, job_manager_instance: Any = None) -> int:
+        """Synchronous 15-minute TTL pass for background workers and tests."""
+        if not self.storage_dir.exists():
             return 0
 
-    async def start_periodic_worker(self, job_manager):
-        """
-        Background worker loop running every cleanup interval.
-        """
-        self._running = True
-        logger.info("Temporary document auto-deletion background worker started.")
-        while self._running:
+        purged_count = 0
+        now = datetime.datetime.now(datetime.timezone.utc)
+
+        if job_manager_instance and hasattr(job_manager_instance, "jobs"):
+            for job_id, job_data in list(job_manager_instance.jobs.items()):
+                created_str = job_data.get("created_at") if isinstance(job_data, dict) else getattr(job_data, "created_at", None)
+                if created_str:
+                    try:
+                        created_dt = datetime.datetime.fromisoformat(created_str)
+                        if (now - created_dt).total_seconds() > (TTL_MINUTES * 60):
+                            if isinstance(job_data, dict):
+                                job_data["status"] = JobStatus.EXPIRED
+                            else:
+                                job_data.status = JobStatus.EXPIRED
+                            self.delete_job_files(job_id)
+                            purged_count += 1
+                    except Exception:
+                        pass
+        return purged_count
+
+    def _force_remove(self, path: Path) -> bool:
+        if not path.exists():
+            return False
+        try:
+            if path.is_file():
+                try:
+                    os.chmod(str(path), 0o777)
+                except Exception:
+                    pass
+                path.unlink(missing_ok=True)
+            elif path.is_dir():
+                def on_rm_error(func, p, exc_info):
+                    try:
+                        os.chmod(p, 0o777)
+                        func(p)
+                    except Exception:
+                        pass
+                shutil.rmtree(path, onerror=on_rm_error)
+            return True
+        except Exception:
+            shutil.rmtree(path, ignore_errors=True)
+            return not path.exists()
+
+    def run_20min_hard_safety_cleanup(self) -> int:
+        """Emergency hard delete pass purging anything on disk older than 20 minutes."""
+        if not self.storage_dir.exists():
+            return 0
+
+        now = time.time()
+        hard_limit = HARD_DELETE_MINUTES * 60
+        purged = 0
+
+        # Scan storage_dir and storage_dir/jobs
+        scan_dirs = [self.storage_dir]
+        jobs_sub = self.storage_dir / "jobs"
+        if jobs_sub.exists():
+            scan_dirs.append(jobs_sub)
+
+        for s_dir in scan_dirs:
+            if not s_dir.exists():
+                continue
+            for item in list(s_dir.iterdir()):
+                if item.name == "jobs" and s_dir == self.storage_dir:
+                    continue
+                try:
+                    is_stale = (now - item.stat().st_mtime) > hard_limit
+                    if not is_stale and item.is_dir():
+                        for root, dirs, files in os.walk(str(item)):
+                            for f in files:
+                                f_p = os.path.join(root, f)
+                                try:
+                                    if (now - os.path.getmtime(f_p)) > hard_limit:
+                                        is_stale = True
+                                        break
+                                except Exception:
+                                    pass
+                            if is_stale:
+                                break
+                    if is_stale:
+                        if self._force_remove(item):
+                            purged += 1
+                except Exception as e:
+                    logger.warning(f"Error purging {item}: {e}")
+
+        return purged
+
+    def delete_job_files(self, job_id: str) -> bool:
+        """Deletes all temporary files/directories associated with job_id."""
+        deleted = False
+        paths_to_check = [
+            self.storage_dir / job_id,
+            self.storage_dir / "jobs" / job_id
+        ]
+        for p in paths_to_check:
+            if p.exists():
+                if self._force_remove(p):
+                    deleted = True
+        return deleted
+
+
+    async def execute_cleanup_cycle(self, job_manager_instance: Any = None) -> int:
+        """Executes periodic cleanup pass."""
+        ttl_purged = self.run_15min_ttl_cleanup(job_manager_instance)
+        hard_purged = self.run_20min_hard_safety_cleanup()
+        return ttl_purged + hard_purged
+
+    async def start_periodic_worker(self, job_manager_instance: Any = None):
+        """Runs background task checking TTL every 60 seconds."""
+        self.is_running = True
+        self.run_startup_cleanup()
+        while self.is_running:
             try:
-                # 1. Run 15-min application TTL cleanup
-                self.run_15min_ttl_cleanup(job_manager)
-                # 2. Run 20-min emergency hard safety cleanup
-                self.run_20min_hard_safety_cleanup()
-                # 3. Run QR Share expiration cleanup
-                self.run_qr_share_cleanup()
+                await asyncio.sleep(60)
+                await self.execute_cleanup_cycle(job_manager_instance)
+            except asyncio.CancelledError:
+                break
             except Exception as e:
-                logger.error(f"Cleanup worker iteration error: {str(e)}")
-            
-            await asyncio.sleep(settings.CLEANUP_INTERVAL_SECONDS)
+                logger.error(f"Error in cleanup worker loop: {e}")
 
     def stop_worker(self):
-        self._running = False
-        if self._worker_task:
-            self._worker_task.cancel()
+        self.is_running = False
+
+    async def handle_post_download_cleanup(self, job_id: str, job_manager_instance: Any = None):
+        """Immediately cleans up temporary workspace after successful download."""
+        self.delete_job_files(job_id)
+        if job_manager_instance and hasattr(job_manager_instance, "jobs"):
+            job = job_manager_instance.jobs.get(job_id)
+            if job and isinstance(job, dict):
+                out_path = job.get("output_path")
+                if out_path and os.path.exists(out_path):
+                    try:
+                        os.remove(out_path)
+                    except Exception:
+                        pass
+
+    def handle_job_failure(self, job_id: str, job_manager_instance: Any = None):
+        """Immediately removes any partial files or artifacts from failed jobs."""
+        self.delete_job_files(job_id)
 
 
 cleanup_service = CleanupService()
+
+
+

@@ -158,7 +158,7 @@ ${analysis.keyFindings.map((kf, i) => `${i + 1}. ${kf}`).join('\n')}
       {/* Hero Header */}
       <section className={`py-14 border-b ${darkMode ? 'border-slate-800 bg-slate-900/40' : 'border-slate-100 bg-slate-50/70'}`}>
         <div className="max-w-5xl mx-auto px-6 text-center">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 font-black text-xs uppercase tracking-widest mb-4">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 font-black text-xs uppercase tracking-widest mb-4">
             <Sparkles size={14} /> PDF Intelligence + Creation Engine
           </div>
           <h1 className={`text-3xl md:text-5xl font-black mb-4 tracking-tight leading-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>
@@ -180,7 +180,7 @@ ${analysis.keyFindings.map((kf, i) => `${i + 1}. ${kf}`).join('\n')}
                 <h2 className={`text-2xl font-black mb-2 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
                   Analyzing Document Intelligence...
                 </h2>
-                <p className="text-xs text-slate-400 max-w-md mx-auto">
+                <p className="text-xs text-slate-500 dark:text-slate-400 max-w-md mx-auto">
                   Extracting text streams, tabular grids, image operators, and generating topical executive insights...
                 </p>
               </div>
@@ -200,7 +200,7 @@ ${analysis.keyFindings.map((kf, i) => `${i + 1}. ${kf}`).join('\n')}
             {/* Header with Switch File */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-6 border-b border-slate-200 dark:border-slate-800">
               <div>
-                <span className="text-[10px] font-black uppercase tracking-widest text-yellow-500">Analyzed Document</span>
+                <span className="text-[10px] font-black uppercase tracking-widest text-yellow-700 dark:text-yellow-400">Analyzed Document</span>
                 <h2 className={`text-2xl font-black ${darkMode ? 'text-white' : 'text-slate-900'}`}>
                   {analysis.fileName}
                 </h2>
@@ -218,15 +218,15 @@ ${analysis.keyFindings.map((kf, i) => `${i + 1}. ${kf}`).join('\n')}
             {/* Metric Counters Grid */}
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
               {[
-                { label: 'Pages', val: analysis.pageCount, icon: <Layers size={18} className="text-yellow-500" /> },
-                { label: 'Words', val: analysis.wordCount.toLocaleString(), icon: <FileText size={18} className="text-blue-500" /> },
-                { label: 'Read Time', val: `~${analysis.estimatedReadTimeMinutes} min`, icon: <Clock size={18} className="text-emerald-500" /> },
-                { label: 'Tables Detected', val: analysis.tableCount, icon: <Table size={18} className="text-purple-500" /> },
-                { label: 'Images', val: analysis.imageCount, icon: <Sparkles size={18} className="text-amber-500" /> },
-                { label: 'Characters', val: analysis.characterCount.toLocaleString(), icon: <Hash size={18} className="text-rose-500" /> },
+                { label: 'Pages', val: analysis.pageCount, icon: <Layers size={18} className="text-yellow-600 dark:text-yellow-400" /> },
+                { label: 'Words', val: analysis.wordCount.toLocaleString(), icon: <FileText size={18} className="text-blue-600 dark:text-blue-400" /> },
+                { label: 'Read Time', val: `~${analysis.estimatedReadTimeMinutes} min`, icon: <Clock size={18} className="text-emerald-600 dark:text-emerald-400" /> },
+                { label: 'Tables Detected', val: analysis.tableCount, icon: <Table size={18} className="text-purple-600 dark:text-purple-400" /> },
+                { label: 'Images', val: analysis.imageCount, icon: <Sparkles size={18} className="text-amber-600 dark:text-amber-400" /> },
+                { label: 'Characters', val: analysis.characterCount.toLocaleString(), icon: <Hash size={18} className="text-rose-600 dark:text-rose-400" /> },
               ].map((m, idx) => (
                 <div key={idx} className={`p-5 rounded-2xl border ${darkMode ? 'bg-slate-800/40 border-slate-700' : 'bg-white border-slate-200 shadow-sm'}`}>
-                  <div className="flex items-center gap-2 mb-2">{m.icon} <span className="text-[11px] font-bold text-slate-400 uppercase">{m.label}</span></div>
+                  <div className="flex items-center gap-2 mb-2">{m.icon} <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase">{m.label}</span></div>
                   <div className={`text-xl font-black ${darkMode ? 'text-white' : 'text-slate-900'}`}>{m.val}</div>
                 </div>
               ))}
@@ -234,15 +234,16 @@ ${analysis.keyFindings.map((kf, i) => `${i + 1}. ${kf}`).join('\n')}
 
             {/* Core Topics */}
             <div className={`p-6 rounded-3xl border ${darkMode ? 'bg-slate-800/30 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
-              <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-3">Extracted Core Topics</span>
+              <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 block mb-3">Extracted Core Topics</span>
               <div className="flex flex-wrap gap-2">
                 {analysis.topics.map((t, idx) => (
-                  <span key={idx} className="px-3 py-1.5 rounded-xl bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 text-xs font-black">
+                  <span key={idx} className="px-3 py-1.5 rounded-xl bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 text-xs font-black">
                     #{t}
                   </span>
                 ))}
               </div>
             </div>
+
 
             {/* Executive Summary & Key Findings */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -275,7 +276,7 @@ ${analysis.keyFindings.map((kf, i) => `${i + 1}. ${kf}`).join('\n')}
                 darkMode ? 'bg-gradient-to-br from-slate-900 to-slate-800 border-yellow-500/30' : 'bg-gradient-to-br from-yellow-50 to-amber-50 border-yellow-200 shadow-lg'
               }`}>
                 <div>
-                  <span className="text-[10px] font-black uppercase tracking-widest text-yellow-600 dark:text-yellow-400">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-yellow-700 dark:text-yellow-400">
                     PDF Builder Pipeline
                   </span>
                   <h3 className={`text-xl font-black mt-1 mb-2 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
@@ -338,9 +339,9 @@ ${analysis.keyFindings.map((kf, i) => `${i + 1}. ${kf}`).join('\n')}
                   </div>
                 </div>
 
-                <div className="pt-6 border-t border-slate-200/60 dark:border-slate-700 mt-6 flex items-center justify-between text-[11px] text-slate-400">
+                <div className="pt-6 border-t border-slate-200/60 dark:border-slate-700 mt-6 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
                   <span>100% Client-Side Engine</span>
-                  <span className="text-emerald-500 font-bold">✓ Zero Data Upload</span>
+                  <span className="text-emerald-600 dark:text-emerald-400 font-bold">✓ Zero Data Upload</span>
                 </div>
               </div>
             </div>
@@ -349,9 +350,9 @@ ${analysis.keyFindings.map((kf, i) => `${i + 1}. ${kf}`).join('\n')}
             <div className={`p-8 rounded-3xl border space-y-6 ${darkMode ? 'bg-slate-800/40 border-slate-700' : 'bg-white border-slate-200 shadow-sm'}`}>
               <div>
                 <h3 className={`text-xl font-black flex items-center gap-2 mb-1 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
-                  <MessageSquare className="text-yellow-500" size={22} /> Ask Anything About This PDF
+                  <MessageSquare className="text-yellow-600 dark:text-yellow-400" size={22} /> Ask Anything About This PDF
                 </h3>
-                <p className={`text-xs ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+                <p className={`text-xs ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
                   Query tables, specific page figures, or request summaries directly from the text stream.
                 </p>
               </div>
@@ -364,7 +365,7 @@ ${analysis.keyFindings.map((kf, i) => `${i + 1}. ${kf}`).join('\n')}
                     onClick={() => handleAsk(sq)}
                     disabled={asking}
                     className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all text-left ${
-                      darkMode ? 'border-slate-700 text-slate-300 hover:border-yellow-500' : 'border-slate-200 text-slate-600 hover:border-yellow-500'
+                      darkMode ? 'border-slate-700 text-slate-300 hover:border-yellow-500' : 'border-slate-200 text-slate-700 hover:border-yellow-500'
                     }`}
                   >
                     "{sq}"
@@ -377,7 +378,7 @@ ${analysis.keyFindings.map((kf, i) => `${i + 1}. ${kf}`).join('\n')}
                 <div className="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-800">
                   {chatHistory.map((item, idx) => (
                     <div key={idx} className="space-y-2">
-                      <div className="flex items-start gap-2 text-xs font-bold text-yellow-600 dark:text-yellow-400">
+                      <div className="flex items-start gap-2 text-xs font-bold text-yellow-700 dark:text-yellow-400">
                         <span>You:</span> <span>{item.q}</span>
                       </div>
                       <div className={`p-4 rounded-2xl text-xs leading-relaxed ${
@@ -389,6 +390,7 @@ ${analysis.keyFindings.map((kf, i) => `${i + 1}. ${kf}`).join('\n')}
                   ))}
                 </div>
               )}
+
 
               {/* Input Form */}
               <form

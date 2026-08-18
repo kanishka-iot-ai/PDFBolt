@@ -164,7 +164,7 @@ const Home: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
                   className={`px-2.5 py-0.5 rounded-full text-[11px] font-medium border transition-colors cursor-pointer ${
                     darkMode
                       ? 'bg-slate-900/60 border-slate-800 text-slate-300 hover:border-yellow-500/50 hover:text-yellow-400'
-                      : 'bg-white border-slate-200 text-slate-600 hover:border-yellow-500 hover:text-yellow-600'
+                      : 'bg-white border-slate-200 text-slate-700 hover:border-yellow-600 hover:text-yellow-700'
                   }`}
                 >
                   {suggestion}
@@ -262,7 +262,7 @@ const Home: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
               className={`inline-flex items-center gap-2 px-6 py-3 rounded-full font-bold text-sm border transition-all hover:scale-[1.02] shadow-sm cursor-pointer ${
                 darkMode
                   ? 'bg-slate-900 hover:bg-slate-800 border-slate-700 text-yellow-400'
-                  : 'bg-white hover:bg-slate-50 border-slate-200 text-yellow-600'
+                  : 'bg-white hover:bg-slate-50 border-slate-200 text-yellow-700'
               }`}
             >
               <Layers size={16} />
@@ -272,6 +272,7 @@ const Home: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
           </div>
         )}
       </section>
+
 
       {/* 3. TRUST & VALUE INDICATORS SECTION (Moved below primary tool discovery) */}
       <section
@@ -338,7 +339,7 @@ const Home: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 sm:mb-10 gap-4">
             <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 font-bold text-xs uppercase tracking-widest mb-2">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 font-bold text-xs uppercase tracking-widest mb-2">
                 <FileText size={14} /> Knowledge Base & Tutorials
               </div>
               <h2 className={`text-2xl sm:text-3xl md:text-4xl font-black ${darkMode ? 'text-white' : 'text-slate-900'}`}>
@@ -347,13 +348,14 @@ const Home: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
             </div>
             <Link
               to="/guides"
-              className="inline-flex items-center gap-2 font-bold text-sm text-yellow-600 dark:text-yellow-400 hover:underline"
+              className="inline-flex items-center gap-2 font-bold text-sm text-yellow-700 dark:text-yellow-400 hover:underline"
             >
               View All 13+ Guides <Globe size={16} />
             </Link>
+
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
             <Link
               to="/guides/how-to-convert-pdf-to-word"
               className={`p-5 sm:p-6 rounded-2xl border transition-all duration-200 hover:-translate-y-1 hover:border-yellow-500/50 flex flex-col justify-between ${
@@ -361,7 +363,7 @@ const Home: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
               }`}
             >
               <div>
-                <span className="text-[10px] font-black uppercase tracking-widest text-yellow-500 bg-yellow-500/10 px-2 py-0.5 rounded">
+                <span className="text-[10px] font-black uppercase tracking-widest text-yellow-700 dark:text-yellow-400 bg-yellow-500/10 px-2 py-0.5 rounded">
                   4 min read
                 </span>
                 <h3 className={`font-bold text-base sm:text-lg mt-3 mb-2 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
@@ -383,7 +385,7 @@ const Home: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
               }`}
             >
               <div>
-                <span className="text-[10px] font-black uppercase tracking-widest text-yellow-500 bg-yellow-500/10 px-2 py-0.5 rounded">
+                <span className="text-[10px] font-black uppercase tracking-widest text-yellow-700 dark:text-yellow-400 bg-yellow-500/10 px-2 py-0.5 rounded">
                   3 min read
                 </span>
                 <h3 className={`font-bold text-base sm:text-lg mt-3 mb-2 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
@@ -405,7 +407,7 @@ const Home: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
               }`}
             >
               <div>
-                <span className="text-[10px] font-black uppercase tracking-widest text-yellow-500 bg-yellow-500/10 px-2 py-0.5 rounded">
+                <span className="text-[10px] font-black uppercase tracking-widest text-yellow-700 dark:text-yellow-400 bg-yellow-500/10 px-2 py-0.5 rounded">
                   2 min read
                 </span>
                 <h3 className={`font-bold text-base sm:text-lg mt-3 mb-2 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
@@ -476,11 +478,11 @@ const Home: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
           }`}
         >
           <div className="relative z-10 max-w-3xl mx-auto">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white dark:bg-slate-900 shadow-sm text-yellow-600 dark:text-yellow-400 font-bold text-xs uppercase tracking-widest mb-4">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white dark:bg-slate-900 shadow-sm text-yellow-700 dark:text-yellow-400 font-bold text-xs uppercase tracking-widest mb-4">
               <Shield size={14} /> Free & Fast Support
             </div>
             <h2 className={`text-3xl sm:text-4xl md:text-5xl font-black mb-4 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
-              Need <span className="text-yellow-500">Assistance?</span>
+              Need <span className="text-yellow-700 dark:text-yellow-400">Assistance?</span>
             </h2>
             <p
               className={`text-sm sm:text-base md:text-lg font-medium mb-8 leading-relaxed max-w-2xl mx-auto ${

@@ -70,15 +70,16 @@ export const ContactPage: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
             <Headphones size={14} /> Customer Care
           </div>
           <h1 className={`text-7xl font-black mb-8 leading-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>
-            How can we <span className="text-yellow-500">help?</span>
+            How can we <span className="text-yellow-700 dark:text-yellow-400">help?</span>
           </h1>
-          <p className={`text-xl font-medium mb-12 leading-relaxed ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+          <p className={`text-xl font-medium mb-12 leading-relaxed ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
             Have questions about our serverless security model? Found a bug? Or just want to say hi? Our team is ready to assist you.
           </p>
 
           <div className="space-y-6">
-            <a href="mailto:support@pdfbolt.in" className={`p-6 rounded-3xl border flex items-center gap-6 transition-all hover:scale-[1.02] ${darkMode ? 'bg-slate-800 border-slate-700 hover:bg-slate-700' : 'bg-slate-50 border-slate-200 hover:bg-slate-100'}`}>
-              <div className="p-4 bg-white dark:bg-slate-900 rounded-2xl text-yellow-500 shadow-sm"><Mail size={24} /></div>
+            <a href="mailto:support@pdfbolt.com" className={`p-6 rounded-3xl border flex items-center gap-6 transition-all hover:scale-[1.02] ${darkMode ? 'bg-slate-800 border-slate-700 hover:bg-slate-700' : 'bg-slate-50 border-slate-200 hover:bg-slate-100'}`}>
+              <div className="p-4 bg-white dark:bg-slate-900 rounded-2xl text-yellow-700 dark:text-yellow-400 shadow-sm"><Mail size={24} /></div>
+
               <div>
                 <h2 className={`font-black uppercase text-xs tracking-widest mb-1 ${darkMode ? 'text-white' : 'text-slate-900'}`}>Email Support</h2>
                 <p className="text-sm font-bold text-slate-500">Click to Send Email</p>

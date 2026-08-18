@@ -69,24 +69,25 @@ const EncyclopediaDetailPage: React.FC<EncyclopediaDetailPageProps> = ({ darkMod
       <article className="max-w-4xl mx-auto px-6 pt-12">
         {/* Breadcrumb Navigation */}
         <nav className="flex items-center gap-2 text-xs font-semibold mb-6 text-slate-500">
-          <Link to="/" className="hover:text-yellow-500 transition-colors">Home</Link>
+          <Link to="/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Home</Link>
           <span>/</span>
-          <Link to="/encyclopedia" className="hover:text-yellow-500 transition-colors">Encyclopedia</Link>
+          <Link to="/encyclopedia" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Encyclopedia</Link>
           <span>/</span>
-          <span className="text-yellow-500 font-bold truncate max-w-xs">{article.title}</span>
+          <span className="text-yellow-700 dark:text-yellow-400 font-bold truncate max-w-xs">{article.title}</span>
         </nav>
 
         <div className="flex items-center gap-3 mb-4">
-          <span className="text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full bg-yellow-500/10 text-yellow-600 dark:text-yellow-400">
+          <span className="text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full bg-yellow-500/10 text-yellow-700 dark:text-yellow-400">
             {article.category}
           </span>
-          <span className="text-xs font-semibold text-slate-400 flex items-center gap-1">
+          <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-1">
             <Clock size={12} /> {article.readTime}
           </span>
-          <span className="text-xs font-semibold text-slate-400">
+          <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
             Updated {article.updatedAt}
           </span>
         </div>
+
 
         <h1 className={`text-3xl md:text-5xl font-black mb-6 tracking-tight leading-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>
           {article.title}
@@ -172,11 +173,12 @@ const EncyclopediaDetailPage: React.FC<EncyclopediaDetailPageProps> = ({ darkMod
                   darkMode ? 'bg-slate-800/30 border-slate-800' : 'bg-white border-slate-200 shadow-sm'
                 }`}
               >
-                <span className="text-[10px] font-bold uppercase text-yellow-500">{ra.category}</span>
+                <span className="text-[10px] font-bold uppercase text-yellow-700 dark:text-yellow-400">{ra.category}</span>
                 <h3 className={`font-bold text-base mt-1 mb-1 ${darkMode ? 'text-white' : 'text-slate-900'}`}>{ra.title}</h3>
-                <span className="inline-flex items-center gap-1 text-xs font-bold text-yellow-500">Read Explainer <ArrowRight size={12} /></span>
+                <span className="inline-flex items-center gap-1 text-xs font-bold text-yellow-700 dark:text-yellow-400">Read Explainer <ArrowRight size={12} /></span>
               </Link>
             ))}
+
           </div>
         </section>
       </article>

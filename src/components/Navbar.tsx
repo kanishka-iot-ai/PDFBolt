@@ -92,7 +92,7 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
         onClick={(e) => handleSafeNavigation(e, to)}
         aria-label={ariaLabel}
         className={`text-sm font-bold transition-all relative flex items-center gap-1.5 outline-none focus-visible:ring-2 focus-visible:ring-yellow-500 focus-visible:ring-offset-2 rounded-lg px-1.5 py-0.5 ${
-          isActive ? 'text-yellow-500 font-extrabold' : 'hover:text-yellow-500'
+          isActive ? 'text-yellow-700 dark:text-yellow-400 font-extrabold' : 'text-slate-700 dark:text-slate-200 hover:text-yellow-700 dark:hover:text-yellow-400'
         }`}
       >
         {children}
@@ -102,6 +102,7 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
       </Link>
     );
   };
+
 
   return (
     <>
@@ -128,7 +129,7 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
           <div className="hidden lg:flex items-center gap-6">
             {/* Global Home Button */}
             <NavLink to="/" ariaLabel="Go to PDFBolt home">
-              <Home size={16} className="text-yellow-500" />
+              <Home size={16} className="text-yellow-700 dark:text-yellow-400" />
               <span>Home</span>
             </NavLink>
 
@@ -136,11 +137,12 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
             <div className="relative" ref={dropdownRef}>
               <button 
                 onClick={() => setIsToolsOpen(!isToolsOpen)}
-                className={`flex items-center gap-1.5 text-sm font-bold transition-colors outline-none focus-visible:ring-2 focus-visible:ring-yellow-500 rounded-lg px-1.5 py-0.5 ${isToolsOpen ? 'text-yellow-500' : 'hover:text-yellow-500'}`}
+                className={`flex items-center gap-1.5 text-sm font-bold transition-colors outline-none focus-visible:ring-2 focus-visible:ring-yellow-500 rounded-lg px-1.5 py-0.5 ${isToolsOpen ? 'text-yellow-700 dark:text-yellow-400' : 'text-slate-700 dark:text-slate-200 hover:text-yellow-700 dark:hover:text-yellow-400'}`}
                 aria-expanded={isToolsOpen}
               >
                 All Tools <ChevronDown size={16} className={`transition-transform duration-300 ${isToolsOpen ? 'rotate-180' : ''}`} />
               </button>
+
               
               {/* Mega Menu */}
               {isToolsOpen && (
@@ -250,10 +252,11 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
             </div>
             
             <NavLink to="/analyze-pdf">
-              <span className="inline-flex items-center gap-1 text-yellow-500 font-extrabold">
+              <span className="inline-flex items-center gap-1 text-yellow-700 dark:text-yellow-400 font-extrabold">
                 <Sparkles size={14} /> AI Analyzer
               </span>
             </NavLink>
+
             <NavLink to="/tools">Tools Hub</NavLink>
             <NavLink to="/guides">Guides</NavLink>
             <NavLink to="/encyclopedia">Encyclopedia</NavLink>

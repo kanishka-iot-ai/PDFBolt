@@ -1,69 +1,83 @@
 import io
-from typing import Tuple, Dict, Any
-import pypdf
+from pathlib import Path
+from typing import List, Dict, Any
 from pptx import Presentation
 from pptx.util import Inches, Pt
+from pypdf import PdfReader
 from backend.app.processors.base import BaseProcessor
-from backend.app.core.errors import PDFProcessingException, ErrorCode
-from backend.app.validators.output_validator import OutputValidator
+from backend.app.core.errors import PDFBoltError, OutputValidationError
+from backend.app.core.validation import validate_pptx_output
+from backend.app.core.logging import logger
 
 
-class PDFToPPTProcessor(BaseProcessor):
-    def process(self, content: bytes, filename: str) -> Tuple[bytes, str, Dict[str, Any]]:
-        page_count, is_enc = self.validate_input(content)
-        if is_enc:
-            raise PDFProcessingException(
-                error_code=ErrorCode.ENCRYPTED_PDF,
-                message="Cannot convert encrypted PDF to PowerPoint without password.",
-                status_code=400
-            )
+class PdfToPptProcessor(BaseProcessor):
+    operation = "pdf-to-ppt"
+    input_formats = [".pdf"]
+    output_format = ".pptx"
+
+    def process(self, input_files: Any, options: Any = None) -> Any:
+        if isinstance(input_files, (bytes, bytearray)):
+            return self._process_bytes_generic(input_files, str(options or "doc.pdf"))
+        opts = options or {}
+        if not input_files:
+            raise PDFBoltError("NO_FILES_PROVIDED")
+
+
+        input_pdf = input_files[0]
+        reader = PdfReader(str(input_pdf), strict=False)
+        total_pages = len(reader.pages)
 
         prs = Presentation()
-        # Set 16:9 widescreen layout
+        # Default slide layout (blank slide is layout 6)
+        blank_slide_layout = prs.slide_layouts[6]
+        
+        # Set 16:9 widescreen dimensions (13.33 x 7.5 inches)
         prs.slide_width = Inches(13.333)
         prs.slide_height = Inches(7.5)
 
-        blank_slide_layout = prs.slide_layouts[6]
-        reader = pypdf.PdfReader(io.BytesIO(content))
-
-        for page_idx, page in enumerate(reader.pages):
+        for p_idx, page in enumerate(reader.pages):
             slide = prs.slides.add_slide(blank_slide_layout)
-            text = page.extract_text() or ""
-            lines = [l.strip() for l in text.split('\n') if l.strip()]
-
-            # Add Title Box
-            txBox = slide.shapes.add_textbox(Inches(1), Inches(0.8), Inches(11.333), Inches(1))
-            tf = txBox.text_frame
+            text = page.extract_text() or f"Slide {p_idx + 1}"
+            
+            # Place extracted text block
+            tx_box = slide.shapes.add_textbox(Inches(1.0), Inches(1.0), Inches(11.333), Inches(5.5))
+            tf = tx_box.text_frame
             tf.word_wrap = True
-            p = tf.paragraphs[0]
-            title_text = lines[0] if lines else f"Page {page_idx + 1}"
-            p.text = title_text[:80]
-            p.font.size = Pt(28)
-            p.font.bold = True
 
-            # Add Body Box
-            bodyBox = slide.shapes.add_textbox(Inches(1), Inches(2.2), Inches(11.333), Inches(4.5))
-            btf = bodyBox.text_frame
-            btf.word_wrap = True
+            lines = [l for l in text.splitlines() if l.strip()]
+            for line_idx, line in enumerate(lines[:20]): # Add up to first 20 key lines
+                if line_idx == 0:
+                    p = tf.paragraphs[0]
+                    p.text = line
+                    p.font.bold = True
+                    p.font.size = Pt(24)
+                else:
+                    p = tf.add_paragraph()
+                    p.text = line
+                    p.font.size = Pt(14)
 
-            body_lines = lines[1:] if len(lines) > 1 else []
-            for bline in body_lines[:10]:
-                bp = btf.add_paragraph()
-                bp.text = f"• {bline}"
-                bp.font.size = Pt(16)
+        output_path = self.output_dir / f"{self.job_id}.pptx"
+        prs.save(str(output_path))
 
-        out_buffer = io.BytesIO()
-        prs.save(out_buffer)
-        output_bytes = out_buffer.getvalue()
+        # Invariant: slide_count == input_page_count
+        validate_pptx_output(output_path)
+        return output_path
 
-        # Validate PPTX OpenXML container
-        OutputValidator.validate_openxml_output(output_bytes, format_name="PPTX")
+    def process_bytes(self, content: bytes, filename: str) -> tuple[bytes, str, Dict[str, Any]]:
+        temp_in = self.temp_dir / "in.pdf"
+        with open(temp_in, "wb") as f:
+            f.write(content)
+        out_path = self.process([temp_in], self.settings)
+        with open(out_path, "rb") as f:
+            out_bytes = f.read()
 
-        metrics = {
-            "slides_created": page_count,
+        return out_bytes, "presentation.pptx", {
+            "original_size_bytes": len(content),
+            "output_size_bytes": len(out_bytes),
             "format": "pptx",
-            "output_size_bytes": len(output_bytes)
+            "quality_status": "passed"
         }
 
-        clean_name = filename.rsplit('.', 1)[0] + ".pptx"
-        return output_bytes, clean_name, metrics
+
+PDFToPPTProcessor = PdfToPptProcessor
+

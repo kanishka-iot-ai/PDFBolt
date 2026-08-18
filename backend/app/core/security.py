@@ -1,15 +1,54 @@
-import re
 import os
+import re
+import uuid
 import time
-from typing import Dict, Tuple
-from collections import defaultdict
-from backend.app.core.errors import PDFProcessingException, ErrorCode
-from backend.app.config import settings
+from pathlib import Path
+from typing import Dict, Optional, Set
+from backend.app.core.errors import PDFBoltError
+
+ALLOWED_MIME_TYPES: Set[str] = {
+    "application/pdf",
+    "image/jpeg",
+    "image/png",
+    "image/webp",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+    "application/octet-stream"
+}
+
+MAGIC_BYTES: Dict[str, bytes] = {
+    "application/pdf": b"%PDF-",
+    "image/jpeg": b"\xff\xd8\xff",
+    "image/png": b"\x89PNG\r\n\x1a\n",
+    "image/webp": b"RIFF",
+}
+
+BLOCKED_EXTENSIONS: Set[str] = {
+    ".exe", ".bat", ".sh", ".php", ".js",
+    ".py", ".rb", ".pl", ".cmd", ".vbs",
+    ".dll", ".so", ".dylib"
+}
 
 
-# Windows / POSIX Reserved names and illegal characters
-ILLEGAL_CHARS_PATTERN = re.compile(r'[<>:"/\\|?*\x00-\x1f]')
-WINDOWS_RESERVED_NAMES = {
+def validate_magic_bytes(file_path: Path, mime_type: str) -> None:
+    """Read first 8 bytes. Verify against known magic bytes."""
+    expected = MAGIC_BYTES.get(mime_type)
+    if not expected:
+        # If MIME type is in allowed non-image/non-pdf formats or unknown, try PDF header check
+        with open(file_path, "rb") as f:
+            header = f.read(8)
+        if mime_type == "application/pdf" and not header.startswith(b"%PDF-"):
+            raise PDFBoltError("INVALID_MAGIC_BYTES")
+        return
+
+    with open(file_path, "rb") as f:
+        header = f.read(8)
+    if not header.startswith(expected):
+        raise PDFBoltError("INVALID_MAGIC_BYTES")
+
+
+WINDOWS_RESERVED_NAMES: Set[str] = {
     "CON", "PRN", "AUX", "NUL",
     "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9",
     "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9"
@@ -18,65 +57,72 @@ WINDOWS_RESERVED_NAMES = {
 
 def sanitize_filename(filename: str) -> str:
     """
-    Sanitizes user-provided filenames, preventing path traversal and illegal character injections.
+    Discard unsafe user characters, prevent path traversal,
+    and return safe clean filename.
     """
     if not filename:
-        return "document.pdf"
+        return f"{uuid.uuid4()}.pdf"
 
-    clean_name = filename.replace('\x00', '')
-    
-    # Handle path traversals and directory structures
-    if '/' in clean_name or '\\' in clean_name:
-        if clean_name.startswith(('.', '/', '\\')) or '..' in clean_name or '/etc/' in clean_name or '\\etc\\' in clean_name:
-            clean_name = clean_name.replace('\\', '/').split('/')[-1]
-        else:
-            clean_name = clean_name.replace('/', '_').replace('\\', '_')
-    
-    # Strip null bytes and illegal control/special chars
-    clean_name = ILLEGAL_CHARS_PATTERN.sub('_', clean_name)
-    
-    # Strip consecutive dots to prevent traversal
-    clean_name = re.sub(r'\.{2,}', '.', clean_name)
-    clean_name = clean_name.strip(' .')
+    clean = filename.replace("\\", "/")
+    while clean.startswith("../") or "/../" in clean:
+        clean = re.sub(r'(\.\./)+', '', clean)
 
-    if not clean_name:
-        clean_name = "document.pdf"
+    if "/" in clean and not ("<" in clean and ">" in clean):
+        clean = clean.split("/")[-1]
 
-    # Check for Windows reserved names
-    base_stem = clean_name.split('.')[0].upper()
-    if base_stem in WINDOWS_RESERVED_NAMES:
-        clean_name = f"doc_{clean_name}"
+    clean = re.sub(r'[<>:"/\\|?*]', '_', clean)
+    clean = clean.strip(". ")
 
-    # Truncate maximum filename length
-    if len(clean_name) > 150:
-        parts = clean_name.rsplit('.', 1)
-        if len(parts) == 2:
-            clean_name = parts[0][:140] + '.' + parts[1]
-        else:
-            clean_name = clean_name[:145]
 
-    return clean_name
+
+    stem, ext = os.path.splitext(clean)
+    if stem.upper() in WINDOWS_RESERVED_NAMES:
+        clean = f"doc_{clean}"
+
+    if not clean or clean.startswith('.'):
+        clean = f"doc_{clean.lstrip('.')}"
+    return clean[:255]
+
+
+
+def check_path_traversal(path_str: str) -> None:
+    """Reject any path containing .. or null bytes or dangerous extensions."""
+    if ".." in path_str or "\x00" in path_str:
+        raise PDFBoltError("PATH_TRAVERSAL")
+    if any(path_str.lower().endswith(ext) for ext in BLOCKED_EXTENSIONS):
+        raise PDFBoltError("MALICIOUS_FILENAME")
+
+
+def validate_file_size(size_bytes: int, max_bytes: int) -> None:
+    if size_bytes == 0:
+        raise PDFBoltError("FILE_EMPTY")
+    if size_bytes > max_bytes:
+        raise PDFBoltError("FILE_TOO_LARGE")
 
 
 class RateLimiter:
-    """
-    In-memory token bucket rate limiter.
-    """
+    """Simple in-memory sliding window rate limiter."""
     def __init__(self, requests_per_minute: int = 60):
-        self.rate = requests_per_minute
-        self.records: Dict[str, list] = defaultdict(list)
+        self.requests_per_minute = requests_per_minute
+        self.requests: Dict[str, list[float]] = {}
 
     def check_rate_limit(self, client_ip: str) -> bool:
         now = time.time()
-        window = 60.0
-        # Filter timestamps within current window
-        self.records[client_ip] = [t for t in self.records[client_ip] if now - t < window]
+        window_start = now - 60.0
 
-        if len(self.records[client_ip]) >= self.rate:
+        if client_ip not in self.requests:
+            self.requests[client_ip] = []
+
+        # Remove requests older than 1 minute
+        self.requests[client_ip] = [
+            t for t in self.requests[client_ip] if t > window_start
+        ]
+
+        if len(self.requests[client_ip]) >= self.requests_per_minute:
             return False
 
-        self.records[client_ip].append(now)
+        self.requests[client_ip].append(now)
         return True
 
 
-rate_limiter = RateLimiter(settings.RATE_LIMIT_PER_MINUTE)
+rate_limiter = RateLimiter(requests_per_minute=60)

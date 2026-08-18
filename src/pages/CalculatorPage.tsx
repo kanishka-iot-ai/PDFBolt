@@ -62,7 +62,7 @@ const CalculatorPage: React.FC<CalculatorPageProps> = ({ darkMode }) => {
       {/* Hero Header */}
       <section className={`py-16 border-b ${darkMode ? 'border-slate-800 bg-slate-900/40' : 'border-slate-100 bg-slate-50/70'}`}>
         <div className="max-w-4xl mx-auto px-6 text-center">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 font-black text-xs uppercase tracking-widest mb-4">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 font-black text-xs uppercase tracking-widest mb-4">
             <Calculator size={14} /> Interactive PDF Calculator
           </div>
           <h1 className={`text-3xl md:text-5xl font-black mb-4 tracking-tight leading-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>
@@ -83,7 +83,7 @@ const CalculatorPage: React.FC<CalculatorPageProps> = ({ darkMode }) => {
             darkMode ? 'bg-slate-800/40 border-slate-700' : 'bg-white border-slate-200 shadow-sm'
           }`}>
             <h2 className={`text-xl font-bold flex items-center gap-2 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
-              <Sliders size={20} className="text-yellow-500" /> Document Parameters
+              <Sliders size={20} className="text-yellow-600 dark:text-yellow-400" /> Document Parameters
             </h2>
 
             {/* Current Size Slider */}
@@ -92,7 +92,7 @@ const CalculatorPage: React.FC<CalculatorPageProps> = ({ darkMode }) => {
                 <label className={`text-sm font-bold ${darkMode ? 'text-slate-300' : 'text-slate-700'}`}>
                   Current PDF File Size
                 </label>
-                <span className="text-sm font-black text-yellow-500">{currentSizeMB} MB</span>
+                <span className="text-sm font-black text-yellow-700 dark:text-yellow-400">{currentSizeMB} MB</span>
               </div>
               <input
                 type="range"
@@ -102,7 +102,7 @@ const CalculatorPage: React.FC<CalculatorPageProps> = ({ darkMode }) => {
                 onChange={(e) => setCurrentSizeMB(Number(e.target.value))}
                 className="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-yellow-500"
               />
-              <div className="flex justify-between text-[10px] text-slate-400 mt-1">
+              <div className="flex justify-between text-[10px] text-slate-500 dark:text-slate-400 mt-1">
                 <span>1 MB</span>
                 <span>50 MB</span>
                 <span>100 MB</span>
@@ -116,7 +116,7 @@ const CalculatorPage: React.FC<CalculatorPageProps> = ({ darkMode }) => {
                 <label className={`text-sm font-bold ${darkMode ? 'text-slate-300' : 'text-slate-700'}`}>
                   Total Pages
                 </label>
-                <span className="text-sm font-black text-yellow-500">{pageCount} Pages</span>
+                <span className="text-sm font-black text-yellow-700 dark:text-yellow-400">{pageCount} Pages</span>
               </div>
               <input
                 type="range"
@@ -145,7 +145,7 @@ const CalculatorPage: React.FC<CalculatorPageProps> = ({ darkMode }) => {
                     onClick={() => setContentType(type.id as any)}
                     className={`p-3 rounded-xl text-xs font-bold border transition-all text-left ${
                       contentType === type.id
-                        ? 'bg-yellow-500/10 border-yellow-500 text-yellow-600 dark:text-yellow-400'
+                        ? 'bg-yellow-500/10 border-yellow-500 text-yellow-700 dark:text-yellow-400'
                         : darkMode
                           ? 'border-slate-700 hover:bg-slate-800 text-slate-300'
                           : 'border-slate-200 hover:bg-slate-50 text-slate-600'
@@ -192,9 +192,10 @@ const CalculatorPage: React.FC<CalculatorPageProps> = ({ darkMode }) => {
               darkMode ? 'bg-slate-900 border-slate-700' : 'bg-gradient-to-br from-yellow-50 to-amber-50 border-yellow-200 shadow-lg'
             }`}>
               <div>
-                <span className="text-[10px] font-black uppercase tracking-widest text-yellow-600 dark:text-yellow-400">
+                <span className="text-[10px] font-black uppercase tracking-widest text-yellow-700 dark:text-yellow-400">
                   Estimated Result
                 </span>
+
                 <h3 className={`text-3xl font-black mt-2 mb-1 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
                   {estimation.estimatedSizeMB} MB
                 </h3>

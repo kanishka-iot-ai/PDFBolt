@@ -20,7 +20,7 @@ const EncyclopediaHub: React.FC<EncyclopediaHubProps> = ({ darkMode }) => {
       {/* Hero Header */}
       <section className={`py-16 border-b ${darkMode ? 'border-slate-800 bg-slate-900/40' : 'border-slate-100 bg-slate-50/70'}`}>
         <div className="max-w-5xl mx-auto px-6 text-center">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 font-black text-xs uppercase tracking-widest mb-4">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 font-black text-xs uppercase tracking-widest mb-4">
             <Layers size={14} /> Technical Reference & Standards
           </div>
           <h1 className={`text-4xl md:text-6xl font-black mb-6 tracking-tight leading-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>
@@ -45,10 +45,10 @@ const EncyclopediaHub: React.FC<EncyclopediaHubProps> = ({ darkMode }) => {
             >
               <div>
                 <div className="flex items-center justify-between gap-2 mb-4">
-                  <span className="text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded bg-yellow-500/10 text-yellow-600 dark:text-yellow-400">
+                  <span className="text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded bg-yellow-500/10 text-yellow-700 dark:text-yellow-400">
                     {art.category}
                   </span>
-                  <span className="text-xs font-semibold text-slate-400 flex items-center gap-1">
+                  <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-1">
                     <Clock size={12} /> {art.readTime}
                   </span>
                 </div>
@@ -61,10 +61,10 @@ const EncyclopediaHub: React.FC<EncyclopediaHubProps> = ({ darkMode }) => {
               </div>
 
               <div className="pt-6 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-                <span className="text-xs font-semibold text-slate-400">
+                <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
                   Updated {art.updatedAt}
                 </span>
-                <span className="inline-flex items-center gap-1 text-xs font-black text-yellow-500">
+                <span className="inline-flex items-center gap-1 text-xs font-black text-yellow-700 dark:text-yellow-400">
                   Read Article <ArrowRight size={14} />
                 </span>
               </div>
@@ -72,6 +72,7 @@ const EncyclopediaHub: React.FC<EncyclopediaHubProps> = ({ darkMode }) => {
           ))}
         </div>
       </section>
+
     </div>
   );
 };

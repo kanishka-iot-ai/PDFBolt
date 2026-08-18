@@ -47,13 +47,13 @@ const Footer: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
           <p className={`font-black uppercase text-xs tracking-widest mb-4 ${darkMode ? 'text-slate-200' : 'text-slate-900'}`}>PDF Tools</p>
           <ul className="space-y-2.5 text-xs font-semibold">
             <li><Link to="/analyze-pdf" className="text-yellow-700 dark:text-yellow-400 font-bold hover:underline">✨ AI PDF Analyzer</Link></li>
-            <li><Link to="/merge-pdf" className="hover:text-yellow-500 transition-colors">Merge PDF</Link></li>
-            <li><Link to="/split-pdf" className="hover:text-yellow-500 transition-colors">Split PDF</Link></li>
-            <li><Link to="/compress-pdf" className="hover:text-yellow-500 transition-colors">Compress PDF</Link></li>
-            <li><Link to="/pdf-to-word" className="hover:text-yellow-500 transition-colors">PDF to Word</Link></li>
-            <li><Link to="/pdf-to-excel" className="hover:text-yellow-500 transition-colors">PDF to Excel</Link></li>
-            <li><Link to="/redact-pdf" className="hover:text-yellow-500 transition-colors">Redact PDF</Link></li>
-            <li><Link to="/ocr-pdf" className="hover:text-yellow-500 transition-colors">OCR PDF</Link></li>
+            <li><Link to="/merge-pdf" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Merge PDF</Link></li>
+            <li><Link to="/split-pdf" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Split PDF</Link></li>
+            <li><Link to="/compress-pdf" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Compress PDF</Link></li>
+            <li><Link to="/pdf-to-word" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">PDF to Word</Link></li>
+            <li><Link to="/pdf-to-excel" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">PDF to Excel</Link></li>
+            <li><Link to="/redact-pdf" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Redact PDF</Link></li>
+            <li><Link to="/ocr-pdf" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">OCR PDF</Link></li>
             <li><Link to="/tools" className="text-yellow-700 dark:text-yellow-400 font-bold hover:underline">View All 25+ Tools →</Link></li>
           </ul>
         </nav>
@@ -62,11 +62,11 @@ const Footer: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
         <nav aria-label="PDF How-To Guides">
           <p className={`font-black uppercase text-xs tracking-widest mb-4 ${darkMode ? 'text-slate-200' : 'text-slate-900'}`}>Knowledge Base</p>
           <ul className="space-y-2.5 text-xs font-semibold">
-            <li><Link to="/guides/how-to-convert-pdf-to-word" className="hover:text-yellow-500 transition-colors">Convert PDF to Word</Link></li>
-            <li><Link to="/guides/how-to-compress-a-pdf" className="hover:text-yellow-500 transition-colors">Compress Below 2MB</Link></li>
-            <li><Link to="/guides/how-to-merge-pdf-files" className="hover:text-yellow-500 transition-colors">Combine Multiple PDFs</Link></li>
-            <li><Link to="/guides/how-to-redact-a-pdf" className="hover:text-yellow-500 transition-colors">Permanently Redact Data</Link></li>
-            <li><Link to="/guides/how-to-protect-a-pdf" className="hover:text-yellow-500 transition-colors">Password Protect PDF</Link></li>
+            <li><Link to="/guides/how-to-convert-pdf-to-word" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Convert PDF to Word</Link></li>
+            <li><Link to="/guides/how-to-compress-a-pdf" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Compress Below 2MB</Link></li>
+            <li><Link to="/guides/how-to-merge-pdf-files" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Combine Multiple PDFs</Link></li>
+            <li><Link to="/guides/how-to-redact-a-pdf" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Permanently Redact Data</Link></li>
+            <li><Link to="/guides/how-to-protect-a-pdf" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Password Protect PDF</Link></li>
             <li><Link to="/guides" className="text-yellow-700 dark:text-yellow-400 font-bold hover:underline">All How-To Guides →</Link></li>
           </ul>
         </nav>
@@ -75,13 +75,13 @@ const Footer: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
         <nav aria-label="Workflows & Encyclopedia">
           <p className={`font-black uppercase text-xs tracking-widest mb-4 ${darkMode ? 'text-slate-200' : 'text-slate-900'}`}>Ecosystem</p>
           <ul className="space-y-2.5 text-xs font-semibold">
-            <li><Link to="/student-pdf-tools" className="hover:text-yellow-500 transition-colors">Student Study Workflow</Link></li>
-            <li><Link to="/business-pdf-tools" className="hover:text-yellow-500 transition-colors">Business Legal Workflow</Link></li>
-            <li><Link to="/developer-pdf-tools" className="hover:text-yellow-500 transition-colors">Developer Architecture</Link></li>
-            <li><Link to="/encyclopedia" className="hover:text-yellow-500 transition-colors">PDF Format Encyclopedia</Link></li>
-            <li><Link to="/compare/online-pdf-tools" className="hover:text-yellow-500 transition-colors">Privacy Comparison</Link></li>
-            <li><Link to="/tools/pdf-size-calculator" className="hover:text-yellow-500 transition-colors">PDF Size Calculator</Link></li>
-            <li><Link to="/test-files" className="hover:text-yellow-500 transition-colors">Sample Test Files</Link></li>
+            <li><Link to="/student-pdf-tools" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Student Study Workflow</Link></li>
+            <li><Link to="/business-pdf-tools" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Business Legal Workflow</Link></li>
+            <li><Link to="/developer-pdf-tools" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Developer Architecture</Link></li>
+            <li><Link to="/encyclopedia" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">PDF Format Encyclopedia</Link></li>
+            <li><Link to="/compare/online-pdf-tools" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Privacy Comparison</Link></li>
+            <li><Link to="/tools/pdf-size-calculator" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">PDF Size Calculator</Link></li>
+            <li><Link to="/test-files" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Sample Test Files</Link></li>
           </ul>
         </nav>
 
@@ -89,12 +89,13 @@ const Footer: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
         <div>
           <p className={`font-black uppercase text-xs tracking-widest mb-4 ${darkMode ? 'text-slate-200' : 'text-slate-900'}`}>Support & Legal</p>
           <ul className="space-y-2.5 text-xs font-semibold mb-6">
-            <li><Link to="/" aria-label="Go to PDFBolt home" className="hover:text-yellow-500 transition-colors">Home</Link></li>
-            <li><Link to="/about" className="hover:text-yellow-500 transition-colors">About PDFBolt</Link></li>
-            <li><Link to="/privacy" className="hover:text-yellow-500 transition-colors">Privacy Policy</Link></li>
-            <li><Link to="/terms" className="hover:text-yellow-500 transition-colors">Terms of Service</Link></li>
-            <li><Link to="/contact" className="hover:text-yellow-500 transition-colors flex items-center gap-1"><Headphones size={12} /> Contact Support</Link></li>
+            <li><Link to="/" aria-label="Go to PDFBolt home" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Home</Link></li>
+            <li><Link to="/about" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">About PDFBolt</Link></li>
+            <li><Link to="/privacy" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Privacy Policy</Link></li>
+            <li><Link to="/terms" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Terms of Service</Link></li>
+            <li><Link to="/contact" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors flex items-center gap-1"><Headphones size={12} /> Contact Support</Link></li>
           </ul>
+
 
           <div className="bg-gradient-to-br from-yellow-400 to-orange-500 text-slate-950 p-4 rounded-2xl text-center shadow-md">
             <Heart className="mx-auto mb-1 text-slate-950 fill-current" size={20} />

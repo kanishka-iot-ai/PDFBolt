@@ -67,7 +67,7 @@ class ErrorBoundary extends Component<Props, State> {
 
                         {this.state.error && (
                             <div className="mb-8 p-4 bg-slate-100 dark:bg-slate-950 rounded-2xl text-left border border-slate-200 dark:border-slate-800 overflow-x-auto">
-                                <div className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Error Details</div>
+                                <div className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-2">Error Details</div>
                                 <p className="text-sm font-mono text-red-600 dark:text-red-400 break-words whitespace-pre-wrap">
                                     {this.state.error.toString()}
                                 </p>
@@ -77,20 +77,21 @@ class ErrorBoundary extends Component<Props, State> {
                         <div className="flex flex-col sm:flex-row gap-4 justify-center">
                             <button
                                 onClick={this.handleReset}
-                                className="px-8 py-4 bg-yellow-500 text-white rounded-2xl font-black text-lg shadow-xl shadow-yellow-500/20 hover:bg-yellow-600 hover:-translate-y-1 transition-all flex items-center justify-center gap-2"
+                                className="px-8 py-4 bg-yellow-500 text-slate-950 rounded-2xl font-black text-lg shadow-xl shadow-yellow-500/20 hover:bg-yellow-400 hover:-translate-y-1 transition-all flex items-center justify-center gap-2"
                             >
                                 <RefreshCw size={20} />
                                 Restart Application
                             </button>
                             
                             <a 
-                                href="mailto:support@pdfbolt.in?subject=App%20Crash%20Report" 
+                                href="mailto:support@pdfbolt.com?subject=App%20Crash%20Report" 
                                 className="px-8 py-4 bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white rounded-2xl font-bold text-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition-all flex items-center justify-center gap-2 border border-slate-200 dark:border-slate-700"
                             >
                                 <Mail size={20} />
                                 Report Issue
                             </a>
                         </div>
+
 
                         <p className="text-xs font-medium text-slate-500 dark:text-slate-500 mt-8">
                             If this keeps happening, try clearing your browser cache.

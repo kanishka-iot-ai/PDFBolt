@@ -6,7 +6,7 @@ python-multipart>=0.0.9,<1.0.0
 
 # PDF & Document Processing Engines
 pypdf>=4.1.0,<5.0.0
-pymupdf>=1.24.0,<2.0.0
+pikepdf>=8.12.0,<10.0.0; sys_platform != "win32" or python_version < "3.14"
 pdfplumber>=0.10.3,<1.0.0
 reportlab>=4.1.0,<5.0.0
 Pillow>=10.2.0
@@ -14,8 +14,9 @@ python-docx>=1.1.0,<2.0.0
 openpyxl>=3.1.2,<4.0.0
 python-pptx>=0.6.23,<1.0.0
 pytesseract>=0.3.10,<1.0.0
+pdf2image>=1.17.0,<2.0.0
 
-# Storage & Cloud Providers (Azure & Google Cloud)
+# Storage & Network
 azure-storage-blob>=12.19.0
 azure-identity>=1.15.0
 google-cloud-storage>=2.14.0,<3.0.0
@@ -23,3 +24,10 @@ google-cloud-pubsub>=2.19.0,<3.0.0
 aiofiles>=23.2.1,<24.0.0
 httpx>=0.27.0,<1.0.0
 python-dotenv>=1.0.1,<2.0.0
+
+# Security, Logging & Quality
+python-jose>=3.3.0,<4.0.0
+structlog>=23.2.0
+schedule>=1.2.0
+pytest>=8.0.0
+pytest-asyncio>=0.23.0

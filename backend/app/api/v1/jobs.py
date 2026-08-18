@@ -1,158 +1,174 @@
-import json
 import os
+import json
 from typing import Optional, List
-from fastapi import APIRouter, UploadFile, File, Form, HTTPException, BackgroundTasks
-from fastapi.responses import FileResponse
-from backend.app.models.schemas import JobResponse, OperationType, JobStatus
-from backend.app.services.job_manager import job_manager
-from backend.app.services.storage import storage
-from backend.app.services.cleanup_service import cleanup_service
-from backend.app.core.errors import PDFProcessingException, ErrorCode
+from pathlib import Path
+from fastapi import APIRouter, UploadFile, File, Form, HTTPException, BackgroundTasks, Query
+from fastapi.responses import FileResponse, Response
+from backend.app.core.errors import PDFBoltError
 from backend.app.core.security import sanitize_filename
+from backend.app.services.job_service import job_service
+from backend.app.services.job_manager import job_manager
+from backend.app.services.cleanup_service import cleanup_service
+from backend.app.models.schemas import JobStatus as LegacyJobStatus
 
 router = APIRouter(prefix="/jobs", tags=["Jobs"])
 
 
-@router.post("", response_model=JobResponse)
+@router.post("")
 async def create_and_process_job(
     operation: str = Form(...),
-    settings: Optional[str] = Form(default="{}"),
+    options: Optional[str] = Form(default=None),
+    settings: Optional[str] = Form(default=None),
     file: Optional[UploadFile] = File(default=None),
     files: Optional[List[UploadFile]] = File(default=None)
 ):
     """
-    Submits a PDF document processing job.
-    Executes through the strict 8-stage integrity pipeline and returns the canonical result.
+    Submits a PDF document processing job through the strict 20-step verification pipeline.
+    Supports both single-file and multi-file processing operations.
     """
+    raw_opts = options or settings or "{}"
     try:
-        op_enum = OperationType(operation)
-    except ValueError:
-        raise PDFProcessingException(
-            error_code=ErrorCode.PROCESSING_FAILED,
-            message=f"Unsupported operation: '{operation}'",
-            status_code=400
-        )
-
-    try:
-        settings_dict = json.loads(settings) if settings else {}
+        options_dict = json.loads(raw_opts) if raw_opts else {}
     except Exception:
-        settings_dict = {}
+        options_dict = {}
 
-    # Handle multiple files (e.g. merge) vs single file
-    if op_enum == OperationType.MERGE:
-        uploaded_files = files or ([file] if file else [])
-        if not uploaded_files or len(uploaded_files) < 2:
-            raise PDFProcessingException(
-                error_code=ErrorCode.INVALID_PDF,
-                message="Merge operation requires at least two PDF documents.",
-                status_code=400
-            )
+    # Aggregate uploaded files
+    upload_list: List[UploadFile] = []
+    if files:
+        upload_list.extend(files)
+    if file:
+        if not upload_list or file not in upload_list:
+            upload_list.append(file)
 
-        job_id = job_manager.create_job(op_enum, settings_dict)
-        files_data = []
-        for uf in uploaded_files:
-            content = await uf.read()
-            clean_name = sanitize_filename(uf.filename or "file.pdf")
-            files_data.append((content, clean_name))
+    if not upload_list:
+        raise PDFBoltError("NO_FILES_PROVIDED", "No document files uploaded for processing.")
 
-        from backend.app.processors.merge import MergeProcessor
-        proc = MergeProcessor(settings_dict)
-        out_bytes, out_name, metrics = proc.process_multiple(files_data)
+    # Execute universal 20-step pipeline
+    job = await job_service.execute_job(
+        operation=operation,
+        uploads=upload_list,
+        options=options_dict
+    )
 
-        # Save output
-        clean_out_name, out_path = storage.save_output_sync(job_id, out_name, out_bytes)
-        
-        job = job_manager.jobs[job_id]
-        job["status"] = JobStatus.COMPLETED
-        job["progress"] = 100
-        job["output_path"] = out_path
-        job["output"] = {"filename": clean_out_name, "size_bytes": len(out_bytes)}
-        job["metrics"] = metrics
-
-        return job_manager.get_job(job_id)
-
-    # Single File Operation
-    if not file:
-        raise PDFProcessingException(
-            error_code=ErrorCode.FILE_EMPTY,
-            message="No file uploaded for processing.",
-            status_code=400
-        )
-
-    content = await file.read()
-    clean_name = sanitize_filename(file.filename or "document.pdf")
-
-    job_id = job_manager.create_job(op_enum, settings_dict)
-    return job_manager.execute_job_sync(job_id, content, clean_name)
+    # Format response compatible with frontend & API spec
+    return {
+        "success": True,
+        "job_id": job.job_id,
+        "status": job.status.value,
+        "operation": job.operation,
+        "poll_url": f"/api/v1/jobs/{job.job_id}",
+        "download_url": f"/api/v1/jobs/{job.job_id}/download",
+        "output": {
+            "filename": job.output_filename or f"{job.operation}_result.pdf",
+            "size_bytes": job.output_size or 0
+        },
+        "metrics": job.metrics,
+        "created_at": job.created_at.isoformat(),
+        "expires_at": job.expires_at.isoformat()
+    }
 
 
-@router.get("/{job_id}", response_model=JobResponse)
+@router.get("/{job_id}")
 def get_job_status(job_id: str):
-    """
-    Polls the live progress and canonical status of a processing job.
-    """
-    job = job_manager.get_job(job_id)
-    if not job:
-        raise PDFProcessingException(
-            error_code=ErrorCode.JOB_NOT_FOUND,
-            message=f"Job '{job_id}' not found.",
-            status_code=404
-        )
-    return job
+    """Retrieves current job status, invariant metadata, and download links."""
+    job = job_service.get_job(job_id)
+    if job:
+        return {
+            "success": job.status.value == "COMPLETED",
+            "job_id": job.job_id,
+            "status": job.status.value,
+            "operation": job.operation,
+            "output": {
+                "filename": job.output_filename or f"{job.operation}_result.pdf",
+                "size_bytes": job.output_size or 0
+            },
+            "metrics": job.metrics,
+            "download_url": f"/api/v1/jobs/{job.job_id}/download",
+            "created_at": job.created_at.isoformat(),
+            "expires_at": job.expires_at.isoformat()
+        }
 
+    legacy_job = job_manager.get_job(job_id)
+    if legacy_job:
+        return legacy_job
 
-@router.post("/{job_id}/cancel")
-def cancel_job(job_id: str):
-    """
-    Cancels an active or queued processing job and immediately purges all temporary files.
-    """
-    success = job_manager.cancel_job(job_id)
-    if not success:
-        raise PDFProcessingException(
-            error_code=ErrorCode.JOB_NOT_FOUND,
-            message=f"Job '{job_id}' not found.",
-            status_code=404
-        )
-    return {"success": True, "job_id": job_id, "status": "CANCELLED", "message": "Job cancelled and temporary files purged immediately."}
+    raise PDFBoltError("JOB_NOT_FOUND", f"Job '{job_id}' not found.")
 
 
 @router.get("/{job_id}/download")
-def download_job_result(job_id: str, background_tasks: BackgroundTasks):
+def download_job_result(
+    job_id: str,
+    background_tasks: BackgroundTasks,
+    token: Optional[str] = Query(default=None)
+):
     """
-    Securely downloads the validated output artifact from a completed job.
-    Triggers automatic file cleanup post-download.
+    Downloads the verified output artifact.
+    Enforces safe generated filenames and schedules ephemeral workspace cleanup.
     """
-    job = job_manager.jobs.get(job_id)
-    if not job:
-        raise PDFProcessingException(
-            error_code=ErrorCode.JOB_NOT_FOUND,
-            message=f"Job '{job_id}' not found.",
-            status_code=404
-        )
+    job = job_service.get_job(job_id)
+    out_path = None
+    out_filename = None
 
-    if job["status"] != JobStatus.COMPLETED:
-        raise PDFProcessingException(
-            error_code=ErrorCode.PROCESSING_FAILED,
-            message=f"Job is not completed yet (current status: {job['status'].value}).",
-            status_code=400
-        )
+    if job:
+        if job.status.value != "COMPLETED":
+            raise PDFBoltError("JOB_STILL_PROCESSING", f"Job is not completed yet (current status: {job.status.value}).")
+        out_path = job.output_path
+        out_filename = sanitize_filename(job.output_filename or f"{job.operation}_result.pdf")
+    elif job_id in job_manager.jobs:
+        legacy_data = job_manager.jobs[job_id]
+        status_val = legacy_data.get("status")
+        status_str = getattr(status_val, "value", str(status_val))
+        if status_str != "COMPLETED":
+            raise PDFBoltError("JOB_STILL_PROCESSING", f"Job is not completed yet.")
+        out_path = legacy_data.get("output_path")
+        out_filename = sanitize_filename(os.path.basename(out_path or f"job_{job_id}.pdf"))
 
-    out_path = job.get("output_path")
     if not out_path or not os.path.exists(out_path):
-        raise PDFProcessingException(
-            error_code=ErrorCode.STORAGE_ERROR,
-            message="Output file artifact missing or already purged.",
-            status_code=404
-        )
+        raise PDFBoltError("STORAGE_ERROR", "Output artifact file missing or already purged by lifecycle TTL.")
 
-    out = job.get("output")
-    out_filename = getattr(out, "filename", None) or (out.get("filename") if isinstance(out, dict) else "result.pdf") or "result.pdf"
-    
-    # Schedule immediate auto-cleanup of the temporary file after transfer
+    # Schedule post-download cleanup
     background_tasks.add_task(cleanup_service.handle_post_download_cleanup, job_id, job_manager)
+
+    ext = Path(out_path).suffix.lower()
+    media_types = {
+        ".pdf": "application/pdf",
+        ".docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        ".xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        ".pptx": "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+        ".zip": "application/zip",
+        ".png": "image/png",
+        ".jpg": "image/jpeg",
+        ".jpeg": "image/jpeg",
+    }
+    media_type = media_types.get(ext, "application/octet-stream")
 
     return FileResponse(
         path=out_path,
         filename=out_filename,
-        media_type="application/octet-stream"
+        media_type=media_type
     )
+
+
+@router.delete("/{job_id}")
+def cancel_and_delete_job(job_id: str):
+    """Immediately terminates processing and permanently purges temporary work directories."""
+    job = job_service.get_job(job_id)
+    if job:
+        job.status = job.status.CANCELLED
+    
+    if job_id in job_manager.jobs:
+        job_manager.jobs[job_id]["status"] = LegacyJobStatus.CANCELLED
+
+    cleanup_service.delete_job_files(job_id)
+
+    return {
+        "success": True,
+        "job_id": job_id,
+        "status": "CANCELLED",
+        "message": "Job cancelled and workspace purged immediately."
+    }
+
+
+@router.post("/{job_id}/cancel")
+def cancel_job_post_alias(job_id: str):
+    return cancel_and_delete_job(job_id)

@@ -56,9 +56,10 @@ const WorkflowPage: React.FC<WorkflowPageProps> = ({ workflowSlug, darkMode }) =
       {/* Hero Section */}
       <section className={`py-16 border-b ${darkMode ? 'border-slate-800 bg-slate-900/40' : 'border-slate-100 bg-slate-50/70'}`}>
         <div className="max-w-5xl mx-auto px-6 text-center">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 font-black text-xs uppercase tracking-widest mb-4">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 font-black text-xs uppercase tracking-widest mb-4">
             <Sparkles size={14} /> {workflow.heroBadge}
           </div>
+
           <h1 className={`text-4xl md:text-6xl font-black mb-6 tracking-tight leading-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>
             {workflow.heroHeadline}
           </h1>
@@ -187,10 +188,11 @@ const WorkflowPage: React.FC<WorkflowPageProps> = ({ workflowSlug, darkMode }) =
                 }`}
               >
                 <div>
-                  <span className="text-[10px] font-bold uppercase text-yellow-500">{otherWf.audience}</span>
+                  <span className="text-[10px] font-bold uppercase text-yellow-700 dark:text-yellow-400">{otherWf.audience}</span>
                   <h3 className={`font-bold text-base mt-1 ${darkMode ? 'text-white' : 'text-slate-900'}`}>{otherWf.title}</h3>
                 </div>
-                <ArrowRight size={18} className="text-yellow-500" />
+                <ArrowRight size={18} className="text-yellow-700 dark:text-yellow-400" />
+
               </Link>
             ))}
           </div>

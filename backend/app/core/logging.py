@@ -1,49 +1,33 @@
 import logging
 import json
 import time
-import sys
 from typing import Any, Dict
 
 
-class JSONFormatter(logging.Formatter):
-    """
-    Format logs as JSON objects without sensitive document contents.
-    """
+class StructuredJSONFormatter(logging.Formatter):
+    """Formats log records as structured JSON without PII."""
     def format(self, record: logging.LogRecord) -> str:
         log_data: Dict[str, Any] = {
-            "timestamp": self.formatTime(record, "%Y-%m-%dT%H:%M:%SZ"),
+            "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(record.created)),
             "level": record.levelname,
             "logger": record.name,
-            "message": record.getMessage()
+            "message": record.getMessage(),
         }
-
-        # Include extra structured fields if available
-        if hasattr(record, "job_id"):
-            log_data["job_id"] = getattr(record, "job_id")
-        if hasattr(record, "operation"):
-            log_data["operation"] = getattr(record, "operation")
-        if hasattr(record, "input_size_bytes"):
-            log_data["input_size_bytes"] = getattr(record, "input_size_bytes")
-        if hasattr(record, "output_size_bytes"):
-            log_data["output_size_bytes"] = getattr(record, "output_size_bytes")
-        if hasattr(record, "duration_ms"):
-            log_data["duration_ms"] = getattr(record, "duration_ms")
-        if hasattr(record, "error_code"):
-            log_data["error_code"] = getattr(record, "error_code")
-
+        if hasattr(record, "props"):
+            log_data.update(record.props)
+        if record.exc_info:
+            log_data["exception"] = self.formatException(record.exc_info)
         return json.dumps(log_data)
 
 
-def setup_logger(name: str = "pdfbolt") -> logging.Logger:
+def get_logger(name: str = "pdfbolt") -> logging.Logger:
     logger = logging.getLogger(name)
-    logger.setLevel(logging.INFO)
-
     if not logger.handlers:
-        handler = logging.StreamHandler(sys.stdout)
-        handler.setFormatter(JSONFormatter())
+        handler = logging.StreamHandler()
+        handler.setFormatter(StructuredJSONFormatter())
         logger.addHandler(handler)
-
+        logger.setLevel(logging.INFO)
     return logger
 
 
-logger = setup_logger()
+logger = get_logger("pdfbolt")

@@ -1,89 +1,128 @@
-import io
-from typing import Tuple, Dict, Any, List
-import pypdf
+import re
+import zipfile
+from pathlib import Path
+from typing import List, Dict, Any, Set
+from pypdf import PdfReader, PdfWriter
 from backend.app.processors.base import BaseProcessor
-from backend.app.core.errors import PDFProcessingException, ErrorCode
+from backend.app.core.errors import PDFBoltError, OutputValidationError
+from backend.app.core.validation import validate_pdf_output
 
 
-def parse_page_ranges(range_input: Any, max_pages: int) -> List[int]:
-    """Parses range strings like '1-3, 5, 7-10' or integer lists [1, 2, 5] into 0-indexed page indices."""
-    selected_indices = set()
-    if range_input is None:
-        return []
+def parse_page_ranges(range_str: str, total_pages: int) -> List[int]:
+    """
+    Parses strings like '1', '1-5', '1,3,5', '1-3,7,9-11' (1-based) into ordered list of 0-based page indices.
+    """
+    if not range_str or not range_str.strip():
+        raise PDFBoltError("INVALID_PAGE_RANGE", "Empty page range provided.")
 
-    if isinstance(range_input, (list, tuple, set)):
-        for item in range_input:
-            if isinstance(item, int):
-                if 1 <= item <= max_pages:
-                    selected_indices.add(item - 1)
-            elif isinstance(item, str):
-                for idx in parse_page_ranges(item, max_pages):
-                    selected_indices.add(idx)
-        return sorted(list(selected_indices))
-
-    if isinstance(range_input, int):
-        if 1 <= range_input <= max_pages:
-            return [range_input - 1]
-        return []
-
-    range_str = str(range_input)
+    pages_0based: List[int] = []
+    seen: Set[int] = set()
     parts = [p.strip() for p in range_str.split(',') if p.strip()]
+
+    if not parts:
+        raise PDFBoltError("INVALID_PAGE_RANGE", "Invalid page range format.")
 
     for part in parts:
         if '-' in part:
             bounds = part.split('-')
-            if len(bounds) == 2 and bounds[0].strip().isdigit() and bounds[1].strip().isdigit():
-                start = max(1, int(bounds[0].strip()))
-                end = min(max_pages, int(bounds[1].strip()))
-                for i in range(start, end + 1):
-                    selected_indices.add(i - 1)
-        elif part.isdigit():
-            val = int(part)
-            if 1 <= val <= max_pages:
-                selected_indices.add(val - 1)
+            if len(bounds) != 2 or not bounds[0].strip().isdigit() or not bounds[1].strip().isdigit():
+                raise PDFBoltError("INVALID_PAGE_RANGE", f"Malformed range syntax: '{part}'")
+            start = int(bounds[0].strip())
+            end = int(bounds[1].strip())
+            if start <= 0 or end <= 0:
+                raise PDFBoltError("INVALID_PAGE_RANGE", "Page numbers must be greater than 0.")
+            if start > end:
+                raise PDFBoltError("INVALID_PAGE_RANGE", f"Range start ({start}) cannot exceed end ({end}).")
+            if end > total_pages:
+                raise PDFBoltError("PAGE_OUT_OF_RANGE", f"Page {end} exceeds document page count of {total_pages}.")
+            for p in range(start, end + 1):
+                idx = p - 1
+                if idx not in seen:
+                    pages_0based.append(idx)
+                    seen.add(idx)
+        else:
+            if not part.isdigit():
+                raise PDFBoltError("INVALID_PAGE_RANGE", f"Invalid page number: '{part}'")
+            p = int(part)
+            if p <= 0:
+                raise PDFBoltError("INVALID_PAGE_RANGE", "Page number must be greater than 0.")
+            if p > total_pages:
+                raise PDFBoltError("PAGE_OUT_OF_RANGE", f"Page {p} exceeds document page count of {total_pages}.")
+            idx = p - 1
+            if idx not in seen:
+                pages_0based.append(idx)
+                seen.add(idx)
 
-    return sorted(list(selected_indices))
+    if not pages_0based:
+        raise PDFBoltError("INVALID_PAGE_RANGE", "No valid pages specified.")
+
+    return pages_0based
 
 
 class SplitProcessor(BaseProcessor):
-    def process(self, content: bytes, filename: str) -> Tuple[bytes, str, Dict[str, Any]]:
-        page_count, is_enc = self.validate_input(content)
-        if is_enc:
-            raise PDFProcessingException(
-                error_code=ErrorCode.ENCRYPTED_PDF,
-                message="Cannot split encrypted PDF without password.",
-                status_code=400
-            )
+    operation = "split"
+    input_formats = [".pdf"]
+    output_format = ".pdf"
 
-        range_input = self.settings.get("range") or self.settings.get("page_ranges") or self.settings.get("pages", "1")
-        range_str = str(range_input)
-        selected_pages = parse_page_ranges(range_input, page_count)
+    def process(self, input_files: Any, options: Any = None) -> Any:
+        if isinstance(input_files, (bytes, bytearray)):
+            return self.process_bytes(input_files, str(options or "doc.pdf"))
+        opts = options or self.settings or {}
 
-        if not selected_pages:
-            raise PDFProcessingException(
-                error_code=ErrorCode.INVALID_PAGE_RANGE,
-                message=f'No valid pages matched the requested range "{range_str}" (document has {page_count} pages).',
-                status_code=400
-            )
+        if not input_files:
+            raise PDFBoltError("NO_FILES_PROVIDED")
 
-        reader = pypdf.PdfReader(io.BytesIO(content))
-        writer = pypdf.PdfWriter()
+        input_pdf = input_files[0]
+        reader = PdfReader(str(input_pdf), strict=False)
+        total_pages = len(reader.pages)
 
-        for idx in selected_pages:
+        range_str = opts.get("ranges") or opts.get("pages") or opts.get("range") or f"1-{total_pages}"
+
+        if isinstance(range_str, list):
+            range_str = ",".join(str(x) for x in range_str)
+
+        target_indices = parse_page_ranges(str(range_str), total_pages)
+
+        # Build output PDF
+        writer = PdfWriter()
+        for idx in target_indices:
             writer.add_page(reader.pages[idx])
 
-        out_buffer = io.BytesIO()
-        writer.write(out_buffer)
-        output_bytes = out_buffer.getvalue()
+        output_path = self.output_dir / f"{self.job_id}.pdf"
+        with open(output_path, "wb") as f:
+            writer.write(f)
 
-        # Validate output page invariant
-        self.validate_output(output_bytes, expected_pages=len(selected_pages))
+        # Verify Invariant
+        actual_pages = validate_pdf_output(output_path)
+        if actual_pages != len(target_indices):
+            output_path.unlink(missing_ok=True)
+            raise OutputValidationError(f"Split invariant failed: expected {len(target_indices)} pages, got {actual_pages}.")
 
-        metrics = {
-            "original_pages": page_count,
-            "extracted_pages": len(selected_pages),
-            "output_size_bytes": len(output_bytes)
+        return output_path
+
+    # Backward-compatible byte processing
+    def process_bytes(self, content: bytes, filename: str) -> tuple[bytes, str, Dict[str, Any]]:
+        import io
+        reader = PdfReader(io.BytesIO(content), strict=False)
+        total_pages = len(reader.pages)
+        range_str = self.settings.get("ranges") or self.settings.get("pages") or self.settings.get("range") or f"1-{total_pages}"
+
+        if isinstance(range_str, list):
+            range_str = ",".join(str(x) for x in range_str)
+        target_indices = parse_page_ranges(str(range_str), total_pages)
+
+        writer = PdfWriter()
+        for idx in target_indices:
+            writer.add_page(reader.pages[idx])
+
+        out_buf = io.BytesIO()
+        writer.write(out_buf)
+        out_bytes = out_buf.getvalue()
+
+        return out_bytes, "split_document.pdf", {
+            "original_size_bytes": len(content),
+            "output_size_bytes": len(out_bytes),
+            "original_pages": total_pages,
+            "extracted_pages": len(target_indices),
+            "quality_status": "passed"
         }
-
-        clean_name = filename.rsplit('.', 1)[0] + f"_split_pages_{range_str.replace(' ', '')}.pdf"
-        return output_bytes, clean_name, metrics

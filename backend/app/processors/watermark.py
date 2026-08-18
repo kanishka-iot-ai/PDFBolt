@@ -1,63 +1,110 @@
 import io
-from typing import Tuple, Dict, Any
-import pypdf
+from pathlib import Path
+from typing import List, Dict, Any
+from pypdf import PdfReader, PdfWriter
 from reportlab.pdfgen import canvas
-from reportlab.lib.colors import Color
+from reportlab.lib import colors
 from backend.app.processors.base import BaseProcessor
-from backend.app.core.errors import PDFProcessingException, ErrorCode
+from backend.app.core.errors import PDFBoltError, OutputValidationError
+from backend.app.core.validation import validate_pdf_output
 
 
 class WatermarkProcessor(BaseProcessor):
-    def process(self, content: bytes, filename: str) -> Tuple[bytes, str, Dict[str, Any]]:
-        page_count, is_enc = self.validate_input(content)
-        if is_enc:
-            raise PDFProcessingException(
-                error_code=ErrorCode.ENCRYPTED_PDF,
-                message="Cannot watermark password-protected PDF without password.",
-                status_code=400
-            )
+    operation = "watermark"
+    input_formats = [".pdf"]
+    output_format = ".pdf"
 
-        text = self.settings.get("text", "CONFIDENTIAL")
-        font_size = int(self.settings.get("font_size", 48))
-        opacity = float(self.settings.get("opacity", 0.3))
+    def _hex_to_color(self, hex_str: str, opacity: float):
+        clean = hex_str.lstrip('#')
+        if len(clean) == 6:
+            r = int(clean[0:2], 16) / 255.0
+            g = int(clean[2:4], 16) / 255.0
+            b = int(clean[4:6], 16) / 255.0
+            return colors.Color(r, g, b, alpha=opacity)
+        return colors.Color(0.5, 0.5, 0.5, alpha=opacity)
 
-        reader = pypdf.PdfReader(io.BytesIO(content))
-        writer = pypdf.PdfWriter()
+    def _generate_watermark_page(self, width: float, height: float, text: str, options: Dict[str, Any]) -> io.BytesIO:
+        packet = io.BytesIO()
+        can = canvas.Canvas(packet, pagesize=(width, height))
 
-        for page in reader.pages:
-            # Create watermark canvas matching page dimensions
-            page_box = page.mediabox
-            width = float(page_box.width)
-            height = float(page_box.height)
+        font_size = float(options.get("font_size") or options.get("fontSize") or 48)
+        opacity = float(options.get("opacity") or 0.3)
+        color_hex = str(options.get("color") or "#718096")
+        rotation = float(options.get("rotation") or 45)
+        position = str(options.get("position") or "center").lower()
 
-            watermark_buffer = io.BytesIO()
-            can = canvas.Canvas(watermark_buffer, pagesize=(width, height))
-            can.setFillColor(Color(0.5, 0.5, 0.5, alpha=opacity))
-            can.setFont("Helvetica-Bold", font_size)
+        watermark_color = self._hex_to_color(color_hex, opacity)
+        can.setFont("Helvetica-Bold", font_size)
+        can.setFillColor(watermark_color)
 
-            can.saveState()
-            can.translate(width / 2, height / 2)
-            can.rotate(45)
+        can.saveState()
+        if position == "diagonal" or rotation != 0:
+            can.translate(width / 2.0, height / 2.0)
+            can.rotate(rotation)
             can.drawCentredString(0, 0, text)
-            can.restoreState()
-            can.save()
+        elif position == "top-left":
+            can.drawString(50, height - 50, text)
+        elif position == "top-right":
+            can.drawRightString(width - 50, height - 50, text)
+        elif position == "bottom-left":
+            can.drawString(50, 50, text)
+        elif position == "bottom-right":
+            can.drawRightString(width - 50, 50, text)
+        else: # center
+            can.drawCentredString(width / 2.0, height / 2.0, text)
 
-            watermark_buffer.seek(0)
-            wm_pdf = pypdf.PdfReader(watermark_buffer)
-            page.merge_page(wm_pdf.pages[0])
+        can.restoreState()
+        can.save()
+        packet.seek(0)
+        return packet
+
+    def process(self, input_files: Any, options: Any = None) -> Any:
+        if isinstance(input_files, (bytes, bytearray)):
+            return self.process_bytes(input_files, str(options or "doc.pdf"))
+        opts = options or self.settings or {}
+        if not input_files:
+            raise PDFBoltError("NO_FILES_PROVIDED")
+
+        input_pdf = input_files[0]
+        reader = PdfReader(str(input_pdf), strict=False)
+        total_pages = len(reader.pages)
+
+        watermark_text = opts.get("text") or opts.get("watermark") or "CONFIDENTIAL"
+
+        writer = PdfWriter()
+        for page in reader.pages:
+            width = float(page.mediabox.width)
+            height = float(page.mediabox.height)
+
+            wm_buf = self._generate_watermark_page(width, height, watermark_text, opts)
+            wm_reader = PdfReader(wm_buf)
+            page.merge_page(wm_reader.pages[0])
             writer.add_page(page)
 
-        out_buffer = io.BytesIO()
-        writer.write(out_buffer)
-        output_bytes = out_buffer.getvalue()
 
-        self.validate_output(output_bytes, expected_pages=page_count)
+        output_path = self.output_dir / f"{self.job_id}.pdf"
+        with open(output_path, "wb") as f:
+            writer.write(f)
 
-        metrics = {
-            "watermark_text": text,
-            "total_pages": page_count,
-            "output_size_bytes": len(output_bytes)
+        # Invariant: output_pages == input_pages
+        actual_pages = validate_pdf_output(output_path)
+        if actual_pages != total_pages:
+            output_path.unlink(missing_ok=True)
+            raise OutputValidationError(f"Watermark altered page count: expected {total_pages}, got {actual_pages}.")
+
+        return output_path
+
+    def process_bytes(self, content: bytes, filename: str) -> tuple[bytes, str, Dict[str, Any]]:
+        import io
+        temp_in = self.temp_dir / "in.pdf"
+        with open(temp_in, "wb") as f:
+            f.write(content)
+        out_path = self.process([temp_in], self.settings)
+        with open(out_path, "rb") as f:
+            out_bytes = f.read()
+
+        return out_bytes, "watermarked_document.pdf", {
+            "original_size_bytes": len(content),
+            "output_size_bytes": len(out_bytes),
+            "quality_status": "passed"
         }
-
-        clean_name = filename.rsplit('.', 1)[0] + "_watermarked.pdf"
-        return output_bytes, clean_name, metrics

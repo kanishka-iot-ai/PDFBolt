@@ -39,7 +39,7 @@ const GuidesHub: React.FC<GuidesHubProps> = ({ darkMode }) => {
       {/* Hero Header */}
       <section className={`py-16 border-b ${darkMode ? 'border-slate-800 bg-slate-900/40' : 'border-slate-100 bg-slate-50/70'}`}>
         <div className="max-w-5xl mx-auto px-6 text-center">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 font-black text-xs uppercase tracking-widest mb-4">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 font-black text-xs uppercase tracking-widest mb-4">
             <BookOpen size={14} /> PDF Knowledge Base & Tutorials
           </div>
           <h1 className={`text-4xl md:text-6xl font-black mb-6 tracking-tight leading-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>
@@ -52,7 +52,7 @@ const GuidesHub: React.FC<GuidesHubProps> = ({ darkMode }) => {
 
           {/* Search bar */}
           <div className="max-w-xl mx-auto relative mb-6">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400 w-5 h-5" />
             <input
               type="text"
               value={search}
@@ -75,7 +75,7 @@ const GuidesHub: React.FC<GuidesHubProps> = ({ darkMode }) => {
                     ? 'bg-yellow-500 text-slate-950 shadow-sm scale-105'
                     : darkMode
                       ? 'bg-slate-800 text-slate-300 hover:bg-slate-700'
-                      : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+                      : 'bg-white text-slate-700 hover:bg-slate-100 border border-slate-200'
                 }`}
               >
                 {cat.label}
@@ -98,10 +98,10 @@ const GuidesHub: React.FC<GuidesHubProps> = ({ darkMode }) => {
             >
               <div>
                 <div className="flex items-center justify-between gap-2 mb-3">
-                  <span className="text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded bg-yellow-500/10 text-yellow-600 dark:text-yellow-400">
+                  <span className="text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded bg-yellow-500/10 text-yellow-700 dark:text-yellow-400">
                     {guide.category}
                   </span>
-                  <span className="text-xs font-semibold text-slate-400 flex items-center gap-1">
+                  <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-1">
                     <Clock size={12} /> {guide.readTime}
                   </span>
                 </div>
@@ -114,10 +114,10 @@ const GuidesHub: React.FC<GuidesHubProps> = ({ darkMode }) => {
               </div>
 
               <div className="pt-6 border-t border-slate-100 dark:border-slate-800 mt-6 flex items-center justify-between">
-                <span className="text-xs font-semibold text-slate-400">
+                <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
                   Updated {guide.updatedAt}
                 </span>
-                <span className="inline-flex items-center gap-1 text-xs font-black text-yellow-500">
+                <span className="inline-flex items-center gap-1 text-xs font-black text-yellow-700 dark:text-yellow-400">
                   Read Guide <ArrowRight size={14} />
                 </span>
               </div>
@@ -125,6 +125,7 @@ const GuidesHub: React.FC<GuidesHubProps> = ({ darkMode }) => {
           ))}
         </div>
       </section>
+
     </div>
   );
 };

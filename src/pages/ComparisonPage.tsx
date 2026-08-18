@@ -23,7 +23,7 @@ const ComparisonPage: React.FC<ComparisonPageProps> = ({ darkMode }) => {
       {/* Hero Header */}
       <section className={`py-16 border-b ${darkMode ? 'border-slate-800 bg-slate-900/40' : 'border-slate-100 bg-slate-50/70'}`}>
         <div className="max-w-5xl mx-auto px-6 text-center">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 font-black text-xs uppercase tracking-widest mb-4">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 font-black text-xs uppercase tracking-widest mb-4">
             <Sparkles size={14} /> Comprehensive 2026 Comparison
           </div>
           <h1 className={`text-4xl md:text-6xl font-black mb-6 tracking-tight leading-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>
@@ -63,8 +63,9 @@ const ComparisonPage: React.FC<ComparisonPageProps> = ({ darkMode }) => {
                 <tr key={idx} className={idx % 2 === 0 ? (darkMode ? 'bg-slate-900/30' : 'bg-white') : (darkMode ? 'bg-slate-800/20' : 'bg-slate-50/50')}>
                   <td className="p-5">
                     <div className="font-bold text-slate-900 dark:text-white">{feat.name}</div>
-                    <div className="text-xs text-slate-400 mt-0.5">{feat.notes}</div>
+                    <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{feat.notes}</div>
                   </td>
+
                   <td className="p-5 font-bold text-emerald-600 dark:text-emerald-400 bg-yellow-500/5 dark:bg-yellow-500/10">
                     <div className="flex items-center gap-2">
                       <CheckCircle2 size={18} className="text-emerald-500 flex-shrink-0" />

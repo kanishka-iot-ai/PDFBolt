@@ -65,10 +65,10 @@ const AIChatbot: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
     return (
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-8 right-8 z-[100] p-4 bg-yellow-500 text-white rounded-full shadow-lg shadow-yellow-500/30 hover:scale-105 active:scale-95 transition-all group animate-pulse-slow"
+        className="fixed bottom-8 right-8 z-[100] p-4 bg-yellow-500 text-slate-950 rounded-full shadow-lg shadow-yellow-500/30 hover:scale-105 active:scale-95 transition-all group animate-pulse-slow font-bold"
       >
         <Sparkles size={24} className="group-hover:rotate-12 transition-transform" />
-        <span className="absolute -top-1 -right-1 bg-slate-900 text-[10px] font-black px-2 py-0.5 rounded-full border-2 border-white dark:border-slate-800">AI</span>
+        <span className="absolute -top-1 -right-1 bg-slate-900 text-white text-[10px] font-black px-2 py-0.5 rounded-full border-2 border-white dark:border-slate-800">AI</span>
       </button>
     );
   }
@@ -76,16 +76,16 @@ const AIChatbot: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
   return (
     <div className={`fixed bottom-8 right-8 z-[100] w-[90vw] md:w-[400px] h-[600px] max-h-[80vh] flex flex-col rounded-2xl shadow-2xl overflow-hidden animate-slideUp glass border ${darkMode ? 'border-slate-700/50' : 'border-slate-200'}`}>
       {/* Header */}
-      <div className="p-4 bg-yellow-500 text-white flex justify-between items-center shrink-0">
+      <div className="p-4 bg-yellow-500 text-slate-950 flex justify-between items-center shrink-0">
         <div className="flex items-center gap-3">
-          <div className="p-1 bg-white/20 rounded-lg flex items-center justify-center">
+          <div className="p-1 bg-black/10 rounded-lg flex items-center justify-center">
             <img src="/pdfbolt-logo.webp" alt="PDFBolt AI" width="24" height="24" className="h-6 w-auto object-contain" />
           </div>
           <div>
-            <h4 className="font-bold text-sm tracking-tight">PDFBolt AI</h4>
+            <h4 className="font-extrabold text-sm tracking-tight text-slate-950">PDFBolt AI</h4>
             <div className="flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 bg-green-300 rounded-full animate-pulse"></span>
-              <span className="text-[10px] font-semibold opacity-90 uppercase">Online</span>
+              <span className="w-1.5 h-1.5 bg-emerald-800 rounded-full animate-pulse"></span>
+              <span className="text-[10px] font-bold uppercase text-slate-900">Online</span>
             </div>
           </div>
         </div>
@@ -94,7 +94,7 @@ const AIChatbot: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
             title="Clear History"
             aria-label="Clear chat history"
             onClick={() => setMessages([{ role: 'model', text: 'History cleared. How can I help?' }])}
-            className="p-2 hover:bg-white/20 rounded-md transition-colors"
+            className="p-2 hover:bg-black/10 rounded-md transition-colors text-slate-950"
           >
             <Trash2 size={16} />
           </button>
@@ -102,7 +102,7 @@ const AIChatbot: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
             title="Close Chat"
             aria-label="Close chat window"
             onClick={() => setIsOpen(false)}
-            className="p-2 hover:bg-white/20 rounded-md transition-colors"
+            className="p-2 hover:bg-black/10 rounded-md transition-colors text-slate-950"
           >
             <Minimize2 size={16} />
           </button>
@@ -114,7 +114,7 @@ const AIChatbot: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
         {messages.map((m, i) => (
           <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
             <div className={`max-w-[85%] p-3.5 rounded-2xl text-sm leading-relaxed shadow-sm whitespace-pre-wrap ${m.role === 'user'
-                ? 'bg-yellow-500 text-white rounded-tr-sm'
+                ? 'bg-yellow-500 text-slate-950 font-medium rounded-tr-sm'
                 : darkMode ? 'bg-slate-800 text-slate-200 rounded-tl-sm border border-slate-700' : 'bg-white text-slate-800 rounded-tl-sm border border-slate-200'
               }`}>
               {m.text || (isTyping && i === messages.length - 1 ? <span className="flex gap-1"><span className="animate-bounce">.</span><span className="animate-bounce delay-75">.</span><span className="animate-bounce delay-150">.</span></span> : '')}
@@ -140,15 +140,16 @@ const AIChatbot: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
             onClick={handleSend}
             aria-label="Send message"
             disabled={!input.trim() || isTyping}
-            className="absolute right-1.5 top-1/2 -translate-y-1/2 p-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 disabled:opacity-50 transition-all"
+            className="absolute right-1.5 top-1/2 -translate-y-1/2 p-2 bg-yellow-500 text-slate-950 font-bold rounded-lg hover:bg-yellow-400 disabled:opacity-50 transition-all"
           >
             <Send size={16} />
           </button>
         </div>
-        <p className="text-center text-[10px] font-medium text-slate-400 mt-2">Powered by Gemini Pro</p>
+        <p className="text-center text-[10px] font-medium text-slate-500 dark:text-slate-400 mt-2">Powered by Gemini Pro</p>
       </div>
     </div>
   );
 };
 
 export default AIChatbot;
+

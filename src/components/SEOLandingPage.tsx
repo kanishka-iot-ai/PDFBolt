@@ -121,12 +121,13 @@ const SEOLandingPage: React.FC<SEOLandingPageProps> = ({ toolId, darkMode, child
           
           {/* Breadcrumb Visual Navigation */}
           <nav className="flex justify-center items-center gap-2 text-xs font-semibold mb-6 text-slate-500">
-            <Link to="/" className="hover:text-yellow-500 transition-colors">Home</Link>
+            <Link to="/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Home</Link>
             <span>/</span>
-            <Link to="/tools" className="hover:text-yellow-500 transition-colors">PDF Tools</Link>
+            <Link to="/tools" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">PDF Tools</Link>
             <span>/</span>
             <span className="text-yellow-700 dark:text-yellow-400 font-bold">{tool.title}</span>
           </nav>
+
 
           <h1 className={`text-4xl md:text-5xl font-black mb-4 tracking-tight leading-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>
             {tool.seoTitle?.split('–')[0] || tool.title}
@@ -280,9 +281,10 @@ const SEOLandingPage: React.FC<SEOLandingPageProps> = ({ toolId, darkMode, child
                   }`}
                 >
                   <div>
-                    <div className="p-2 w-fit rounded-lg bg-yellow-500/10 text-yellow-500 mb-3">
+                    <div className="p-2 w-fit rounded-lg bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 mb-3">
                       {React.cloneElement(getIcon(rt.icon) as React.ReactElement, { className: 'w-5 h-5' })}
                     </div>
+
                     <h3 className={`font-bold text-sm mb-1 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
                       {rt.title}
                     </h3>

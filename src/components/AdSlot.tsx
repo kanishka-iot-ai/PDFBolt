@@ -78,13 +78,14 @@ const AdSlot: React.FC<AdSlotProps> = ({
           className={`w-full max-w-5xl mx-auto my-6 px-4 py-3 rounded-2xl border-2 border-dashed border-slate-300 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/30 text-center transition-all ${className}`}
           style={{ minHeight: minHeight || config?.minHeightDesktop || '90px', ...style }}
         >
-          <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-1">
+          <p className="text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 mb-1">
             {labelText} • Development Mode
           </p>
-          <div className="flex flex-col items-center justify-center py-2 text-xs font-semibold text-slate-500 dark:text-slate-400">
-            <span>📢 Placement: <strong className="text-yellow-600 dark:text-yellow-400">{config?.name || placement}</strong></span>
-            <span className="text-[10px] font-normal text-slate-400 mt-0.5">Real ads disabled. Set VITE_ADS_ENABLED=true and VITE_ADSENSE_CLIENT in .env to activate.</span>
+          <div className="flex flex-col items-center justify-center py-2 text-xs font-semibold text-slate-700 dark:text-slate-300">
+            <span>📢 Placement: <strong className="text-yellow-700 dark:text-yellow-400">{config?.name || placement}</strong></span>
+            <span className="text-[10px] font-normal text-slate-600 dark:text-slate-400 mt-0.5">Real ads disabled. Set VITE_ADS_ENABLED=true and VITE_ADSENSE_CLIENT in .env to activate.</span>
           </div>
+
         </div>
       );
     }

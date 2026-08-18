@@ -47,7 +47,7 @@ const HubPage: React.FC<HubPageProps> = ({ darkMode }) => {
       {/* Hero Header */}
       <section className={`py-16 border-b ${darkMode ? 'border-slate-800 bg-slate-900/40' : 'border-slate-100 bg-slate-50/70'}`}>
         <div className="max-w-6xl mx-auto px-6 text-center">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 font-black text-xs uppercase tracking-widest mb-4">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 font-black text-xs uppercase tracking-widest mb-4">
             <Sparkles size={14} /> The Complete PDF Toolkit
           </div>
           <h1 className={`text-4xl md:text-6xl font-black mb-6 tracking-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>
@@ -60,7 +60,7 @@ const HubPage: React.FC<HubPageProps> = ({ darkMode }) => {
 
           {/* Live Search Input */}
           <div className="max-w-2xl mx-auto relative mb-8">
-            <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
+            <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400 w-5 h-5" />
             <input
               type="text"
               value={searchQuery}
@@ -70,6 +70,7 @@ const HubPage: React.FC<HubPageProps> = ({ darkMode }) => {
                 darkMode ? 'bg-slate-800/80 border-slate-700 text-white placeholder-slate-500' : 'bg-white border-slate-200 text-slate-900 placeholder-slate-400 shadow-lg'
               }`}
             />
+
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery('')}
@@ -131,9 +132,9 @@ const HubPage: React.FC<HubPageProps> = ({ darkMode }) => {
               >
                 <div>
                   <div className="p-3 rounded-2xl w-fit bg-slate-100 dark:bg-slate-800 mb-4">
-                    {icons[wf.slug as keyof typeof icons] || <Sparkles className="w-6 h-6 text-yellow-500" />}
+                    {icons[wf.slug as keyof typeof icons] || <Sparkles className="w-6 h-6 text-yellow-600 dark:text-yellow-400" />}
                   </div>
-                  <span className="text-[10px] font-black uppercase tracking-widest text-yellow-600 dark:text-yellow-400">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-yellow-700 dark:text-yellow-400">
                     {wf.audience}
                   </span>
                   <h3 className={`text-xl font-bold mt-1 mb-2 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
@@ -143,7 +144,7 @@ const HubPage: React.FC<HubPageProps> = ({ darkMode }) => {
                     {wf.heroSubheadline}
                   </p>
                 </div>
-                <div className="inline-flex items-center gap-1.5 text-xs font-black text-yellow-500 mt-6">
+                <div className="inline-flex items-center gap-1.5 text-xs font-black text-yellow-700 dark:text-yellow-400 mt-6">
                   Explore Workflow <ArrowRight size={14} />
                 </div>
               </Link>
@@ -157,7 +158,7 @@ const HubPage: React.FC<HubPageProps> = ({ darkMode }) => {
         <div className="flex items-center justify-between mb-8">
           <h2 className={`text-2xl font-black ${darkMode ? 'text-white' : 'text-slate-900'}`}>
             {activeCategory === 'all' ? 'All PDF Tools' : categories.find(c => c.id === activeCategory)?.label}
-            <span className="text-sm font-semibold text-slate-400 ml-3">({filteredTools.length} tools)</span>
+            <span className="text-sm font-semibold text-slate-500 dark:text-slate-400 ml-3">({filteredTools.length} tools)</span>
           </h2>
         </div>
 
@@ -169,10 +170,10 @@ const HubPage: React.FC<HubPageProps> = ({ darkMode }) => {
           </div>
         ) : (
           <div className={`p-12 text-center rounded-3xl border ${darkMode ? 'bg-slate-800/20 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
-            <p className="text-lg font-bold text-slate-500 mb-2">No tools match your search "{searchQuery}"</p>
+            <p className="text-lg font-bold text-slate-600 dark:text-slate-400 mb-2">No tools match your search "{searchQuery}"</p>
             <button
               onClick={() => { setSearchQuery(''); setActiveCategory('all'); }}
-              className="text-xs font-bold text-yellow-500 hover:underline"
+              className="text-xs font-bold text-yellow-700 dark:text-yellow-400 hover:underline"
             >
               Reset Filters
             </button>
@@ -186,7 +187,7 @@ const HubPage: React.FC<HubPageProps> = ({ darkMode }) => {
           darkMode ? 'bg-slate-800/40 border-slate-700' : 'bg-gradient-to-r from-yellow-50 to-amber-50 border-yellow-200'
         }`}>
           <div>
-            <div className="flex items-center gap-2 text-yellow-600 font-black text-xs uppercase tracking-widest mb-2">
+            <div className="flex items-center gap-2 text-yellow-700 dark:text-yellow-400 font-black text-xs uppercase tracking-widest mb-2">
               <Calculator size={16} /> Interactive Tools & Utilities
             </div>
             <h3 className={`text-2xl font-black ${darkMode ? 'text-white' : 'text-slate-900'}`}>
@@ -197,6 +198,7 @@ const HubPage: React.FC<HubPageProps> = ({ darkMode }) => {
             </p>
           </div>
           <Link
+
             to="/tools/pdf-size-calculator"
             className="flex-shrink-0 px-6 py-3.5 bg-yellow-500 hover:bg-yellow-400 text-slate-950 font-black text-sm rounded-2xl shadow-lg transition-all"
           >

@@ -4,14 +4,13 @@
 
 services:
   # ----------------------------------------------------------------------------
-  # 1. Frontend Static Site (React / Vite)
+  # 1. Frontend Static Site (React 19 / Vite)
   # ----------------------------------------------------------------------------
-  - type: static
+  - type: web
     name: pdfbolt-web
-    repo: https://github.com/kanishka-iot-ai/PDFBolt.git
-    branch: main
+    env: static
     buildCommand: npm install && npm run build
-    staticPublishPath: dist
+    staticPublishPath: ./dist
     routes:
       - type: rewrite
         source: /*
@@ -27,22 +26,20 @@ services:
         value: "false"
 
   # ----------------------------------------------------------------------------
-  # 2. Backend Processing Engine (FastAPI)
+  # 2. Backend Processing Engine (FastAPI Docker)
   # ----------------------------------------------------------------------------
   - type: web
     name: pdfbolt-api
-    repo: https://github.com/kanishka-iot-ai/PDFBolt.git
-    branch: main
     env: docker
     dockerfilePath: ./Dockerfile.api
     region: oregon
     plan: standard
-    healthCheckPath: /api/v1/health
+    healthCheckPath: /health
     envVars:
       - key: APP_ENV
         value: production
       - key: DEBUG
-        value: false
+        value: "false"
       - key: STORAGE_BACKEND
         value: local
       - key: CORS_ORIGINS
@@ -57,3 +54,4 @@ services:
         value: "300"
       - key: SIGNED_URL_TTL_SECONDS
         value: "900"
+

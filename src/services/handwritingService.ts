@@ -1,4 +1,3 @@
-// Dynamic processing engines imported on-demand inside methods
 import {
   HandwritingPage,
   PDFDesignSettings,
@@ -6,6 +5,8 @@ import {
   ConfidenceTier
 } from '../types/handwriting';
 import { API_BASE_URL } from './apiClient';
+import { loadOpenCV } from './openCVLoader';
+
 
 
 
@@ -170,11 +171,24 @@ export async function processCameraCapture(dataUrl: string, pageNumber: number):
  * Uses OpenCV if loaded on window, otherwise fast 2D canvas adaptive thresholding.
  */
 export async function enhanceImageCanvas(sourceCanvas: HTMLCanvasElement): Promise<string> {
-  const cv = (window as any).cv;
+  let cv = (window as any).cv;
 
-  if (cv) {
+  if (!cv || !cv.Mat) {
+    try {
+      await Promise.race([
+        loadOpenCV(),
+        new Promise((_, reject) => setTimeout(() => reject('timeout'), 2500))
+      ]);
+      cv = (window as any).cv;
+    } catch (e) {
+      // Continue to canvas fallback
+    }
+  }
+
+  if (cv && cv.Mat) {
     try {
       let src = cv.imread(sourceCanvas);
+
       let dst = new cv.Mat();
 
       try {

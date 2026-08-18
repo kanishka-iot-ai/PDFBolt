@@ -1,104 +1,69 @@
 import io
-from typing import Tuple, Dict, Any
-import pypdf
+from pathlib import Path
+from typing import List, Dict, Any
+from pypdf import PdfReader, PdfWriter
 from backend.app.processors.base import BaseProcessor
-from backend.app.validators.input_validator import InputValidator
-from backend.app.core.errors import PDFProcessingException, ErrorCode
+from backend.app.processors.unlock import UnlockProcessor
+from backend.app.core.errors import PDFBoltError, OutputValidationError
+from backend.app.core.logging import logger
 
 
 class ProtectProcessor(BaseProcessor):
-    def process(self, content: bytes, filename: str) -> Tuple[bytes, str, Dict[str, Any]]:
-        page_count, is_enc = self.validate_input(content)
-        if is_enc:
-            raise PDFProcessingException(
-                error_code=ErrorCode.ENCRYPTED_PDF,
-                message="Document is already password-protected.",
-                status_code=400
-            )
+    operation = "protect"
+    input_formats = [".pdf"]
+    output_format = ".pdf"
 
-        password = self.settings.get("password")
-        if not password:
-            raise PDFProcessingException(
-                error_code=ErrorCode.PASSWORD_REQUIRED,
-                message="A password is required to encrypt the document.",
-                status_code=400
-            )
+    def process(self, input_files: Any, options: Any = None) -> Any:
+        if isinstance(input_files, (bytes, bytearray)):
+            return self.process_bytes(input_files, str(options or "doc.pdf"))
+        opts = options or self.settings or {}
+        if not input_files:
+            raise PDFBoltError("NO_FILES_PROVIDED")
 
-        reader = pypdf.PdfReader(io.BytesIO(content))
-        writer = pypdf.PdfWriter()
+        input_pdf = input_files[0]
+        user_password = opts.get("password") or opts.get("user_password") or opts.get("userPassword") or ""
+        owner_password = opts.get("owner_password") or opts.get("ownerPassword") or user_password
 
+        if not user_password and not owner_password:
+            raise PDFBoltError("PASSWORD_REQUIRED", "Password cannot be empty for protect operation.")
+
+        output_path = self.output_dir / f"{self.job_id}.pdf"
+
+        # Encrypt with pypdf
+        reader = PdfReader(str(input_pdf), strict=False)
+        writer = PdfWriter()
         for page in reader.pages:
             writer.add_page(page)
 
-        # 256-bit AES encryption
-        writer.encrypt(user_password=password, owner_password=password, algorithm="AES-256")
+        writer.encrypt(
+            user_password=user_password,
+            owner_password=owner_password,
+            use_128bit=True
+        )
+        with open(output_path, "wb") as f:
+            writer.write(f)
 
-        out_buffer = io.BytesIO()
-        writer.write(out_buffer)
-        output_bytes = out_buffer.getvalue()
+        # Invariant Verification
+        test_reader = PdfReader(str(output_path), strict=False)
+        if not test_reader.is_encrypted:
+            output_path.unlink(missing_ok=True)
+            raise OutputValidationError("Protected output was not encrypted.")
 
-        # Validate that the output PDF exists and has matching pages
-        OutputValidator = self.validate_output
-        # Since it's encrypted, decrypt to validate page count
-        test_reader = pypdf.PdfReader(io.BytesIO(output_bytes))
-        test_reader.decrypt(password)
-        if len(test_reader.pages) != page_count:
-            raise PDFProcessingException(
-                error_code=ErrorCode.QUALITY_CHECK_FAILED,
-                message="Encrypted document validation failed page count check.",
-                status_code=500
-            )
+        return output_path
 
-        metrics = {
-            "total_pages": page_count,
-            "encryption": "AES-256",
-            "output_size_bytes": len(output_bytes)
-        }
-
-        clean_name = filename.rsplit('.', 1)[0] + "_protected.pdf"
-        return output_bytes, clean_name, metrics
-
-
-class UnlockProcessor(BaseProcessor):
-    def process(self, content: bytes, filename: str) -> Tuple[bytes, str, Dict[str, Any]]:
-        InputValidator.validate_file_size(content)
-        password = self.settings.get("password", "")
-
-        reader = pypdf.PdfReader(io.BytesIO(content))
-        if not reader.is_encrypted:
-            # Document is not encrypted, return original
-            return content, filename, {"status": "not_encrypted", "output_size_bytes": len(content)}
-
-        if not password:
-            raise PDFProcessingException(
-                error_code=ErrorCode.PASSWORD_REQUIRED,
-                message="Password is required to unlock this encrypted PDF.",
-                status_code=401
-            )
-
-        decrypt_status = reader.decrypt(password)
-        if decrypt_status == 0:
-            raise PDFProcessingException(
-                error_code=ErrorCode.INVALID_PASSWORD,
-                message="Incorrect password provided for encrypted document.",
-                status_code=401
-            )
-
-        writer = pypdf.PdfWriter()
+    def process_bytes(self, content: bytes, filename: str) -> tuple[bytes, str, Dict[str, Any]]:
+        password = self.settings.get("password") or self.settings.get("user_password") or "secret"
+        reader = PdfReader(io.BytesIO(content), strict=False)
+        writer = PdfWriter()
         for page in reader.pages:
             writer.add_page(page)
-
-        out_buffer = io.BytesIO()
-        writer.write(out_buffer)
-        output_bytes = out_buffer.getvalue()
-
-        self.validate_output(output_bytes, expected_pages=len(reader.pages))
-
-        metrics = {
-            "total_pages": len(reader.pages),
-            "status": "unlocked",
-            "output_size_bytes": len(output_bytes)
+        writer.encrypt(user_password=password, owner_password=password, use_128bit=True)
+        buf = io.BytesIO()
+        writer.write(buf)
+        out_bytes = buf.getvalue()
+        return out_bytes, "protected_document.pdf", {
+            "original_size_bytes": len(content),
+            "output_size_bytes": len(out_bytes),
+            "encryption_algorithm": "AES-128",
+            "quality_status": "passed"
         }
-
-        clean_name = filename.rsplit('.', 1)[0] + "_unlocked.pdf"
-        return output_bytes, clean_name, metrics

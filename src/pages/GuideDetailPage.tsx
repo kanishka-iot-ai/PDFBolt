@@ -106,21 +106,21 @@ const GuideDetailPage: React.FC<GuideDetailPageProps> = ({ darkMode }) => {
       <article className="max-w-4xl mx-auto px-6 pt-12">
         {/* Breadcrumb Navigation */}
         <nav className="flex items-center gap-2 text-xs font-semibold mb-6 text-slate-500">
-          <Link to="/" className="hover:text-yellow-500 transition-colors">Home</Link>
+          <Link to="/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Home</Link>
           <span>/</span>
-          <Link to="/guides" className="hover:text-yellow-500 transition-colors">Guides</Link>
+          <Link to="/guides" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Guides</Link>
           <span>/</span>
-          <span className="text-yellow-500 font-bold truncate max-w-xs">{guide.title}</span>
+          <span className="text-yellow-700 dark:text-yellow-400 font-bold truncate max-w-xs">{guide.title}</span>
         </nav>
 
         <div className="flex items-center gap-3 mb-4">
-          <span className="text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full bg-yellow-500/10 text-yellow-600 dark:text-yellow-400">
+          <span className="text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full bg-yellow-500/10 text-yellow-700 dark:text-yellow-400">
             {guide.category}
           </span>
-          <span className="text-xs font-semibold text-slate-400 flex items-center gap-1">
+          <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-1">
             <Clock size={12} /> {guide.readTime}
           </span>
-          <span className="text-xs font-semibold text-slate-400">
+          <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
             Updated on {guide.updatedAt}
           </span>
         </div>
@@ -151,7 +151,7 @@ const GuideDetailPage: React.FC<GuideDetailPageProps> = ({ darkMode }) => {
             darkMode ? 'bg-gradient-to-r from-slate-900 to-slate-800 border-yellow-500/30' : 'bg-gradient-to-r from-yellow-50 to-amber-50 border-yellow-200 shadow-sm'
           }`}>
             <div>
-              <span className="text-[10px] font-black uppercase tracking-widest text-yellow-600 dark:text-yellow-400">
+              <span className="text-[10px] font-black uppercase tracking-widest text-yellow-700 dark:text-yellow-400">
                 Official Web Tool
               </span>
               <h3 className={`text-xl font-black mt-1 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
@@ -169,6 +169,7 @@ const GuideDetailPage: React.FC<GuideDetailPageProps> = ({ darkMode }) => {
             </Link>
           </div>
         )}
+
 
         {/* Step-by-Step Instructions */}
         <section className="mb-12">
@@ -264,11 +265,12 @@ const GuideDetailPage: React.FC<GuideDetailPageProps> = ({ darkMode }) => {
                   darkMode ? 'bg-slate-800/30 border-slate-800' : 'bg-white border-slate-200 shadow-sm'
                 }`}
               >
-                <span className="text-[10px] font-bold uppercase text-yellow-500">{rg.category}</span>
+                <span className="text-[10px] font-bold uppercase text-yellow-700 dark:text-yellow-400">{rg.category}</span>
                 <h3 className={`font-bold text-base mt-1 mb-1 ${darkMode ? 'text-white' : 'text-slate-900'}`}>{rg.title}</h3>
-                <span className="inline-flex items-center gap-1 text-xs font-bold text-yellow-500">Read Guide <ArrowRight size={12} /></span>
+                <span className="inline-flex items-center gap-1 text-xs font-bold text-yellow-700 dark:text-yellow-400">Read Guide <ArrowRight size={12} /></span>
               </Link>
             ))}
+
           </div>
         </section>
       </article>

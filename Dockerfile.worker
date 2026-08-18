@@ -1,48 +1,40 @@
-# ==============================================================================
-# PDFBolt Production Document Worker Container (Google Cloud Run Worker Pool)
-# Includes Mature Document Processing Engines (qpdf, tesseract, ghostscript, libreoffice)
-# ==============================================================================
+FROM python:3.11-slim AS worker
+WORKDIR /app
 
-FROM python:3.11-slim AS worker-base
-
-ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1 \
-    APP_ENV=production
-
-# Install mature system document engines & fonts
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    curl \
+    ghostscript \
     qpdf \
     tesseract-ocr \
     tesseract-ocr-eng \
-    ghostscript \
-    libreoffice-nogui \
+    poppler-utils \
+    imagemagick \
+    libmagic1 \
+    libreoffice \
     libreoffice-writer \
     libreoffice-calc \
     libreoffice-impress \
+    python3-opencv \
     fonts-liberation \
-    fonts-dejavu-core \
-    libmagic1 \
+    curl \
+    && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Create unprivileged worker user
-RUN addgroup --system --gid 10002 pdfworker && \
-    adduser --system --uid 10002 --ingroup pdfworker --no-create-home pdfworker
+RUN groupadd -r pdfbolt && \
+    useradd -r -g pdfbolt -u 1001 pdfbolt && \
+    mkdir -p /tmp/pdfbolt && \
+    chown -R pdfbolt:pdfbolt /tmp/pdfbolt && \
+    chown -R pdfbolt:pdfbolt /app
 
-WORKDIR /app
+COPY backend/requirements.txt requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Install Python requirements
-COPY requirements.txt /app/requirements.txt
-RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt
+COPY --chown=pdfbolt:pdfbolt backend/ .
 
-# Copy source code
-COPY backend /app/backend
+USER pdfbolt
 
-# Create working directory
-RUN mkdir -p /app/backend/storage && \
-    chown -R pdfworker:pdfworker /app
-
-USER pdfworker:pdfworker
+ENV PYTHONUNBUFFERED=1
+ENV TEMP_DIR=/tmp/pdfbolt
+ENV STORAGE_BACKEND=local
+ENV QUEUE_BACKEND=local
 
 CMD ["python", "-m", "backend.app.main"]

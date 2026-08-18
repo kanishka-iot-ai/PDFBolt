@@ -77,15 +77,6 @@ const HandwritingTool: React.FC<HandwritingToolProps> = ({ darkMode, notify }) =
   // Hidden file input ref for incremental addition
   const uploadInputRef = useRef<HTMLInputElement>(null);
 
-  // Load OpenCV.js dynamically for client preprocessing
-  useEffect(() => {
-    if (!(window as any).cv) {
-      const script = document.createElement('script');
-      script.src = '/lib/opencv.js';
-      script.async = true;
-      document.body.appendChild(script);
-    }
-  }, []);
 
   // ----------------------------------------------------
   // 1. INPUT HANDLERS (Files & Camera)

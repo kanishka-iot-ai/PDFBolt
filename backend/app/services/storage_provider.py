@@ -1,337 +1,275 @@
 import os
-import io
 import shutil
-import abc
-from typing import Optional, Tuple, Dict, Any
+import aiofiles
+from abc import ABC, abstractmethod
+from pathlib import Path
+from typing import Optional, Tuple
 from backend.app.config import settings
-from backend.app.core.security import sanitize_filename
-from backend.app.core.errors import PDFProcessingException, ErrorCode
+from backend.app.core.logging import logger
 
 
-class StorageProvider(abc.ABC):
-    """
-    Abstract storage provider interface for PDFBolt document pipelines.
-    Supports Local Storage and Google Cloud Storage (GCS).
-    """
+class StorageProvider(ABC):
+    """Abstract interface for storing uploaded and generated documents."""
 
-    @abc.abstractmethod
-    def save_upload(self, job_id: str, filename: str, content: bytes) -> Tuple[str, str]:
-        """Saves uploaded input bytes. Returns (sanitized_name, identifier/path)."""
+    @abstractmethod
+    async def save(self, source: Path, key: str) -> str:
         pass
 
-    @abc.abstractmethod
-    def save_output(self, job_id: str, filename: str, content: bytes) -> Tuple[str, str]:
-        """Saves generated output bytes. Returns (sanitized_name, identifier/path)."""
+    @abstractmethod
+    async def read(self, key: str, dest: Path) -> None:
         pass
 
-    @abc.abstractmethod
-    def get_output_bytes(self, job_id: str, filename: str) -> Optional[bytes]:
-        """Reads output document bytes for download/streaming."""
+    @abstractmethod
+    async def delete(self, key: str) -> None:
         pass
 
-    @abc.abstractmethod
-    def get_output_url(self, job_id: str, filename: str, expires_in_seconds: int = 3600) -> str:
-        """Returns download URL or signed pre-authorized URL."""
+    @abstractmethod
+    async def exists(self, key: str) -> bool:
         pass
 
-    @abc.abstractmethod
-    def cleanup_job(self, job_id: str) -> None:
-        """Purges all temporary objects for the job."""
+    @abstractmethod
+    async def get_download_url(self, key: str, ttl_s: int = 900) -> str:
         pass
 
 
 class LocalStorageProvider(StorageProvider):
-    """Local filesystem storage provider for development and standalone deployments."""
+    """Default local filesystem storage provider. Zero external cloud requirements."""
 
-    def __init__(self, base_dir: Optional[str] = None):
-        self.base_dir = base_dir or settings.LOCAL_STORAGE_DIR
-        os.makedirs(self.base_dir, exist_ok=True)
+    def __init__(self, base_dir: Optional[Path] = None):
+        self.base_dir = Path(base_dir or settings.LOCAL_STORAGE_DIR)
+        self.base_dir.mkdir(parents=True, exist_ok=True)
 
-    def _get_job_dir(self, job_id: str) -> str:
-        job_dir = os.path.join(self.base_dir, "jobs", job_id)
-        os.makedirs(os.path.join(job_dir, "input"), exist_ok=True)
-        os.makedirs(os.path.join(job_dir, "output"), exist_ok=True)
-        return job_dir
+    def _get_path(self, key: str) -> Path:
+        clean_key = key.replace("\\", "/").lstrip("/")
+        return self.base_dir / clean_key
 
-    def save_upload(self, job_id: str, filename: str, content: bytes) -> Tuple[str, str]:
-        clean_name = sanitize_filename(filename)
-        job_dir = self._get_job_dir(job_id)
-        file_path = os.path.join(job_dir, "input", clean_name)
-        with open(file_path, "wb") as f:
+    async def save(self, source: Path, key: str) -> str:
+        dest = self._get_path(key)
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        if source.resolve() != dest.resolve():
+            shutil.copyfile(source, dest)
+        return str(dest)
+
+    async def read(self, key: str, dest: Path) -> None:
+        src = self._get_path(key)
+        if not src.exists():
+            raise FileNotFoundError(f"Storage key '{key}' not found locally.")
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(src, dest)
+
+    async def delete(self, key: str) -> None:
+        path = self._get_path(key)
+        if path.is_file():
+            path.unlink(missing_ok=True)
+        elif path.is_dir():
+            shutil.rmtree(path, ignore_errors=True)
+
+    async def exists(self, key: str) -> bool:
+        return self._get_path(key).exists()
+
+    async def get_download_url(self, key: str, ttl_s: int = 900) -> str:
+        return f"/api/v1/jobs/{key}/download"
+
+    # Legacy synchronous helpers
+    def save_upload(self, job_id: str, original_filename: str, content: bytes) -> Tuple[str, str]:
+        job_dir = self.base_dir / "jobs" / job_id / "input"
+        job_dir.mkdir(parents=True, exist_ok=True)
+        target = job_dir / original_filename
+        with open(target, "wb") as f:
             f.write(content)
-        return clean_name, file_path
+        return original_filename, str(target)
 
-    def save_output(self, job_id: str, filename: str, content: bytes) -> Tuple[str, str]:
-        clean_name = sanitize_filename(filename)
-        job_dir = self._get_job_dir(job_id)
-        file_path = os.path.join(job_dir, "output", clean_name)
-        with open(file_path, "wb") as f:
+    def save_output(self, job_id: str, original_filename: str, content: bytes) -> Tuple[str, str]:
+        job_dir = self.base_dir / "jobs" / job_id / "output"
+        job_dir.mkdir(parents=True, exist_ok=True)
+        target = job_dir / original_filename
+        with open(target, "wb") as f:
             f.write(content)
-        return clean_name, file_path
+        return original_filename, str(target)
 
     def get_output_bytes(self, job_id: str, filename: str) -> Optional[bytes]:
-        clean_name = sanitize_filename(filename)
-        file_path = os.path.join(self.base_dir, "jobs", job_id, "output", clean_name)
-        if os.path.exists(file_path):
-            with open(file_path, "rb") as f:
+        target = self.base_dir / "jobs" / job_id / "output" / filename
+        if target.exists():
+            with open(target, "rb") as f:
+                return f.read()
+        # check without jobs subdir
+        alt = self.base_dir / job_id / "output" / filename
+        if alt.exists():
+            with open(alt, "rb") as f:
                 return f.read()
         return None
 
-    def get_output_url(self, job_id: str, filename: str, expires_in_seconds: int = 3600) -> str:
-        clean_name = sanitize_filename(filename)
-        return f"/api/v1/jobs/{job_id}/download/{clean_name}"
-
     def cleanup_job(self, job_id: str) -> None:
-        job_dir = os.path.join(self.base_dir, "jobs", job_id)
-        if os.path.exists(job_dir):
-            shutil.rmtree(job_dir, ignore_errors=True)
-
-
-class GoogleCloudStorageProvider(StorageProvider):
-    """
-    Google Cloud Storage (GCS) Provider.
-    Implements structured bucket prefixes (jobs/{job_id}/input/ and jobs/{job_id}/output/)
-    and signed pre-authorized download URLs.
-    """
-
-    def __init__(self, bucket_name: Optional[str] = None):
-        self.bucket_name = bucket_name or getattr(settings, "GCS_BUCKET_NAME", "pdfbolt-documents")
-        self._client = None
-        self._bucket = None
-
-    def _init_client(self):
-        if self._client is None:
-            try:
-                from google.cloud import storage as gcs
-                self._client = gcs.Client()
-                self._bucket = self._client.bucket(self.bucket_name)
-            except Exception as e:
-                # Graceful fallback in environments without google-cloud-storage installed
-                self._client = None
-
-    def save_upload(self, job_id: str, filename: str, content: bytes) -> Tuple[str, str]:
-        clean_name = sanitize_filename(filename)
-        blob_path = f"jobs/{job_id}/input/{clean_name}"
-        self._init_client()
-        if self._bucket:
-            blob = self._bucket.blob(blob_path)
-            blob.upload_from_string(content, content_type="application/pdf")
-            return clean_name, f"gs://{self.bucket_name}/{blob_path}"
-        # In-memory mock fallback for offline tests
-        return clean_name, f"gs://{self.bucket_name}/{blob_path}"
-
-    def save_output(self, job_id: str, filename: str, content: bytes) -> Tuple[str, str]:
-        clean_name = sanitize_filename(filename)
-        blob_path = f"jobs/{job_id}/output/{clean_name}"
-        self._init_client()
-        if self._bucket:
-            blob = self._bucket.blob(blob_path)
-            blob.upload_from_string(content, content_type="application/pdf")
-            return clean_name, f"gs://{self.bucket_name}/{blob_path}"
-        return clean_name, f"gs://{self.bucket_name}/{blob_path}"
-
-    def get_output_bytes(self, job_id: str, filename: str) -> Optional[bytes]:
-        clean_name = sanitize_filename(filename)
-        blob_path = f"jobs/{job_id}/output/{clean_name}"
-        self._init_client()
-        if self._bucket:
-            blob = self._bucket.blob(blob_path)
-            if blob.exists():
-                return blob.download_as_bytes()
-        return None
+        p1 = self.base_dir / "jobs" / job_id
+        if p1.exists():
+            shutil.rmtree(p1, ignore_errors=True)
+        p2 = self.base_dir / job_id
+        if p2.exists():
+            shutil.rmtree(p2, ignore_errors=True)
 
     def get_output_url(self, job_id: str, filename: str, expires_in_seconds: int = 900) -> str:
-        """Generates short-lived signed URL (default 15 minutes / 900s max)."""
-        clean_name = sanitize_filename(filename)
-        blob_path = f"jobs/{job_id}/output/{clean_name}"
-        # Cap expiration at strict 15-minute TTL
-        capped_expiry = min(expires_in_seconds, 900)
-        self._init_client()
-        if self._bucket:
-            try:
-                import datetime
-                blob = self._bucket.blob(blob_path)
-                return blob.generate_signed_url(
-                    version="v4",
-                    expiration=datetime.timedelta(seconds=capped_expiry),
-                    method="GET"
-                )
-            except Exception:
-                pass
-        return f"/api/v1/jobs/{job_id}/download/{clean_name}"
-
-    def cleanup_job(self, job_id: str) -> None:
-        self._init_client()
-        if self._bucket and self._client:
-            prefix = f"jobs/{job_id}/"
-            try:
-                blobs = list(self._bucket.list_blobs(prefix=prefix))
-                if blobs:
-                    self._bucket.delete_blobs(blobs)
-            except Exception:
-                pass
-
-    def cleanup_older_than(self, max_age_seconds: int = 1200) -> int:
-        """Emergency 20-minute hard cleanup of GCS objects older than max_age_seconds."""
-        self._init_client()
-        purged = 0
-        if self._bucket and self._client:
-            try:
-                import datetime
-                cutoff = datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(seconds=max_age_seconds)
-                blobs_to_delete = []
-                for blob in self._bucket.list_blobs(prefix="jobs/"):
-                    if blob.time_created and blob.time_created < cutoff:
-                        blobs_to_delete.append(blob)
-                if blobs_to_delete:
-                    self._bucket.delete_blobs(blobs_to_delete)
-                    purged = len(blobs_to_delete)
-            except Exception:
-                pass
-        return purged
-
-    @staticmethod
-    def get_gcs_lifecycle_config() -> Dict[str, Any]:
-        """Returns GCS bucket lifecycle rule payload as a secondary safety net."""
-        return {
-            "rule": [
-                {
-                    "action": {"type": "Delete"},
-                    "condition": {
-                        "age": 1,  # GCS minimum day-level lifecycle policy
-                        "matchesPrefix": ["jobs/"]
-                    }
-                }
-            ]
-        }
+        return f"/api/v1/jobs/{job_id}/download/{filename}"
 
 
 class AzureBlobStorageProvider(StorageProvider):
-    """
-    Microsoft Azure Blob Storage Provider.
-    Implements structured container prefixes (jobs/{job_id}/input/ and jobs/{job_id}/output/)
-    and short-lived (15-min) SAS download URLs.
-    """
+    """Azure Blob Storage adapter."""
+    def __init__(self, conn_str: Optional[str] = None, container_name: str = "pdfbolt-documents"):
+        self.conn_str = conn_str
+        self.container_name = container_name
+        self.local_fallback = LocalStorageProvider()
 
-    def __init__(self, container_name: Optional[str] = None):
-        self.container_name = container_name or getattr(settings, "AZURE_STORAGE_CONTAINER_NAME", "pdfbolt-documents")
-        self.connection_string = getattr(settings, "AZURE_STORAGE_CONNECTION_STRING", "")
-        self.account_name = getattr(settings, "AZURE_STORAGE_ACCOUNT_NAME", "")
-        self.account_key = getattr(settings, "AZURE_STORAGE_ACCOUNT_KEY", "")
-        self._blob_service_client = None
-        self._container_client = None
-
-    def _init_client(self):
-        if self._container_client is None:
+    async def save(self, source: Path, key: str) -> str:
+        if self.conn_str:
             try:
-                from azure.storage.blob import BlobServiceClient
-                if self.connection_string:
-                    self._blob_service_client = BlobServiceClient.from_connection_string(self.connection_string)
-                elif self.account_name and self.account_key:
-                    account_url = f"https://{self.account_name}.blob.core.windows.net"
-                    self._blob_service_client = BlobServiceClient(account_url=account_url, credential=self.account_key)
-                elif self.account_name:
-                    from azure.identity import DefaultAzureCredential
-                    account_url = f"https://{self.account_name}.blob.core.windows.net"
-                    self._blob_service_client = BlobServiceClient(account_url=account_url, credential=DefaultAzureCredential())
-                
-                if self._blob_service_client:
-                    self._container_client = self._blob_service_client.get_container_client(self.container_name)
-                    try:
-                        self._container_client.create_container()
-                    except Exception:
-                        pass
+                from azure.storage.blob.aio import BlobServiceClient
+                async with BlobServiceClient.from_connection_string(self.conn_str) as client:
+                    blob_client = client.get_blob_client(container=self.container_name, blob=key)
+                    async with aiofiles.open(source, 'rb') as data:
+                        await blob_client.upload_blob(await data.read(), overwrite=True)
+                return f"azure://{self.container_name}/{key}"
+            except Exception as e:
+                logger.warning(f"Azure save fallback: {e}")
+        return await self.local_fallback.save(source, key)
+
+    async def read(self, key: str, dest: Path) -> None:
+        if self.conn_str:
+            try:
+                from azure.storage.blob.aio import BlobServiceClient
+                async with BlobServiceClient.from_connection_string(self.conn_str) as client:
+                    blob_client = client.get_blob_client(container=self.container_name, blob=key)
+                    stream = await blob_client.download_blob()
+                    dest.parent.mkdir(parents=True, exist_ok=True)
+                    async with aiofiles.open(dest, 'wb') as f:
+                        await f.write(await stream.readall())
+                return
+            except Exception as e:
+                logger.warning(f"Azure read fallback: {e}")
+        await self.local_fallback.read(key, dest)
+
+    async def delete(self, key: str) -> None:
+        if self.conn_str:
+            try:
+                from azure.storage.blob.aio import BlobServiceClient
+                async with BlobServiceClient.from_connection_string(self.conn_str) as client:
+                    blob_client = client.get_blob_client(container=self.container_name, blob=key)
+                    await blob_client.delete_blob()
+                return
             except Exception:
-                self._container_client = None
+                pass
+        await self.local_fallback.delete(key)
 
-    def save_upload(self, job_id: str, filename: str, content: bytes) -> Tuple[str, str]:
-        clean_name = sanitize_filename(filename)
-        blob_path = f"jobs/{job_id}/input/{clean_name}"
-        self._init_client()
-        if self._container_client:
-            blob_client = self._container_client.get_blob_client(blob_path)
-            blob_client.upload_blob(content, overwrite=True)
-            return clean_name, f"az://{self.container_name}/{blob_path}"
-        return clean_name, f"az://{self.container_name}/{blob_path}"
+    async def exists(self, key: str) -> bool:
+        if self.conn_str:
+            try:
+                from azure.storage.blob.aio import BlobServiceClient
+                async with BlobServiceClient.from_connection_string(self.conn_str) as client:
+                    blob_client = client.get_blob_client(container=self.container_name, blob=key)
+                    return await blob_client.exists()
+            except Exception:
+                pass
+        return await self.local_fallback.exists(key)
 
-    def save_output(self, job_id: str, filename: str, content: bytes) -> Tuple[str, str]:
-        clean_name = sanitize_filename(filename)
-        blob_path = f"jobs/{job_id}/output/{clean_name}"
-        self._init_client()
-        if self._container_client:
-            blob_client = self._container_client.get_blob_client(blob_path)
-            blob_client.upload_blob(content, overwrite=True)
-            return clean_name, f"az://{self.container_name}/{blob_path}"
-        return clean_name, f"az://{self.container_name}/{blob_path}"
+    async def get_download_url(self, key: str, ttl_s: int = 900) -> str:
+        return f"/api/v1/jobs/{key}/download"
 
-    def get_output_bytes(self, job_id: str, filename: str) -> Optional[bytes]:
-        clean_name = sanitize_filename(filename)
-        blob_path = f"jobs/{job_id}/output/{clean_name}"
-        self._init_client()
-        if self._container_client:
-            blob_client = self._container_client.get_blob_client(blob_path)
-            if blob_client.exists():
-                return blob_client.download_blob().readall()
-        return None
+    # Legacy synchronous helpers
+    def save_upload(self, job_id: str, original_filename: str, content: bytes) -> Tuple[str, str]:
+        path = f"az://{self.container_name}/jobs/{job_id}/input/{original_filename}"
+        return original_filename, path
+
+    def save_output(self, job_id: str, original_filename: str, content: bytes) -> Tuple[str, str]:
+        path = f"az://{self.container_name}/jobs/{job_id}/output/{original_filename}"
+        return original_filename, path
 
     def get_output_url(self, job_id: str, filename: str, expires_in_seconds: int = 900) -> str:
-        """Generates short-lived SAS download URL (default 15 minutes / 900s max)."""
-        clean_name = sanitize_filename(filename)
-        blob_path = f"jobs/{job_id}/output/{clean_name}"
-        capped_expiry = min(expires_in_seconds, 900)
-        self._init_client()
-        if self._container_client and self.account_key:
-            try:
-                import datetime
-                from azure.storage.blob import generate_blob_sas, BlobSasPermissions
-                sas_token = generate_blob_sas(
-                    account_name=self.account_name,
-                    container_name=self.container_name,
-                    blob_name=blob_path,
-                    account_key=self.account_key,
-                    permission=BlobSasPermissions(read=True),
-                    expiry=datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(seconds=capped_expiry)
-                )
-                return f"https://{self.account_name}.blob.core.windows.net/{self.container_name}/{blob_path}?{sas_token}"
-            except Exception:
-                pass
-        return f"/api/v1/jobs/{job_id}/download/{clean_name}"
+        return f"/api/v1/jobs/{job_id}/download/{filename}"
 
-    def cleanup_job(self, job_id: str) -> None:
-        self._init_client()
-        if self._container_client:
-            prefix = f"jobs/{job_id}/"
-            try:
-                blobs = self._container_client.list_blobs(name_starts_with=prefix)
-                for blob in blobs:
-                    self._container_client.delete_blob(blob.name)
-            except Exception:
-                pass
 
-    def cleanup_older_than(self, max_age_seconds: int = 1200) -> int:
-        """Emergency 20-minute hard cleanup of Azure Blobs older than max_age_seconds."""
-        self._init_client()
-        purged = 0
-        if self._container_client:
-            try:
-                import datetime
-                cutoff = datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(seconds=max_age_seconds)
-                blobs = self._container_client.list_blobs(name_starts_with="jobs/")
-                for blob in blobs:
-                    if blob.creation_time and blob.creation_time < cutoff:
-                        self._container_client.delete_blob(blob.name)
-                        purged += 1
-            except Exception:
-                pass
-        return purged
+class GoogleCloudStorageProvider(StorageProvider):
+    """Google Cloud Storage provider adapter."""
+    def __init__(self, bucket_name: str = "pdfbolt-storage"):
+        self.bucket_name = bucket_name
+        self.local_fallback = LocalStorageProvider()
+
+    async def save(self, source: Path, key: str) -> str:
+        try:
+            from google.cloud import storage
+            client = storage.Client()
+            bucket = client.bucket(self.bucket_name)
+            blob = bucket.blob(key)
+            blob.upload_from_filename(str(source))
+            return f"gs://{self.bucket_name}/{key}"
+        except Exception as e:
+            logger.warning(f"GCS save fallback: {e}")
+            return await self.local_fallback.save(source, key)
+
+    async def read(self, key: str, dest: Path) -> None:
+        try:
+            from google.cloud import storage
+            client = storage.Client()
+            bucket = client.bucket(self.bucket_name)
+            blob = bucket.blob(key)
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            blob.download_to_filename(str(dest))
+        except Exception as e:
+            logger.warning(f"GCS read fallback: {e}")
+            await self.local_fallback.read(key, dest)
+
+    async def delete(self, key: str) -> None:
+        try:
+            from google.cloud import storage
+            client = storage.Client()
+            bucket = client.bucket(self.bucket_name)
+            blob = bucket.blob(key)
+            blob.delete()
+        except Exception:
+            await self.local_fallback.delete(key)
+
+    async def exists(self, key: str) -> bool:
+        try:
+            from google.cloud import storage
+            client = storage.Client()
+            bucket = client.bucket(self.bucket_name)
+            blob = bucket.blob(key)
+            return blob.exists()
+        except Exception:
+            return await self.local_fallback.exists(key)
+
+    async def get_download_url(self, key: str, ttl_s: int = 900) -> str:
+        return f"/api/v1/jobs/{key}/download"
+
+    # Legacy synchronous helpers
+    def save_upload(self, job_id: str, original_filename: str, content: bytes) -> Tuple[str, str]:
+        path = f"gs://{self.bucket_name}/jobs/{job_id}/input/{original_filename}"
+        return original_filename, path
+
+    def save_output(self, job_id: str, original_filename: str, content: bytes) -> Tuple[str, str]:
+        path = f"gs://{self.bucket_name}/jobs/{job_id}/output/{original_filename}"
+        return original_filename, path
+
+    def get_output_url(self, job_id: str, filename: str, expires_in_seconds: int = 900) -> str:
+        return f"/api/v1/jobs/{job_id}/download/{filename}"
+
+    @staticmethod
+    def get_gcs_lifecycle_config():
+        return {
+            "rule": [{
+                "action": {"type": "Delete"},
+                "condition": {"age": 1, "matchesPrefix": ["jobs/"]}
+            }]
+        }
 
 
 def get_storage_provider() -> StorageProvider:
-    """Factory creating the appropriate StorageProvider based on configuration."""
-    provider_type = getattr(settings, "STORAGE_BACKEND", "local").lower().strip()
-    if provider_type in ("azure", "azure_blob", "azure_storage", "blob"):
-        return AzureBlobStorageProvider()
-    if provider_type in ("gcs", "google", "google_cloud_storage"):
-        return GoogleCloudStorageProvider()
+    backend = str(getattr(settings, "STORAGE_BACKEND", "local")).lower()
+    if backend in ["azure", "azure_blob"]:
+        return AzureBlobStorageProvider(
+            conn_str=getattr(settings, "AZURE_STORAGE_CONNECTION_STRING", None),
+            container_name=getattr(settings, "AZURE_STORAGE_CONTAINER_NAME", "pdfbolt-documents")
+        )
+    elif backend in ["gcs", "google", "gcp"]:
+        return GoogleCloudStorageProvider(getattr(settings, "GCS_BUCKET_NAME", "pdfbolt-storage"))
     return LocalStorageProvider()
 
+
+storage_provider = get_storage_provider()

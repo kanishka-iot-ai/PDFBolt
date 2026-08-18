@@ -1,51 +1,42 @@
-# ==============================================================================
-# PDFBolt Production API Container (Google Cloud Run Ready)
-# Optimized for Fast Startup, Minimal Memory Footprint, and Sub-second Latency
-# ==============================================================================
-
 FROM python:3.11-slim AS base
-
-# Prevent Python from writing .pyc files & enable unbuffered stdout
-ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1 \
-    PORT=8000 \
-    APP_ENV=production
-
-# Install essential runtime utilities & libmagic for byte sniffing
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    curl \
-    libmagic1 \
-    && rm -rf /var/lib/apt/lists/*
-
-# Create non-root system user for security compliance (Principle of Least Privilege)
-RUN addgroup --system --gid 10001 pdfbolt && \
-    adduser --system --uid 10001 --ingroup pdfbolt --no-create-home pdfbolt
-
 WORKDIR /app
 
-# Copy dependency requirements
-COPY requirements.txt /app/requirements.txt
+# Install all required system binaries for Ghostscript, QPDF, Tesseract, Poppler, OpenCV
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ghostscript \
+    qpdf \
+    tesseract-ocr \
+    tesseract-ocr-eng \
+    poppler-utils \
+    imagemagick \
+    libmagic1 \
+    python3-opencv \
+    fonts-liberation \
+    fonts-dejavu \
+    curl \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
-# Install dependencies into system Python
-RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt
-
-# Copy backend application code
-COPY backend /app/backend
-
-# Create isolated local storage mount point with appropriate permissions
-RUN mkdir -p /app/backend/storage && \
+# Non-root user (security requirement)
+RUN groupadd -r pdfbolt && \
+    useradd -r -g pdfbolt -u 1001 pdfbolt && \
+    mkdir -p /tmp/pdfbolt && \
+    chown -R pdfbolt:pdfbolt /tmp/pdfbolt && \
     chown -R pdfbolt:pdfbolt /app
 
-# Switch to unprivileged user
-USER pdfbolt:pdfbolt
+COPY backend/requirements.txt requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Cloud Run / Render Container Port
+COPY --chown=pdfbolt:pdfbolt backend/ .
+
+USER pdfbolt
+
+ENV PYTHONUNBUFFERED=1
+ENV TEMP_DIR=/tmp/pdfbolt
+ENV STORAGE_BACKEND=local
+ENV QUEUE_BACKEND=local
 EXPOSE 8000
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:${PORT:-8000}/api/v1/health || exit 1
+CMD ["sh", "-c", "uvicorn backend.app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
 
-# Start Uvicorn production server with dynamic $PORT support
-CMD ["sh", "-c", "exec uvicorn backend.app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
+
