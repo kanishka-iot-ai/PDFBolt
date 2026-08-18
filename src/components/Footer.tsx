@@ -114,17 +114,18 @@ const Footer: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
       <div className="max-w-7xl mx-auto px-6 mt-16 pt-8 border-t border-slate-200 dark:border-slate-800">
         <div className="flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-8">
-            <div className="flex items-center gap-2 text-green-500 dark:text-green-400 text-xs font-black uppercase tracking-widest bg-green-50 dark:bg-green-500/10 px-3 py-1.5 rounded-md">
+            <div className="flex items-center gap-2 text-emerald-800 dark:text-emerald-300 text-xs font-black uppercase tracking-widest bg-emerald-50 dark:bg-emerald-950/40 px-3 py-1.5 rounded-md border border-emerald-600/20">
               <CheckCircle size={14} /> 100% Client-Side Processing
             </div>
             <button
               onClick={() => setShowWipeModal(true)}
-              className="text-xs font-black uppercase tracking-widest text-red-500/70 hover:text-red-500 transition-colors py-1 cursor-pointer"
+              className="text-xs font-black uppercase tracking-widest text-red-700 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 transition-colors py-1 cursor-pointer"
             >
               Wipe Site Data
             </button>
           </div>
-          <p className="text-[10px] font-bold uppercase tracking-widest opacity-60">© {new Date().getFullYear()} PDFBolt. All rights reserved.</p>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-slate-600 dark:text-slate-400">© {new Date().getFullYear()} PDFBolt. All rights reserved.</p>
+
         </div>
       </div>
 

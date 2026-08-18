@@ -45,6 +45,23 @@ export default defineConfig(({ mode }) => {
           drop_debugger: true,
         },
       },
+      modulePreload: {
+        polyfill: false,
+        resolveDependencies: (filename, deps) => {
+          // Never preload heavy processing chunks on landing/initial page load
+          const heavyPatterns = [
+            'jspdf',
+            'pdf-lib',
+            'pdfjs-dist',
+            'docx',
+            'html2canvas',
+            'tesseract',
+            'mammoth',
+            'exceljs'
+          ];
+          return deps.filter(dep => !heavyPatterns.some(pattern => dep.includes(pattern)));
+        },
+      },
       rollupOptions: {
         output: {
           manualChunks: {
@@ -61,6 +78,7 @@ export default defineConfig(({ mode }) => {
       },
       chunkSizeWarningLimit: 1000,
       sourcemap: false,
+
     },
     test: {
       globals: true,

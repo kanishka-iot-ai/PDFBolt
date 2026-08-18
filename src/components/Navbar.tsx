@@ -118,12 +118,13 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
             <img 
               src="/pdfbolt-logo.webp" 
               alt="PDFBolt" 
-              width="150"
-              height="40"
+              width="124"
+              height="100"
               fetchPriority="high"
               decoding="async"
               className="h-9 md:h-10 w-auto object-contain transition-transform duration-300 group-hover:scale-105" 
             />
+
           </Link>
           
           <div className="hidden lg:flex items-center gap-6">

@@ -98,9 +98,10 @@ const Home: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
 
         <div className="max-w-4xl mx-auto px-4 sm:px-6 relative z-10">
           {/* Small Badge */}
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-yellow-500/10 dark:bg-yellow-500/15 border border-yellow-500/30 text-yellow-700 dark:text-yellow-400 font-bold text-[11px] uppercase tracking-widest mb-3 animate-slideDown">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/15 dark:bg-amber-500/20 border border-amber-600/30 dark:border-amber-400/30 text-amber-900 dark:text-amber-300 font-black text-[11px] uppercase tracking-widest mb-3 animate-slideDown">
             <Star size={12} className="fill-current" /> PROFESSIONAL PDF TOOLKIT
           </div>
+
 
           {/* Primary H1 */}
           <h1
