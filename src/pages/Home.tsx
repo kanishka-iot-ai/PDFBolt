@@ -155,9 +155,10 @@ const Home: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
             </div>
 
             {/* Quick Pill Suggestions */}
-            <div className="flex items-center justify-center gap-1.5 sm:gap-2 mt-2.5 flex-wrap text-xs text-slate-400">
-              <span className="hidden sm:inline font-medium text-slate-400">Try:</span>
+            <div className="flex items-center justify-center gap-1.5 sm:gap-2 mt-2.5 flex-wrap text-xs text-slate-600 dark:text-slate-400">
+              <span className="hidden sm:inline font-bold text-slate-600 dark:text-slate-400">Try:</span>
               {['Merge PDF', 'Compress PDF', 'PDF to Word', 'Protect PDF'].map(suggestion => (
+
                 <button
                   key={suggestion}
                   type="button"
