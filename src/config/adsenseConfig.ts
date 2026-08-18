@@ -15,19 +15,20 @@ export interface AdPlacementConfig {
 
 // Global Environment Configuration
 export const getAdSenseClient = (): string => {
-  return (import.meta.env.VITE_ADSENSE_CLIENT || '').trim();
+  return (import.meta.env.VITE_ADSENSE_CLIENT || 'ca-pub-9225330373068045').trim();
 };
 
 export const isAdsEnabled = (): boolean => {
   const envVal = (import.meta.env.VITE_ADS_ENABLED || '').toString().toLowerCase().trim();
   const client = getAdSenseClient();
   
-  // Enabled only if explicitly set to true and a client ID is provided
-  if (envVal === 'true' || envVal === '1') {
-    return client.length > 0;
+  // Enabled if set to true, or enabled by default in production with valid client
+  if (envVal === 'false' || envVal === '0') {
+    return false;
   }
-  return false;
+  return client.length > 0;
 };
+
 
 export const isAdTestMode = (): boolean => {
   const testVal = (import.meta.env.VITE_ADSENSE_TEST_MODE || '').toString().toLowerCase().trim();
