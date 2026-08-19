@@ -7,7 +7,8 @@ python-multipart>=0.0.9,<1.0.0
 # PDF & Document Processing Engines
 pypdf>=4.1.0,<5.0.0
 pymupdf>=1.24.0,<2.0.0
-pikepdf>=8.12.0,<10.0.0; sys_platform != "win32" or python_version < "3.14"
+pikepdf>=8.12.0
+
 pdfplumber>=0.10.3,<1.0.0
 pdf2docx>=0.5.13,<1.0.0
 reportlab>=4.1.0,<5.0.0

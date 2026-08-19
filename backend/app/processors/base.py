@@ -99,10 +99,13 @@ class BaseProcessor(ABC):
 
     def _validate_input(self, path: Path) -> None:
         """Validate file exists, is readable, magic bytes correct."""
+        if not path.exists() or path.stat().st_size == 0:
+            raise PDFBoltError("FILE_EMPTY")
+        if self.operation == "repair":
+            return
         if self.input_formats == [".pdf"]:
             validate_pdf_file(path)
-        elif not path.exists() or path.stat().st_size == 0:
-            raise PDFBoltError("FILE_EMPTY")
+
 
     def _validate_output(self, path: Path) -> None:
         """Validate output file is real, correct, and non-empty."""

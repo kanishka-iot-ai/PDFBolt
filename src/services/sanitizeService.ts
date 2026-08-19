@@ -120,7 +120,7 @@ export async function repairPdf(file: File): Promise<Uint8Array> {
                 canvas.height = viewport.height;
                 await page.render({ canvasContext: ctx, viewport }).promise;
 
-                const imgData = canvas.toDataURL('image/jpeg', 0.92);
+                const imgData = canvas.toDataURL('image/jpeg', 0.95);
                 const imgBytes = await fetch(imgData).then(res => res.arrayBuffer());
                 const jpgImage = await newPdf.embedJpg(imgBytes);
 
@@ -140,87 +140,11 @@ export async function repairPdf(file: File): Promise<Uint8Array> {
             return await newPdf.save();
         }
     } catch (e) {
-        // Continue to Tier 4
+        // Fallback to backend deep recovery
     }
 
-    // Tier 4: Direct Binary Stream Text & Content Extractor & Rebuilder
-    try {
-        const textDecoder = new TextDecoder('latin1');
-        const fullString = textDecoder.decode(rawBytes);
-
-        const extractedLines: string[] = [];
-
-        // 1. Extract Tj strings: (text) Tj
-        const tjRegex = /\(([^)]+)\)\s*Tj/g;
-        let match;
-        while ((match = tjRegex.exec(fullString)) !== null) {
-            const s = match[1].trim();
-            if (s.length > 1 && !extractedLines.includes(s)) {
-                extractedLines.push(s);
-            }
-        }
-
-        // 2. Extract TJ array strings: [(t1) 10 (t2)] TJ
-        const tjArrRegex = /\[([^\]]+)\]\s*TJ/g;
-        while ((match = tjArrRegex.exec(fullString)) !== null) {
-            const subMatches = match[1].match(/\(([^)]+)\)/g);
-            if (subMatches) {
-                const joined = subMatches.map(m => m.slice(1, -1).trim()).filter(Boolean).join(' ');
-                if (joined.length > 1 && !extractedLines.includes(joined)) {
-                    extractedLines.push(joined);
-                }
-            }
-        }
-
-        // 3. Extract readable text sequences
-        if (extractedLines.length < 3) {
-            const asciiRegex = /[A-Za-z0-9 ,.!?:;\-_/()'"$#%&*+=]{8,}/g;
-            while ((match = asciiRegex.exec(fullString)) !== null) {
-                const s = match[0].trim();
-                if (!s.match(/^(Font|Type|Pages|Catalog|MediaBox|Contents|Parent|Producer|CreationDate|Metadata|Length|Root|Size)/i)) {
-                    if (!extractedLines.includes(s)) {
-                        extractedLines.push(s);
-                    }
-                }
-            }
-        }
-
-        // Build salvaged document
-        const newPdf = await PDFDocument.create();
-        const font = await newPdf.embedFont('Helvetica' as any);
-        const boldFont = await newPdf.embedFont('Helvetica-Bold' as any);
-
-        let currentPage = newPdf.addPage([595.28, 841.89]);
-        let currentY = 780;
-
-        currentPage.drawText("PDFBolt Recovered Document", { x: 50, y: currentY, size: 16, font: boldFont });
-        currentPage.drawText(`Restored from source: ${file.name}`, { x: 50, y: currentY - 20, size: 10, font });
-        currentY -= 55;
-
-        if (extractedLines.length === 0) {
-            currentPage.drawText("The structural container of this document was repaired and normalized.", { x: 50, y: currentY, size: 11, font });
-        } else {
-            for (const line of extractedLines) {
-                if (currentY < 60) {
-                    currentPage = newPdf.addPage([595.28, 841.89]);
-                    currentY = 780;
-                }
-                const truncatedLine = line.length > 80 ? line.substring(0, 80) + '...' : line;
-                try {
-                    currentPage.drawText(truncatedLine, { x: 50, y: currentY, size: 10, font });
-                } catch (drawErr) {
-                    // Ignore non-ascii glyph errors
-                }
-                currentY -= 16;
-            }
-        }
-
-        return await newPdf.save();
-    } catch (tier4Err) {
-        console.warn("Tier 4 recovery fallback:", tier4Err);
-    }
-
-    throw new Error("Unable to recover damaged PDF. The document data is critically unreadable.");
+    throw new Error("Unable to recover damaged PDF client-side. Please submit to deep backend structural recovery.");
 }
+
 
 
