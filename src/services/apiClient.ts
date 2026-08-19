@@ -53,7 +53,7 @@ class ApiClient {
       const res = await fetch(`${this.baseUrl}/health`, {
         method: 'GET',
         headers: { 'Accept': 'application/json' },
-        signal: AbortSignal.timeout(2500)
+        signal: AbortSignal.timeout(10000)
       });
       this.backendAvailable = res.ok;
     } catch {

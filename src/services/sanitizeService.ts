@@ -67,7 +67,7 @@ export async function repairPdf(file: File): Promise<Uint8Array> {
         // Continue to Tier 2
     }
 
-    // Tier 2: Binary Alignment (Strip leading garbage, fix %%EOF)
+    // Tier 2: Synthetic XRef & Catalog Healer (Strip garbage, discover Catalog root, inject valid trailer & %%EOF)
     try {
         let startIdx = 0;
         for (let i = 0; i < Math.min(rawBytes.length - 4, 1024); i++) {
@@ -78,12 +78,20 @@ export async function repairPdf(file: File): Promise<Uint8Array> {
         }
 
         let cleaned = rawBytes.slice(startIdx);
-        // Ensure %%EOF marker exists
-        const eofStr = "\n%%EOF\n";
-        const eofBytes = new TextEncoder().encode(eofStr);
-        const combined = new Uint8Array(cleaned.length + eofBytes.length);
+        const textDecoder = new TextDecoder('latin1');
+        const cleanedStr = textDecoder.decode(cleaned);
+
+        // Discover Catalog Root Object ID
+        const catalogMatch = cleanedStr.match(/(\d+)\s+\d+\s+obj\s*<<[^>]*?\/Type\s*\/Catalog/);
+        const catalogId = catalogMatch ? catalogMatch[1] : "1";
+
+        // Inject standard synthetic xref table and trailer
+        const syntheticTrailer = `\nxref\n0 1\n0000000000 65535 f\ntrailer\n<< /Size 500 /Root ${catalogId} 0 R >>\nstartxref\n0\n%%EOF\n`;
+        const trailerBytes = new TextEncoder().encode(syntheticTrailer);
+
+        const combined = new Uint8Array(cleaned.length + trailerBytes.length);
         combined.set(cleaned);
-        combined.set(eofBytes, cleaned.length);
+        combined.set(trailerBytes, cleaned.length);
 
         const pdfDoc = await PDFDocument.load(combined, { ignoreEncryption: true });
         if (pdfDoc.getPageCount() > 0) {
