@@ -1,9 +1,18 @@
+import io
 import os
 import shutil
 import subprocess
 from pathlib import Path
 from typing import List, Dict, Any, Optional
 from pypdf import PdfReader, PdfWriter
+from PIL import Image
+
+try:
+    import pymupdf
+    HAS_PYMUPDF = True
+except ImportError:
+    HAS_PYMUPDF = False
+
 from backend.app.processors.base import BaseProcessor
 from backend.app.core.errors import PDFBoltError, OutputValidationError
 from backend.app.core.validation import validate_pdf_output
@@ -22,31 +31,139 @@ class CompressProcessor(BaseProcessor):
                 return path
         return None
 
+    def _compress_pymupdf(self, input_path: Path, output_path: Path, level: str) -> bool:
+        """
+        High-efficiency, non-blur compression engine using PyMuPDF and Pillow.
+        Preserves 100% native vector text, fonts, links, and layout while 
+        intelligently optimizing image streams and deflating PDF objects.
+        """
+        if not HAS_PYMUPDF:
+            return False
+
+        lvl = (level or "BALANCED").upper()
+        
+        # Quality & Resolution profiles (Never degrades below crisp reading standards)
+        if lvl in ("MAX", "LOW"):
+            max_dim = 3000   # ~300 DPI
+            jpeg_quality = 90
+        elif lvl in ("HIGH", "HIGH-COMPRESSION"):
+            max_dim = 1800   # ~180 DPI
+            jpeg_quality = 80
+        elif lvl == "EXTREME":
+            max_dim = 1500   # ~150 DPI (Crisp on all mobile/retina screens, non-blur)
+            jpeg_quality = 75
+        else: # BALANCED / RECOMMENDED / MEDIUM
+            max_dim = 2200   # ~220 DPI
+            jpeg_quality = 84
+
+        try:
+            doc = pymupdf.open(str(input_path))
+            processed_xrefs = set()
+
+            for page in doc:
+                try:
+                    image_list = page.get_images(full=True)
+                except Exception:
+                    continue
+
+                for img_info in image_list:
+                    xref = img_info[0]
+                    if xref in processed_xrefs:
+                        continue
+                    processed_xrefs.add(xref)
+
+                    try:
+                        base_image = doc.extract_image(xref)
+                        if not base_image:
+                            continue
+                        
+                        orig_bytes = base_image.get("image")
+                        if not orig_bytes or len(orig_bytes) < 8192:  # Skip tiny icons/masks
+                            continue
+
+                        pil_img = Image.open(io.BytesIO(orig_bytes))
+                        w, h = pil_img.size
+
+                        # Smart proportional downsampling with Lanczos anti-aliasing filter
+                        if w > max_dim or h > max_dim:
+                            ratio = min(max_dim / w, max_dim / h)
+                            new_size = (max(1, int(w * ratio)), max(1, int(h * ratio)))
+                            pil_img = pil_img.resize(new_size, Image.Resampling.LANCZOS)
+
+                        # Convert non-RGB modes safely for optimal JPEG encoding
+                        if pil_img.mode in ("RGBA", "LA", "P"):
+                            background = Image.new("RGB", pil_img.size, (255, 255, 255))
+                            if pil_img.mode == "P":
+                                pil_img = pil_img.convert("RGBA")
+                            background.paste(pil_img, mask=pil_img.split()[-1] if len(pil_img.split()) > 3 else None)
+                            pil_img = background
+                        elif pil_img.mode not in ("RGB", "L"):
+                            pil_img = pil_img.convert("RGB")
+
+                        out_bio = io.BytesIO()
+                        pil_img.save(
+                            out_bio,
+                            format="JPEG",
+                            quality=jpeg_quality,
+                            optimize=True,
+                            progressive=True
+                        )
+                        compressed_img_bytes = out_bio.getvalue()
+
+                        # Invariant: Only update stream if size is genuinely reduced
+                        if len(compressed_img_bytes) < len(orig_bytes):
+                            doc.update_image(xref, compressed_img_bytes)
+                    except Exception as img_err:
+                        logger.debug(f"PyMuPDF image xref {xref} skipped: {img_err}")
+                        continue
+
+            # Save with maximum lossless object stream deflation and garbage collection
+            doc.save(
+                str(output_path),
+                garbage=4,
+                deflate=True,
+                deflate_images=True,
+                deflate_fonts=True,
+                clean=True
+            )
+            doc.close()
+            return output_path.exists() and output_path.stat().st_size > 0
+        except Exception as e:
+            logger.warning(f"PyMuPDF compression error: {e}")
+            return False
+
     def _compress_ghostscript(self, input_path: Path, output_path: Path, level: str) -> bool:
         gs_bin = self._find_ghostscript()
         if not gs_bin:
             return False
 
-        lvl = level.upper()
-        if lvl == "LOW":
-            pdf_setting = "/ebook"
-            extra_args = []
-        elif lvl == "MEDIUM":
+        lvl = (level or "BALANCED").upper()
+        if lvl in ("LOW", "MAX"):
             pdf_setting = "/printer"
-            extra_args = []
+            extra_args = ["-dColorImageResolution=300", "-dGrayImageResolution=300"]
+        elif lvl in ("MEDIUM", "BALANCED"):
+            pdf_setting = "/ebook"
+            extra_args = ["-dColorImageResolution=200", "-dGrayImageResolution=200"]
         elif lvl == "EXTREME":
-            pdf_setting = "/screen"
+            pdf_setting = "/ebook"
             extra_args = [
                 "-dColorImageDownsampleType=/Bicubic",
-                "-dColorImageResolution=60",
+                "-dColorImageResolution=150",
                 "-dGrayImageDownsampleType=/Bicubic",
-                "-dGrayImageResolution=60",
+                "-dGrayImageResolution=150",
                 "-dMonoImageDownsampleType=/Bicubic",
-                "-dMonoImageResolution=60"
+                "-dMonoImageResolution=300",
+                "-dJPEGQ=75"
             ]
-        else: # HIGH (default)
-            pdf_setting = "/screen"
-            extra_args = []
+        else: # HIGH / HIGH-COMPRESSION
+            pdf_setting = "/ebook"
+            extra_args = [
+                "-dColorImageDownsampleType=/Bicubic",
+                "-dColorImageResolution=180",
+                "-dGrayImageDownsampleType=/Bicubic",
+                "-dGrayImageResolution=180",
+                "-dJPEGQ=80"
+            ]
 
         cmd = [
             gs_bin,
@@ -57,6 +174,10 @@ class CompressProcessor(BaseProcessor):
             "-dBATCH",
             "-dSAFER",
             "-dQUIET",
+            "-dDetectDuplicateImages=true",
+            "-dCompressFonts=true",
+            "-dSubsetFonts=true",
+            "-dAutoFilterColorImages=true",
             *extra_args,
             f"-sOutputFile={str(output_path)}",
             str(input_path)
@@ -88,7 +209,7 @@ class CompressProcessor(BaseProcessor):
             try:
                 for img in page.images:
                     try:
-                        img.replace(img.image, quality=60)
+                        img.replace(img.image, quality=78)
                     except Exception:
                         pass
             except Exception:
@@ -96,7 +217,6 @@ class CompressProcessor(BaseProcessor):
 
         with open(output_path, "wb") as f:
             writer.write(f)
-
 
     def process(self, input_files: Any, options: Any = None) -> Any:
         if isinstance(input_files, (bytes, bytearray)):
@@ -111,14 +231,19 @@ class CompressProcessor(BaseProcessor):
         reader = PdfReader(str(input_pdf), strict=False)
         expected_pages = len(reader.pages)
 
-        level = opts.get("level") or opts.get("strength") or "HIGH"
+        level = opts.get("profile") or opts.get("level") or opts.get("strength") or "EXTREME"
 
         candidate_path = self.temp_dir / f"candidate_{self.job_id}.pdf"
 
-        # 1. Try Ghostscript first
-        gs_success = self._compress_ghostscript(input_pdf, candidate_path, str(level))
-        if not gs_success or not candidate_path.exists() or candidate_path.stat().st_size == 0:
-            # 2. Fallback to pure Python stream optimizer
+        # 1. Try PyMuPDF advanced lossless/perceptual optimizer first (preserves 100% vector text)
+        success = self._compress_pymupdf(input_pdf, candidate_path, str(level))
+        
+        # 2. Try Ghostscript if PyMuPDF was not available
+        if not success or not candidate_path.exists() or candidate_path.stat().st_size == 0:
+            success = self._compress_ghostscript(input_pdf, candidate_path, str(level))
+            
+        # 3. Fallback to pure PyPDF stream optimizer
+        if not success or not candidate_path.exists() or candidate_path.stat().st_size == 0:
             self._compress_python_fallback(input_pdf, candidate_path)
 
         output_path = self.output_dir / f"{self.job_id}.pdf"
@@ -143,7 +268,6 @@ class CompressProcessor(BaseProcessor):
 
     # Backward-compatible byte processing
     def process_bytes(self, content: bytes, filename: str) -> tuple[bytes, str, Dict[str, Any]]:
-        import io
         temp_in = self.temp_dir / "in.pdf"
         with open(temp_in, "wb") as f:
             f.write(content)
@@ -172,4 +296,5 @@ class CompressProcessor(BaseProcessor):
             "is_reduced": is_reduced,
             "quality_status": "passed"
         }
+
 

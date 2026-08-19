@@ -250,47 +250,47 @@ export async function compressPdfAdvanced(
       targetPdf.setCreator('');
     }
 
-    // Determine scale and quality based on profile or target size
-    let scale = 1.5; // ~150 DPI
-    let quality = 0.75;
+    // Determine scale and quality based on profile or target size (Never degrades below 150 DPI non-blur baseline)
+    let scale = 1.8; // ~180 DPI
+    let quality = 0.82;
 
     if (options.profile === 'max') {
-      scale = 2.5; // ~250-300 DPI
-      quality = 0.92;
+      scale = 2.8; // ~300 DPI
+      quality = 0.94;
     } else if (options.profile === 'high') {
-      scale = 2.0; // ~200 DPI
-      quality = 0.85;
+      scale = 2.2; // ~220 DPI
+      quality = 0.88;
     } else if (options.profile === 'balanced') {
-      scale = 1.5; // ~150 DPI
-      quality = 0.75;
+      scale = 1.8; // ~180 DPI
+      quality = 0.82;
     } else if (options.profile === 'high-compression') {
-      scale = 1.1; // ~100 DPI
-      quality = 0.58;
+      scale = 1.6; // ~160 DPI
+      quality = 0.76;
     } else if (options.profile === 'extreme') {
-      scale = 0.85; // ~72 DPI
-      quality = 0.42;
+      scale = 1.5; // ~150 DPI (Crisp anti-aliased text, zero blur)
+      quality = 0.72;
     } else if (options.profile === 'custom') {
       scale = (options.customDpi || 150) / 96;
-      quality = options.customQuality || 0.75;
+      quality = options.customQuality || 0.80;
     } else if (options.profile === 'target' && options.targetSizeMB) {
-      // Calculate target ratio
       const currentMB = file.size / (1024 * 1024);
       const targetRatio = Math.max(0.1, Math.min(0.95, options.targetSizeMB / currentMB));
       
       if (targetRatio >= 0.75) {
-        scale = 2.0;
-        quality = 0.85;
+        scale = 2.2;
+        quality = 0.88;
       } else if (targetRatio >= 0.5) {
-        scale = 1.5;
-        quality = 0.75;
+        scale = 1.8;
+        quality = 0.82;
       } else if (targetRatio >= 0.3) {
-        scale = 1.1;
-        quality = 0.58;
+        scale = 1.6;
+        quality = 0.76;
       } else {
-        scale = 0.85;
-        quality = 0.42;
+        scale = 1.5;
+        quality = 0.72;
       }
     }
+
 
     for (let i = 1; i <= pdf.numPages; i++) {
       onProgress?.(Math.round(15 + (i / pdf.numPages) * 75));
