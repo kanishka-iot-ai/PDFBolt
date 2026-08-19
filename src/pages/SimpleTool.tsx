@@ -357,7 +357,19 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
         b = await redactPdf(file);
       }
       else if (mode === 'repair' && file) {
-        b = await repairPdf(file);
+        const isBackendUp = await apiClient.checkBackend();
+        if (isBackendUp) {
+          try {
+            const res = await apiClient.submitJob('repair', file);
+            const arrayBuf = await res.outputBlob.arrayBuffer();
+            b = new Uint8Array(arrayBuf);
+          } catch (backendErr) {
+            console.warn("Backend repair failed, falling back to local multi-tier engine:", backendErr);
+            b = await repairPdf(file);
+          }
+        } else {
+          b = await repairPdf(file);
+        }
       }
       // -- SECURITY TOOLS --
       else if (mode === 'protect' && file) {
