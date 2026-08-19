@@ -298,36 +298,74 @@ export async function pdfToWord(file: File): Promise<Uint8Array> {
           }
         });
       } else {
-        // Group items into spatial lines based on Y and X coordinates
-        const items = (textContent.items as any[]).map(item => ({
+        // Group items into spatial lines based on Y and X coordinates with accurate baseline clustering
+        const rawItems = (textContent.items as any[]).map(item => ({
           text: item.str,
-          x: Math.round(item.transform[4]),
-          y: Math.round(item.transform[5]),
-          height: Math.round(item.height || 12),
+          x: item.transform[4],
+          y: item.transform[5],
+          width: item.width || (item.str.length * (item.height || 12) * 0.5),
+          height: item.height || 12,
           fontName: item.fontName || ''
         }));
 
-        // Sort items: Top to Bottom, then Left to Right
-        items.sort((a, b) => b.y - a.y || a.x - b.x);
+        // Sort items initially by descending Y (top of page to bottom)
+        rawItems.sort((a, b) => b.y - a.y);
 
-        const heights = items.map(i => i.height).filter(h => h > 0);
+        const heights = rawItems.map(i => i.height).filter(h => h > 0);
         const medianHeight = heights.length > 0 ? heights[Math.floor(heights.length / 2)] : 12;
-        const Y_THRESHOLD = Math.max(4, medianHeight * 0.6);
+        const Y_THRESHOLD = Math.max(3, medianHeight * 0.5);
 
-        let currentLineItems: typeof items = [];
-        let currentY: number | null = null;
+        // Group into lines
+        const lines: (typeof rawItems)[] = [];
+        rawItems.forEach(item => {
+          let placed = false;
+          for (const line of lines) {
+            const lineY = line[0].y;
+            if (Math.abs(lineY - item.y) <= Y_THRESHOLD) {
+              line.push(item);
+              placed = true;
+              break;
+            }
+          }
+          if (!placed) {
+            lines.push([item]);
+          }
+        });
 
-        const processLine = (lineItems: typeof items) => {
+        // Sort lines top to bottom
+        lines.sort((a, b) => b[0].y - a[0].y);
+
+        // For each line, sort items strictly left-to-right by X coordinate
+        lines.forEach(lineItems => {
+          lineItems.sort((a, b) => a.x - b.x);
+
           if (lineItems.length === 0) return;
 
-          // Detect line max height for heading style
           const maxHeight = Math.max(...lineItems.map(it => it.height));
-          const lineText = lineItems.map(it => it.text).join(' ').trim();
+          const isHeading1 = maxHeight >= 22;
+          const isHeading2 = maxHeight >= 16 && maxHeight < 22;
+
+          // Rebuild line with accurate spacing
+          let reconstructedLine = '';
+          for (let k = 0; k < lineItems.length; k++) {
+            const cur = lineItems[k];
+            if (k === 0) {
+              reconstructedLine += cur.text;
+            } else {
+              const prev = lineItems[k - 1];
+              const gap = cur.x - (prev.x + prev.width);
+              if (gap > 2 && !prev.text.endsWith(' ') && !cur.text.startsWith(' ')) {
+                reconstructedLine += ' ' + cur.text;
+              } else {
+                reconstructedLine += cur.text;
+              }
+            }
+          }
+
+          const lineText = reconstructedLine.trim();
           if (!lineText) return;
 
-          const isHeading1 = maxHeight >= 20;
-          const isHeading2 = maxHeight >= 15 && maxHeight < 20;
-          const isBold = lineItems.some(it => it.fontName.toLowerCase().includes('bold') || it.fontName.toLowerCase().includes('black'));
+          const isBold = lineItems.some(it => it.fontName.toLowerCase().includes('bold') || it.fontName.toLowerCase().includes('black') || it.fontName.toLowerCase().includes('heavy'));
 
           if (isHeading1) {
             docParagraphs.push(new Paragraph({
@@ -347,28 +385,13 @@ export async function pdfToWord(file: File): Promise<Uint8Array> {
                 new TextRun({
                   text: lineText,
                   bold: isBold,
-                  size: Math.max(18, Math.min(32, maxHeight * 2))
+                  size: Math.max(18, Math.min(32, Math.round(maxHeight * 2)))
                 })
               ],
               spacing: { after: 100 }
             }));
           }
-        };
-
-        items.forEach(item => {
-          if (currentY === null || Math.abs(currentY - item.y) < Y_THRESHOLD) {
-            currentLineItems.push(item);
-            currentY = item.y;
-          } else {
-            processLine(currentLineItems);
-            currentLineItems = [item];
-            currentY = item.y;
-          }
         });
-
-        if (currentLineItems.length > 0) {
-          processLine(currentLineItems);
-        }
       }
 
       if (i < pdf.numPages) {

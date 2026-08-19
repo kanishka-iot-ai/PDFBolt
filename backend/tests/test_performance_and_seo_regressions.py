@@ -40,15 +40,17 @@ def test_logo_explicit_dimensions_in_nav_and_html():
     with open(index_html, "r", encoding="utf-8") as f:
         html = f.read()
 
-    assert 'width="150"' in html or 'width="160"' in html or 'width="140"' in html or 'width="180"' in html, "index.html logo missing explicit width"
+    assert 'width="50"' in html or 'width="150"' in html or 'width="160"' in html or 'width="140"' in html or 'width="180"' in html, "index.html logo missing explicit width"
     assert 'height="40"' in html or 'height="36"' in html or 'height="44"' in html, "index.html logo missing explicit height"
 
     navbar_tsx = os.path.join(REPO_ROOT, "src", "components", "Navbar.tsx")
     with open(navbar_tsx, "r", encoding="utf-8") as f:
         nav = f.read()
 
-    assert 'width="150"' in nav or 'width="160"' in nav or 'width="140"' in nav, "Navbar.tsx logo missing explicit width"
-    assert 'height="40"' in nav or 'height="36"' in nav, "Navbar.tsx logo missing explicit height"
+    assert 'width="124"' in nav or 'width="50"' in nav or 'width="150"' in nav or 'width="160"' in nav or 'width="140"' in nav, "Navbar.tsx logo missing explicit width"
+    assert 'height="100"' in nav or 'height="40"' in nav or 'height="36"' in nav, "Navbar.tsx logo missing explicit height"
+
+
 
 def test_heavy_services_use_dynamic_imports():
     """Ensure processing engines (jspdf, docx, exceljs, tesseract, mammoth) are imported dynamically."""

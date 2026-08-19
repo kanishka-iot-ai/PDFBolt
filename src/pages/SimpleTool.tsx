@@ -283,11 +283,35 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
         b = await pdfToJpg(file);
       }
       else if ((mode === 'pdf2word' || mode === 'pdf2doc') && file) {
-        b = await pdfToWord(file);
+        const isBackendUp = await apiClient.checkBackend();
+        if (isBackendUp) {
+          try {
+            const res = await apiClient.submitJob('pdf-to-word', file);
+            const arrayBuf = await res.outputBlob.arrayBuffer();
+            b = new Uint8Array(arrayBuf);
+          } catch (backendErr) {
+            console.warn("Backend pdf-to-word failed, falling back to local engine:", backendErr);
+            b = await pdfToWord(file);
+          }
+        } else {
+          b = await pdfToWord(file);
+        }
         outputKind = 'docx';
       }
       else if (mode === 'pdf2excel' && file) {
-        b = await pdfToExcel(file);
+        const isBackendUp = await apiClient.checkBackend();
+        if (isBackendUp) {
+          try {
+            const res = await apiClient.submitJob('pdf-to-excel', file);
+            const arrayBuf = await res.outputBlob.arrayBuffer();
+            b = new Uint8Array(arrayBuf);
+          } catch (backendErr) {
+            console.warn("Backend pdf-to-excel failed, falling back to local engine:", backendErr);
+            b = await pdfToExcel(file);
+          }
+        } else {
+          b = await pdfToExcel(file);
+        }
         outputKind = 'xlsx';
       }
       // -- NEW ADVANCED TOOLS --
