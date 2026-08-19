@@ -31,6 +31,7 @@ from backend.app.processors.repair import RepairProcessor
 from backend.app.processors.pdf_to_word import PdfToWordProcessor
 from backend.app.processors.pdf_to_excel import PdfToExcelProcessor
 from backend.app.processors.pdf_to_ppt import PdfToPptProcessor
+from backend.app.processors.ppt_to_pdf import PptToPdfProcessor
 from backend.app.processors.pdf_to_images import PdfToImagesProcessor
 from backend.app.processors.images_to_pdf import ImagesToPdfProcessor
 from backend.app.processors.ocr import OcrProcessor
@@ -61,6 +62,10 @@ PROCESSOR_REGISTRY: Dict[str, Type[BaseProcessor]] = {
     "pdf_to_excel": PdfToExcelProcessor,
     "pdf-to-ppt": PdfToPptProcessor,
     "pdf_to_ppt": PdfToPptProcessor,
+    "ppt-to-pdf": PptToPdfProcessor,
+    "ppt_to_pdf": PptToPdfProcessor,
+    "pptx-to-pdf": PptToPdfProcessor,
+    "pptx_to_pdf": PptToPdfProcessor,
     "pdf-to-images": PdfToImagesProcessor,
     "pdf_to_images": PdfToImagesProcessor,
     "pdf-to-image": PdfToImagesProcessor,
@@ -74,6 +79,7 @@ PROCESSOR_REGISTRY: Dict[str, Type[BaseProcessor]] = {
     "handwriting-to-pdf": HandwritingProcessor,
     "handwriting": HandwritingProcessor,
 }
+
 
 
 class JobService:

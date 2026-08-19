@@ -317,11 +317,36 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
       // -- NEW ADVANCED TOOLS --
       else if ((mode === 'pdf2ppt' || mode === 'ppt2pdf') && file) {
         if (mode.includes('pdf2ppt')) {
-          b = await pdfToPpt(file);
+          const isBackendUp = await apiClient.checkBackend();
+          if (isBackendUp) {
+            try {
+              const res = await apiClient.submitJob('pdf-to-ppt', file);
+              const arrayBuf = await res.outputBlob.arrayBuffer();
+              b = new Uint8Array(arrayBuf);
+            } catch (backendErr) {
+              console.warn("Backend pdf-to-ppt failed, falling back to local engine:", backendErr);
+              b = await pdfToPpt(file);
+            }
+          } else {
+            b = await pdfToPpt(file);
+          }
           outputKind = 'pptx';
         } else {
           // PPT to PDF
-          b = await pptToPdf(file);
+          const isBackendUp = await apiClient.checkBackend();
+          if (isBackendUp) {
+            try {
+              const res = await apiClient.submitJob('ppt-to-pdf', file);
+              const arrayBuf = await res.outputBlob.arrayBuffer();
+              b = new Uint8Array(arrayBuf);
+            } catch (backendErr) {
+              console.warn("Backend ppt-to-pdf failed, falling back to local engine:", backendErr);
+              b = await pptToPdf(file);
+            }
+          } else {
+            b = await pptToPdf(file);
+          }
+          outputKind = 'pdf';
         }
       }
       else if (mode === 'ocr' && file) {

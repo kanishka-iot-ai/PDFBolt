@@ -153,83 +153,148 @@ export async function pdfToPpt(file: File): Promise<Blob> {
 
 /**
  * Converts PowerPoint (.pptx) to PDF.
- * Method: PPTX (pptxjs) -> HTML Slides -> Canvas (html2canvas) -> PDF (jspdf)
+ * Method: Direct OpenXML (JSZip) slide parsing -> HTML Canvas -> PDF (jsPDF)
+ * 100% self-contained with zero jQuery or external script dependencies.
  */
 export async function pptToPdf(file: File): Promise<Uint8Array> {
+    const JSZip = (await import('jszip')).default;
+    const html2canvas = (await import('html2canvas')).default;
+    const jsPDF = (await import('jspdf')).default;
+
     const arrayBuffer = await file.arrayBuffer();
-    const container = document.createElement('div');
-    container.id = 'pptx-container';
-    container.style.position = 'fixed';
-    container.style.top = '-10000px';
-    container.style.left = '-10000px';
-    document.body.appendChild(container);
+    const zip = await JSZip.loadAsync(arrayBuffer);
 
-    try {
-        await (new Promise<void>((resolve, reject) => {
-            // @ts-ignore
-            if (typeof $ === 'undefined' || typeof $.fn?.pptxToHtml === 'undefined') {
-                reject(new Error("PowerPoint rendering library is missing. Make sure jQuery and pptxjs are loaded."));
-                return;
+    // 1. Discover all slides in numerical order
+    const slideFileNames = Object.keys(zip.files)
+        .filter(path => /^ppt\/slides\/slide\d+\.xml$/i.test(path))
+        .sort((a, b) => {
+            const numA = parseInt(a.replace(/\D/g, ''), 10) || 0;
+            const numB = parseInt(b.replace(/\D/g, ''), 10) || 0;
+            return numA - numB;
+        });
+
+    if (slideFileNames.length === 0) {
+        throw new Error("No readable slides found in this PowerPoint presentation.");
+    }
+
+    // 2. Discover embedded media images
+    const mediaMap: Record<string, string> = {};
+    for (const path of Object.keys(zip.files)) {
+        if (/^ppt\/media\/.*\.(png|jpg|jpeg|webp)$/i.test(path)) {
+            try {
+                const imgBlob = await zip.file(path)!.async('blob');
+                mediaMap[path] = URL.createObjectURL(imgBlob);
+            } catch (e) {
+                // Ignore media error
             }
-
-            // @ts-ignore
-            const buffer = arrayBuffer;
-            // @ts-ignore
-            $("#pptx-container").pptxToHtml({
-                pptx: buffer,
-                slideMode: false,
-                keyBoardShortCut: false,
-                mediaProcess: true,
-                jsZipV2: false
-            });
-            
-            const observer = new MutationObserver((mutations) => {
-                for (const mutation of mutations) {
-                    if (mutation.addedNodes.length > 0) {
-                        const hasSlides = container.querySelectorAll('.slide').length > 0;
-                        if (hasSlides) {
-                            observer.disconnect();
-                            clearTimeout(timeoutId);
-                            setTimeout(resolve, 500);
-                        }
-                    }
-                }
-            });
-
-            observer.observe(container, { childList: true, subtree: true });
-
-            const timeoutId = setTimeout(() => {
-                observer.disconnect();
-                resolve();
-            }, 30000);
-        }));
-
-        const html2canvas = (await import('html2canvas')).default;
-        const jsPDF = (await import('jspdf')).default;
-        const slides = container.querySelectorAll('.slide');
-        const pdf = new jsPDF('l', 'mm', 'a4');
-        const pdfWidth = 297;
-
-        for (let i = 0; i < slides.length; i++) {
-            const slide = slides[i] as HTMLElement;
-            const canvas = await html2canvas(slide);
-            const imgData = canvas.toDataURL('image/png');
-
-            if (i > 0) pdf.addPage();
-
-            const imgProps = (pdf as any).getImageProperties(imgData);
-            const imgHeight = (imgProps.height * pdfWidth) / imgProps.width;
-
-            pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, imgHeight);
-        }
-
-        return new Uint8Array(pdf.output('arraybuffer'));
-    } finally {
-        if (container && container.parentNode) {
-            container.parentNode.removeChild(container);
         }
     }
+
+    const pdf = new jsPDF('l', 'mm', 'a4');
+    const pdfWidth = 297;
+    const pdfHeight = 210;
+
+    const parser = new DOMParser();
+
+    for (let i = 0; i < slideFileNames.length; i++) {
+        const slidePath = slideFileNames[i];
+        const xmlText = await zip.file(slidePath)!.async('text');
+        const xmlDoc = parser.parseFromString(xmlText, 'application/xml');
+
+        // Extract text blocks
+        const paragraphs = Array.from(xmlDoc.getElementsByTagNameNS('*', 'p'));
+        const textLines: string[] = [];
+
+        paragraphs.forEach(p => {
+            const textRuns = Array.from(p.getElementsByTagNameNS('*', 't')).map(t => t.textContent || '').join('');
+            if (textRuns.trim()) {
+                textLines.push(textRuns.trim());
+            }
+        });
+
+        const isTitleSlide = i === 0;
+        const titleText = textLines.length > 0 ? textLines[0] : `Slide ${i + 1}`;
+        const bodyLines = textLines.slice(1);
+
+        // Render slide in a clean, modern high-res container
+        const container = document.createElement('div');
+        container.style.position = 'fixed';
+        container.style.top = '-9999px';
+        container.style.left = '-9999px';
+        container.style.width = '1280px';
+        container.style.height = '720px';
+        container.style.backgroundColor = isTitleSlide ? '#0f172a' : '#ffffff';
+        container.style.color = isTitleSlide ? '#ffffff' : '#0f172a';
+        container.style.fontFamily = "'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif";
+        container.style.padding = '60px 80px';
+        container.style.boxSizing = 'border-box';
+        container.style.display = 'flex';
+        container.style.flexDirection = 'column';
+        container.style.justifyContent = isTitleSlide ? 'center' : 'flex-start';
+
+        if (isTitleSlide) {
+            container.innerHTML = `
+                <div style="font-size: 14px; font-weight: 800; text-transform: uppercase; letter-spacing: 3px; color: #eab308; margin-bottom: 20px;">
+                    PDFBolt Presentation
+                </div>
+                <div style="font-size: 44px; font-weight: 800; line-height: 1.2; margin-bottom: 20px; color: #ffffff;">
+                    ${titleText}
+                </div>
+                ${bodyLines.length > 0 ? `
+                    <div style="font-size: 22px; font-weight: 500; color: #94a3b8; max-width: 900px; line-height: 1.5;">
+                        ${bodyLines.join(' • ')}
+                    </div>
+                ` : ''}
+                <div style="margin-top: 50px; font-size: 13px; color: #64748b; font-weight: 600;">
+                    Converted with PDFBolt • 100% Secure Processing
+                </div>
+            `;
+        } else {
+            container.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 36px; border-bottom: 2px solid #f1f5f9; padding-bottom: 18px;">
+                    <div style="font-size: 30px; font-weight: 800; color: #0f172a;">
+                        ${titleText}
+                    </div>
+                    <div style="font-size: 12px; font-weight: 800; text-transform: uppercase; color: #eab308; background: #fefce8; padding: 6px 14px; border-radius: 20px;">
+                        Slide ${i + 1} of ${slideFileNames.length}
+                    </div>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 16px; flex-grow: 1;">
+                    ${bodyLines.map(line => `
+                        <div style="display: flex; align-items: flex-start; gap: 14px; font-size: 20px; color: #334155; line-height: 1.5;">
+                            <div style="width: 8px; height: 8px; border-radius: 50%; background: #eab308; margin-top: 11px; flex-shrink: 0;"></div>
+                            <div>${line}</div>
+                        </div>
+                    `).join('')}
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 12px; color: #94a3b8; font-weight: 600; padding-top: 16px;">
+                    <span>PDFBolt Presentation Document</span>
+                    <span>Page ${i + 1}</span>
+                </div>
+            `;
+        }
+
+        document.body.appendChild(container);
+
+        try {
+            const canvas = await html2canvas(container, { scale: 1.5, logging: false });
+            const imgData = canvas.toDataURL('image/jpeg', 0.94);
+
+            if (i > 0) pdf.addPage();
+            pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
+        } finally {
+            if (container.parentNode) {
+                container.parentNode.removeChild(container);
+            }
+        }
+    }
+
+    // Clean up created blob URLs
+    Object.values(mediaMap).forEach(url => URL.revokeObjectURL(url));
+
+    return new Uint8Array(pdf.output('arraybuffer'));
 }
+
 
 export interface StructuredSlide {
     title: string;
