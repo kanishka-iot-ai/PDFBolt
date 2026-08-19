@@ -8,26 +8,31 @@ export async function protectPdf(file: File, password: string): Promise<Uint8Arr
     try {
         const bytes = await file.arrayBuffer();
 
-        // Load PDF using the extended library
-        const pdfDoc = await PDFDocument.load(bytes, { ignoreEncryption: true });
+        // 1. Load source document
+        const srcDoc = await PDFDocument.load(bytes, { ignoreEncryption: true });
 
+        // 2. Create clean target document and copy all pages with full content streams, fonts, and images
+        const pdfDoc = await PDFDocument.create();
+        const pageIndices = srcDoc.getPageIndices();
+        const copiedPages = await pdfDoc.copyPages(srcDoc, pageIndices);
+        copiedPages.forEach(page => pdfDoc.addPage(page));
 
-        // Encrypt
+        // 3. Encrypt with full content viewing, rendering, and accessibility permissions enabled
         await pdfDoc.encrypt({
             userPassword: password,
             ownerPassword: password,
             permissions: {
                 printing: 'highResolution',
-                modifying: false,
-                copying: false,
-                annotating: false,
-                fillingForms: false,
-                contentAccessibility: false,
-                documentAssembly: false,
+                modifying: true,
+                copying: true,
+                annotating: true,
+                fillingForms: true,
+                contentAccessibility: true,
+                documentAssembly: true,
             },
         });
 
-        // Save encrypted PDF
+        // 4. Save encrypted PDF
         return await pdfDoc.save();
     } catch (err) {
         console.error("Encryption Error:", err);
