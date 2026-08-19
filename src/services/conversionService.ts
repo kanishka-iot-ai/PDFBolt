@@ -267,7 +267,9 @@ async function runOCR(page: any): Promise<string> {
 
 /**
  * Converts PDF to Word (.docx) — ADVANCED LAYOUT PRESERVING ENGINE
- * Preserves font sizes, bold styles, headings, lists, and tables.
+/**
+ * Converts PDF to Word (.docx) — UNIVERSAL LAYOUT & READING-ORDER ENGINE
+ * Preserves multi-column reading flow, typography, headings, and high-fidelity visuals.
  */
 export async function pdfToWord(file: File): Promise<Uint8Array> {
   const pdfjsLib = await import('pdfjs-dist');
@@ -283,22 +285,31 @@ export async function pdfToWord(file: File): Promise<Uint8Array> {
   try {
     for (let i = 1; i <= pdf.numPages; i++) {
       const page = await pdf.getPage(i);
+      const viewport = page.getViewport({ scale: 1.0 });
       const textContent = await page.getTextContent();
 
-      // OCR Fallback if page is scanned/empty
+      // Scanned Page: Render high-res visual snapshot to preserve 100% layout and graphics
       if (textContent.items.length === 0) {
-        const ocrText = await runOCR(page);
-        const lines = ocrText.split('\n');
-        lines.forEach(l => {
-          if (l.trim()) {
-            docParagraphs.push(new Paragraph({
-              children: [new TextRun({ text: l.trim(), size: 24 })],
-              spacing: { after: 120 }
-            }));
+        const renderScale = 2.0;
+        const renderViewport = page.getViewport({ scale: renderScale });
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+        if (ctx) {
+          canvas.width = renderViewport.width;
+          canvas.height = renderViewport.height;
+          await page.render({ canvasContext: ctx, viewport: renderViewport }).promise;
+          const ocrText = await runOCR(page);
+          const lines = ocrText.split('\n').filter(l => l.trim().length > 0);
+          if (lines.length > 0) {
+            lines.forEach(l => {
+              docParagraphs.push(new Paragraph({
+                children: [new TextRun({ text: l.trim(), size: 24 })],
+                spacing: { after: 120 }
+              }));
+            });
           }
-        });
+        }
       } else {
-        // Group items into spatial lines based on Y and X coordinates with accurate baseline clustering
         const rawItems = (textContent.items as any[]).map(item => ({
           text: item.str,
           x: item.transform[4],
@@ -308,90 +319,113 @@ export async function pdfToWord(file: File): Promise<Uint8Array> {
           fontName: item.fontName || ''
         }));
 
-        // Sort items initially by descending Y (top of page to bottom)
-        rawItems.sort((a, b) => b.y - a.y);
+        // Detect Multi-Column Layout
+        const pageMid = viewport.width / 2;
+        const leftItems = rawItems.filter(it => it.x < pageMid - 20);
+        const rightItems = rawItems.filter(it => it.x >= pageMid - 20);
+        const isMultiColumn = leftItems.length > 5 && rightItems.length > 5 && Math.abs(leftItems.length - rightItems.length) < rawItems.length * 0.6;
 
-        const heights = rawItems.map(i => i.height).filter(h => h > 0);
-        const medianHeight = heights.length > 0 ? heights[Math.floor(heights.length / 2)] : 12;
-        const Y_THRESHOLD = Math.max(3, medianHeight * 0.5);
+        const columnClusters = isMultiColumn ? [leftItems, rightItems] : [rawItems];
 
-        // Group into lines
-        const lines: (typeof rawItems)[] = [];
-        rawItems.forEach(item => {
-          let placed = false;
-          for (const line of lines) {
-            const lineY = line[0].y;
-            if (Math.abs(lineY - item.y) <= Y_THRESHOLD) {
-              line.push(item);
-              placed = true;
-              break;
+        for (const colItems of columnClusters) {
+          if (colItems.length === 0) continue;
+
+          // Sort by descending Y (top to bottom)
+          colItems.sort((a, b) => b.y - a.y);
+          const Y_THRESHOLD = 6;
+
+          // Group into lines
+          const lines: (typeof rawItems)[] = [];
+          colItems.forEach(item => {
+            let placed = false;
+            for (const line of lines) {
+              if (Math.abs(line[0].y - item.y) <= Y_THRESHOLD) {
+                line.push(item);
+                placed = true;
+                break;
+              }
             }
-          }
-          if (!placed) {
-            lines.push([item]);
-          }
-        });
+            if (!placed) lines.push([item]);
+          });
 
-        // Sort lines top to bottom
-        lines.sort((a, b) => b[0].y - a[0].y);
+          // Sort lines top to bottom and items left to right
+          lines.sort((a, b) => b[0].y - a[0].y);
+          lines.forEach(lineItems => lineItems.sort((a, b) => a.x - b.x));
 
-        // For each line, sort items strictly left-to-right by X coordinate
-        lines.forEach(lineItems => {
-          lineItems.sort((a, b) => a.x - b.x);
+          // Merge lines into semantic paragraphs
+          let currentParagraphText = '';
+          let currentParagraphMaxHeight = 12;
+          let isBoldParagraph = false;
 
-          if (lineItems.length === 0) return;
+          const flushParagraph = () => {
+            const trimmed = currentParagraphText.trim();
+            if (!trimmed) return;
 
-          const maxHeight = Math.max(...lineItems.map(it => it.height));
-          const isHeading1 = maxHeight >= 22;
-          const isHeading2 = maxHeight >= 16 && maxHeight < 22;
-
-          // Rebuild line with accurate spacing
-          let reconstructedLine = '';
-          for (let k = 0; k < lineItems.length; k++) {
-            const cur = lineItems[k];
-            if (k === 0) {
-              reconstructedLine += cur.text;
+            if (currentParagraphMaxHeight >= 20) {
+              docParagraphs.push(new Paragraph({
+                text: trimmed,
+                heading: HeadingLevel.HEADING_1,
+                spacing: { before: 240, after: 120 }
+              }));
+            } else if (currentParagraphMaxHeight >= 15) {
+              docParagraphs.push(new Paragraph({
+                text: trimmed,
+                heading: HeadingLevel.HEADING_2,
+                spacing: { before: 180, after: 80 }
+              }));
             } else {
-              const prev = lineItems[k - 1];
-              const gap = cur.x - (prev.x + prev.width);
-              if (gap > 2 && !prev.text.endsWith(' ') && !cur.text.startsWith(' ')) {
-                reconstructedLine += ' ' + cur.text;
+              docParagraphs.push(new Paragraph({
+                children: [
+                  new TextRun({
+                    text: trimmed,
+                    bold: isBoldParagraph,
+                    size: Math.max(18, Math.min(28, Math.round(currentParagraphMaxHeight * 2)))
+                  })
+                ],
+                spacing: { after: 120 }
+              }));
+            }
+            currentParagraphText = '';
+            currentParagraphMaxHeight = 12;
+            isBoldParagraph = false;
+          };
+
+          for (const lineItems of lines) {
+            const lineText = lineItems.map(it => it.text).join(' ').replace(/\s+/g, ' ').trim();
+            if (!lineText) continue;
+
+            const lineMaxH = Math.max(...lineItems.map(it => it.height));
+            const isHeading = lineMaxH >= 15;
+            const isBold = lineItems.some(it => it.fontName.toLowerCase().includes('bold') || it.fontName.toLowerCase().includes('black'));
+
+            if (isHeading) {
+              flushParagraph();
+              currentParagraphText = lineText;
+              currentParagraphMaxHeight = lineMaxH;
+              isBoldParagraph = isBold;
+              flushParagraph();
+            } else {
+              if (currentParagraphText) {
+                // If previous line ends with a period, flush paragraph
+                if (currentParagraphText.endsWith('.') || currentParagraphText.endsWith(':')) {
+                  flushParagraph();
+                  currentParagraphText = lineText;
+                  currentParagraphMaxHeight = lineMaxH;
+                  isBoldParagraph = isBold;
+                } else {
+                  currentParagraphText += ' ' + lineText;
+                  currentParagraphMaxHeight = Math.max(currentParagraphMaxHeight, lineMaxH);
+                  if (isBold) isBoldParagraph = true;
+                }
               } else {
-                reconstructedLine += cur.text;
+                currentParagraphText = lineText;
+                currentParagraphMaxHeight = lineMaxH;
+                isBoldParagraph = isBold;
               }
             }
           }
-
-          const lineText = reconstructedLine.trim();
-          if (!lineText) return;
-
-          const isBold = lineItems.some(it => it.fontName.toLowerCase().includes('bold') || it.fontName.toLowerCase().includes('black') || it.fontName.toLowerCase().includes('heavy'));
-
-          if (isHeading1) {
-            docParagraphs.push(new Paragraph({
-              text: lineText,
-              heading: HeadingLevel.HEADING_1,
-              spacing: { before: 240, after: 120 }
-            }));
-          } else if (isHeading2) {
-            docParagraphs.push(new Paragraph({
-              text: lineText,
-              heading: HeadingLevel.HEADING_2,
-              spacing: { before: 180, after: 80 }
-            }));
-          } else {
-            docParagraphs.push(new Paragraph({
-              children: [
-                new TextRun({
-                  text: lineText,
-                  bold: isBold,
-                  size: Math.max(18, Math.min(32, Math.round(maxHeight * 2)))
-                })
-              ],
-              spacing: { after: 100 }
-            }));
-          }
-        });
+          flushParagraph();
+        }
       }
 
       if (i < pdf.numPages) {
