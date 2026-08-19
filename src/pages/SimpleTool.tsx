@@ -8,9 +8,11 @@ import { protectPdf, unlockPdf, signPdf, bruteForceUnlock, dictionaryUnlock, mul
 import { ocrPdf } from '../services/ocrService';
 import { pptToPdf, pdfToPpt } from '../services/pptService';
 import { redactPdf, repairPdf } from '../services/sanitizeService';
+import { comparePdfDocuments } from '../services/compareService';
 import { GET_WORDLIST } from '../utils/wordlists';
 import { FileText, Download, CheckCircle2, Settings2, Eye, X, Image as ImageIcon, Lock, Zap } from 'lucide-react';
 import { NotifySystem } from '../types';
+
 import ProgressBar from '../components/ProgressBar';
 import { validateFiles, validateOutputIntegrity, ALLOWED_MIME_TYPES, MAX_FILE_SIZE } from '../utils/fileValidation';
 import { apiClient } from '../services/apiClient';
@@ -198,13 +200,14 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
       return;
     }
 
+    const isMultiSupported = isImageTool || mode === 'compare';
     const allowedTypes = getAcceptedTypes(mode, isImageTool);
     const maxSize = isImageTool ? MAX_FILE_SIZE.IMAGE : allowedTypes === ALLOWED_MIME_TYPES.PDF ? MAX_FILE_SIZE.PDF : MAX_FILE_SIZE.DOCUMENT;
 
     const validation = await validateFiles(f, {
       allowedTypes,
       maxSize,
-      maxFiles: isImageTool ? 50 : 1,
+      maxFiles: isImageTool ? 50 : mode === 'compare' ? 2 : 1,
       checkStructure: allowedTypes === ALLOWED_MIME_TYPES.PDF
     });
 
@@ -220,8 +223,9 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
       }
     }
 
-    if (isImageTool) {
-      setMultiFiles(prev => [...prev, ...f]);
+    if (isMultiSupported) {
+      setMultiFiles(prev => [...prev, ...f].slice(0, mode === 'compare' ? 2 : 50));
+      if (f.length > 0) setFile(f[0]);
     } else {
       setFile(f[0]);
     }
@@ -230,6 +234,7 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
     setPassword('');
     setIsZip(false);
     notify.upload();
+
   };
 
   const process = async () => {
@@ -371,6 +376,27 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
           b = await repairPdf(file);
         }
       }
+      else if (mode === 'compare' && (multiFiles.length >= 1 || file)) {
+        const fileA = multiFiles[0] || file!;
+        const fileB = multiFiles[1] || multiFiles[0] || file!;
+        const isBackendUp = await apiClient.checkBackend();
+        if (isBackendUp) {
+          try {
+            const res = await apiClient.submitCompareJob(fileA, fileB);
+            const arrayBuf = await res.outputBlob.arrayBuffer();
+            b = new Uint8Array(arrayBuf);
+          } catch (backendErr) {
+            console.warn("Backend compare failed, falling back to local engine:", backendErr);
+            const compRes = await comparePdfDocuments(fileA, fileB);
+            b = compRes.reportBytes;
+          }
+        } else {
+          const compRes = await comparePdfDocuments(fileA, fileB);
+          b = compRes.reportBytes;
+        }
+        outputKind = 'pdf';
+      }
+
       // -- SECURITY TOOLS --
       else if (mode === 'protect' && file) {
         if (!password) throw new Error("Please enter a password.");
@@ -737,11 +763,33 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
                 </div>
               )}
 
+              {mode === 'compare' && (
+                <div className={`p-6 rounded-2xl border ${darkMode ? 'bg-slate-900 border-slate-700' : 'bg-amber-50/70 border-amber-200'}`}>
+                  <div className="flex items-center gap-3 mb-3">
+                    <span className="p-2 rounded-xl bg-yellow-500/20 text-yellow-700 dark:text-yellow-400 font-black">
+                      <Zap size={18} />
+                    </span>
+                    <div>
+                      <h4 className={`font-bold text-sm ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+                        Document Differential Analyzer
+                      </h4>
+                      <p className={`text-xs ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+                        Comparing {multiFiles.length >= 2 ? `${multiFiles[0].name} and ${multiFiles[1].name}` : file ? file.name : 'selected PDF documents'}.
+                      </p>
+                    </div>
+                  </div>
+                  <p className={`text-xs leading-relaxed ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+                    PDFBolt extracts structured text and visual elements page-by-page to detect additions, deletions, modified paragraphs, and structural alterations. A comprehensive summary comparison PDF report will be generated.
+                  </p>
+                </div>
+              )}
+
               {mode === 'redact' && (
                 <div className="p-4 bg-orange-50 text-orange-800 rounded-2xl mb-4">
                   <p className="font-bold">Warning: This will convert all pages to images to permanently sanitize hidden text. Quality may be slightly reduced.</p>
                 </div>
               )}
+
 
               {mode === 'compress' && (
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

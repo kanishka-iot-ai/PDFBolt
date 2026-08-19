@@ -118,6 +118,45 @@ class ApiClient {
   }
 
   /**
+   * Submits two files for differential comparison processing.
+   */
+  async submitCompareJob(fileA: File, fileB: File, settings: Record<string, any> = {}): Promise<BackendJobResult> {
+    const formData = new FormData();
+    formData.append('operation', 'compare');
+    formData.append('settings', JSON.stringify(settings));
+    formData.append('files', fileA);
+    formData.append('files', fileB);
+
+    const response = await fetch(`${this.baseUrl}/jobs`, {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error?.message || "Compare processing failed on backend.");
+    }
+
+    const jobData = await response.json();
+    const jobId = jobData.job_id;
+
+    const dlResponse = await fetch(`${this.baseUrl}/jobs/${jobId}/download`);
+    if (!dlResponse.ok) {
+      throw new Error("Failed to retrieve comparison report.");
+    }
+
+    const outputBlob = await dlResponse.blob();
+    return {
+      success: true,
+      job_id: jobId,
+      operation: 'compare',
+      outputBlob,
+      outputFilename: jobData.output?.filename || "comparison_report.pdf",
+      metrics: jobData.metrics || {}
+    };
+  }
+
+  /**
    * Submits multiple files for merge processing.
    */
   async submitMergeJob(files: File[], settings: Record<string, any> = {}): Promise<BackendJobResult> {
@@ -156,6 +195,7 @@ class ApiClient {
       metrics: jobData.metrics || {}
     };
   }
+
 
   /**
    * Sends a PDF document for deep structural analysis and topical breakdown.
