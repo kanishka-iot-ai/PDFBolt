@@ -9,7 +9,8 @@ export async function protectPdf(file: File, password: string): Promise<Uint8Arr
         const bytes = await file.arrayBuffer();
 
         // Load PDF using the extended library
-        const pdfDoc = await PDFDocument.load(bytes);
+        const pdfDoc = await PDFDocument.load(bytes, { ignoreEncryption: true });
+
 
         // Encrypt
         await pdfDoc.encrypt({

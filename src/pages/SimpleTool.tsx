@@ -362,7 +362,19 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
       // -- SECURITY TOOLS --
       else if (mode === 'protect' && file) {
         if (!password) throw new Error("Please enter a password.");
-        b = await protectPdf(file, password);
+        const isBackendUp = await apiClient.checkBackend();
+        if (isBackendUp) {
+          try {
+            const res = await apiClient.submitJob('protect', file, { password });
+            const arrayBuf = await res.outputBlob.arrayBuffer();
+            b = new Uint8Array(arrayBuf);
+          } catch (backendErr) {
+            console.warn("Backend protect failed, falling back to local engine:", backendErr);
+            b = await protectPdf(file, password);
+          }
+        } else {
+          b = await protectPdf(file, password);
+        }
       }
       else if (mode === 'unlock' && file) {
         if (bruteForceMode) {

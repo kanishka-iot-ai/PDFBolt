@@ -384,7 +384,7 @@ export async function validateOutputIntegrity(
         // Deep verification: try loading into PDF-Lib parser
         try {
             const { PDFDocument } = await import('pdf-lib');
-            const doc = await PDFDocument.load(bytes);
+            const doc = await PDFDocument.load(bytes, { ignoreEncryption: true });
             if (doc.getPageCount() === 0) {
                 return {
                     valid: false,
@@ -393,6 +393,7 @@ export async function validateOutputIntegrity(
                 };
             }
         } catch (e: any) {
+
             return {
                 valid: false,
                 error: `PDF parser validation failed: ${e.message}`,
