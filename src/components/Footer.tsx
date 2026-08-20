@@ -32,13 +32,22 @@ const Footer: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
           <p className="text-xs font-medium leading-relaxed mb-6">
             Privacy-first browser-based PDF toolkit. 100% client-side WebAssembly execution with zero server file transfers.
           </p>
-          <div className="flex gap-2">
+          <div className="flex gap-2 items-center flex-wrap">
             <div className={`p-2 rounded-xl flex items-center justify-center ${darkMode ? 'bg-slate-800 text-yellow-500' : 'bg-white shadow-sm text-yellow-600'}`}>
               <Lock size={16} />
             </div>
             <div className={`p-2 rounded-xl flex items-center justify-center ${darkMode ? 'bg-slate-800 text-green-500' : 'bg-white shadow-sm text-green-600'}`}>
               <ShieldCheck size={16} />
             </div>
+            <a 
+              href="https://www.trustpilot.com/review/pdfbolt.in" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className={`px-2.5 py-1.5 rounded-xl text-[11px] font-bold flex items-center gap-1 transition-transform hover:scale-105 ${darkMode ? 'bg-slate-800 text-emerald-400 border border-slate-700' : 'bg-white shadow-sm text-emerald-600 border border-slate-200'}`}
+              aria-label="Trustpilot Reviews"
+            >
+              ★ Trustpilot
+            </a>
           </div>
         </div>
 
@@ -94,6 +103,7 @@ const Footer: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
             <li><Link to="/privacy" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Privacy Policy</Link></li>
             <li><Link to="/terms" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Terms of Service</Link></li>
             <li><Link to="/contact" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors flex items-center gap-1"><Headphones size={12} /> Contact Support</Link></li>
+            <li><a href="https://www.trustpilot.com/review/pdfbolt.in" target="_blank" rel="noopener noreferrer" className="text-emerald-700 dark:text-emerald-400 font-bold hover:underline flex items-center gap-1">★ Review on Trustpilot</a></li>
           </ul>
 
 
