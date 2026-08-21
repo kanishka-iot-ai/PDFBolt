@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     APP_VERSION: str = "1.0.0"
     APP_ENV: str = "development"
     DEBUG: bool = True
+    API_ADMIN_KEY: str = ""
     PORT: int = 8000
     HOST: str = "0.0.0.0"
 

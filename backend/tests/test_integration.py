@@ -23,8 +23,7 @@ def test_api_merge_integration():
     assert data["status"] == "COMPLETED"
     assert data["operation"] == "merge"
     
-    job_id = data["job_id"]
-    dl_response = client.get(f"/api/v1/jobs/{job_id}/download")
+    dl_response = client.get(data["download_url"])
     assert dl_response.status_code == 200
     assert len(dl_response.content) > 100
 

@@ -33,12 +33,35 @@ class CleanupService:
         purged_count = 0
         now = datetime.datetime.now(datetime.timezone.utc)
 
+        # 1. Clean up modern JobService jobs
+        try:
+            from backend.app.services.job_service import job_service
+            if hasattr(job_service, "jobs"):
+                for j_id, j_obj in list(job_service.jobs.items()):
+                    exp_dt = getattr(j_obj, "expires_at", None)
+                    if exp_dt:
+                        if exp_dt.tzinfo is None:
+                            exp_dt = exp_dt.replace(tzinfo=datetime.timezone.utc)
+                        if now > exp_dt:
+                            if hasattr(j_obj, "status"):
+                                j_obj.status = getattr(j_obj.status, "EXPIRED", JobStatus.EXPIRED)
+                            self.delete_job_files(j_id)
+                            # Prune memory dictionary for jobs older than 1 hour
+                            if (now - exp_dt).total_seconds() > 3600:
+                                job_service.jobs.pop(j_id, None)
+                            purged_count += 1
+        except Exception as e:
+            logger.debug(f"Modern job cleanup pass notice: {e}")
+
+        # 2. Clean up legacy JobManager jobs
         if job_manager_instance and hasattr(job_manager_instance, "jobs"):
             for job_id, job_data in list(job_manager_instance.jobs.items()):
                 created_str = job_data.get("created_at") if isinstance(job_data, dict) else getattr(job_data, "created_at", None)
                 if created_str:
                     try:
                         created_dt = datetime.datetime.fromisoformat(created_str)
+                        if created_dt.tzinfo is None:
+                            created_dt = created_dt.replace(tzinfo=datetime.timezone.utc)
                         if (now - created_dt).total_seconds() > (TTL_MINUTES * 60):
                             if isinstance(job_data, dict):
                                 job_data["status"] = JobStatus.EXPIRED

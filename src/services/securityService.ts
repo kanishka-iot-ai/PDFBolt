@@ -315,7 +315,6 @@ export async function multiThreadedUnlock(
                     cleanup();
 
                     try {
-                        const { PDFDocument } = await import('pdf-lib-plus-encrypt');
                         const pdfDoc = await PDFDocument.load(pdfBytes, { password } as any);
                         const decryptedPdf = await pdfDoc.save();
                         resolve({ password, decryptedPdf });

@@ -40,9 +40,13 @@ def test_job_compression_api_lifecycle(tiny_pdf_bytes):
     job_data = response.json()
     assert job_data["status"] == "COMPLETED"
     assert job_data["job_id"] is not None
+    assert "token=" in job_data["download_url"]
 
     # Test download endpoint
     job_id = job_data["job_id"]
-    dl_response = client.get(f"/api/v1/jobs/{job_id}/download")
+    blocked_response = client.get(f"/api/v1/jobs/{job_id}/download")
+    assert blocked_response.status_code == 401
+
+    dl_response = client.get(job_data["download_url"])
     assert dl_response.status_code == 200
     assert dl_response.content.startswith(b"%PDF-")

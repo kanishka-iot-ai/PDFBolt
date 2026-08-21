@@ -8,6 +8,7 @@ from pathlib import Path
 class JobStatus(str, Enum):
     QUEUED      = "QUEUED"
     PROCESSING  = "PROCESSING"
+    VALIDATING   = "VALIDATING"
     COMPLETED   = "COMPLETED"
     FAILED      = "FAILED"
     EXPIRED     = "EXPIRED"

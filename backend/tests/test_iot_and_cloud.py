@@ -33,7 +33,10 @@ def test_iot_device_lifecycle_and_security(tiny_pdf_bytes):
     assert resp.json()["firmware_version"] == "2.4.1"
 
     # 3. Device Heartbeat
-    resp = client.get("/api/v1/devices/scanner_hp_officejet_x99/status")
+    resp = client.get(
+        "/api/v1/devices/scanner_hp_officejet_x99/status",
+        headers={"X-Device-Token": token}
+    )
     assert resp.status_code == 200
     assert resp.json()["ready"] is True
 
@@ -118,4 +121,3 @@ def test_pubsub_queue_service():
 def test_zero_active_s3_storage_provider():
     import backend.app.services.storage_provider as sp_module
     assert not hasattr(sp_module, "S3StorageProvider"), "S3StorageProvider must be removed from production codebase"
-

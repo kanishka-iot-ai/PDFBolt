@@ -6,10 +6,12 @@ from fastapi.responses import JSONResponse
 ERROR_CODES: Dict[str, tuple[int, str]] = {
     # Input errors
     "FILE_EMPTY"               : (400, "Uploaded file is empty"),
+    "INVALID_FILE"             : (400, "Invalid file provided"),
     "INVALID_PDF"              : (400, "File is not a valid PDF"),
     "CORRUPTED_PDF"            : (422, "PDF file is corrupted"),
     "INVALID_MAGIC_BYTES"      : (400, "File type mismatch"),
     "UNSUPPORTED_FORMAT"       : (400, "File format not supported"),
+    "UNSUPPORTED_OPERATION"    : (400, "Operation not supported"),
     "FILE_TOO_LARGE"           : (413, "File exceeds size limit"),
     "PAGE_LIMIT_EXCEEDED"      : (400, "PDF has too many pages"),
     "NO_FILES_PROVIDED"        : (400, "No files uploaded"),
@@ -18,6 +20,7 @@ ERROR_CODES: Dict[str, tuple[int, str]] = {
     # Page/range errors
     "PAGE_OUT_OF_RANGE"        : (400, "Page number out of range"),
     "INVALID_PAGE_RANGE"       : (400, "Invalid page range format"),
+    "INVALID_PARAMETER"        : (400, "Invalid parameter provided"),
     "DUPLICATE_PAGES"          : (400, "Duplicate pages in range"),
 
     # Security errors
@@ -114,13 +117,16 @@ async def pdf_exception_handler(request: Request, exc: PDFBoltError) -> JSONResp
 
 
 async def generic_exception_handler(request: Request, exc: Exception) -> JSONResponse:
+    from backend.app.config import settings
+
+    public_message = str(exc) if settings.DEBUG or settings.APP_ENV.lower() != "production" else "An unexpected server error occurred."
     return JSONResponse(
         status_code=500,
         content={
             "success": False,
             "error": {
                 "code": "PROCESSING_FAILED",
-                "message": str(exc) or "An unexpected server error occurred.",
+                "message": public_message,
                 "status_code": 500
             }
         }

@@ -1,6 +1,8 @@
 import os
 import shutil
 import secrets
+import hashlib
+import hmac
 import datetime
 from typing import Dict, Any, Optional, Tuple, List
 from backend.app.config import settings
@@ -29,6 +31,18 @@ class QRShareManager:
         os.makedirs(share_dir, exist_ok=True)
         return share_dir
 
+    @staticmethod
+    def _hash_secret(secret: str, salt: str) -> str:
+        return hashlib.pbkdf2_hmac("sha256", secret.encode("utf-8"), salt.encode("utf-8"), 120000).hex()
+
+    @classmethod
+    def _verify_secret(cls, provided: Optional[str], salt: Optional[str], expected_hash: Optional[str]) -> bool:
+        if not expected_hash or not salt:
+            return True
+        if not provided:
+            return False
+        return hmac.compare_digest(cls._hash_secret(provided, salt), expected_hash)
+
     def create_share(
         self,
         content: bytes,
@@ -47,6 +61,8 @@ class QRShareManager:
 
         share_id = secrets.token_urlsafe(16)
         revocation_token = secrets.token_urlsafe(32)
+        revocation_salt = secrets.token_urlsafe(16)
+        pin_salt = secrets.token_urlsafe(16) if pin else None
         clean_name = sanitize_filename(filename or "shared_document.pdf")
 
         # Save physical file into private storage
@@ -68,8 +84,10 @@ class QRShareManager:
             "expires_at": expires_dt.isoformat(),
             "duration_seconds": duration_seconds,
             "status": QRShareStatus.ACTIVE,
-            "revocation_token": revocation_token,
-            "pin": pin,
+            "revocation_token_hash": self._hash_secret(revocation_token, revocation_salt),
+            "revocation_token_salt": revocation_salt,
+            "pin_hash": self._hash_secret(pin, pin_salt) if pin and pin_salt else None,
+            "pin_salt": pin_salt,
             "one_time_scan": one_time_scan,
             "download_count": 0
         }
@@ -114,8 +132,8 @@ class QRShareManager:
             raise PDFProcessingException(ErrorCode.PROCESSING_FAILED, "This QR share has expired and the file has been deleted.", 410)
 
         # Check PIN if required
-        if share.get("pin"):
-            if not pin or pin != share["pin"]:
+        if share.get("pin_hash"):
+            if not self._verify_secret(pin, share.get("pin_salt"), share.get("pin_hash")):
                 raise PDFProcessingException(ErrorCode.SECURITY_AUTH_FAILED, "Invalid or missing PIN for this QR share.", 403)
 
         return QRShareResponse(
@@ -129,7 +147,7 @@ class QRShareManager:
             download_url=f"/api/v1/qr-shares/{share_id}/download",
             revocation_token=None,  # Do not expose revocation token publicly
             one_time_scan=share["one_time_scan"],
-            require_pin=bool(share["pin"]),
+            require_pin=bool(share.get("pin_hash")),
             is_expired=False,
             duration_seconds=share["duration_seconds"]
         )
@@ -153,7 +171,7 @@ class QRShareManager:
             share["status"] = QRShareStatus.EXPIRED
             raise PDFProcessingException(ErrorCode.PROCESSING_FAILED, "This QR share has expired and the file has been deleted.", 410)
 
-        if share.get("pin") and pin != share["pin"]:
+        if share.get("pin_hash") and not self._verify_secret(pin, share.get("pin_salt"), share.get("pin_hash")):
             raise PDFProcessingException(ErrorCode.SECURITY_AUTH_FAILED, "Invalid PIN.", 403)
 
         file_path = share.get("file_path")
@@ -180,7 +198,7 @@ class QRShareManager:
         if not share:
             raise PDFProcessingException(ErrorCode.JOB_NOT_FOUND, "QR Share not found.", 404)
 
-        if share.get("revocation_token") != revocation_token:
+        if not self._verify_secret(revocation_token, share.get("revocation_token_salt"), share.get("revocation_token_hash")):
             raise PDFProcessingException(ErrorCode.SECURITY_AUTH_FAILED, "Invalid revocation token.", 403)
 
         self._purge_share_file(share_id)

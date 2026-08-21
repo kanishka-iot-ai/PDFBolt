@@ -33,6 +33,15 @@ const rawHost = (typeof import.meta !== 'undefined' && import.meta.env && (impor
 export const API_BASE_URL = rawHost.endsWith('/api/v1') 
   ? rawHost.replace(/\/$/, '') 
   : `${rawHost.replace(/\/$/, '')}/api/v1`;
+const API_ORIGIN = API_BASE_URL.replace(/\/api\/v1\/?$/, '');
+
+function resolveApiUrl(pathOrUrl?: string, fallback?: string): string {
+  const value = pathOrUrl || fallback || '';
+  if (value.startsWith('http://') || value.startsWith('https://')) return value;
+  if (value.startsWith('/api/v1')) return `${API_ORIGIN}${value}`;
+  if (value.startsWith('/')) return `${API_BASE_URL}${value}`;
+  return value;
+}
 
 class ApiClient {
   private baseUrl: string = API_BASE_URL;
@@ -92,7 +101,7 @@ class ApiClient {
     const jobId = jobData.job_id;
 
     // Fetch output artifact
-    const dlResponse = await fetch(`${this.baseUrl}/jobs/${jobId}/download`);
+    const dlResponse = await fetch(resolveApiUrl(jobData.download_url, `/jobs/${jobId}/download`));
     if (!dlResponse.ok) {
       throw new Error("Failed to download output artifact from backend storage.");
     }
@@ -140,7 +149,7 @@ class ApiClient {
     const jobData = await response.json();
     const jobId = jobData.job_id;
 
-    const dlResponse = await fetch(`${this.baseUrl}/jobs/${jobId}/download`);
+    const dlResponse = await fetch(resolveApiUrl(jobData.download_url, `/jobs/${jobId}/download`));
     if (!dlResponse.ok) {
       throw new Error("Failed to retrieve comparison report.");
     }
@@ -180,7 +189,7 @@ class ApiClient {
     const jobData = await response.json();
     const jobId = jobData.job_id;
 
-    const dlResponse = await fetch(`${this.baseUrl}/jobs/${jobId}/download`);
+    const dlResponse = await fetch(resolveApiUrl(jobData.download_url, `/jobs/${jobId}/download`));
     if (!dlResponse.ok) {
       throw new Error("Failed to retrieve merged document.");
     }

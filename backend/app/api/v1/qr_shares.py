@@ -4,6 +4,7 @@ from fastapi.responses import FileResponse
 from backend.app.models.qr_share import QRShareResponse, QRShareRevokeRequest, QRShareStatus
 from backend.app.services.qr_share_manager import qr_share_manager
 from backend.app.core.errors import PDFProcessingException, ErrorCode
+from backend.app.validators.input_validator import InputValidator
 
 router = APIRouter(prefix="/qr-shares", tags=["QR Shares"])
 
@@ -20,11 +21,9 @@ async def create_qr_share(
     Returns an unguessable share URL and a private revocation token.
     """
     content = await file.read()
-    if not content:
-        raise PDFProcessingException(ErrorCode.FILE_EMPTY, "Uploaded PDF file is empty.", 400)
-
-    # Magic-byte check for valid PDF
-    if not content.startswith(b"%PDF-"):
+    InputValidator.validate_file_size(content)
+    page_count, is_encrypted = InputValidator.validate_pdf_structure(content)
+    if not is_encrypted and page_count <= 0:
         raise PDFProcessingException(ErrorCode.INVALID_PDF, "Only valid PDF documents can be shared.", 400)
 
     return qr_share_manager.create_share(

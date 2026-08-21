@@ -163,3 +163,34 @@ def test_gcs_lifecycle_policy_configuration():
     assert config["rule"][0]["action"]["type"] == "Delete"
     assert config["rule"][0]["condition"]["age"] == 1
     assert "jobs/" in config["rule"][0]["condition"]["matchesPrefix"]
+
+
+def test_modern_job_service_ttl_cleanup():
+    """Verify modern JobService in-memory jobs are expired and purged by TTL pass."""
+    from backend.app.services.job_service import job_service
+    from backend.app.models.job import Job, JobStatus as ModernJobStatus
+    import datetime
+
+    job_id = "test-modern-expired-uuid-123"
+    work_dir = cleanup_service.storage_dir / job_id
+    work_dir.mkdir(parents=True, exist_ok=True)
+    (work_dir / "test.pdf").write_bytes(SAMPLE_PDF_BYTES)
+
+    expired_time = datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(minutes=16)
+    job = Job(
+        job_id=job_id,
+        status=ModernJobStatus.COMPLETED,
+        operation="rotate",
+        created_at=expired_time - datetime.timedelta(minutes=1),
+        started_at=expired_time - datetime.timedelta(minutes=1),
+        expires_at=expired_time,
+        download_token="sample-tok"
+    )
+    job_service.jobs[job_id] = job
+
+    assert work_dir.exists()
+    purged = cleanup_service.run_15min_ttl_cleanup()
+    assert purged >= 1
+    assert not work_dir.exists()
+    assert job_service.jobs[job_id].status == ModernJobStatus.EXPIRED
+

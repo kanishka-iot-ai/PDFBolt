@@ -54,17 +54,19 @@ class PageNumbersProcessor(BaseProcessor):
         total_pages = len(reader.pages)
 
         start_num = int(opts.get("start_number") or opts.get("start") or 1)
-        prefix = str(opts.get("prefix") or "Page ")
+        prefix = str(opts.get("prefix") or "")
         include_total = opts.get("include_total", True)
-        format_style = opts.get("format", "page_x_of_y")
+        format_style = str(opts.get("format") or opts.get("style") or "page_x_of_y").lower()
 
         writer = PdfWriter()
         for idx, page in enumerate(reader.pages):
             current_num = start_num + idx
-            if format_style == "page_x_of_y" or include_total:
-                label = f"{prefix}{current_num} of {total_pages}"
+            if "of" in format_style or format_style == "page_x_of_y" or (include_total and format_style not in ("numbers_only", "1,2,3", "simple", "number_only", "number")):
+                p_text = prefix if prefix else ("Page " if "page" in format_style else "")
+                label = f"{p_text}{current_num} of {total_pages}"
             else:
-                label = f"{prefix}{current_num}"
+                p_text = prefix if prefix else ("Page " if "page" in format_style else "")
+                label = f"{p_text}{current_num}"
 
             width = float(page.mediabox.width)
             height = float(page.mediabox.height)

@@ -10,12 +10,30 @@ from backend.app.models.schemas import JobResponse, JobStatus, OperationType
 from backend.app.services.job_manager import job_manager
 from backend.app.services.storage_provider import get_storage_provider
 from backend.app.validators.input_validator import InputValidator
+from backend.app.config import settings
 
 router = APIRouter(prefix="/devices", tags=["IoT & Edge Devices"])
 
 # In-memory device store (Production: Cloud SQL / Spanner / DynamoDB)
 DEVICE_REGISTRY: Dict[str, Dict[str, Any]] = {}
 DEVICE_TOKENS: Dict[str, str] = {}  # device_id -> hashed_token
+
+
+def _require_admin_auth(x_admin_token: Optional[str] = Header(None)) -> bool:
+    configured = settings.API_ADMIN_KEY.strip()
+    if not configured:
+        if settings.APP_ENV.lower() == "production":
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail="Device management API is not configured."
+            )
+        return True
+    if not x_admin_token or x_admin_token != configured:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Invalid device management credentials."
+        )
+    return True
 
 
 def _generate_device_token(device_id: str) -> str:
@@ -49,7 +67,7 @@ def _verify_device_auth(device_id: str, x_device_token: Optional[str] = Header(N
 
 
 @router.post("", response_model=DeviceResponse, status_code=status.HTTP_201_CREATED)
-def register_device(payload: DeviceRegistration):
+def register_device(payload: DeviceRegistration, _: bool = Depends(_require_admin_auth)):
     """
     Provisions a new IoT scanner, camera terminal, or edge hardware unit.
     Generates a unique cryptographic device authentication token.
@@ -77,13 +95,13 @@ def register_device(payload: DeviceRegistration):
 
 
 @router.get("", response_model=List[DeviceResponse])
-def list_devices():
+def list_devices(_: bool = Depends(_require_admin_auth)):
     """Lists all registered IoT scanning and document hardware units."""
     return list(DEVICE_REGISTRY.values())
 
 
 @router.get("/{device_id}", response_model=DeviceResponse)
-def get_device(device_id: str):
+def get_device(device_id: str, _: bool = Depends(_require_admin_auth)):
     """Retrieves operational telemetry and registration profile for a specific IoT device."""
     if device_id not in DEVICE_REGISTRY:
         raise HTTPException(status_code=404, detail="Device not found.")
@@ -91,10 +109,9 @@ def get_device(device_id: str):
 
 
 @router.get("/{device_id}/status")
-def get_device_status(device_id: str):
+def get_device_status(device_id: str, x_device_token: Optional[str] = Header(None)):
     """Lightweight health check and heartbeat ping for IoT edge firmware."""
-    if device_id not in DEVICE_REGISTRY:
-        raise HTTPException(status_code=404, detail="Device not found.")
+    _verify_device_auth(device_id, x_device_token)
     
     DEVICE_REGISTRY[device_id]["last_seen"] = datetime.datetime.now(datetime.timezone.utc).isoformat()
     return {

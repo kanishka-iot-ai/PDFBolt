@@ -153,6 +153,9 @@ def test_qr_share_pin_protection():
         data={"duration_seconds": 86400, "pin": "9876"}
     )
     share_id = create_resp.json()["share_id"]
+    share_record = qr_share_manager.shares[share_id]
+    assert "pin" not in share_record
+    assert share_record["pin_hash"] != "9876"
 
     # Access without PIN fails (403)
     resp_no_pin = client.get(f"/api/v1/qr-shares/{share_id}")

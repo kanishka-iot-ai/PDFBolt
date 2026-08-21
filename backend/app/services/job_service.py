@@ -1,6 +1,8 @@
 import uuid
+import secrets
 import time
 import json
+import asyncio
 from pathlib import Path
 from typing import List, Dict, Any, Optional, Type
 from datetime import datetime, timezone, timedelta
@@ -11,6 +13,7 @@ from backend.app.core.logging import logger
 from backend.app.models.job import Job, JobStatus, JobResult
 from backend.app.services.file_service import file_service
 from backend.app.services.storage_provider import storage_provider
+from backend.app.services.cleanup_service import cleanup_service
 
 # Import all processors
 from backend.app.processors.base import BaseProcessor
@@ -40,23 +43,37 @@ from backend.app.processors.handwriting import HandwritingProcessor
 from backend.app.processors.compare import CompareProcessor
 
 PROCESSOR_REGISTRY: Dict[str, Type[BaseProcessor]] = {
+    "merge_pdf": MergeProcessor,
     "merge": MergeProcessor,
+    "split_pdf": SplitProcessor,
     "split": SplitProcessor,
+    "compress_pdf": CompressProcessor,
     "compress": CompressProcessor,
+    "rotate_pdf": RotateProcessor,
     "rotate": RotateProcessor,
+    "delete_pdf_pages": DeletePagesProcessor,
     "delete-pages": DeletePagesProcessor,
     "delete_pages": DeletePagesProcessor,
     "extract-pages": ExtractPagesProcessor,
     "extract_pages": ExtractPagesProcessor,
+    "organize_pdf": OrganizeProcessor,
     "organize": OrganizeProcessor,
+    "watermark_pdf": WatermarkProcessor,
     "watermark": WatermarkProcessor,
+    "add_page_numbers": PageNumbersProcessor,
     "page-numbers": PageNumbersProcessor,
     "page_numbers": PageNumbersProcessor,
+    "protect_pdf": ProtectProcessor,
     "protect": ProtectProcessor,
+    "unlock_pdf": UnlockProcessor,
     "unlock": UnlockProcessor,
+    "sign_pdf": SignProcessor,
     "sign": SignProcessor,
+    "redact_pdf": RedactProcessor,
     "redact": RedactProcessor,
+    "repair_pdf": RepairProcessor,
     "repair": RepairProcessor,
+    "compare_pdf": CompareProcessor,
     "compare": CompareProcessor,
     "compare-pdf": CompareProcessor,
     "compare_pdf": CompareProcessor,
@@ -70,18 +87,26 @@ PROCESSOR_REGISTRY: Dict[str, Type[BaseProcessor]] = {
     "ppt_to_pdf": PptToPdfProcessor,
     "pptx-to-pdf": PptToPdfProcessor,
     "pptx_to_pdf": PptToPdfProcessor,
+    "pdf-to-jpg": PdfToImagesProcessor,
+    "pdf_to_jpg": PdfToImagesProcessor,
     "pdf-to-images": PdfToImagesProcessor,
     "pdf_to_images": PdfToImagesProcessor,
     "pdf-to-image": PdfToImagesProcessor,
+    "jpg_to_pdf": ImagesToPdfProcessor,
     "images-to-pdf": ImagesToPdfProcessor,
     "images_to_pdf": ImagesToPdfProcessor,
     "jpg-to-pdf": ImagesToPdfProcessor,
+    "ocr_pdf": OcrProcessor,
     "ocr": OcrProcessor,
     "ocr-pdf": OcrProcessor,
+    "analyze_pdf": AnalyzerProcessor,
     "analyze": AnalyzerProcessor,
     "analyze-pdf": AnalyzerProcessor,
+    "handwriting_to_pdf": HandwritingProcessor,
     "handwriting-to-pdf": HandwritingProcessor,
     "handwriting": HandwritingProcessor,
+    "scan-handwriting": HandwritingProcessor,
+    "scan_handwriting": HandwritingProcessor,
 }
 
 
@@ -106,7 +131,7 @@ class JobService:
         op_key = operation.lower().strip()
         processor_cls = PROCESSOR_REGISTRY.get(op_key)
         if not processor_cls:
-            raise PDFBoltError("UNSUPPORTED_FORMAT", f"Unsupported operation: '{operation}'")
+            raise PDFBoltError("UNSUPPORTED_OPERATION", f"Unsupported operation: '{operation}'")
 
         if not uploads:
             raise PDFBoltError("NO_FILES_PROVIDED", "No input files provided for job.")
@@ -126,6 +151,7 @@ class JobService:
             created_at=now,
             started_at=now,
             expires_at=now + timedelta(minutes=15),
+            download_token=secrets.token_urlsafe(32),
             options=options
         )
         self.jobs[job_id] = job
@@ -149,9 +175,9 @@ class JobService:
             job.input_size = total_in_bytes
             job.page_count_in = first_page_count
 
-            # Step 11: Execute processor
+            # Step 11: Execute processor in non-blocking worker thread
             processor = processor_cls(job_id=job_id, work_dir=work_dir, settings=options)
-            result: JobResult = processor.run(input_paths, options)
+            result: JobResult = await asyncio.to_thread(processor.run, input_paths, options)
 
             # Step 15 & 16: Record output metadata
             job.status = JobStatus.COMPLETED
@@ -179,11 +205,13 @@ class JobService:
             job.status = JobStatus.FAILED
             job.error_code = pe.code
             job.error_message = pe.message
+            cleanup_service.delete_job_files(job_id)
             raise
         except Exception as e:
             job.status = JobStatus.FAILED
             job.error_code = "PROCESSING_FAILED"
             job.error_message = str(e)
+            cleanup_service.delete_job_files(job_id)
             raise PDFBoltError("PROCESSING_FAILED", str(e))
 
 

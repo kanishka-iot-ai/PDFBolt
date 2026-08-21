@@ -2,6 +2,7 @@ import os
 import re
 import uuid
 import time
+import zipfile
 from pathlib import Path
 from typing import Dict, Optional, Set
 from backend.app.core.errors import PDFBoltError
@@ -22,6 +23,9 @@ MAGIC_BYTES: Dict[str, bytes] = {
     "image/jpeg": b"\xff\xd8\xff",
     "image/png": b"\x89PNG\r\n\x1a\n",
     "image/webp": b"RIFF",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document": b"PK\x03\x04",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": b"PK\x03\x04",
+    "application/vnd.openxmlformats-officedocument.presentationml.presentation": b"PK\x03\x04",
 }
 
 BLOCKED_EXTENSIONS: Set[str] = {
@@ -32,20 +36,55 @@ BLOCKED_EXTENSIONS: Set[str] = {
 
 
 def validate_magic_bytes(file_path: Path, mime_type: str) -> None:
-    """Read first 8 bytes. Verify against known magic bytes."""
-    expected = MAGIC_BYTES.get(mime_type)
-    if not expected:
-        # If MIME type is in allowed non-image/non-pdf formats or unknown, try PDF header check
-        with open(file_path, "rb") as f:
-            header = f.read(8)
-        if mime_type == "application/pdf" and not header.startswith(b"%PDF-"):
-            raise PDFBoltError("INVALID_MAGIC_BYTES")
-        return
+    """Validate content signatures instead of trusting browser-supplied MIME alone."""
+    if mime_type not in ALLOWED_MIME_TYPES:
+        raise PDFBoltError("UNSUPPORTED_FORMAT")
+
+    suffix = file_path.suffix.lower()
+    if suffix in BLOCKED_EXTENSIONS:
+        raise PDFBoltError("MALICIOUS_FILENAME")
 
     with open(file_path, "rb") as f:
-        header = f.read(8)
+        header = f.read(12)
+
+    expected = MAGIC_BYTES.get(mime_type)
+    if mime_type == "application/octet-stream":
+        if suffix == ".pdf":
+            expected = MAGIC_BYTES["application/pdf"]
+        elif suffix in {".jpg", ".jpeg"}:
+            expected = MAGIC_BYTES["image/jpeg"]
+        elif suffix == ".png":
+            expected = MAGIC_BYTES["image/png"]
+        elif suffix == ".webp":
+            expected = MAGIC_BYTES["image/webp"]
+        elif suffix in {".docx", ".xlsx", ".pptx"}:
+            expected = b"PK\x03\x04"
+        else:
+            raise PDFBoltError("UNSUPPORTED_FORMAT")
+
+    if not expected:
+        raise PDFBoltError("UNSUPPORTED_FORMAT")
+
     if not header.startswith(expected):
         raise PDFBoltError("INVALID_MAGIC_BYTES")
+
+    if suffix == ".webp" and b"WEBP" not in header[8:12]:
+        raise PDFBoltError("INVALID_MAGIC_BYTES")
+
+    if suffix in {".docx", ".xlsx", ".pptx"}:
+        try:
+            with zipfile.ZipFile(file_path) as archive:
+                names = set(archive.namelist())
+        except zipfile.BadZipFile:
+            raise PDFBoltError("INVALID_MAGIC_BYTES")
+
+        required_member = {
+            ".docx": "word/document.xml",
+            ".xlsx": "xl/workbook.xml",
+            ".pptx": "ppt/presentation.xml",
+        }[suffix]
+        if required_member not in names:
+            raise PDFBoltError("INVALID_MAGIC_BYTES")
 
 
 WINDOWS_RESERVED_NAMES: Set[str] = {

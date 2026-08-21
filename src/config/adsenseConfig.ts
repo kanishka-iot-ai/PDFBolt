@@ -26,6 +26,9 @@ export const isAdsEnabled = (): boolean => {
   if (envVal === 'false' || envVal === '0') {
     return false;
   }
+  if (import.meta.env.DEV && envVal !== 'true' && envVal !== '1') {
+    return false;
+  }
   return client.length > 0;
 };
 

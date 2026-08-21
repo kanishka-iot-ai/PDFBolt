@@ -14,6 +14,24 @@ from backend.app.models.schemas import JobStatus as LegacyJobStatus
 router = APIRouter(prefix="/jobs", tags=["Jobs"])
 
 
+def _tokenized_job_url(job_id: str, token: Optional[str]) -> str:
+    if token:
+        return f"/api/v1/jobs/{job_id}/download?token={token}"
+    return f"/api/v1/jobs/{job_id}/download"
+
+
+def _require_job_token(job_id: str, provided_token: Optional[str]) -> None:
+    job = job_service.get_job(job_id)
+    if job and job.download_token and provided_token != job.download_token:
+        raise HTTPException(
+            status_code=401,
+            detail={
+                "code": "INVALID_DOWNLOAD_TOKEN",
+                "message": "Invalid or missing job access token."
+            }
+        )
+
+
 @router.post("")
 async def create_and_process_job(
     operation: str = Form(...),
@@ -57,7 +75,7 @@ async def create_and_process_job(
         "status": job.status.value,
         "operation": job.operation,
         "poll_url": f"/api/v1/jobs/{job.job_id}",
-        "download_url": f"/api/v1/jobs/{job.job_id}/download",
+        "download_url": _tokenized_job_url(job.job_id, job.download_token),
         "output": {
             "filename": job.output_filename or f"{job.operation}_result.pdf",
             "size_bytes": job.output_size or 0
@@ -69,8 +87,9 @@ async def create_and_process_job(
 
 
 @router.get("/{job_id}")
-def get_job_status(job_id: str):
+def get_job_status(job_id: str, token: Optional[str] = Query(default=None)):
     """Retrieves current job status, invariant metadata, and download links."""
+    _require_job_token(job_id, token)
     job = job_service.get_job(job_id)
     if job:
         return {
@@ -83,7 +102,7 @@ def get_job_status(job_id: str):
                 "size_bytes": job.output_size or 0
             },
             "metrics": job.metrics,
-            "download_url": f"/api/v1/jobs/{job.job_id}/download",
+            "download_url": _tokenized_job_url(job.job_id, job.download_token),
             "created_at": job.created_at.isoformat(),
             "expires_at": job.expires_at.isoformat()
         }
@@ -110,6 +129,7 @@ def download_job_result(
     out_filename = None
 
     if job:
+        _require_job_token(job_id, token)
         if job.status.value != "COMPLETED":
             raise PDFBoltError("JOB_STILL_PROCESSING", f"Job is not completed yet (current status: {job.status.value}).")
         out_path = job.output_path
@@ -149,9 +169,15 @@ def download_job_result(
     )
 
 
+@router.get("/{job_id}/status")
+def get_job_status_alias(job_id: str, token: Optional[str] = Query(default=None)):
+    return get_job_status(job_id, token)
+
+
 @router.delete("/{job_id}")
-def cancel_and_delete_job(job_id: str):
+def cancel_and_delete_job(job_id: str, token: Optional[str] = Query(default=None)):
     """Immediately terminates processing and permanently purges temporary work directories."""
+    _require_job_token(job_id, token)
     job = job_service.get_job(job_id)
     if job:
         job.status = job.status.CANCELLED
@@ -170,5 +196,5 @@ def cancel_and_delete_job(job_id: str):
 
 
 @router.post("/{job_id}/cancel")
-def cancel_job_post_alias(job_id: str):
-    return cancel_and_delete_job(job_id)
+def cancel_job_post_alias(job_id: str, token: Optional[str] = Query(default=None)):
+    return cancel_and_delete_job(job_id, token)
