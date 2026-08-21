@@ -160,10 +160,70 @@ const SEOLandingPage: React.FC<SEOLandingPageProps> = ({ toolId, darkMode, child
         <AdSlot placement="TOOL_CONTENT_BOTTOM" />
       </div>
 
-      {/* 4. RELATED PDF TOOLS */}
-      {relatedToolsList.length > 0 && (
-        <div className="max-w-4xl mx-auto px-6 py-8 sm:py-12">
+      {/* 4. HOW-TO GUIDE & FEATURES (BELOW THE FOLD - DOES NOT OBSTRUCT UPLOAD) */}
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-10 space-y-10">
+        
+        {/* Step-by-Step Instructions */}
+        {tool.howToSteps && tool.howToSteps.length > 0 && (
+          <section className={`p-6 sm:p-8 rounded-3xl border ${darkMode ? 'bg-slate-800/40 border-slate-800' : 'bg-slate-50 border-slate-200/80'}`}>
+            <h2 className={`text-xl sm:text-2xl font-black mb-6 flex items-center gap-2 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+              <BookOpen className="text-yellow-500" size={22} /> How to {tool.title} Online
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {tool.howToSteps.map((step, idx) => (
+                <div key={idx} className={`p-5 rounded-2xl border ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200 shadow-sm'}`}>
+                  <div className="w-8 h-8 rounded-xl bg-yellow-500 text-slate-950 font-black text-sm flex items-center justify-center mb-3">
+                    {idx + 1}
+                  </div>
+                  <h3 className={`font-black text-sm mb-1.5 ${darkMode ? 'text-white' : 'text-slate-900'}`}>{step.name}</h3>
+                  <p className={`text-xs leading-relaxed ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>{step.text}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
 
+        {/* Key Features & Architecture */}
+        {tool.features && tool.features.length > 0 && (
+          <section className={`p-6 sm:p-8 rounded-3xl border ${darkMode ? 'bg-slate-800/40 border-slate-800' : 'bg-slate-50 border-slate-200/80'}`}>
+            <h2 className={`text-xl sm:text-2xl font-black mb-6 flex items-center gap-2 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+              <Sparkles className="text-yellow-500" size={22} /> Key Capabilities & Security
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {tool.features.map((feat, idx) => (
+                <div key={idx} className="flex items-start gap-3">
+                  <div className="p-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 mt-0.5">
+                    <CheckCircle size={16} />
+                  </div>
+                  <span className={`text-xs sm:text-sm font-semibold ${darkMode ? 'text-slate-300' : 'text-slate-700'}`}>{feat}</span>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Frequently Asked Questions */}
+        {tool.faqs && tool.faqs.length > 0 && (
+          <section className={`p-6 sm:p-8 rounded-3xl border ${darkMode ? 'bg-slate-800/40 border-slate-800' : 'bg-slate-50 border-slate-200/80'}`}>
+            <h2 className={`text-xl sm:text-2xl font-black mb-6 flex items-center gap-2 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+              <HelpCircle className="text-yellow-500" size={22} /> Frequently Asked Questions
+            </h2>
+            <div className="space-y-4">
+              {tool.faqs.map((faq, idx) => (
+                <div key={idx} className={`p-5 rounded-2xl border ${darkMode ? 'bg-slate-800/80 border-slate-700' : 'bg-white border-slate-200 shadow-sm'}`}>
+                  <h3 className={`font-black text-sm sm:text-base mb-2 ${darkMode ? 'text-white' : 'text-slate-900'}`}>{faq.q}</h3>
+                  <p className={`text-xs sm:text-sm leading-relaxed ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>{faq.a}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+      </div>
+
+      {/* 5. RELATED PDF TOOLS */}
+      {relatedToolsList.length > 0 && (
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
           <section className="pt-8 border-t border-slate-200 dark:border-slate-800">
             <h2 className={`text-xl font-black mb-6 flex items-center gap-2 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
               <Layers className="text-yellow-500" /> Related PDF Tools
