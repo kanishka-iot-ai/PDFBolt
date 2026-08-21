@@ -4,13 +4,12 @@ import SignatureCanvas, { SignatureCanvasRef } from '../components/SignatureCanv
 import { createZipFromFiles } from '../services/zipService';
 import { rotateFile, addPageNumbers, compressPdf, watermarkPdf, deletePages, splitPdf, imagesToPdf } from '../services/pdfService';
 import { wordToPdf, excelToPdf, htmlToPdf, pdfToJpg, pdfToWord, pdfToExcel } from '../services/conversionService';
-import { protectPdf, unlockPdf, signPdf, bruteForceUnlock, dictionaryUnlock, multiThreadedUnlock } from '../services/securityService';
+import { protectPdf, unlockPdf, removePermissions, signPdf } from '../services/securityService';
 import { ocrPdf } from '../services/ocrService';
 import { pptToPdf, pdfToPpt } from '../services/pptService';
 import { redactPdf, repairPdf } from '../services/sanitizeService';
 import { comparePdfDocuments } from '../services/compareService';
-import { GET_WORDLIST } from '../utils/wordlists';
-import { FileText, Download, CheckCircle2, Settings2, Eye, X, Image as ImageIcon, Lock, Zap } from 'lucide-react';
+import { FileText, Download, CheckCircle2, Settings2, Eye, EyeOff, X, Image as ImageIcon, Lock, Zap } from 'lucide-react';
 import { NotifySystem } from '../types';
 
 import ProgressBar from '../components/ProgressBar';
@@ -20,7 +19,6 @@ import AdSlot from '../components/AdSlot';
 import { useActiveWork } from '../context/ActiveWorkContext';
 
 type ResultKind = 'pdf' | 'zip' | 'docx' | 'pptx' | 'xlsx' | 'txt';
-type BruteCharset = 'numeric' | 'alpha-lower' | 'alpha-mixed' | 'alphanumeric' | 'all';
 type ImagePageSize = 'fit' | 'a4' | 'letter';
 type ImageOrientation = 'portrait' | 'landscape';
 type ImageMargin = 'none' | 'small' | 'standard';
@@ -63,6 +61,7 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
   const [compressionLevel, setCompressionLevel] = useState('recommended');
   const [pageInput, setPageInput] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [isZip, setIsZip] = useState(false);
   const [progress, setProgress] = useState(0);
   const [processingStatus, setProcessingStatus] = useState<'processing' | 'complete' | 'error'>('processing');
@@ -91,15 +90,7 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
   const [signatureBgColor, setSignatureBgColor] = useState('rgba(255,255,255,0)');
   const [savedSignature, setSavedSignature] = useState<string | null>(null);
   const signatureCanvasRef = useRef<SignatureCanvasRef>(null);
-  const abortControllerRef = useRef<AbortController | null>(null);
 
-  // Brute Force State
-  const [bruteForceMode, setBruteForceMode] = useState(false);
-  const [unlockStrategy, setUnlockStrategy] = useState<'sequential' | 'ripper'>('ripper');
-  const [turboMode, setTurboMode] = useState(false);
-  const [bruteCharset, setBruteCharset] = useState<BruteCharset>('numeric');
-  const [bruteMaxLength, setBruteMaxLength] = useState(4);
-  const [bruteStatus, setBruteStatus] = useState<string | null>(null);
   const [repairReport, setRepairReport] = useState<{
     original_pages: number;
     recovered_pages: number;
@@ -125,7 +116,6 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
     setResult(null);
     setShowPreview(false);
     setStatusMessage(null);
-    setBruteStatus(null);
     setRepairReport(null);
     setIsZip(false);
     setResultKind('pdf');
@@ -135,7 +125,6 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
     setResult(null);
     setShowPreview(false);
     setStatusMessage(null);
-    setBruteStatus(null);
     setRepairReport(null);
     setProgress(0);
     setProcessingStatus('processing');
@@ -460,69 +449,20 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
         }
       }
       else if (mode === 'unlock' && file) {
-        if (bruteForceMode) {
-          // Brute Force Logic
-          setProcessingStatus('processing');
-          notify.upload();
+        if (!password) throw new Error("Please enter the document password.");
+        setStatusMessage('Decrypting PDF and removing security restrictions...');
+        const isBackendUp = await apiClient.checkBackend();
 
-          // Create AbortController
-          const controller = new AbortController();
-          abortControllerRef.current = controller;
-
+        if (isBackendUp) {
           try {
-            let result;
-            if (unlockStrategy === 'ripper') {
-              const wordlist = GET_WORDLIST(turboMode ? 'turbo' : 'full');
-              if (turboMode) {
-                result = await multiThreadedUnlock(file, wordlist, (pass, count) => {
-                  setBruteStatus(`Turbo Pro: Testing "${pass}" (${count}/${wordlist.length})`);
-                });
-              } else {
-                result = await dictionaryUnlock(file, wordlist, (pass, count) => {
-                  setBruteStatus(`Ripper Mode: Testing "${pass}" (${count} attempts)`);
-                });
-              }
-            } else {
-              if (turboMode) {
-                // For sequential turbo, we could implement a sequential wordlist generator and feed it to multiThreadedUnlock
-                // But for now, let's just use it for ripper which is most common.
-                result = await bruteForceUnlock(file, {
-                  charset: bruteCharset,
-                  maxLength: bruteMaxLength,
-                  signal: controller.signal
-                }, (pass, count) => {
-                  setBruteStatus(`Sequential Mode: Testing "${pass}" (${count} attempts)`);
-                });
-              } else {
-                result = await bruteForceUnlock(file, {
-                  charset: bruteCharset,
-                  maxLength: bruteMaxLength,
-                  signal: controller.signal
-                }, (pass, count) => {
-                  setBruteStatus(`Sequential Mode: Testing "${pass}" (${count} attempts)`);
-                });
-              }
-            }
-
-            if (result.password && result.decryptedPdf) {
-              b = result.decryptedPdf;
-              setStatusMessage(`Password found: ${result.password}`);
-            } else {
-              throw new Error("Password not found. Try a different method or longer length.");
-            }
-          } catch (err: any) {
-            if (err.message === 'Brute force stopped by user.') {
-              setProcessing(false);
-              setProcessingStatus('error'); // Or 'idle'
-              setBruteStatus('stopped');
-              return; // Exit without further processing
-            }
-            throw err;
-          } finally {
-            abortControllerRef.current = null;
+            const res = await apiClient.submitJob('unlock', file, { password });
+            const arrayBuf = await res.outputBlob.arrayBuffer();
+            b = new Uint8Array(arrayBuf);
+          } catch (backendErr: any) {
+            console.warn("Backend unlock failed, falling back to local decryption engine:", backendErr);
+            b = await unlockPdf(file, password);
           }
         } else {
-          if (!password) throw new Error("Please enter the password.");
           b = await unlockPdf(file, password);
         }
       }
@@ -646,14 +586,6 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
                 status={processingStatus}
                 fileName={file?.name || `${multiFiles.length} files`}
               />
-              {bruteForceMode && processingStatus === 'processing' && (
-                <button 
-                  onClick={() => abortControllerRef.current?.abort()}
-                  className="mx-auto block px-4 py-2 rounded-lg bg-red-100 text-red-600 font-bold uppercase tracking-widest text-xs hover:bg-red-200 transition-colors"
-                >
-                  Cancel Operation
-                </button>
-              )}
             </div>
           )}
 
@@ -869,141 +801,38 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
 
               {needsPassword && (
                 <div className="space-y-6">
-                  {mode === 'unlock' && (
-                    <div className="flex items-center justify-between p-4 bg-slate-100 dark:bg-slate-700/50 rounded-xl">
-                      <span className="font-bold text-sm uppercase">Forgot Password? (Brute Force)</span>
+                  <div className="space-y-3">
+                    <label className="block text-xs font-black uppercase tracking-widest text-slate-500">
+                      {mode === 'protect' ? 'Set Encryption Password' : 'Enter Document Password'}
+                    </label>
+                    <div className="relative">
+                      <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
+                      <input
+                        type={showPassword ? 'text' : 'password'}
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder={mode === 'protect' ? 'Create a strong password...' : 'Enter the password to remove restrictions...'}
+                        className={`w-full p-6 pl-14 pr-14 rounded-2xl text-xl font-bold border-2 focus:ring-4 transition-all outline-none ${
+                          darkMode ? 'bg-slate-900 border-slate-700 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
+                        }`}
+                      />
                       <button
-                        role="switch"
-                        aria-checked={bruteForceMode}
-                        aria-label="Toggle Brute Force Mode"
-                        onClick={() => setBruteForceMode(!bruteForceMode)}
-                        className={`w-12 h-6 rounded-full transition-colors relative focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-red-500 outline-none ${bruteForceMode ? 'bg-red-600' : 'bg-slate-300'}`}
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-2 transition-colors"
+                        aria-label={showPassword ? 'Hide password' : 'Show password'}
                       >
-                        <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${bruteForceMode ? 'left-7' : 'left-1'}`}></div>
+                        {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                       </button>
                     </div>
-                  )}
+                  </div>
 
-                  {!bruteForceMode ? (
-                    <div className="space-y-4">
-                      <label className="block text-xs font-black uppercase tracking-widest text-slate-500 mb-2">
-                        {mode === 'protect' ? 'Set Encryption Password' : 'Enter Password to Unlock'}
-                      </label>
-                      <div className="relative">
-                        <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
-                        <input
-                          type="password"
-                          value={password}
-                          onChange={(e) => setPassword(e.target.value)}
-                          placeholder="••••••••"
-                          className={`w-full p-6 pl-14 rounded-2xl text-xl font-bold border-2 focus:ring-4 transition-all outline-none ${darkMode ? 'bg-slate-900 border-slate-700 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
-                            }`}
-                        />
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="space-y-6 animate-fadeIn">
-                      <div className="p-4 bg-orange-50 text-orange-800 rounded-xl text-sm font-bold border border-orange-200">
-                        Browser-based cracking works best for short passwords. "John the Ripper" mode uses a fast dictionary attack.
-                      </div>
-
-                      {/* Turbo Toggle */}
-                      <div className="flex items-center justify-between p-4 bg-red-50 dark:bg-red-900/10 rounded-xl border border-red-100 dark:border-red-900/30">
-                        <div className="flex items-center gap-3">
-                          <Zap className="text-red-600 fill-red-600" size={20} />
-                          <div>
-                            <span className="font-black text-sm uppercase block text-red-700">Turbo Pro Mode</span>
-                            <span className="text-[10px] text-red-600/70 font-bold uppercase tracking-tighter">Uses all CPU cores (Extreme Speed)</span>
-                          </div>
-                        </div>
-                        <button
-                          role="switch"
-                          aria-checked={turboMode}
-                          aria-label="Toggle Turbo Pro Mode"
-                          onClick={() => setTurboMode(!turboMode)}
-                          className={`w-12 h-6 rounded-full transition-colors relative focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-red-500 outline-none ${turboMode ? 'bg-red-600' : 'bg-slate-300'}`}
-                        >
-                          <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${turboMode ? 'left-7' : 'left-1'}`}></div>
-                        </button>
-                      </div>
-
-                      {/* Strategy Selector */}
-                      <div className="space-y-2">
-                        <label className="block text-xs font-black uppercase tracking-widest text-slate-500">Unlock Method</label>
-                        <div className="grid grid-cols-2 gap-3">
-                          <button
-                            onClick={() => setUnlockStrategy('ripper')}
-                            className={`p-4 rounded-xl border-2 font-black transition-all flex items-center justify-center gap-2 ${unlockStrategy === 'ripper' ? 'border-red-600 bg-red-600 text-white' : 'border-slate-200 text-slate-400'}`}
-                          >
-                            <Zap size={16} /> John The Ripper
-                          </button>
-                          <button
-                            onClick={() => setUnlockStrategy('sequential')}
-                            className={`p-4 rounded-xl border-2 font-black transition-all flex items-center justify-center gap-2 ${unlockStrategy === 'sequential' ? 'border-red-600 bg-red-600 text-white' : 'border-slate-200 text-slate-400'}`}
-                          >
-                            Sequential Brute Force
-                          </button>
-                        </div>
-                      </div>
-
-                      {unlockStrategy === 'sequential' && (
-                        <>
-                          {/* Charset Selector */}
-                          <div className="space-y-2">
-                            <label className="block text-xs font-black uppercase tracking-widest text-slate-500">Character Set</label>
-                            <div className="grid grid-cols-2 gap-3">
-                              {[
-                                { id: 'numeric', label: 'Numeric (0-9)' },
-                                { id: 'alpha-lower', label: 'Letters (a-z)' },
-                                { id: 'alpha-mixed', label: 'Mixed Case (a-Z)' },
-                                { id: 'alphanumeric', label: 'All (a-Z, 0-9)' }
-                              ].map(opt => (
-                                <button
-                                  key={opt.id}
-                              onClick={() => setBruteCharset(opt.id as BruteCharset)}
-                                  className={`p-3 rounded-xl border-2 text-sm font-bold transition-all ${bruteCharset === opt.id ? 'border-red-500 bg-red-50 text-red-600 dark:bg-red-900/20' : 'border-slate-200 dark:border-slate-700'}`}
-                                >
-                                  {opt.label}
-                                </button>
-                              ))}
-                            </div>
-                          </div>
-
-                          {/* Max Length Slider */}
-                          <div className="space-y-4">
-                            <div className="flex justify-between">
-                              <label className="block text-xs font-black uppercase tracking-widest text-slate-500">Max Length: {bruteMaxLength}</label>
-                            </div>
-                            <input
-                              type="range"
-                              min="1"
-                              max="6"
-                              value={bruteMaxLength}
-                              onChange={(e) => setBruteMaxLength(parseInt(e.target.value))}
-                              className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-red-600"
-                            />
-                            <div className="flex justify-between text-xs font-bold text-slate-400">
-                              <span>1</span>
-                              <span>6 (Very Slow)</span>
-                            </div>
-                          </div>
-                        </>
-                      )}
-
-                      {unlockStrategy === 'ripper' && (
-                        <div className="p-6 rounded-2xl border-4 border-dashed border-red-200 text-center space-y-3">
-                          <Zap className="mx-auto text-red-600 w-12 h-12 animate-pulse" />
-                          <p className="text-xs font-black uppercase text-slate-500">Ripper Mode Active</p>
-                          <p className="text-[10px] text-slate-400">Testing top 1,000 most common passwords used globally. Found 80% of weak passwords in seconds.</p>
-                        </div>
-                      )}
-
-                      {/* Status Display */}
-                      {bruteStatus && (
-                        <div className="p-4 bg-slate-900 text-green-400 font-mono text-sm rounded-xl overflow-hidden truncate">
-                          &gt; {bruteStatus}
-                        </div>
-                      )}
+                  {mode === 'unlock' && (
+                    <div className={`p-4 rounded-xl text-xs flex items-center gap-3 border ${
+                      darkMode ? 'bg-slate-800/60 border-slate-700 text-slate-300' : 'bg-blue-50/80 border-blue-100 text-blue-800'
+                    }`}>
+                      <Lock size={16} className="shrink-0 text-blue-600 dark:text-blue-400" />
+                      <span>PDFBolt permanently removes password protection and permission locks from documents you have authorized access to. Passwords are never stored or transmitted.</span>
                     </div>
                   )}
                 </div>
@@ -1028,21 +857,12 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
             {!result && (
               <div className="flex flex-col gap-4 w-full max-w-xl">
                 <button
-                  disabled={processing || (needsPageInput && !pageInput) || (needsPassword && !password && !bruteForceMode) || (isImageTool && multiFiles.length === 0)}
+                  disabled={processing || (needsPageInput && !pageInput) || (needsPassword && !password) || (isImageTool && multiFiles.length === 0)}
                   onClick={process}
                   className="w-full px-8 py-6 sm:py-8 bg-red-600 text-white rounded-[2rem] font-black text-2xl sm:text-3xl shadow-2xl hover:bg-red-700 hover:scale-[1.02] disabled:opacity-30 transition-all flex items-center justify-center gap-4 group"
                 >
                   {processing ? <div className="w-8 h-8 border-4 border-white/30 border-t-white rounded-full animate-spin"></div> : <span>Process {title}</span>}
                 </button>
-
-                {processing && bruteForceMode && (
-                  <button
-                    onClick={() => abortControllerRef.current?.abort()}
-                    className="w-full py-4 bg-slate-800 text-white rounded-2xl font-bold hover:bg-slate-700 active:scale-95 transition-all"
-                  >
-                    Stop Operation
-                  </button>
-                )}
               </div>
             )}
 

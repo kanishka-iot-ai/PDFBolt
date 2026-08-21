@@ -1,6 +1,8 @@
 import { PDFDocument, StandardFonts, rgb } from 'pdf-lib-plus-encrypt';
 
 /**
+ * Encrypts a PDF with user and owner passwords and configurable security permissions.
+ * @param file The source PDF file.
  * @param password The password to set.
  * @returns Encrypted PDF as Uint8Array.
  */
@@ -41,22 +43,45 @@ export async function protectPdf(file: File, password: string): Promise<Uint8Arr
 }
 
 /**
- * Unlocks (Decrypts) a PDF file using the provided password.
+ * Unlocks and permanently decrypts a PDF file using the authorized password.
+ * Removes user password encryption and all permission restriction flags.
  * @param file The encrypted PDF file.
  * @param password The password to unlock.
- * @returns Decrypted PDF (no password) as Uint8Array.
+ * @returns Decrypted PDF (unencrypted) as Uint8Array.
  */
 export async function unlockPdf(file: File, password: string): Promise<Uint8Array> {
     const bytes = await file.arrayBuffer();
     try {
-        // Load with password - bypass TS check for library extension
+        // Load document with the provided authorization password
         const pdfDoc = await PDFDocument.load(bytes, { password } as any);
 
-        // To "remove" encryption in pdf-lib, we just save it. 
-        // pdf-lib does not persist encryption on save unless .encrypt() is called again.
+        // Saving without calling .encrypt() permanently removes encryption
         return await pdfDoc.save();
-    } catch (err) {
-        throw new Error("Invalid password or failed to decrypt.");
+    } catch (err: any) {
+        const msg = (err.message || '').toLowerCase();
+        if (msg.includes('password') || msg.includes('decrypt') || msg.includes('encrypted') || msg.includes('auth')) {
+            throw new Error("Incorrect password. Please verify and enter the correct document password.");
+        }
+        throw new Error("Failed to decrypt document. Please verify the password and try again.");
+    }
+}
+
+/**
+ * Removes permission restrictions (such as printing or copying locks) from a document.
+ * @param file PDF file with permission restrictions.
+ * @returns Unrestricted PDF as Uint8Array.
+ */
+export async function removePermissions(file: File): Promise<Uint8Array> {
+    const bytes = await file.arrayBuffer();
+    try {
+        const srcDoc = await PDFDocument.load(bytes, { ignoreEncryption: true });
+        const pdfDoc = await PDFDocument.create();
+        const pageIndices = srcDoc.getPageIndices();
+        const copiedPages = await pdfDoc.copyPages(srcDoc, pageIndices);
+        copiedPages.forEach(page => pdfDoc.addPage(page));
+        return await pdfDoc.save();
+    } catch (err: any) {
+        throw new Error("Unable to remove permissions. Document may require a user password.");
     }
 }
 
@@ -94,7 +119,7 @@ export async function signPdf(
         : await pdfDoc.embedJpg(sigBytes);
 
     const pages = pdfDoc.getPages();
-    const { width, height } = signatureImage.scale(0.15); // Scale down signature (0.15 is smaller than 0.25)
+    const { width, height } = signatureImage.scale(0.15);
 
     for (const page of pages) {
         const { width: pageWidth, height: pageHeight } = page.getSize();
@@ -130,225 +155,4 @@ export async function signPdf(
     }
 
     return await pdfDoc.save();
-}
-
-/**
- * Attempts to brute force a PDF password.
- * @param file Encrypted PDF file
- * @param options Charset and length options
- * @param onProgress Callback for progress
- */
-export async function bruteForceUnlock(
-    file: File,
-    options: {
-        charset: 'numeric' | 'alpha-lower' | 'alpha-mixed' | 'alphanumeric' | 'all';
-        maxLength: number;
-        signal?: AbortSignal;
-    },
-    onProgress: (currentAttempt: string, totalAttempts: number) => void
-): Promise<{ password: string | null; decryptedPdf: Uint8Array | null }> {
-
-    // Define charsets
-    const charsets = {
-        'numeric': '0123456789',
-        'alpha-lower': 'abcdefghijklmnopqrstuvwxyz',
-        'alpha-mixed': 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
-        'alphanumeric': '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
-        'all': '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*()_+-=[]{}|;:,.<>?/~`'
-    };
-
-    const chars = charsets[options.charset];
-    const bytes = await file.arrayBuffer();
-
-    // Helper to generate combinations
-    const generateCombinations = function* (maxLength: number) {
-        // Try lengths from 1 up to maxLength
-        for (let len = 1; len <= maxLength; len++) {
-            const indices = new Array(len).fill(0);
-
-            while (true) {
-                let password = "";
-                for (let i = 0; i < len; i++) {
-                    password += chars[indices[i]];
-                }
-                yield password;
-
-                let nextIndex = len - 1;
-                while (nextIndex >= 0) {
-                    indices[nextIndex]++;
-                    if (indices[nextIndex] < chars.length) {
-                        break;
-                    }
-                    indices[nextIndex] = 0;
-                    nextIndex--;
-                }
-
-                if (nextIndex < 0) break;
-            }
-        }
-    };
-
-    let count = 0;
-    const generator = generateCombinations(options.maxLength);
-
-    for (const password of generator) {
-        // Check for cancellation
-        if (options.signal?.aborted) {
-            throw new Error("Brute force stopped by user.");
-        }
-
-        count++;
-        // Update more frequently for better responsiveness
-        if (count % 10 === 0) {
-            onProgress(password, count);
-            // Yield to main thread
-            await new Promise(r => setTimeout(r, 0));
-        }
-
-        try {
-            // Attempt load
-            const pdfDoc = await PDFDocument.load(bytes, { password } as any);
-
-            // If we get here, password is correct!
-            const decryptedPdf = await pdfDoc.save();
-            return { password, decryptedPdf };
-        } catch (e: any) {
-            const msg = (e.message || '').toLowerCase();
-            if (!msg.includes('password') && !msg.includes('decrypt') && !msg.includes('encrypted') && !msg.includes('permission')) {
-                throw e;
-            }
-            // Wrong password, continue
-        }
-    }
-
-    return { password: null, decryptedPdf: null };
-}
-
-/**
- * Attempts to unlock a PDF using a dictionary of common passwords (John the Ripper style).
- * @param file Encrypted PDF file
- * @param wordlist Array of passwords to try
- * @param onProgress Callback for progress
- */
-export async function dictionaryUnlock(
-    file: File,
-    wordlist: string[],
-    onProgress: (currentAttempt: string, totalAttempts: number) => void
-): Promise<{ password: string | null; decryptedPdf: Uint8Array | null }> {
-    const bytes = await file.arrayBuffer();
-    let count = 0;
-
-    for (const password of wordlist) {
-        count++;
-
-        // Update UI every 5 attempts for dictionary (since it's usually small)
-        if (count % 5 === 0) {
-            onProgress(password, count);
-            await new Promise(r => setTimeout(r, 0));
-        }
-
-        try {
-            const pdfDoc = await PDFDocument.load(bytes, { password } as any);
-            const decryptedPdf = await pdfDoc.save();
-            return { password, decryptedPdf };
-        } catch (e: any) {
-            const msg = (e.message || '').toLowerCase();
-            if (!msg.includes('password') && !msg.includes('decrypt') && !msg.includes('encrypted') && !msg.includes('permission')) {
-                throw e;
-            }
-            // Continue
-        }
-    }
-
-    return { password: null, decryptedPdf: null };
-}
-
-/**
- * Attempts to unlock a PDF using multiple Web Workers for high performance.
- * @param file Encrypted PDF file
- * @param wordlist List of passwords to test
- * @param onProgress Callback for total progress
- */
-export async function multiThreadedUnlock(
-    file: File,
-    wordlist: string[],
-    onProgress: (lastAttempt: string, totalCount: number) => void
-): Promise<{ password: string | null; decryptedPdf: Uint8Array | null }> {
-    const pdfBytes = await file.arrayBuffer();
-    const coreCount = navigator.hardwareConcurrency || 4;
-    const workers: Worker[] = [];
-    const batchSize = Math.ceil(wordlist.length / coreCount);
-
-    return new Promise((resolve, reject) => {
-        let isResolved = false;
-        let finishedWorkers = 0;
-        let totalTested = 0;
-
-        const cleanup = () => {
-            workers.forEach(w => w.terminate());
-        };
-
-        for (let i = 0; i < coreCount; i++) {
-            const worker = new Worker(new URL('./unlock.worker.ts', import.meta.url), { type: 'module' });
-            workers.push(worker);
-
-            const start = i * batchSize;
-            const end = Math.min(start + batchSize, wordlist.length);
-            const batch = wordlist.slice(start, end);
-
-            const chunkSize = 50;
-            let offset = 0;
-
-            const sendNextChunk = () => {
-                if (offset >= batch.length || isResolved) return;
-                const chunk = batch.slice(offset, offset + chunkSize);
-                worker.postMessage({ pdfBytes, passwords: chunk, batchId: i });
-                offset += chunkSize;
-            };
-
-            worker.onmessage = async (e) => {
-                if (isResolved) return;
-                const { type, password, count, lastAttempt } = e.data;
-
-                if (type === 'SUCCESS') {
-                    isResolved = true;
-                    cleanup();
-
-                    try {
-                        const pdfDoc = await PDFDocument.load(pdfBytes, { password } as any);
-                        const decryptedPdf = await pdfDoc.save();
-                        resolve({ password, decryptedPdf });
-                    } catch (err) {
-                        reject(err);
-                    }
-                } else if (type === 'PROGRESS' || type === 'FINISHED') {
-                    totalTested += count;
-                    onProgress(lastAttempt, totalTested);
-
-                    if (type === 'FINISHED') {
-                        if (offset < batch.length && !isResolved) {
-                            sendNextChunk();
-                        } else {
-                            finishedWorkers++;
-                            if (finishedWorkers >= coreCount && !isResolved) {
-                                cleanup();
-                                resolve({ password: null, decryptedPdf: null });
-                            }
-                        }
-                    }
-                }
-            };
-
-            worker.onerror = (err) => {
-                console.error("Worker Error:", err);
-                finishedWorkers++;
-                if (finishedWorkers >= coreCount && !isResolved) {
-                    cleanup();
-                    resolve({ password: null, decryptedPdf: null });
-                }
-            };
-
-            sendNextChunk();
-        }
-    });
 }
