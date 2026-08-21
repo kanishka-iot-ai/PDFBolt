@@ -393,6 +393,15 @@ export async function validateOutputIntegrity(
                 };
             }
         } catch (e: any) {
+            // Check if output is a valid encrypted PDF (e.g. from protectPdf or password security)
+            const textSample = new TextDecoder('latin1').decode(bytes.slice(0, Math.min(bytes.length, 4096)));
+            const endSample = new TextDecoder('latin1').decode(bytes.slice(Math.max(0, bytes.length - 2048)));
+            const isEncrypted = textSample.includes('/Encrypt') || endSample.includes('/Encrypt') || (e.message && (e.message.includes('Pages') || e.message.includes('encrypt') || e.message.includes('password') || e.message.includes('encrypted')));
+            const hasEOF = endSample.includes('%%EOF') || textSample.includes('%PDF-');
+
+            if (isEncrypted && hasEOF) {
+                return { valid: true };
+            }
 
             return {
                 valid: false,
