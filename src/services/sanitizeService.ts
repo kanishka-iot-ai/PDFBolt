@@ -1,8 +1,102 @@
+export interface SensitiveItem {
+    id: string;
+    type: string;
+    label: string;
+    value: string;
+    masked: string;
+    page: number;
+    selected: boolean;
+}
+
+export const SENSITIVE_PATTERNS: Record<string, { regex: RegExp; label: string }> = {
+    PAN: { regex: /\b[A-Z]{5}[0-9]{4}[A-Z]\b/g, label: 'PAN Card' },
+    AADHAAR: { regex: /\b[2-9]\d{3}\s\d{4}\s\d{4}\b|\b[2-9]\d{11}\b/g, label: 'Aadhaar Number' },
+    PHONE_IN: { regex: /(?:\+91[\-\s]?)?[6-9]\d{9}\b/g, label: 'Indian Mobile' },
+    IFSC: { regex: /\b[A-Z]{4}0[A-Z0-9]{6}\b/g, label: 'Bank IFSC' },
+    UPI: { regex: /\b[\w\.\-]+@(okhdfcbank|okaxis|okicici|oksbi|paytm|ybl|apl|upi|axl|ibl|barodampay|federal)\b/gi, label: 'UPI ID' },
+    EMAIL: { regex: /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g, label: 'Email Address' },
+    CREDIT_CARD: { regex: /\b(?:\d{4}[-\s]?){3}\d{4}\b/g, label: 'Card Number' },
+    BANK_ACCOUNT: { regex: /\b(?:A\/C|Account|Acc|AC|A\/c)[\s:#.-]*(\d{9,18})\b|\b\d{9,18}\b/gi, label: 'Bank Account' }
+};
+
+export function maskSensitiveValue(val: string): string {
+    const clean = val.trim();
+    if (clean.length <= 4) return '***';
+    return clean.slice(0, 2) + '*'.repeat(Math.max(2, clean.length - 4)) + clean.slice(-2);
+}
+
 /**
- * "Redacts" a PDF by flattening it to images.
- * This ensures no hidden text or interactive elements remain.
+ * Scans PDF text page-by-page client-side for sensitive PII patterns and custom keywords.
  */
-export async function redactPdf(file: File): Promise<Uint8Array> {
+export async function detectSensitiveDataClient(file: File, customTerms: string[] = []): Promise<SensitiveItem[]> {
+    const pdfjsLib = await import('pdfjs-dist');
+    const pdfjsWorker = (await import('pdfjs-dist/build/pdf.worker.min.mjs?url')).default;
+    pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
+
+    const arrayBuffer = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+    const findings: SensitiveItem[] = [];
+
+    try {
+        for (let i = 1; i <= pdf.numPages; i++) {
+            const page = await pdf.getPage(i);
+            const textContent = await page.getTextContent();
+            const pageText = textContent.items.map((item: any) => item.str || '').join(' ');
+
+            // 1. Scan built-in regex patterns
+            for (const [pType, { regex, label }] of Object.entries(SENSITIVE_PATTERNS)) {
+                regex.lastIndex = 0;
+                let match;
+                while ((match = regex.exec(pageText)) !== null) {
+                    const val = match[0];
+                    findings.push({
+                        id: `${pType}_p${i}_${match.index}_${Math.random().toString(36).substr(2, 4)}`,
+                        type: pType,
+                        label,
+                        value: val,
+                        masked: maskSensitiveValue(val),
+                        page: i,
+                        selected: true
+                    });
+                }
+            }
+
+            // 2. Scan custom query terms
+            for (const term of customTerms) {
+                const tClean = term.trim();
+                if (!tClean) continue;
+                const termRegex = new RegExp(tClean.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+                let match;
+                while ((match = termRegex.exec(pageText)) !== null) {
+                    const val = match[0];
+                    findings.push({
+                        id: `CUSTOM_p${i}_${match.index}_${Math.random().toString(36).substr(2, 4)}`,
+                        type: 'CUSTOM_QUERY',
+                        label: `Custom: "${tClean}"`,
+                        value: val,
+                        masked: maskSensitiveValue(val),
+                        page: i,
+                        selected: true
+                    });
+                }
+            }
+        }
+    } finally {
+        pdf.destroy();
+    }
+
+    return findings;
+}
+
+/**
+ * Irreversibly redacts target regions and text occurrences by burning solid black boxes onto visual
+ * layers and stripping all metadata packets from the PDF container.
+ */
+export async function redactPdf(
+    file: File,
+    regions: { page: number; x: number; y: number; w: number; h: number }[] = [],
+    termsToRedact: string[] = []
+): Promise<Uint8Array> {
     const pdfjsLib = await import('pdfjs-dist');
     const pdfjsWorker = (await import('pdfjs-dist/build/pdf.worker.min.mjs?url')).default;
     pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
@@ -12,12 +106,11 @@ export async function redactPdf(file: File): Promise<Uint8Array> {
     const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
 
     try {
-        // Create new PDF
         const newPdf = await PDFDocument.create();
 
         for (let i = 1; i <= pdf.numPages; i++) {
             const page = await pdf.getPage(i);
-            const viewport = page.getViewport({ scale: 2.0 }); // High quality
+            const viewport = page.getViewport({ scale: 2.0 });
 
             const canvas = document.createElement('canvas');
             const context = canvas.getContext('2d');
@@ -26,11 +119,39 @@ export async function redactPdf(file: File): Promise<Uint8Array> {
 
             if (context) {
                 await page.render({ canvasContext: context, viewport }).promise;
-                const imgData = canvas.toDataURL('image/jpeg', 0.9);
+
+                // Burn manual drag redaction regions for this page
+                const pageRegions = regions.filter(r => r.page === i);
+                context.fillStyle = '#000000';
+                for (const r of pageRegions) {
+                    context.fillRect(r.x * 2.0, r.y * 2.0, r.w * 2.0, r.h * 2.0);
+                }
+
+                // If term-based redactions specified, locate and burn on canvas
+                if (termsToRedact.length > 0) {
+                    const textContent = await page.getTextContent();
+                    for (const item of textContent.items as any[]) {
+                        const itemStr = item.str || '';
+                        for (const term of termsToRedact) {
+                            if (term && itemStr.toLowerCase().includes(term.toLowerCase())) {
+                                const tx = item.transform;
+                                if (tx && tx.length >= 6) {
+                                    const x = tx[4] * 2.0;
+                                    const y = (page.view[3] - tx[5] - (item.height || 12)) * 2.0;
+                                    const w = (item.width || term.length * 8) * 2.0;
+                                    const h = (item.height || 14) * 2.0;
+                                    context.fillRect(x - 2, y - 2, w + 4, h + 4);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                const imgData = canvas.toDataURL('image/jpeg', 0.92);
                 const imgBytes = await fetch(imgData).then(res => res.arrayBuffer());
 
                 const jpgImage = await newPdf.embedJpg(imgBytes);
-                const pdfPage = newPdf.addPage([jpgImage.width / 2, jpgImage.height / 2]); // Adjust scale back
+                const pdfPage = newPdf.addPage([jpgImage.width / 2, jpgImage.height / 2]);
                 pdfPage.drawImage(jpgImage, {
                     x: 0,
                     y: 0,
@@ -39,6 +160,14 @@ export async function redactPdf(file: File): Promise<Uint8Array> {
                 });
             }
         }
+
+        // Complete Metadata Sanitization
+        newPdf.setTitle('');
+        newPdf.setAuthor('');
+        newPdf.setSubject('');
+        newPdf.setKeywords([]);
+        newPdf.setProducer('PDFBolt True Redactor');
+        newPdf.setCreator('PDFBolt');
 
         return await newPdf.save();
     } finally {
