@@ -25,17 +25,115 @@ from backend.app.core.validation import validate_pdf_output
 from backend.app.core.logging import logger
 
 
+class RepairOutputValidator:
+    """
+    Forensic output validator for PDF structural recovery.
+    Verifies that the output is a valid, non-empty, structurally intact PDF containing
+    genuine recovered content consistent with the input document.
+    """
+    @staticmethod
+    def validate_repaired_document(
+        output_path: Path,
+        expected_min_pages: int = 1,
+        expected_content_strings: Optional[List[str]] = None
+    ) -> Dict[str, Any]:
+        if not output_path.exists() or output_path.stat().st_size < 100:
+            raise OutputValidationError("Repair output file is missing or empty.")
+
+        # 1. Verify PDF opens with PyMuPDF
+        mupdf_doc = None
+        recovered_pages = 0
+        total_text_chars = 0
+        has_images_or_drawings = False
+        extracted_texts = []
+
+        try:
+            mupdf_doc = pymupdf.open(str(output_path))
+            recovered_pages = len(mupdf_doc)
+            if recovered_pages < expected_min_pages:
+                raise OutputValidationError(
+                    f"Recovered page count ({recovered_pages}) is less than expected recoverable pages ({expected_min_pages})."
+                )
+
+            for page in mupdf_doc:
+                txt = page.get_text().strip()
+                extracted_texts.append(txt)
+                total_text_chars += len(txt)
+                image_list = page.get_images()
+                drawings = page.get_drawings()
+                if len(image_list) > 0 or len(drawings) > 0:
+                    has_images_or_drawings = True
+
+            mupdf_doc.close()
+        except OutputValidationError:
+            raise
+        except Exception as e:
+            if mupdf_doc:
+                try:
+                    mupdf_doc.close()
+                except Exception:
+                    pass
+            raise OutputValidationError(f"Repaired PDF failed PyMuPDF structure verification: {e}")
+
+        # 2. Verify PDF opens with PyPDF
+        try:
+            reader = PdfReader(str(output_path), strict=False)
+            if len(reader.pages) != recovered_pages:
+                raise OutputValidationError("Parser page count mismatch between PyMuPDF and PyPDF.")
+        except OutputValidationError:
+            raise
+        except Exception as e:
+            raise OutputValidationError(f"Repaired PDF failed PyPDF structure verification: {e}")
+
+        # 3. Verify PDF opens with pikepdf (QPDF)
+        if HAS_PIKEPDF:
+            try:
+                with pikepdf.open(str(output_path), suppress_warnings=True) as pdf:
+                    if len(pdf.pages) != recovered_pages:
+                        raise OutputValidationError("Parser page count mismatch in QPDF verification.")
+            except OutputValidationError:
+                raise
+            except Exception as e:
+                raise OutputValidationError(f"Repaired PDF failed QPDF structure verification: {e}")
+
+        # 4. Content Verification: Ensure output is NOT a fake/blank PDF
+        if total_text_chars == 0 and not has_images_or_drawings:
+            raise OutputValidationError("Repaired PDF contains no content streams (blank pages detected).")
+
+        # 5. Check if output contains placeholder messages indicating false repair
+        combined_text = " ".join(extracted_texts).lower()
+        if "the original pdf structure contained unrecoverable byte corruption" in combined_text or "document envelope has been rebuilt" in combined_text:
+            raise OutputValidationError("Repaired output contains placeholder text instead of recovered document content.")
+
+        # 6. If expected strings were specified, ensure they were preserved
+        if expected_content_strings:
+            for s in expected_content_strings:
+                if s.lower() not in combined_text:
+                    raise OutputValidationError(f"Expected source text '{s}' was not recovered in repaired PDF.")
+
+        return {
+            "valid": True,
+            "recovered_pages": recovered_pages,
+            "total_text_chars": total_text_chars,
+            "has_images_or_drawings": has_images_or_drawings
+        }
+
+
 class RepairProcessor(BaseProcessor):
     """
     Production-grade multi-stage PDF structural recovery and repair pipeline.
     
     Phases:
-    1. Structural Analysis & Corruption Detection (Object and Page pre-scan)
+    1. Structural Analysis & Corruption Detection (Object, Page, and Stream pre-scan)
     2. Header/Trailer Alignment and XRef Reconstruction
-    3. Multi-Engine Staged Recovery (pikepdf / QPDF -> PyMuPDF -> Page-Tree Synthesizer -> PyPDF)
-    4. Content Stream & Resource Verification
-    5. Visual Fallback Reconstruction (when object graph is severely broken)
-    6. Multi-Parser Independent Validation & Quality Scoring (0-100 score)
+    3. Multi-Engine Staged Recovery:
+       - pikepdf / QPDF (C++ structural re-linearization & XRef recovery)
+       - PyMuPDF Deep Stream and Object Salvager
+       - Synthetic Page-Tree & Catalog Synthesizer
+       - PyPDF Fault-Tolerant Reader
+       - Visual Raster Fallback (for broken vector streams)
+    4. RepairOutputValidator: Independent multi-parser invariant validation
+    5. Truthful error reporting (REPAIR_UNRECOVERABLE) when recovery is impossible
     """
 
     operation = "repair"
@@ -49,7 +147,7 @@ class RepairProcessor(BaseProcessor):
         catalog_matches = list(re.finditer(rb"(\d+)\s+(\d+)\s+obj\s*<<[^>]*?/Type\s*/Catalog\b", raw_bytes, re.DOTALL))
         pages_tree_matches = list(re.finditer(rb"(\d+)\s+(\d+)\s+obj\s*<<[^>]*?/Type\s*/Pages\b", raw_bytes, re.DOTALL))
 
-        has_header = raw_bytes.startswith(b"%PDF-") or (raw_bytes.find(b"%PDF-") != -1)
+        has_header = (raw_bytes.find(b"%PDF-") != -1)
         has_eof = raw_bytes.rstrip().endswith(b"%%EOF")
         has_xref = (raw_bytes.rfind(b"xref") != -1) or (raw_bytes.rfind(b"/Type/XRef") != -1) or (raw_bytes.rfind(b"/Type /XRef") != -1)
         has_trailer = raw_bytes.rfind(b"trailer") != -1
@@ -57,7 +155,6 @@ class RepairProcessor(BaseProcessor):
         # Detect page count directly from objects if /Type /Page is present
         detected_pages = len(page_matches)
         if detected_pages == 0:
-            # Fallback heuristic: check for /MediaBox or /Contents definitions
             media_matches = list(re.finditer(rb"/MediaBox\s*\[", raw_bytes))
             if media_matches:
                 detected_pages = len(media_matches)
@@ -78,7 +175,8 @@ class RepairProcessor(BaseProcessor):
 
         return {
             "total_objects": len(obj_matches),
-            "detected_pages": max(1, detected_pages),
+            "detected_pages": detected_pages,
+            "has_header": has_header,
             "has_catalog": len(catalog_matches) > 0,
             "has_pages_tree": len(pages_tree_matches) > 0,
             "has_xref": has_xref,
@@ -133,7 +231,6 @@ class RepairProcessor(BaseProcessor):
         if not HAS_PYMUPDF:
             return False, None
         try:
-            # Find all page object IDs: "X Y obj << ... /Type /Page"
             page_objs = list(re.finditer(rb"(\d+)\s+(\d+)\s+obj\s*<<[^>]*?/Type\s*/Page\b", raw_bytes, re.DOTALL))
             if not page_objs:
                 return False, None
@@ -142,7 +239,6 @@ class RepairProcessor(BaseProcessor):
             kids_str = " ".join(kid_refs)
             count = len(page_objs)
 
-            # Build appended catalog & pages tree objects
             max_id = max([int(m.group(1).decode()) for m in page_objs]) + 1
             pages_id = max_id
             catalog_id = max_id + 1
@@ -196,11 +292,7 @@ startxref
         return False, None
 
     def _try_visual_fallback_reconstruction(self, cleaned_bytes: bytes, output_path: Path) -> Tuple[bool, Optional[int]]:
-        """
-        Stage 5: Visual raster rendering fallback.
-        ONLY used when internal object references cannot be linked.
-        Preserves page count and visual appearance without dumping internal object syntax.
-        """
+        """Stage 5: Visual raster rendering fallback when object graph syntax is corrupt."""
         if not HAS_PYMUPDF:
             return False, None
         try:
@@ -238,7 +330,7 @@ startxref
         strategy: str
     ) -> Dict[str, Any]:
         """Validates output across independent parsers and calculates a 0-100 quality score."""
-        detected_pages = analysis["detected_pages"]
+        detected_pages = max(1, analysis["detected_pages"])
         recovered_pages = 0
         text_recovery_pct = 0.0
         visual_recovery_pct = 0.0
@@ -247,24 +339,21 @@ startxref
         pypdf_valid = False
         warnings = []
 
-        # 1. Validate with PyMuPDF
         if HAS_PYMUPDF and output_path.exists():
             try:
                 doc = pymupdf.open(str(output_path))
                 recovered_pages = len(doc)
                 mupdf_valid = recovered_pages > 0
                 
-                # Check extracted text
                 total_text_chars = sum([len(p.get_text().strip()) for p in doc])
                 if total_text_chars > 0:
                     text_recovery_pct = 100.0 if recovered_pages >= detected_pages else round((recovered_pages / detected_pages) * 100.0, 1)
                 else:
-                    text_recovery_pct = 80.0 if strategy == "visual_reconstruction" else 100.0 # pure graphics / scanned
+                    text_recovery_pct = 80.0 if strategy == "visual_reconstruction" else 100.0
                 doc.close()
             except Exception as e:
                 warnings.append(f"MuPDF validator notice: {e}")
 
-        # 2. Validate with PyPDF
         try:
             r = PdfReader(str(output_path), strict=False)
             if len(r.pages) > 0:
@@ -274,7 +363,6 @@ startxref
         except Exception as e:
             warnings.append(f"PyPDF validator notice: {e}")
 
-        # 3. Validate with pikepdf / QPDF
         if HAS_PIKEPDF:
             try:
                 with pikepdf.open(str(output_path), suppress_warnings=True) as pdf:
@@ -289,16 +377,10 @@ startxref
 
         visual_recovery_pct = 100.0 if pages_lost == 0 else round((recovered_pages / max(1, detected_pages)) * 100.0, 1)
 
-        # Quality Score Calculation (0 - 100)
-        # Structural Integrity (25%)
         structural_pts = 25 if (qpdf_valid and mupdf_valid) else (18 if (mupdf_valid or pypdf_valid) else 5)
-        # Page Recovery (25%)
         page_pts = 25.0 * (recovered_pages / max(1, detected_pages))
-        # Text Recovery (20%)
         text_pts = 20.0 * (text_recovery_pct / 100.0)
-        # Visual Recovery (20%)
         visual_pts = 20.0 * (visual_recovery_pct / 100.0)
-        # Independent Validation (10%)
         val_pts = 10 if (mupdf_valid and pypdf_valid) else 5
 
         total_score = min(100, max(0, round(structural_pts + page_pts + text_pts + visual_pts + val_pts)))
@@ -311,7 +393,7 @@ startxref
             message = f"Partial recovery: {recovered_pages} of {detected_pages} pages recovered ({pages_lost} pages unreadable)."
         else:
             status = "unrecoverable"
-            message = "Unable to recover document data across all recovery tiers."
+            message = "We could not recover the original document structure from this PDF."
 
         return {
             "success": status in ["repaired", "partial_recovery"],
@@ -347,6 +429,9 @@ startxref
         with open(input_pdf, "rb") as f:
             raw_bytes = f.read()
 
+        if len(raw_bytes) == 0:
+            raise PDFBoltError("FILE_EMPTY", "Uploaded file is empty.")
+
         # Step 1: Pre-Analysis
         analysis = self._analyze_structure(raw_bytes)
         logger.info(
@@ -354,35 +439,42 @@ startxref
             f"{analysis['detected_pages']} detected pages, corruption: {analysis['corruption_level']}"
         )
 
+        # Early check: Genuinely unrecoverable if 0 objects and no PDF markers
+        if analysis["total_objects"] == 0 and analysis["detected_pages"] == 0 and not analysis["has_header"] and not analysis["has_eof"]:
+            raise PDFBoltError(
+                "REPAIR_UNRECOVERABLE",
+                "We could not recover the original document structure from this PDF."
+            )
+
         cleaned_bytes = self._sanitize_bytes(raw_bytes)
         repaired = False
         strategy_used = "none"
 
-        # Step 2: Tier 1 - pikepdf (QPDF C++ Engine)
+        # Stage 1: pikepdf (QPDF C++ Engine)
         if not repaired:
             repaired, count = self._try_pikepdf_recovery(cleaned_bytes, output_path)
             if repaired:
                 strategy_used = "qpdf_reconstruction"
 
-        # Step 3: Tier 2 - PyMuPDF Structural Salvage
+        # Stage 2: PyMuPDF Structural Salvage
         if not repaired:
             repaired, count = self._try_pymupdf_salvage(cleaned_bytes, output_path)
             if repaired:
                 strategy_used = "mupdf_salvage"
 
-        # Step 4: Tier 3 - Synthetic Page Tree & Catalog Synthesizer
+        # Stage 3: Synthetic Page Tree & Catalog Synthesizer
         if not repaired:
             repaired, count = self._try_synthetic_tree_rebuild(raw_bytes, output_path)
             if repaired:
                 strategy_used = "synthetic_page_tree"
 
-        # Step 5: Tier 4 - PyPDF Fault-Tolerant Extractor
+        # Stage 4: PyPDF Fault-Tolerant Extractor
         if not repaired:
             repaired, count = self._try_pypdf_recovery(cleaned_bytes, output_path)
             if repaired:
                 strategy_used = "pypdf_tolerant_extractor"
 
-        # Step 6: Tier 5 - Visual Raster Fallback
+        # Stage 5: Visual Raster Fallback
         if not repaired:
             repaired, count = self._try_visual_fallback_reconstruction(cleaned_bytes, output_path)
             if repaired:
@@ -390,8 +482,22 @@ startxref
 
         if not repaired or not output_path.exists() or output_path.stat().st_size < 100:
             raise PDFBoltError(
-                "CORRUPTED_PDF",
-                "Unable to recover damaged PDF structure. The byte stream contains critically unrecoverable data."
+                "REPAIR_UNRECOVERABLE",
+                "We could not recover the original document structure from this PDF."
+            )
+
+        # Step 6: Validate output integrity with RepairOutputValidator
+        try:
+            RepairOutputValidator.validate_repaired_document(
+                output_path,
+                expected_min_pages=1
+            )
+        except OutputValidationError as ove:
+            logger.warning(f"Repair output validation failed: {ove}")
+            output_path.unlink(missing_ok=True)
+            raise PDFBoltError(
+                "REPAIR_UNRECOVERABLE",
+                "We could not recover the original document structure from this PDF."
             )
 
         validate_pdf_output(output_path)

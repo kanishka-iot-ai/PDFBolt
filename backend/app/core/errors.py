@@ -35,6 +35,8 @@ ERROR_CODES: Dict[str, tuple[int, str]] = {
     "OUTPUT_VALIDATION_FAILED" : (500, "Output validation failed"),
     "OCR_FAILED"               : (500, "OCR processing failed"),
     "CONVERSION_FAILED"        : (500, "Conversion failed"),
+    "REPAIR_UNRECOVERABLE"     : (422, "We could not recover the original document structure from this PDF"),
+    "REPAIR_SUCCESS"           : (200, "PDF repaired successfully"),
 
     # Compression-specific
     "NO_SIZE_REDUCTION"        : (200, "No compression achieved"),
@@ -98,6 +100,7 @@ class ErrorCode:
     STORAGE_ERROR = "STORAGE_ERROR"
     RATE_LIMITED = "RATE_LIMITED"
     SECURITY_AUTH_FAILED = "SECURITY_AUTH_FAILED"
+    REPAIR_UNRECOVERABLE = "REPAIR_UNRECOVERABLE"
 
 
 

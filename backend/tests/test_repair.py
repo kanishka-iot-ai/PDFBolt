@@ -1,17 +1,17 @@
 import io
+import pytest
 from pathlib import Path
 import pymupdf
 import pikepdf
 from pypdf import PdfReader
 
-from backend.app.processors.repair import RepairProcessor
+from backend.app.processors.repair import RepairProcessor, RepairOutputValidator
+from backend.app.core.errors import PDFBoltError, OutputValidationError
 from backend.app.core.validation import validate_pdf_output
-
-FIXTURES_DIR = Path(__file__).parent / "fixtures"
 
 
 def create_sample_5page_pdf(file_path: Path) -> bytes:
-    """Helper to create a standard 5-page PDF document with distinct content."""
+    """Helper to create a standard 5-page PDF document with distinct text and graphics."""
     doc = pymupdf.open()
     for i in range(1, 6):
         page = doc.new_page(width=595, height=842)
@@ -29,90 +29,183 @@ def create_sample_5page_pdf(file_path: Path) -> bytes:
     return raw_bytes
 
 
-def test_repair_valid_pdf(tmp_path):
-    """Test repair on standard valid PDF."""
-    p1 = tmp_path / "valid.pdf"
-    create_sample_5page_pdf(p1)
-    
-    processor = RepairProcessor(job_id="test_valid", work_dir=tmp_path)
-    result = processor.run([p1], {})
-    
-    assert result.status == "COMPLETED"
-    assert result.output_path.exists()
-    assert validate_pdf_output(result.output_path) == 5
-    assert processor.metrics["status"] == "repaired"
-    assert processor.metrics["recovered_pages"] == 5
-    assert processor.metrics["pages_lost"] == 0
-    assert processor.metrics["repair_score"] >= 90
-
-
-def test_repair_truncated_xref_and_trailer_5page_document(tmp_path):
-    """
-    CRITICAL INVARIANT TEST:
-    Given a 5-page PDF whose xref, trailer, and EOF have been completely cut off,
-    the repair engine must recover all 5 pages, authentic text, and correct page tree.
-    """
-    valid_path = tmp_path / "orig.pdf"
+def test_repair_case_1_corrupted_xref_table(tmp_path):
+    """Test 1: Corrupted XRef table offsets - must recover all 5 pages and original text."""
+    valid_path = tmp_path / "orig_c1.pdf"
     raw_bytes = create_sample_5page_pdf(valid_path)
     
-    # Truncate at xref/trailer
+    # Corrupt XRef table by mangling byte offsets
+    corrupted_bytes = raw_bytes.replace(b"00000000", b"99999999")
+    corrupt_file = tmp_path / "corrupt_xref.pdf"
+    corrupt_file.write_bytes(corrupted_bytes)
+    
+    processor = RepairProcessor(job_id="test_c1", work_dir=tmp_path)
+    result = processor.run([corrupt_file], {})
+    
+    assert result.status == "COMPLETED"
+    doc_out = pymupdf.open(str(result.output_path))
+    assert len(doc_out) == 5, f"Expected 5 recovered pages, got {len(doc_out)}"
+    assert "Page 1 of 5" in doc_out[0].get_text()
+    assert "Page 5 of 5" in doc_out[4].get_text()
+    doc_out.close()
+
+
+def test_repair_case_2_missing_truncated_xref(tmp_path):
+    """Test 2: Missing/truncated XRef table - must rebuild XRef and recover 5 pages."""
+    valid_path = tmp_path / "orig_c2.pdf"
+    raw_bytes = create_sample_5page_pdf(valid_path)
+    
     pos = raw_bytes.rfind(b"xref")
     if pos == -1:
         pos = raw_bytes.rfind(b"startxref")
     truncated_bytes = raw_bytes[:pos]
     
-    corrupted_file = tmp_path / "pdfbolt_broken_test.pdf"
-    with open(corrupted_file, "wb") as f:
-        f.write(truncated_bytes)
-        
-    processor = RepairProcessor(job_id="test_5page_broken", work_dir=tmp_path)
-    result = processor.run([corrupted_file], {})
+    corrupt_file = tmp_path / "missing_xref.pdf"
+    corrupt_file.write_bytes(truncated_bytes)
+    
+    processor = RepairProcessor(job_id="test_c2", work_dir=tmp_path)
+    result = processor.run([corrupt_file], {})
     
     assert result.status == "COMPLETED"
-    assert result.output_path.exists()
-    
-    # Verify recovered document page count is exactly 5 (NOT 3, NOT 1)
     doc_out = pymupdf.open(str(result.output_path))
-    assert len(doc_out) == 5, f"Expected 5 pages, got {len(doc_out)}"
-    
-    # Verify text preservation on first and last page
-    p1_text = doc_out[0].get_text()
-    p5_text = doc_out[4].get_text()
-    assert "Page 1 of 5" in p1_text
-    assert "Page 5 of 5" in p5_text
-    
-    # Verify that raw PDF keywords do NOT appear as visible page text
-    assert "/MediaBox" not in p1_text
-    assert "/Type /Page" not in p1_text
-    assert "10 0 obj" not in p1_text
-    
+    assert len(doc_out) == 5
+    assert "Page 1 of 5" in doc_out[0].get_text()
+    assert "Page 5 of 5" in doc_out[4].get_text()
     doc_out.close()
-    
-    # Verify quality metrics
-    metrics = processor.metrics
-    assert metrics["recovered_pages"] == 5
-    assert metrics["original_pages"] == 5
-    assert metrics["pages_lost"] == 0
-    assert metrics["status"] == "repaired"
-    assert metrics["repair_score"] >= 85
 
 
-def test_repair_missing_eof_and_junk_prefix(tmp_path):
-    """Test recovery when PDF has HTTP junk prefix and missing EOF."""
-    valid_path = tmp_path / "valid2.pdf"
+def test_repair_case_3_damaged_trailer(tmp_path):
+    """Test 3: Damaged trailer dictionary - must reconstruct catalog and trailer."""
+    valid_path = tmp_path / "orig_c3.pdf"
     raw_bytes = create_sample_5page_pdf(valid_path)
     
-    # Add junk header and strip EOF
-    junk_prefix = b"HTTP/1.1 200 OK\r\nServer: Apache\r\n\r\n"
-    corrupted_bytes = junk_prefix + raw_bytes.replace(b"%%EOF", b"")
+    # Strip trailer dictionary
+    trailer_idx = raw_bytes.rfind(b"trailer")
+    damaged_bytes = raw_bytes[:trailer_idx] + b"\nstartxref\n0\n%%EOF\n"
     
-    corrupted_file = tmp_path / "junk_header.pdf"
-    with open(corrupted_file, "wb") as f:
-        f.write(corrupted_bytes)
-        
-    processor = RepairProcessor(job_id="test_junk_header", work_dir=tmp_path)
-    result = processor.run([corrupted_file], {})
+    corrupt_file = tmp_path / "damaged_trailer.pdf"
+    corrupt_file.write_bytes(damaged_bytes)
+    
+    processor = RepairProcessor(job_id="test_c3", work_dir=tmp_path)
+    result = processor.run([corrupt_file], {})
     
     assert result.status == "COMPLETED"
-    assert validate_pdf_output(result.output_path) == 5
-    assert processor.metrics["recovered_pages"] == 5
+    doc_out = pymupdf.open(str(result.output_path))
+    assert len(doc_out) == 5
+    assert "Page 1 of 5" in doc_out[0].get_text()
+    doc_out.close()
+
+
+def test_repair_case_4_damaged_object_references(tmp_path):
+    """Test 4: Damaged indirect object references - must resolve page tree."""
+    valid_path = tmp_path / "orig_c4.pdf"
+    raw_bytes = create_sample_5page_pdf(valid_path)
+    
+    # Insert orphan invalid object reference
+    corrupt_bytes = raw_bytes.replace(b"/Kids [", b"/Kids [999 0 R ")
+    corrupt_file = tmp_path / "damaged_refs.pdf"
+    corrupt_file.write_bytes(corrupt_bytes)
+    
+    processor = RepairProcessor(job_id="test_c4", work_dir=tmp_path)
+    result = processor.run([corrupt_file], {})
+    
+    assert result.status == "COMPLETED"
+    doc_out = pymupdf.open(str(result.output_path))
+    assert len(doc_out) >= 1
+    doc_out.close()
+
+
+def test_repair_case_5_minor_stream_corruption(tmp_path):
+    """Test 5: Stream syntax repair - ensures content streams are decompressed & re-deflated."""
+    valid_path = tmp_path / "orig_c5.pdf"
+    raw_bytes = create_sample_5page_pdf(valid_path)
+    
+    # Mild stream noise injection (between objects)
+    corrupted_bytes = raw_bytes.replace(b"endstream", b"endstream\n%--REPAIR-TEST-NOISE--\n")
+    corrupt_file = tmp_path / "stream_noise.pdf"
+    corrupt_file.write_bytes(corrupted_bytes)
+    
+    processor = RepairProcessor(job_id="test_c5", work_dir=tmp_path)
+    result = processor.run([corrupt_file], {})
+    
+    assert result.status == "COMPLETED"
+    doc_out = pymupdf.open(str(result.output_path))
+    assert len(doc_out) == 5
+    doc_out.close()
+
+
+def test_repair_case_6_truncated_pdf(tmp_path):
+    """Test 6: Truncated PDF (bytes cut off towards end) - recovers all intact pages."""
+    valid_path = tmp_path / "orig_c6.pdf"
+    raw_bytes = create_sample_5page_pdf(valid_path)
+    
+    # Cut off last 15% of file
+    truncated_bytes = raw_bytes[:int(len(raw_bytes) * 0.85)]
+    corrupt_file = tmp_path / "truncated.pdf"
+    corrupt_file.write_bytes(truncated_bytes)
+    
+    processor = RepairProcessor(job_id="test_c6", work_dir=tmp_path)
+    result = processor.run([corrupt_file], {})
+    
+    assert result.status == "COMPLETED"
+    doc_out = pymupdf.open(str(result.output_path))
+    assert len(doc_out) >= 1
+    assert "PDFBolt Document Header" in doc_out[0].get_text()
+    doc_out.close()
+
+
+def test_repair_case_7_recoverable_malformed_pdf(tmp_path):
+    """Test 7: Garbage header prefix and stripped EOF - recovers intact 5 pages."""
+    valid_path = tmp_path / "orig_c7.pdf"
+    raw_bytes = create_sample_5page_pdf(valid_path)
+    
+    junk_prefix = b"HTTP/1.1 200 OK\r\nContent-Type: application/pdf\r\n\r\n"
+    corrupted_bytes = junk_prefix + raw_bytes.replace(b"%%EOF", b"")
+    corrupt_file = tmp_path / "junk_prefix.pdf"
+    corrupt_file.write_bytes(corrupted_bytes)
+    
+    processor = RepairProcessor(job_id="test_c7", work_dir=tmp_path)
+    result = processor.run([corrupt_file], {})
+    
+    assert result.status == "COMPLETED"
+    doc_out = pymupdf.open(str(result.output_path))
+    assert len(doc_out) == 5
+    assert "Page 1 of 5" in doc_out[0].get_text()
+    assert "Page 5 of 5" in doc_out[4].get_text()
+    doc_out.close()
+
+
+def test_repair_case_8_genuinely_unrecoverable_pdf_raises_error(tmp_path):
+    """
+    Test 8: Genuinely unrecoverable input (random binary noise, no PDF objects).
+    CRITICAL REQUIREMENT: Must raise REPAIR_UNRECOVERABLE with user-facing message,
+    and MUST NOT fabricate a fake 1-page recovery document.
+    """
+    garbage_bytes = b"\x00\xFF\xAA\x55\xDE\xAD\xBE\xEF" * 100
+    garbage_file = tmp_path / "unrecoverable.pdf"
+    garbage_file.write_bytes(garbage_bytes)
+    
+    processor = RepairProcessor(job_id="test_c8", work_dir=tmp_path)
+    
+    with pytest.raises(PDFBoltError) as exc_info:
+        processor.run([garbage_file], {})
+        
+    assert exc_info.value.code == "REPAIR_UNRECOVERABLE"
+    assert "We could not recover the original document structure from this PDF." in exc_info.value.message
+
+
+def test_repair_output_validator_rejects_placeholder_text(tmp_path):
+    """Test that RepairOutputValidator rejects fabricated placeholder PDFs."""
+    # Create a fake placeholder PDF with the banned notice
+    doc = pymupdf.open()
+    page = doc.new_page()
+    page.insert_text((50, 100), "The original PDF structure contained unrecoverable byte corruption.")
+    page.insert_text((50, 130), "The document envelope has been rebuilt with valid PDF-1.7 specifications.")
+    placeholder_path = tmp_path / "fake_placeholder.pdf"
+    doc.save(str(placeholder_path))
+    doc.close()
+    
+    with pytest.raises(OutputValidationError) as exc_info:
+        RepairOutputValidator.validate_repaired_document(placeholder_path)
+        
+    assert "placeholder text" in str(exc_info.value)

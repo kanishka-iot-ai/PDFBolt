@@ -226,25 +226,11 @@ export async function repairPdf(file: File): Promise<Uint8Array> {
             return await recoveryDoc.save();
         }
     } catch (e) {
-        // Continue to Tier 5
+        // Fallback to truthful unrecoverable error
     }
 
-    // Tier 5: Direct Container Stabilization Fallback
-    try {
-        const recoveryDoc = await PDFDocument.create();
-        const font = await recoveryDoc.embedFont(StandardFonts.Helvetica);
-        const boldFont = await recoveryDoc.embedFont(StandardFonts.HelveticaBold);
-        const page = recoveryDoc.addPage([595.28, 841.89]);
-
-        page.drawText('PDFBolt Document Recovery', { x: 50, y: 790, size: 18, font: boldFont, color: rgb(0.1, 0.1, 0.1) });
-        page.drawText(`File: ${file.name} (${Math.round(file.size / 1024)} KB)`, { x: 50, y: 760, size: 11, font, color: rgb(0.4, 0.4, 0.4) });
-        page.drawText('The original PDF structure contained unrecoverable byte corruption.', { x: 50, y: 720, size: 12, font, color: rgb(0.2, 0.2, 0.2) });
-        page.drawText('The document envelope has been rebuilt with valid PDF-1.7 specifications.', { x: 50, y: 700, size: 12, font, color: rgb(0.2, 0.2, 0.2) });
-
-        return await recoveryDoc.save();
-    } catch (e) {
-        throw new Error("Unable to recover damaged PDF structure. The file data is completely corrupt.");
-    }
+    // Never fabricate recovered content or generate fake placeholder pages
+    throw new Error("We could not recover the original document structure from this PDF.");
 }
 
 
