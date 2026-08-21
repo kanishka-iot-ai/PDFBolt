@@ -539,22 +539,47 @@ const RedactTool: React.FC<RedactToolProps> = ({ darkMode, notify }) => {
                                 )}
                             </div>
 
-                            {/* Category Filter Pills */}
-                            {categories.length > 1 && (
-                                <div className="flex flex-wrap gap-2">
-                                    {categories.map(cat => (
+                            {/* Category Filter Pills & 1-Click Auto Action */}
+                            {detectedItems.length > 0 && (
+                                <div className="space-y-4">
+                                    <div className="flex flex-wrap items-center justify-between gap-4 p-4 rounded-2xl bg-gradient-to-r from-red-600 to-orange-600 text-white shadow-lg">
+                                        <div className="space-y-0.5">
+                                            <span className="font-black text-sm uppercase tracking-wider block">1-Click Universal Auto-Redaction</span>
+                                            <span className="text-xs text-white/90 font-medium">Instantly purge all {detectedItems.length} detected confidential details & sanitize metadata.</span>
+                                        </div>
                                         <button
-                                            key={cat}
-                                            onClick={() => setSelectedCategory(cat)}
-                                            className={`px-3 py-1 rounded-full text-xs font-bold transition-colors ${
-                                                selectedCategory === cat
-                                                    ? 'bg-red-600 text-white'
-                                                    : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300'
-                                            }`}
+                                            disabled={loading}
+                                            onClick={() => {
+                                                selectAllDetected(true);
+                                                handleApplyAutoRedactions();
+                                            }}
+                                            className="px-6 py-3 bg-white text-red-600 font-black rounded-xl text-sm shadow-md hover:scale-105 transition-all flex items-center gap-2 shrink-0 disabled:opacity-50"
                                         >
-                                            {cat === 'ALL' ? 'All Types' : cat}
+                                            <Lock size={16} /> ⚡ Auto-Redact All ({detectedItems.length})
                                         </button>
-                                    ))}
+                                    </div>
+
+                                    {categories.length > 1 && (
+                                        <div className="flex flex-wrap gap-2">
+                                            {categories.map(cat => {
+                                                const count = cat === 'ALL' ? detectedItems.length : detectedItems.filter(i => i.type === cat).length;
+                                                return (
+                                                    <button
+                                                        key={cat}
+                                                        onClick={() => setSelectedCategory(cat)}
+                                                        className={`px-3 py-1 rounded-full text-xs font-bold transition-colors flex items-center gap-1.5 ${
+                                                            selectedCategory === cat
+                                                                ? 'bg-red-600 text-white'
+                                                                : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300'
+                                                        }`}
+                                                    >
+                                                        <span>{cat === 'ALL' ? 'All' : cat}</span>
+                                                        <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-black/20 text-white font-mono">{count}</span>
+                                                    </button>
+                                                );
+                                            })}
+                                        </div>
+                                    )}
                                 </div>
                             )}
 

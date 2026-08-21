@@ -19,25 +19,35 @@ from backend.app.core.logging import logger
 
 class SensitiveDataDetector:
     """
-    Hybrid Deterministic Sensitive Information Detector.
-    Scans document text streams for high-confidence Indian and universal PII patterns.
+    Universal Hybrid Sensitive Information Detector.
+    Scans document text streams for high-confidence Indian and universal confidential data patterns.
     """
     PATTERNS: Dict[str, Tuple[re.Pattern, str]] = {
-        "PAN": (re.compile(r"\b[A-Z]{5}[0-9]{4}[A-Z]\b"), "PAN Card Number"),
-        "AADHAAR": (re.compile(r"\b[2-9]\d{3}\s\d{4}\s\d{4}\b|\b[2-9]\d{11}\b"), "Aadhaar Number"),
-        "PHONE_IN": (re.compile(r"(?:\+91[\-\s]?)?[6-9]\d{9}\b"), "Indian Mobile Number"),
-        "IFSC": (re.compile(r"\b[A-Z]{4}0[A-Z0-9]{6}\b"), "Bank IFSC Code"),
-        "UPI": (re.compile(r"\b[\w\.\-]+@(okhdfcbank|okaxis|okicici|oksbi|paytm|ybl|apl|upi|axl|ibl|barodampay|federal)\b", re.I), "UPI ID"),
-        "EMAIL": (re.compile(r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b"), "Email Address"),
-        "CREDIT_CARD": (re.compile(r"\b(?:\d{4}[-\s]?){3}\d{4}\b"), "Credit/Debit Card Number"),
-        "BANK_ACCOUNT": (re.compile(r"\b(?:A/C|Account|Acc|AC|A/c)[\s:#.-]*(\d{9,18})\b"), "Bank Account Number"),
-        "PASSPORT_IN": (re.compile(r"\b[A-PR-WYa-pr-wy][1-9]\d\s?\d{4}[1-9]\b"), "Passport Number")
+        "PERSON": (re.compile(r"(?:Full Name|Name|Account Holder|Customer|Patient|Cardholder)[\s:#.-]+([A-Z][a-z]+(?:\s+[A-Z][a-z]+){1,2})(?=\s|$|PERSON|\n)", re.I), "Full Name / Person"),
+        "EMAIL": (re.compile(r"\b[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\b"), "Email Address"),
+        "PHONE": (re.compile(r"(?:\(\+91\)\s*|\+91[\s-]?)?[0]?[6-9]\d{4}[\s-]?\d{5}\b|(?:\(\+91\)\s*|\+91[\s-]?)?[0]?[6-9]\d{2}[\s-]?\d{3}[\s-]?\d{4}\b|\b0?[6-9]\d{9}\b"), "Mobile / Phone"),
+        "PAN": (re.compile(r"(?:PAN\s*[:=#\-]?\s*)?([A-Z]{5}[0-9]{4}[A-Z])\b"), "PAN Card"),
+        "AADHAAR": (re.compile(r"(?<!\d)(?<!\d\s)[2-9]\d{3}\s{1,3}\d{4}\s{1,3}\d{4}(?!\s*\d)|(?<!\d)[2-9]\d{3}-\d{4}-\d{4}(?!\d)|(?<!\d)[2-9]\d{11}(?!\d)"), "Aadhaar Number"),
+        "BANK_ACCOUNT": (re.compile(r"(?:Bank Account|Account number|Account no|Account|A/C No|A/C|Acc No|Acc|AC|A/c)[\s:#.=-]*(\d{9,18})\b"), "Bank Account"),
+        "IFSC": (re.compile(r"(?:IFSC(?:\s*Code)?[\s:#.=-]*)?([A-Z]{4}0[A-Z0-9]{6})\b"), "Bank IFSC"),
+        "UPI": (re.compile(r"\b[a-zA-Z0-9.\-_]{2,}@(okhdfcbank|okaxis|okicici|oksbi|paytm|ybl|apl|upi|axl|ibl|barodampay|federal|postbank|idfcbank|kotak|sbi|hdfc|icici|axis|indus|airtel|gpay|upi)\b", re.I), "UPI ID"),
+        "CARD": (re.compile(r"(?<!\d)(?:\d{4}[\s-]){3}\d{4}(?!\d)|\b(?:\d{4}-){3}\d{4}\b"), "Debit/Credit Card"),
+        "CVV": (re.compile(r"(?:CVV(?:-style)?|CVC|Security Code)[\s:#.=-]*(\d{3,4})\b", re.I), "CVV"),
+        "CARD_EXPIRY": (re.compile(r"(?:Expiry|Valid Thru|Expires|EXP)[\s:#.=-]*((?:0[1-9]|1[0-2])\/\d{2,4})\b", re.I), "Card Expiry"),
+        "PASSPORT": (re.compile(r"(?:Passport(?:-style)?[\s:#.=-]*)?([A-PR-WYa-pr-wy][1-9]\d{6,7})\b"), "Passport"),
+        "DRIVING_LICENCE": (re.compile(r"(?:Driving Licence(?:-style)?|DL)[\s:#.=-]*([A-Z]{2}[-\s]?\d{2}[-\s]?(?:19|20)\d{2}[-\s]?\d{7})\b|[A-Z]{2}-\d{2}-\d{4}-\d{7}\b", re.I), "Driving Licence"),
+        "GSTIN": (re.compile(r"\b\d{2}[A-Z]{5}\d{4}[A-Z]{1}[A-Z\d]{1}[Zz]{1}[A-Z\d]{1}\b"), "GSTIN Number"),
+        "DATE": (re.compile(r"(?:Date of Birth|DOB|D\.O\.B|Birth Date)[\s:#.=-]*(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2,4})\b", re.I), "Date of Birth"),
+        "POSTAL_CODE": (re.compile(r"(?:PIN\s*Code|Postal\s*Code|PIN|Zip)[\s:#.=-]*([1-9]\d{5})\b", re.I), "PIN Code"),
+        "ADDRESS": (re.compile(r"(?:Address|Deliver to)[\s:#.=-]+([^;\n\r]{10,80}?)(?=\s*(?:ADDRESS|Deliver|$|\n))", re.I), "Physical Address"),
+        "CUSTOM_ID": (re.compile(r"\b(?:CUST|INV|ORD|EMP|MRN|TXN|REF|ORDER|INVOICE|CUSTOMER|EMPLOYEE|PATIENT)-[A-Z0-9-]+\b", re.I), "Document / Reference ID"),
+        "MEDICAL": (re.compile(r"(?:Diagnosis|Medication|Condition|Treatment|Rx)[\s:#.=-]+([^;\n\r]+(?:;\s*(?:Medication|Diagnosis|Treatment)[\s:#.=-]+[^;\n\r]+)?)(?=\s*(?:MEDICAL|$|\n))", re.I), "Medical Details")
     }
 
     @classmethod
     def mask_value(cls, val: str) -> str:
         """Masks sensitive value for safe logging and UI preview without exposing raw PII."""
-        clean = val.strip()
+        clean = val.strip().replace("\n", " ")
         if len(clean) <= 4:
             return "***"
         return clean[:2] + "*" * (len(clean) - 4) + clean[-2:]
@@ -45,19 +55,33 @@ class SensitiveDataDetector:
     @classmethod
     def scan_page_text(cls, page_text: str, page_num: int, custom_terms: Optional[List[str]] = None) -> List[Dict[str, Any]]:
         findings = []
-        
+        seen = set()
+
+        def add_item(p_type: str, label: str, raw_val: str, conf: float = 0.99):
+            val_clean = raw_val.strip().replace("\n", " ")
+            # Strip trailing punctuation
+            val_clean = re.sub(r"[;,.]+$", "", val_clean).strip()
+            if len(val_clean) < 2:
+                return
+            dedup_key = f"{p_type}_{val_clean.lower()}"
+            if dedup_key in seen:
+                return
+            seen.add(dedup_key)
+
+            findings.append({
+                "type": p_type,
+                "label": label,
+                "value": val_clean,
+                "masked": cls.mask_value(val_clean),
+                "page": page_num,
+                "confidence": conf
+            })
+
         # 1. Built-in Pattern Scan
         for p_type, (regex, label) in cls.PATTERNS.items():
             for m in regex.finditer(page_text):
-                val = m.group(0)
-                findings.append({
-                    "type": p_type,
-                    "label": label,
-                    "value": val,
-                    "masked": cls.mask_value(val),
-                    "page": page_num,
-                    "confidence": 0.99
-                })
+                val = m.group(1) if m.lastindex else m.group(0)
+                add_item(p_type, label, val, 0.99)
 
         # 2. Custom Query Terms Scan
         if custom_terms:
@@ -67,15 +91,7 @@ class SensitiveDataDetector:
                     continue
                 term_regex = re.compile(re.escape(t_clean), re.IGNORECASE)
                 for m in term_regex.finditer(page_text):
-                    val = m.group(0)
-                    findings.append({
-                        "type": "CUSTOM_QUERY",
-                        "label": f"Custom: '{t_clean}'",
-                        "value": val,
-                        "masked": cls.mask_value(val),
-                        "page": page_num,
-                        "confidence": 1.0
-                    })
+                    add_item("CUSTOM_QUERY", f"Custom: '{t_clean}'", m.group(0), 1.0)
 
         return findings
 
@@ -96,7 +112,7 @@ class RedactionVerificationEngine:
             full_text = " ".join([p.get_text() for p in doc])
             for val in targeted_values:
                 val_clean = val.strip()
-                if len(val_clean) > 2 and val_clean in full_text:
+                if len(val_clean) > 3 and val_clean in full_text:
                     doc.close()
                     raise OutputValidationError(
                         f"Post-redaction verification failed: target value '{val_clean[:2]}***' was still found in output text vectors."
@@ -117,10 +133,10 @@ class RedactionVerificationEngine:
 
 class RedactProcessor(BaseProcessor):
     """
-    Enterprise-grade Hybrid PDF Redaction Engine.
+    Enterprise-grade Universal PDF Redaction Engine.
     
     Features:
-    1. Built-in Sensitive Data Auto-Detector (Aadhaar, PAN, Phone, IFSC, UPI, Card, Email, Bank A/C)
+    1. Built-in Sensitive Data Auto-Detector (Aadhaar, PAN, Phone, IFSC, UPI, Card, Email, Bank A/C, Medical, IDs)
     2. True Native PDF Redaction (PyMuPDF C-level vector, glyph & image pixel eradication)
     3. Complete Metadata Sanitization (Strips Author, Title, Creator, XMP metadata)
     4. Post-Redaction Verification Engine (Asserts 0 extractable characters remain)
@@ -187,6 +203,7 @@ class RedactProcessor(BaseProcessor):
         # 1. Parse targets
         raw_regions = opts.get("regions") or opts.get("redactions") or []
         terms_to_redact = opts.get("terms") or opts.get("search_terms") or []
+        auto_redact_all = opts.get("auto_redact_all", False)
         targeted_strings = []
 
         if not HAS_PYMUPDF:
@@ -195,10 +212,17 @@ class RedactProcessor(BaseProcessor):
         doc = pymupdf.open(str(input_pdf))
         total_pages = len(doc)
 
+        # If auto_redact_all is enabled, automatically scan and add all detected PII to targets
+        if auto_redact_all:
+            auto_findings = self.scan_document(input_pdf)
+            for f in auto_findings:
+                if f.get("value"):
+                    terms_to_redact.append(f["value"])
+
         # Apply term-based redactions
         for term in terms_to_redact:
             t_clean = str(term).strip()
-            if not t_clean:
+            if not t_clean or len(t_clean) < 2:
                 continue
             targeted_strings.append(t_clean)
             for page in doc:

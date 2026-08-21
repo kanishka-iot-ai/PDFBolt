@@ -9,45 +9,81 @@ export interface SensitiveItem {
 }
 
 export const SENSITIVE_PATTERNS: Record<string, { regex: RegExp; label: string }> = {
+    PERSON: {
+        regex: /(?:Full Name|Name|Account Holder|Customer|Patient|Cardholder)[\s:#.-]+([A-Z][a-z]+(?:\s+[A-Z][a-z]+){1,2})(?=\s|$|PERSON|\n)/gi,
+        label: 'Full Name / Person'
+    },
+    EMAIL: {
+        regex: /\b[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\b/gi,
+        label: 'Email Address'
+    },
+    PHONE: {
+        regex: /(?:\(\+91\)\s*|\+91[\s-]?)?[0]?[6-9]\d{4}[\s-]?\d{5}\b|(?:\(\+91\)\s*|\+91[\s-]?)?[0]?[6-9]\d{2}[\s-]?\d{3}[\s-]?\d{4}\b|\b0?[6-9]\d{9}\b/g,
+        label: 'Mobile / Phone'
+    },
     PAN: {
-        regex: /\b[A-Z]{5}[0-9]{4}[A-Z]\b|[A-Za-z]\s*[A-Za-z]\s*[A-Za-z]\s*[A-Za-z]\s*[A-Za-z]\s*\d\s*\d\s*\d\s*\d\s*[A-Za-z]/gi,
+        regex: /(?:PAN\s*[:=#\-]?\s*)?([A-Z]{5}[0-9]{4}[A-Z])\b/gi,
         label: 'PAN Card'
     },
     AADHAAR: {
-        regex: /\b[2-9]\d{3}[\s-]?\d{4}[\s-]?\d{4}\b|\b[2-9]\d{11}\b/g,
+        regex: /(?<!\d)(?<!\d\s)[2-9]\d{3}\s{1,3}\d{4}\s{1,3}\d{4}(?!\s*\d)|(?<!\d)[2-9]\d{3}-\d{4}-\d{4}(?!\d)|(?<!\d)[2-9]\d{11}(?!\d)/g,
         label: 'Aadhaar Number'
     },
-    PHONE_IN: {
-        regex: /(?:\+91[\s-]?)?[6-9]\d{9}\b|(?:\+91[\s-]?)?[6-9]\d{4}[\s-]?\d{5}\b|(?:\+91[\s-]?)?[6-9]\d{2}[\s-]?\d{3}[\s-]?\d{4}\b/g,
-        label: 'Mobile Number'
+    BANK_ACCOUNT: {
+        regex: /(?:Bank Account|Account number|Account no|Account|A\/C No|A\/C|Acc No|Acc|AC|A\/c)[\s:#.=-]*(\d{9,18})\b/gi,
+        label: 'Bank Account'
     },
     IFSC: {
-        regex: /\b[A-Z]{4}0[A-Z0-9]{6}\b/gi,
+        regex: /(?:IFSC(?:\s*Code)?[\s:#.=-]*)?([A-Z]{4}0[A-Z0-9]{6})\b/gi,
         label: 'Bank IFSC'
     },
     UPI: {
-        regex: /[a-zA-Z0-9.\-_]{2,}@(okhdfcbank|okaxis|okicici|oksbi|paytm|ybl|apl|upi|axl|ibl|barodampay|federal|postbank|idfcbank|kotak|sbi|hdfc|icici|axis|indus|airtel|gpay)\b/gi,
+        regex: /\b[a-zA-Z0-9.\-_]{2,}@(okhdfcbank|okaxis|okicici|oksbi|paytm|ybl|apl|upi|axl|ibl|barodampay|federal|postbank|idfcbank|kotak|sbi|hdfc|icici|axis|indus|airtel|gpay|upi)\b/gi,
         label: 'UPI ID'
     },
-    EMAIL: {
-        regex: /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/gi,
-        label: 'Email Address'
+    CARD: {
+        regex: /(?<!\d)(?:\d{4}[\s-]){3}\d{4}(?!\d)|\b(?:\d{4}-){3}\d{4}\b/g,
+        label: 'Debit/Credit Card'
     },
-    CREDIT_CARD: {
-        regex: /\b(?:\d{4}[\s-]?){3}\d{4}\b/g,
-        label: 'Card Number'
+    CVV: {
+        regex: /(?:CVV(?:-style)?|CVC|Security Code)[\s:#.=-]*(\d{3,4})\b/gi,
+        label: 'CVV'
     },
-    BANK_ACCOUNT: {
-        regex: /(?:A\/C|Account|Acc|AC|A\/c|Acct|Acc No|Account No|Account Number)[\s:#.-]*([0-9]{9,18})/gi,
-        label: 'Bank Account'
+    CARD_EXPIRY: {
+        regex: /(?:Expiry|Valid Thru|Expires|EXP)[\s:#.=-]*((?:0[1-9]|1[0-2])\/\d{2,4})\b/gi,
+        label: 'Card Expiry'
     },
-    DOB: {
-        regex: /(?:DOB|Date of Birth|D\.O\.B|Birth Date)[\s:#.-]*([0-9]{1,2}[\/\-\.][0-9]{1,2}[\/\-\.][0-9]{2,4})/gi,
+    PASSPORT: {
+        regex: /(?:Passport(?:-style)?[\s:#.=-]*)?([A-PR-WYa-pr-wy][1-9]\d{6,7})\b/gi,
+        label: 'Passport'
+    },
+    DRIVING_LICENCE: {
+        regex: /(?:Driving Licence(?:-style)?|DL)[\s:#.=-]*([A-Z]{2}[-\s]?\d{2}[-\s]?(?:19|20)\d{2}[-\s]?\d{7})\b|[A-Z]{2}-\d{2}-\d{4}-\d{7}\b/gi,
+        label: 'Driving Licence'
+    },
+    GSTIN: {
+        regex: /\b\d{2}[A-Z]{5}\d{4}[A-Z]{1}[A-Z\d]{1}[Zz]{1}[A-Z\d]{1}\b/gi,
+        label: 'GSTIN Number'
+    },
+    DATE: {
+        regex: /(?:Date of Birth|DOB|D\.O\.B|Birth Date)[\s:#.=-]*(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2,4})\b/gi,
         label: 'Date of Birth'
     },
-    NAME: {
-        regex: /(?:Name|Patient|Customer|Account Holder|Cardholder)[\s:#.-]+([A-Z][a-z]+(?:\s+[A-Z][a-z]+){1,3})/g,
-        label: 'Name / Person'
+    POSTAL_CODE: {
+        regex: /(?:PIN\s*Code|Postal\s*Code|PIN|Zip)[\s:#.=-]*([1-9]\d{5})\b/gi,
+        label: 'PIN Code'
+    },
+    ADDRESS: {
+        regex: /(?:Address|Deliver to)[\s:#.=-]+([^;\n\r]{10,80}?)(?=\s*(?:ADDRESS|Deliver|$|\n))/gi,
+        label: 'Physical Address'
+    },
+    CUSTOM_ID: {
+        regex: /\b(?:CUST|INV|ORD|EMP|MRN|TXN|REF|ORDER|INVOICE|CUSTOMER|EMPLOYEE|PATIENT)-[A-Z0-9-]+\b/gi,
+        label: 'Document / Reference ID'
+    },
+    MEDICAL: {
+        regex: /(?:Diagnosis|Medication|Condition|Treatment|Rx)[\s:#.=-]+([^;\n\r]+(?:;\s*(?:Medication|Diagnosis|Treatment)[\s:#.=-]+[^;\n\r]+)?)(?=\s*(?:MEDICAL|$|\n))/gi,
+        label: 'Medical Details'
     }
 };
 
