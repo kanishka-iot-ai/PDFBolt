@@ -69,7 +69,7 @@ export async function repairPdf(file: File): Promise<Uint8Array> {
         // Continue to Tier 2
     }
 
-    // Tier 2: Binary Header Alignment, Catalog Discovery & XRef Healer
+    // Tier 2: Binary Header Alignment, Object Offset Mapping & Complete XRef Table Synthesizer
     let cleaned: Uint8Array = rawBytes;
     try {
         let startIdx = 0;
@@ -83,7 +83,6 @@ export async function repairPdf(file: File): Promise<Uint8Array> {
         if (startIdx > 0) {
             cleaned = rawBytes.slice(startIdx);
         } else if (rawBytes[0] !== 0x25) {
-            // Missing %PDF- header: prepend standard header
             const header = new TextEncoder().encode('%PDF-1.4\n');
             const withHeader = new Uint8Array(header.length + rawBytes.length);
             withHeader.set(header);
@@ -94,21 +93,64 @@ export async function repairPdf(file: File): Promise<Uint8Array> {
         const textDecoder = new TextDecoder('latin1');
         const cleanedStr = textDecoder.decode(cleaned);
 
-        // Discover Catalog or Pages root
-        const catalogMatch = cleanedStr.match(/(\d+)\s+\d+\s+obj[\s\S]*?(?:\/Type\s*\/Catalog|\/Catalog)/i);
-        const catalogId = catalogMatch ? catalogMatch[1] : "1";
+        // Find all indirect object byte offsets in cleaned stream
+        const objRegex = /(\d+)\s+(\d+)\s+obj\b/g;
+        const objects: { id: number; offset: number }[] = [];
+        let match;
+        while ((match = objRegex.exec(cleanedStr)) !== null) {
+            objects.push({ id: parseInt(match[1], 10), offset: match.index });
+        }
 
-        // Inject standard synthetic trailer & xref table
-        const syntheticTrailer = `\nxref\n0 1\n0000000000 65535 f\ntrailer\n<< /Size 500 /Root ${catalogId} 0 R >>\nstartxref\n0\n%%EOF\n`;
-        const trailerBytes = new TextEncoder().encode(syntheticTrailer);
+        if (objects.length > 0) {
+            const pageObjs = [...cleanedStr.matchAll(/(\d+)\s+\d+\s+obj[\s\S]*?(?:\/Type\s*\/Page\b|\/MediaBox)/gi)];
+            const maxObjId = Math.max(...objects.map(o => o.id), 0);
+            
+            let extraObjStr = "";
+            let rootId = "1";
+            const catalogMatch = cleanedStr.match(/(\d+)\s+\d+\s+obj[\s\S]*?(?:\/Type\s*\/Catalog|\/Catalog)/i);
+            
+            if (catalogMatch) {
+                rootId = catalogMatch[1];
+            } else if (pageObjs.length > 0) {
+                const pagesId = maxObjId + 1;
+                const catalogId = maxObjId + 2;
+                rootId = catalogId.toString();
+                const kids = pageObjs.map(m => `${m[1]} 0 R`).join(' ');
+                extraObjStr = `\n${pagesId} 0 obj\n<< /Type /Pages /Kids [${kids}] /Count ${pageObjs.length} >>\nendobj\n\n${catalogId} 0 obj\n<< /Type /Catalog /Pages ${pagesId} 0 R >>\nendobj\n`;
+            }
 
-        const combined = new Uint8Array(cleaned.length + trailerBytes.length);
-        combined.set(cleaned);
-        combined.set(trailerBytes, cleaned.length);
+            const baseWithExtra = cleanedStr + extraObjStr;
+            const xrefOffset = baseWithExtra.length + 1;
 
-        const pdfDoc = await PDFDocument.load(combined, { ignoreEncryption: true });
-        if (pdfDoc.getPageCount() > 0) {
-            return await pdfDoc.save();
+            const totalObjs = maxObjId + (extraObjStr ? 2 : 0);
+            let xrefTable = `\nxref\n0 ${totalObjs + 1}\n0000000000 65535 f \n`;
+            
+            const offsetMap = new Map<number, number>();
+            for (const obj of objects) {
+                offsetMap.set(obj.id, obj.offset);
+            }
+            if (extraObjStr) {
+                offsetMap.set(maxObjId + 1, cleanedStr.length + 1);
+                offsetMap.set(maxObjId + 2, cleanedStr.length + 1 + extraObjStr.indexOf(`${maxObjId + 2} 0 obj`));
+            }
+
+            for (let i = 1; i <= totalObjs; i++) {
+                const off = offsetMap.get(i) || 0;
+                const offStr = off.toString().padStart(10, '0');
+                if (off > 0) {
+                    xrefTable += `${offStr} 00000 n \n`;
+                } else {
+                    xrefTable += `0000000000 65535 f \n`;
+                }
+            }
+
+            const fullTrailer = `${baseWithExtra}${xrefTable}trailer\n<< /Size ${totalObjs + 1} /Root ${rootId} 0 R >>\nstartxref\n${xrefOffset}\n%%EOF\n`;
+            const healedBytes = new TextEncoder().encode(fullTrailer);
+
+            const pdfDoc = await PDFDocument.load(healedBytes, { ignoreEncryption: true });
+            if (pdfDoc.getPageCount() > 0) {
+                return await pdfDoc.save();
+            }
         }
     } catch (e) {
         // Continue to Tier 3
