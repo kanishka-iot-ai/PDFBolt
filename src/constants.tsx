@@ -120,9 +120,14 @@ export const TOOLS: ToolMetadata[] = [
       { name: 'Process Conversion', text: 'The engine parses text blocks and font alignments.' },
       { name: 'Download DOCX', text: 'Open your converted file in Word, Google Docs, or LibreOffice.' }
     ],
+    useCases: [
+      { title: 'Contract & Agreement Editing', description: 'Reconstruct static contract PDFs back into editable Word DOCX files to update clauses and dates.' },
+      { title: 'Resume Updating', description: 'Convert locked PDF resumes back into formatted Word documents without losing section alignment.' }
+    ],
     faqs: [
-      { q: 'Can I edit the converted file in Google Docs?', a: 'Yes, the exported .docx is standard OpenXML compatible with Microsoft Word, Google Docs, and Office 365.' },
-      { q: 'What if my PDF is a scanned photo?', a: 'Our engine applies integrated OCR to convert scanned image text into editable Word characters.' }
+      { q: 'Can I edit the converted file in Microsoft Word and Google Docs?', a: 'Yes, the exported .docx is standard OpenXML compatible with Microsoft Word, Google Docs, and Office 365.' },
+      { q: 'What if my PDF is a scanned photo or image?', a: 'Our engine applies integrated OCR to convert scanned image text into editable Word characters.' },
+      { q: 'Are my converted documents stored on a server?', a: 'Never. All PDF to Word conversion processes 100% locally in your web browser memory.' }
     ],
     relatedTools: [ToolType.WORD_TO_PDF, ToolType.PDF_TO_EXCEL, ToolType.OCR, ToolType.EDIT],
     relatedGuides: ['how-to-convert-pdf-to-word', 'how-to-ocr-a-pdf']
@@ -144,8 +149,14 @@ export const TOOLS: ToolMetadata[] = [
       { name: 'Convert to Slides', text: 'Click Convert to compile slides into a PPTX deck.' },
       { name: 'Present & Edit', text: 'Open in PowerPoint to deliver or customize your presentation.' }
     ],
+    useCases: [
+      { title: 'Pitch Deck Customization', description: 'Transform exported PDF slide decks into editable PowerPoint PPTX presentations for client meetings.' },
+      { title: 'Lecture Handout Editing', description: 'Convert course handouts into presentation slides ready for classroom delivery.' }
+    ],
     faqs: [
-      { q: 'Can I present the exported file immediately?', a: 'Yes, the generated PPTX is standard presentation format compatible with all major slide software.' }
+      { q: 'Can I present the exported file immediately?', a: 'Yes, the generated PPTX is standard presentation format compatible with all major slide software.' },
+      { q: 'Will vector graphics remain crisp in PowerPoint?', a: 'Yes, slide graphics and fonts are converted with high resolution for clear projection.' },
+      { q: 'Is my slide presentation private?', a: '100% private. All processing occurs in your local browser without transmitting slides anywhere.' }
     ],
     relatedTools: [ToolType.PPT_TO_PDF, ToolType.PDF_TO_WORD, ToolType.PDF_TO_JPG],
     relatedGuides: ['how-to-convert-pdf-to-ppt']
@@ -167,8 +178,14 @@ export const TOOLS: ToolMetadata[] = [
       { name: 'Extract Grid', text: 'The engine parses geometric coordinate alignments into cells.' },
       { name: 'Download Spreadsheet', text: 'Open in Excel, Google Sheets, or Numbers.' }
     ],
+    useCases: [
+      { title: 'Financial & Bank Statement Auditing', description: 'Extract tabular statements into Excel spreadsheets with automatic numeric and currency parsing.' },
+      { title: 'Inventory Matrix Migration', description: 'Convert multi-page PDF inventory lists directly into formula-ready XLSX tables.' }
+    ],
     faqs: [
-      { q: 'Will numbers be formatted as editable cells?', a: 'Yes, table contents are mapped into native rows and columns rather than flat screenshots.' }
+      { q: 'Will numbers be formatted as editable cells?', a: 'Yes, table contents are mapped into native rows and columns rather than flat screenshots.' },
+      { q: 'Does it support multi-page tables?', a: 'Yes, tables spanning multiple consecutive pages are extracted into continuous sheet rows.' },
+      { q: 'Are my financial spreadsheets secure?', a: 'Completely secure. Parsing runs 100% client-side via WebAssembly in your browser memory.' }
     ],
     relatedTools: [ToolType.EXCEL_TO_PDF, ToolType.PDF_TO_WORD, ToolType.OCR],
     relatedGuides: ['how-to-convert-pdf-to-excel']
@@ -190,8 +207,14 @@ export const TOOLS: ToolMetadata[] = [
       { name: 'Render Pages', text: 'The browser renders pages onto high-resolution canvases.' },
       { name: 'Save Images', text: 'Download single JPGs or all pages bundled into a ZIP.' }
     ],
+    useCases: [
+      { title: 'Social Media & Web Publishing', description: 'Convert document pages into high-DPI JPG images for Instagram, LinkedIn, or web articles.' },
+      { title: 'Graphic Asset Extraction', description: 'Extract photos and visual diagrams from marketing PDFs in full resolution.' }
+    ],
     faqs: [
-      { q: 'What resolution are the extracted JPGs?', a: 'Pages are rendered at high-DPI (2x retina scale) ensuring crisp text and sharp graphics.' }
+      { q: 'What resolution are the extracted JPGs?', a: 'Pages are rendered at high-DPI (2x retina scale) ensuring crisp text and sharp graphics.' },
+      { q: 'Can I download all pages at once?', a: 'Yes, multi-page PDFs can be extracted and downloaded as a single bundled ZIP archive.' },
+      { q: 'Are image colors accurately preserved?', a: 'Yes, sRGB and CMYK color profiles are mapped to clean 24-bit TrueColor JPGs.' }
     ],
     relatedTools: [ToolType.JPG_TO_PDF, ToolType.SCAN_TO_PDF, ToolType.COMPRESS],
     relatedGuides: ['how-to-extract-images-from-pdf']
@@ -211,6 +234,17 @@ export const TOOLS: ToolMetadata[] = [
       { name: 'Convert to PDF', text: 'The engine renders layout and typography.' },
       { name: 'Download PDF', text: 'Save your standardized PDF file.' }
     ],
+    quickAnswer: 'To convert Word to PDF: Upload your DOCX or DOC document, click "Convert to PDF", and download a standardized, print-ready PDF file with preserved typography and layouts.',
+    longDescription: 'Transform Microsoft Word documents into universal, immutable PDF files. Perfect for submitting resumes, distributing client proposals, and archiving formal reports without font substitution or formatting shifts across devices.',
+    useCases: [
+      { title: 'Resume Submission', description: 'Lock document formatting to ensure hiring managers and ATS systems see your exact typography.' },
+      { title: 'Formal Proposals & Quotes', description: 'Convert editable Word drafts into final non-editable PDF agreements ready for signing.' }
+    ],
+    faqs: [
+      { q: 'Will custom fonts and margins be preserved?', a: 'Yes. Our converter accurately renders standard OpenXML layouts, preserving page breaks, table borders, and spacing.' },
+      { q: 'Can I convert .doc as well as .docx files?', a: 'Yes, both classic .doc and modern .docx formats are fully supported.' },
+      { q: 'Is my document private?', a: '100% private. Conversion processes in your local browser memory without storing files on any server.' }
+    ],
     relatedTools: [ToolType.PDF_TO_WORD, ToolType.MERGE, ToolType.PROTECT],
     relatedGuides: ['how-to-convert-word-to-pdf']
   },
@@ -228,6 +262,17 @@ export const TOOLS: ToolMetadata[] = [
       { name: 'Upload Excel Sheet', text: 'Choose your XLSX or XLS workbook.' },
       { name: 'Render Pages', text: 'Tables are converted and paginated across A4 sheets.' },
       { name: 'Download PDF', text: 'Save clean printable PDF reports.' }
+    ],
+    quickAnswer: 'To convert Excel to PDF: Upload your XLSX or XLS spreadsheet, adjust pagination settings, and download a clean, multi-page PDF document formatted for printing.',
+    longDescription: 'Convert complex financial models, balance sheets, and inventory matrices into professional PDF reports. Automatically fits columns to page widths and formats table grids cleanly.',
+    useCases: [
+      { title: 'Financial Statements', description: 'Export quarterly P&L statements and balance sheets into clean board-ready PDF packages.' },
+      { title: 'Invoice & Pricing Sheets', description: 'Distribute pricing matrices and client estimates without exposing proprietary formulas.' }
+    ],
+    faqs: [
+      { q: 'Does the converter handle multi-sheet workbooks?', a: 'Yes, multiple worksheet tabs are sequenced and paginated into a continuous PDF document.' },
+      { q: 'Are cell formulas visible in the PDF?', a: 'Only the computed values and numbers are rendered in the PDF, protecting your underlying spreadsheet formulas.' },
+      { q: 'Will wide tables be cut off horizontally?', a: 'Our auto-fit algorithm scales tables to fit standard A4/Letter margins neatly.' }
     ],
     relatedTools: [ToolType.PDF_TO_EXCEL, ToolType.MERGE],
     relatedGuides: ['how-to-convert-excel-to-pdf']
@@ -247,6 +292,17 @@ export const TOOLS: ToolMetadata[] = [
       { name: 'Compile PDF', text: 'Slides are rendered into standard PDF pages.' },
       { name: 'Download File', text: 'Share your PDF slide deck anywhere.' }
     ],
+    quickAnswer: 'To convert PowerPoint to PDF: Upload your PPTX or PPT slide deck, click "Convert to PDF", and download a lightweight PDF handout ready for sharing.',
+    longDescription: 'Turn presentation slide decks into universal PDF documents. Ideal for sharing conference presentations, student handouts, and webinar slides that can be viewed on any smartphone or tablet.',
+    useCases: [
+      { title: 'Meeting & Webinar Handouts', description: 'Distribute slides to attendees in a compact format that opens reliably without PowerPoint.' },
+      { title: 'Print Handouts', description: 'Print slides with crisp vector graphics and consistent page breaks.' }
+    ],
+    faqs: [
+      { q: 'Can I view the PDF on mobile devices without PowerPoint installed?', a: 'Yes. Converted PDFs open natively in Apple Safari, Google Chrome, and any PDF viewer app.' },
+      { q: 'Will slide animations or video embeds play in PDF?', a: 'PDF is a static document format, so slides are rendered at their final visual state.' },
+      { q: 'Are high-resolution graphics compressed?', a: 'Slide visuals are rendered at high DPI, maintaining sharp diagrams and photos.' }
+    ],
     relatedTools: [ToolType.PDF_TO_PPT, ToolType.MERGE],
     relatedGuides: ['how-to-convert-ppt-to-pdf']
   },
@@ -265,6 +321,17 @@ export const TOOLS: ToolMetadata[] = [
       { name: 'Arrange Order', text: 'Sort your images in the desired page sequence.' },
       { name: 'Create PDF', text: 'Compile and download your image-based PDF document.' }
     ],
+    quickAnswer: 'To convert JPG images to PDF: Upload one or more image files (JPG, PNG, WebP), arrange their order, and click "Create PDF" to compile a single document.',
+    longDescription: 'Combine photos, scanned receipts, digital drawings, and certificates into a single organized PDF document. Set custom page margins, orientations (portrait/landscape), and page sizing (A4, Letter, or Fit-to-Image).',
+    useCases: [
+      { title: 'Expense Receipts & Invoices', description: 'Combine smartphone photos of receipts into a single monthly reimbursement PDF report.' },
+      { title: 'Portfolio & Design Lookbooks', description: 'Stitch high-resolution design mocks and photography into a clean client PDF presentation.' }
+    ],
+    faqs: [
+      { q: 'How many images can I merge into one PDF?', a: 'There is no limit. You can merge dozens of images in a single batch.' },
+      { q: 'Can I mix JPG and PNG files in the same PDF?', a: 'Yes, you can upload a mix of JPG, PNG, and WebP images simultaneously.' },
+      { q: 'Can I reorder images before generating the PDF?', a: 'Yes, simply drag and drop the image thumbnails to sequence them in your desired order.' }
+    ],
     relatedTools: [ToolType.PDF_TO_JPG, ToolType.MERGE, ToolType.SCAN_TO_PDF],
     relatedGuides: ['how-to-convert-images-to-pdf']
   },
@@ -282,6 +349,17 @@ export const TOOLS: ToolMetadata[] = [
       { name: 'Input HTML', text: 'Paste HTML code or content to render.' },
       { name: 'Render Layout', text: 'Styles and DOM structures are transformed to PDF canvas.' },
       { name: 'Download PDF', text: 'Save your digital web document.' }
+    ],
+    quickAnswer: 'To convert HTML to PDF: Paste HTML/CSS code or web content, click "Render PDF", and save a formatted document with preserved styles and typography.',
+    longDescription: 'Render digital receipts, HTML newsletters, reports, and styled markup into PDF format. Accurately preserves CSS typography, table structures, colors, and layout geometry.',
+    useCases: [
+      { title: 'Invoice & Receipt Archival', description: 'Convert HTML email receipts and billing statements into permanent PDF tax records.' },
+      { title: 'Documentation Export', description: 'Export developer documentation and styled web articles for offline reading.' }
+    ],
+    faqs: [
+      { q: 'Does it support custom CSS styling?', a: 'Yes, standard inline CSS and embedded stylesheet styles are rendered directly onto the PDF canvas.' },
+      { q: 'Is the converted text searchable?', a: 'Yes, text rendered from HTML is selectable and searchable in all PDF readers.' },
+      { q: 'Are external web requests made?', a: 'No. Rendering occurs entirely in your browser memory for maximum security.' }
     ],
     relatedTools: [ToolType.PDF_TO_WORD, ToolType.EDIT],
     relatedGuides: ['how-to-convert-html-to-pdf']
@@ -303,8 +381,14 @@ export const TOOLS: ToolMetadata[] = [
       { name: 'Add Annotations', text: 'Use text, pencil, or image tools to place edits onto pages.' },
       { name: 'Save & Export', text: 'Click "Save PDF" to export your updated document.' }
     ],
+    useCases: [
+      { title: 'Form Filling & Annotations', description: 'Type text directly into unfillable PDF forms and add dates, notes, and checkmarks.' },
+      { title: 'Design Review & Markup', description: 'Draw freehand callouts and highlight text passages during collaborative document reviews.' }
+    ],
     faqs: [
-      { q: 'Can I add images like stamps or logos?', a: 'Yes, you can upload PNG/JPG stamps or logos and resize them directly on the page.' }
+      { q: 'Can I add images like stamps or logos?', a: 'Yes, you can upload PNG/JPG stamps or logos and resize them directly on the page.' },
+      { q: 'Can I change font sizes and colors?', a: 'Yes, the text tool allows customizable font sizes, line heights, and stroke colors.' },
+      { q: 'Does editing flatten or blur the original text?', a: 'No, vector text layers remain sharp and unmodified beneath your annotations.' }
     ],
     relatedTools: [ToolType.SIGN, ToolType.REDACT, ToolType.WATERMARK, ToolType.PAGE_NUMBERS],
     relatedGuides: ['how-to-edit-a-pdf', 'how-to-annotate-pdf-files']
@@ -326,8 +410,14 @@ export const TOOLS: ToolMetadata[] = [
       { name: 'Enter Password', text: 'Type a strong, memorable secret password.' },
       { name: 'Encrypt & Download', text: 'Download your password-protected PDF file.' }
     ],
+    useCases: [
+      { title: 'Confidential Client Data', description: 'Encrypt tax documents, medical records, and payroll data before emailing clients.' },
+      { title: 'Restricting Document Permissions', description: 'Prevent unauthorized printing, copying, or content extraction from proprietary whitepapers.' }
+    ],
     faqs: [
-      { q: 'Can anyone open the PDF without the password?', a: 'No. The file content is mathematically encrypted and cannot be rendered without the correct password.' }
+      { q: 'Can anyone open the PDF without the password?', a: 'No. The file content is mathematically encrypted and cannot be rendered without the correct password.' },
+      { q: 'What encryption standard is used?', a: 'Standard AES-128 and AES-256 bit encryption compatible with Adobe Acrobat and all standard PDF readers.' },
+      { q: 'Do you store or log my password?', 'a': 'Never. Encryption keys are generated in browser memory and immediately discarded.' }
     ],
     relatedTools: [ToolType.UNLOCK, ToolType.REDACT, ToolType.SIGN],
     relatedGuides: ['how-to-protect-a-pdf', 'how-to-encrypt-pdf-documents']
@@ -349,8 +439,14 @@ export const TOOLS: ToolMetadata[] = [
       { name: 'Provide Password', text: 'Enter password or trigger local worker unlock.' },
       { name: 'Download Unlocked PDF', text: 'Save the unrestricted, password-free PDF.' }
     ],
+    useCases: [
+      { title: 'Remove Personal Passwords', description: 'Strip recurring passwords from bank statements and tax filings you own for seamless archiving.' },
+      { title: 'Enable Printing & Copying', description: 'Remove restrictive permission locks from documents you are authorized to edit.' }
+    ],
     faqs: [
-      { q: 'Does this violate copyright or security?', a: 'This tool is intended for document owners and authorized parties to remove restrictions from files they legitimately possess.' }
+      { q: 'Does this violate copyright or security?', a: 'This tool is intended for document owners and authorized parties to remove restrictions from files they legitimately possess.' },
+      { q: 'How fast is password removal?', a: 'If you know the password, removal is instant. For forgotten PINs, the multi-threaded worker tests thousands of combinations per second.' },
+      { q: 'Is the unlocked file identical to the original?', a: 'Yes, exact vector fonts, layout, and visual fidelity are 100% preserved.' }
     ],
     relatedTools: [ToolType.PROTECT, ToolType.REDACT, ToolType.EDIT],
     relatedGuides: ['how-to-unlock-a-protected-pdf']
@@ -372,8 +468,14 @@ export const TOOLS: ToolMetadata[] = [
       { name: 'Create Signature', text: 'Draw with your mouse/touchscreen or upload a signature image.' },
       { name: 'Position & Save', text: 'Choose placement (e.g. bottom-right) and download the signed PDF.' }
     ],
+    useCases: [
+      { title: 'Remote Agreement Execution', description: 'Sign NDAs, employment offers, and real estate leases on your phone or laptop in seconds.' },
+      { title: 'Invoice Approval', description: 'Stamp approved signatures onto contractor invoices and purchase orders without printing.' }
+    ],
     faqs: [
-      { q: 'Is my signature stored on your servers?', a: 'No. Signatures are generated and embedded directly in your device memory.' }
+      { q: 'Is my signature stored on your servers?', a: 'No. Signatures are generated and embedded directly in your device memory.' },
+      { q: 'Can I upload an existing signature image?', a: 'Yes, you can upload transparent PNG signature stamps or draw with mouse/touchscreen.' },
+      { q: 'Is a digitally signed PDF legally binding?', a: 'Electronic signatures are widely recognized under ESIGN and eIDAS acts for standard commercial agreements.' }
     ],
     relatedTools: [ToolType.PROTECT, ToolType.EDIT, ToolType.REDACT],
     relatedGuides: ['how-to-sign-a-pdf']
@@ -395,8 +497,14 @@ export const TOOLS: ToolMetadata[] = [
       { name: 'Draw Redaction Boxes', text: 'Click and drag over private names, account numbers, or text.' },
       { name: 'Burn & Export', text: 'Click Apply Redactions to permanently destroy underlying data.' }
     ],
+    useCases: [
+      { title: 'Court Evidence & Discovery', description: "Permanently destroy social security numbers, minors' names, and bank details from legal filings." },
+      { title: 'FOIA & Public Disclosures', description: 'Sanitize government and corporate public records before online publication.' }
+    ],
     faqs: [
-      { q: 'Can someone highlight or copy text underneath the black boxes?', a: 'No. Our tool permanently renders the redacted regions to raster image pixels. There is zero underlying text in the output file.' }
+      { q: 'Can someone highlight or copy text underneath the black boxes?', a: 'No. Our tool permanently renders the redacted regions to raster image pixels. There is zero underlying text in the output file.' },
+      { q: 'How does true raster sanitization work?', a: 'Underlying text, paths, and metadata streams are stripped and replaced with burned pixels.' },
+      { q: 'Can I redact multiple pages at once?', a: 'Yes, you can navigate through the entire document and place redaction boxes across all pages before burning.' }
     ],
     relatedTools: [ToolType.PROTECT, ToolType.EDIT, ToolType.DELETE_PAGES],
     relatedGuides: ['how-to-redact-a-pdf', 'how-to-sanitize-pdf-documents']
@@ -418,8 +526,14 @@ export const TOOLS: ToolMetadata[] = [
       { name: 'Process OCR', text: 'The neural network recognizes character geometries.' },
       { name: 'Copy or Download', text: 'Export recognized text or save as a searchable document.' }
     ],
+    useCases: [
+      { title: 'Archival Searchability', description: 'Make massive archives of scanned historical books, receipts, and invoices searchable by keyword.' },
+      { title: 'Copying Text from Scans', description: 'Extract quotes and paragraphs from locked image PDFs without manual retyping.' }
+    ],
     faqs: [
-      { q: 'Does OCR require an internet connection?', a: 'Once loaded, the WebAssembly OCR engine runs entirely offline on your local machine.' }
+      { q: 'Does OCR require an internet connection?', a: 'Once loaded, the WebAssembly OCR engine runs entirely offline on your local machine.' },
+      { q: 'What languages are supported?', a: 'English, Spanish, French, German, and major European character sets.' },
+      { q: 'Does it enhance low-contrast scans?', a: 'Yes, built-in OpenCV filters automatically enhance contrast and remove background noise for higher accuracy.' }
     ],
     relatedTools: [ToolType.SCAN_TO_PDF, ToolType.SCAN_HANDWRITING, ToolType.PDF_TO_WORD],
     relatedGuides: ['how-to-ocr-a-pdf', 'how-to-make-a-pdf-searchable']
@@ -439,6 +553,17 @@ export const TOOLS: ToolMetadata[] = [
       { name: 'Snap Pages', text: 'Capture pages with automatic perspective cropping.' },
       { name: 'Generate PDF', text: 'Combine all captured scans into a clean PDF document.' }
     ],
+    quickAnswer: 'To scan to PDF: Open the camera scanner, capture physical pages with auto-cropping and contrast filtering, and download a clean, multi-page PDF document.',
+    longDescription: 'Turn your smartphone camera or laptop webcam into a high-performance document scanner. Features real-time corner edge detection, perspective deskewing, and document contrast filters.',
+    useCases: [
+      { title: 'Paper Contract Digitization', description: 'Capture signed physical agreements and convert them into crisp black-and-white PDFs.' },
+      { title: 'Homework & Assignment Submission', description: 'Snap photos of handwritten assignments, auto-deskew pages, and submit a single unified PDF.' }
+    ],
+    faqs: [
+      { q: 'Does it work directly on mobile browsers?', a: 'Yes, it accesses your smartphone camera directly through mobile Chrome and Safari.' },
+      { q: 'Does it automatically straighten tilted photos?', a: 'Yes, our edge detection filter corrects skewed angles and crops out unwanted background tables.' },
+      { q: 'Can I apply high-contrast filters to remove shadows?', a: 'Yes, choose between Color, Grayscale, and B&W Document modes to eliminate shadows.' }
+    ],
     relatedTools: [ToolType.SCAN_HANDWRITING, ToolType.OCR, ToolType.JPG_TO_PDF],
     relatedGuides: ['how-to-scan-documents-to-pdf']
   },
@@ -456,6 +581,17 @@ export const TOOLS: ToolMetadata[] = [
       { name: 'Snap Note', text: 'Take a clear, well-lit photo of your handwriting.' },
       { name: 'Transcribe', text: 'The OCR engine transcribes handwritten words into text.' },
       { name: 'Export Typed PDF', text: 'Generate a clean computerized PDF document.' }
+    ],
+    quickAnswer: 'To convert handwriting to PDF: Upload a photo of handwritten notes, run the handwriting OCR model, and export editable, digitized PDF text.',
+    longDescription: 'Transcribe handwritten lecture notes, meeting journals, and whiteboards into computerized, searchable PDF text. Combines neural OCR with automated word-wrapping and layout formatting.',
+    useCases: [
+      { title: 'Student Lecture Notes', description: 'Digitize handwritten spiral notebooks into searchable study guides and summaries.' },
+      { title: 'Meeting & Whiteboard Capture', description: 'Convert brainstorming notes from whiteboards into structured text documents.' }
+    ],
+    faqs: [
+      { q: 'How accurate is handwriting recognition?', a: 'Accuracy is highest on clear, well-spaced handwriting with good lighting and contrast.' },
+      { q: 'Can I edit the recognized text before saving?', a: 'Yes, you can review, edit, and format the transcribed text before generating the final PDF.' },
+      { q: 'Is my handwriting processed privately?', a: 'Yes, OCR recognition runs locally in your browser without uploading notes to third-party servers.' }
     ],
     relatedTools: [ToolType.SCAN_TO_PDF, ToolType.OCR, ToolType.PDF_TO_WORD],
     relatedGuides: ['how-to-digitize-handwritten-notes']
@@ -475,6 +611,17 @@ export const TOOLS: ToolMetadata[] = [
       { name: 'Click Rotate', text: 'Turn pages 90 degrees clockwise or counterclockwise.' },
       { name: 'Save PDF', text: 'Download the permanently oriented file.' }
     ],
+    quickAnswer: 'To rotate PDF pages: Upload your document, select 90° clockwise or counterclockwise, choose specific pages or all pages, and download your permanently rotated PDF.',
+    longDescription: 'Fix upside-down scans and sideways diagrams instantly. Modify internal PDF orientation matrix flags permanently so pages display correctly in every PDF viewer.',
+    useCases: [
+      { title: 'Upside-Down Scans', description: 'Fix inverted document pages from flatbed scanners with a single 180° rotation click.' },
+      { title: 'Landscape Chart Alignment', description: 'Rotate landscape spreadsheets and blueprints 90° to match the orientation of surrounding portrait pages.' }
+    ],
+    faqs: [
+      { q: 'Can I rotate only specific pages rather than the whole document?', a: 'Yes, you can choose individual page thumbnails to rotate or apply rotation to all pages.' },
+      { q: 'Will rotating degrade the visual quality or text sharpness?', a: 'No. Rotation only modifies the page view matrix metadata without re-encoding text or images.' },
+      { q: 'Is the rotation permanent?', a: 'Yes, the rotation is saved into the PDF header and displays correctly across all devices.' }
+    ],
     relatedTools: [ToolType.ORGANIZE, ToolType.DELETE_PAGES, ToolType.SPLIT],
     relatedGuides: ['how-to-rotate-pdf-pages']
   },
@@ -492,6 +639,17 @@ export const TOOLS: ToolMetadata[] = [
       { name: 'Upload Document', text: 'View all pages as thumbnail tiles.' },
       { name: 'Rearrange', text: 'Drag thumbnails into the perfect order.' },
       { name: 'Save Organized PDF', text: 'Download your polished file structure.' }
+    ],
+    quickAnswer: 'To organize PDF pages: Upload your document, drag thumbnail tiles to reorder pages, rotate or delete unwanted pages, and download your newly arranged PDF.',
+    longDescription: 'The ultimate visual workspace for PDF page manipulation. View all pages as interactive grid thumbnails. Rearrange sections, delete blanks, duplicate key pages, and re-sequence documents.',
+    useCases: [
+      { title: 'Proposal Assembly', description: 'Re-sequence cover pages, executive summaries, pricing sections, and appendices seamlessly.' },
+      { title: 'Audit Preparation', description: 'Arrange invoices and supporting receipts in exact chronological order.' }
+    ],
+    faqs: [
+      { q: 'How do I rearrange pages?', a: 'Simply click and drag any page thumbnail to its new position in the visual grid.' },
+      { q: 'Can I delete pages while organizing?', a: 'Yes, hover over any page thumbnail and click the trash icon to remove it.' },
+      { q: 'Are bookmarks and links preserved?', a: 'Yes, intact page structures and contents are preserved during page reorganization.' }
     ],
     relatedTools: [ToolType.MERGE, ToolType.SPLIT, ToolType.ROTATE, ToolType.DELETE_PAGES],
     relatedGuides: ['how-to-organize-pdf-pages']
@@ -511,6 +669,17 @@ export const TOOLS: ToolMetadata[] = [
       { name: 'Configure Numbering', text: 'Choose position, format style, and margin.' },
       { name: 'Apply Numbers', text: 'Download your professionally numbered PDF.' }
     ],
+    quickAnswer: 'To add page numbers: Upload your PDF, select numbering style (Page X of Y, 1,2,3), choose position (top/bottom, left/center/right), and apply numbers instantly.',
+    longDescription: 'Add professional pagination to unnumbered reports, court filings, and research papers. Customize font size, margins, format templates, and starting page index.',
+    useCases: [
+      { title: 'Legal Pleadings & Briefs', description: 'Number court submissions with precise bottom-center or bottom-right Bates/page pagination.' },
+      { title: 'Theses & Academic Dissertations', description: 'Paginate multi-chapter academic papers starting after the title page.' }
+    ],
+    faqs: [
+      { q: 'Can I start numbering from a specific page (e.g. skip cover page)?', a: 'Yes, you can set a starting page offset so cover sheets remain unnumbered.' },
+      { q: 'Can I customize the numbering format?', a: 'Yes, choose from standard formats like "1, 2, 3", "Page 1 of 10", or "1 / 10".' },
+      { q: 'Does adding page numbers alter existing text?', a: 'No, page numbers are placed on a clean overlay layer without displacing existing document text.' }
+    ],
     relatedTools: [ToolType.WATERMARK, ToolType.EDIT, ToolType.MERGE],
     relatedGuides: ['how-to-add-page-numbers-to-pdf']
   },
@@ -528,6 +697,17 @@ export const TOOLS: ToolMetadata[] = [
       { name: 'Upload PDF', text: 'Choose your document.' },
       { name: 'Enter Text', text: 'Type your watermark (e.g., CONFIDENTIAL) and adjust opacity.' },
       { name: 'Download PDF', text: 'Save your watermarked document.' }
+    ],
+    quickAnswer: 'To watermark a PDF: Upload your file, type your watermark text (e.g. CONFIDENTIAL or DRAFT), adjust opacity and rotation angle, and save your watermarked document.',
+    longDescription: 'Protect sensitive drafts, legal contracts, and proprietary IP from unauthorized sharing. Stamp customizable text watermarks across all pages with full opacity and font controls.',
+    useCases: [
+      { title: 'Confidential M&A Documents', description: 'Stamp "STRICTLY CONFIDENTIAL" diagonally across all financial exhibits.' },
+      { title: 'Draft Review Copies', description: 'Mark review documents with "DRAFT" to prevent premature publication.' }
+    ],
+    faqs: [
+      { q: 'Can I adjust the watermark transparency so text remains readable?', a: 'Yes, you can adjust opacity from 10% to 100% so text underneath stays clearly legible.' },
+      { q: 'Can I change the watermark angle and size?', a: 'Yes, customize font size, rotation angle (diagonal 45° or horizontal 0°), and colors.' },
+      { q: 'Can watermarks be easily stripped by basic readers?', a: 'Watermarks are embedded directly into the PDF content stream for robust visibility.' }
     ],
     relatedTools: [ToolType.PROTECT, ToolType.EDIT, ToolType.PAGE_NUMBERS],
     relatedGuides: ['how-to-watermark-a-pdf']
@@ -547,6 +727,17 @@ export const TOOLS: ToolMetadata[] = [
       { name: 'Select Pages to Remove', text: 'Click on the pages you want to delete.' },
       { name: 'Save Clean PDF', text: 'Download your updated document.' }
     ],
+    quickAnswer: 'To delete pages from a PDF: Upload your document, click on the thumbnail tiles of the pages you wish to remove, and click "Save Clean PDF".',
+    longDescription: 'Quickly strip out blank pages, expired terms, duplicate sheets, and unwanted appendix pages from any PDF document in seconds.',
+    useCases: [
+      { title: 'Remove Scanner Blank Pages', description: 'Clean up duplex scans by removing trailing blank pages.' },
+      { title: 'Redact Outdated Clauses', description: 'Eliminate obsolete contract sections before sending final client agreements.' }
+    ],
+    faqs: [
+      { q: 'Can I delete multiple pages at the same time?', a: 'Yes, click on all pages you want to remove and delete them in one single action.' },
+      { q: 'What happens to the remaining pages?', a: 'Remaining pages are automatically re-indexed and preserved with original vector quality.' },
+      { q: 'Can I undo if I delete the wrong page?', a: 'Your original file on your computer is untouched. You can re-select pages anytime in the workspace.' }
+    ],
     relatedTools: [ToolType.SPLIT, ToolType.ORGANIZE, ToolType.MERGE],
     relatedGuides: ['how-to-remove-pages-from-pdf']
   },
@@ -564,6 +755,17 @@ export const TOOLS: ToolMetadata[] = [
       { name: 'Upload Both PDFs', text: 'Select Document A (Original) and Document B (Modified).' },
       { name: 'Run Comparison', text: 'The engine analyzes text and visual differences.' },
       { name: 'Review Diff', text: 'Inspect highlighted changes side-by-side.' }
+    ],
+    quickAnswer: 'To compare two PDFs: Upload Document A (Original) and Document B (Revision), click "Compare Documents", and inspect side-by-side text and visual diff highlights.',
+    longDescription: 'Catch stealthy contract alterations, price changes, and formatting tweaks between two PDF document revisions. Highlights additions, deletions, and visual pixel differences.',
+    useCases: [
+      { title: 'Contract Negotiation & Redlines', description: 'Verify that counterparty revisions only changed agreed-upon contract clauses.' },
+      { title: 'Blueprint & Schematic Revisions', description: 'Spot subtle geometric modifications between architectural CAD drawing versions.' }
+    ],
+    faqs: [
+      { q: 'Does it compare text content or visual pixels?', a: 'Our engine performs both semantic text diffing and side-by-side visual comparison.' },
+      { q: 'Are confidential documents safe during comparison?', a: '100% safe. Document comparison runs entirely within your browser memory.' },
+      { q: 'Can I compare documents with different page counts?', a: 'Yes, the comparison engine handles inserted or deleted pages gracefully.' }
     ],
     relatedTools: [ToolType.EDIT, ToolType.MERGE],
     relatedGuides: ['how-to-compare-two-pdf-files']
@@ -583,6 +785,17 @@ export const TOOLS: ToolMetadata[] = [
       { name: 'Rebuild Structure', text: 'The recovery parser re-indexes intact data streams.' },
       { name: 'Download Repaired PDF', text: 'Save your recovered document.' }
     ],
+    quickAnswer: 'To repair a PDF: Upload the damaged or unreadable file, let the recovery engine reconstruct damaged cross-reference tables and trailers, and download your recovered PDF.',
+    longDescription: 'Recover corrupted, truncated, or unreadable PDF files. Reconstructs damaged XRef tables, locates orphaned object streams, and restores document catalog hierarchies.',
+    useCases: [
+      { title: 'Corrupted Email Downloads', description: 'Repair PDFs that failed mid-transfer or corrupted during download.' },
+      { title: 'Legacy File Restoration', description: 'Restore older PDF documents created with obsolete software that fail in modern viewers.' }
+    ],
+    faqs: [
+      { q: 'What types of PDF corruption can be repaired?', a: 'Damaged cross-reference tables, missing EOF markers, broken object streams, and syntax header errors.' },
+      { q: 'Will text and images be restored?', a: 'All intact data streams within the file are salvaged and re-indexed into a valid document.' },
+      { q: 'What if the file is completely unreadable?', a: 'Our multi-tier engine utilizes deep structural reconstruction to recover every recoverable page.' }
+    ],
     relatedTools: [ToolType.COMPRESS, ToolType.UNLOCK],
     relatedGuides: ['how-to-repair-corrupted-pdf']
   },
@@ -600,6 +813,17 @@ export const TOOLS: ToolMetadata[] = [
       { name: 'Upload PDF', text: 'Select the menu, catalog, or flyer.' },
       { name: 'Set Security', text: 'Optionally set an access PIN and expiry.' },
       { name: 'Download QR Code', text: 'Print your QR code onto physical signage.' }
+    ],
+    quickAnswer: 'To create a QR code for a PDF: Upload your PDF document, configure optional PIN protection or expiry, and download a high-resolution QR code image for print or web.',
+    longDescription: 'Generate instant, scannable QR codes for restaurant menus, real estate flyers, conference brochures, and product manuals. Users can scan the QR code to view your PDF on mobile instantly.',
+    useCases: [
+      { title: 'Restaurant Menus', description: 'Place QR codes on dining tables for contactless digital menu viewing on customer phones.' },
+      { title: 'Real Estate & Product Flyers', description: 'Print QR codes on property signs and product packaging to provide instant spec sheets.' }
+    ],
+    faqs: [
+      { q: 'Can anyone with a smartphone scan the QR code?', a: 'Yes, it works natively with the standard camera app on iOS and Android.' },
+      { q: 'Can I protect the PDF with a PIN?', a: 'Yes, you can set an optional PIN so only authorized scanners can access the file.' },
+      { q: 'What image formats can I download the QR code in?', a: 'You can download the QR code as high-resolution PNG or SVG for professional printing.' }
     ],
     relatedTools: [ToolType.COMPRESS, ToolType.PROTECT],
     relatedGuides: ['how-to-create-qr-codes-for-pdf']
@@ -621,8 +845,14 @@ export const TOOLS: ToolMetadata[] = [
       { name: 'Review Intelligence', text: 'Inspect topics, word counts, and executive summary.' },
       { name: 'Build Outputs', text: 'Export directly to PowerPoint, Word, Excel, or Notes.' }
     ],
+    useCases: [
+      { title: 'Executive Document Briefing', description: 'Generate instant executive summaries, word counts, and topic breakdowns from 50+ page PDF reports.' },
+      { title: '1-Click Slide Deck Generation', description: 'Automatically convert dense research papers into structured 10-slide PowerPoint presentations.' }
+    ],
     faqs: [
-      { q: 'Is my document sent to an external server?', a: 'No! All text extraction and presentation generation runs 100% locally in your browser memory.' }
+      { q: 'Is my document sent to an external server?', a: 'No! All text extraction and presentation generation runs 100% locally in your browser memory.' },
+      { q: 'Can I ask questions about the PDF?', a: 'Yes, the interactive Q&A assistant queries the local document text model in real-time.' },
+      { q: 'What file formats can it generate?', a: 'Export directly to PowerPoint (.pptx), Word (.docx), Excel (.xlsx), or Markdown notes.' }
     ],
     relatedTools: [ToolType.PDF_TO_PPT, ToolType.PDF_TO_WORD, ToolType.PDF_TO_EXCEL, ToolType.OCR],
     relatedGuides: ['how-to-convert-pdf-to-word', 'how-to-convert-pdf-to-ppt']
