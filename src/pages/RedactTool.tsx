@@ -230,36 +230,36 @@ const RedactTool: React.FC<RedactToolProps> = ({ darkMode, notify }) => {
         }
     };
 
+    if (!file) {
+        return (
+            <div className="max-w-4xl mx-auto px-4 py-2 animate-fadeIn">
+                <FileUploader
+                    onFilesSelected={handleFilesSelected}
+                    accept=".pdf"
+                    maxSizeMB={30}
+                    darkMode={darkMode}
+                />
+            </div>
+        );
+    }
+
     return (
-        <div className={`min-h-screen flex flex-col ${darkMode ? 'bg-slate-900 text-white' : 'bg-slate-50 text-slate-900'}`}>
+        <div className={`rounded-2xl border overflow-hidden shadow-2xl flex flex-col ${darkMode ? 'bg-slate-900 border-slate-700 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'}`} style={{ minHeight: '80vh' }}>
 
             {/* Header / Toolbar */}
-            <div className={`h-16 border-b flex items-center justify-between px-6 ${darkMode ? 'border-slate-700 bg-slate-900' : 'border-slate-200 bg-white'}`}>
-                <h1 className="font-black text-xl">PDF Redactor <span className="text-yellow-500 text-xs uppercase ml-2 bg-yellow-100 dark:bg-yellow-900/30 px-2 py-0.5 rounded-full">Beta</span></h1>
+            <div className={`h-16 border-b flex items-center justify-between px-6 shrink-0 ${darkMode ? 'border-slate-700 bg-slate-900' : 'border-slate-200 bg-white'}`}>
+                <div className="flex items-center gap-3 truncate">
+                    <span className="font-bold text-sm truncate max-w-md">{file.name}</span>
+                </div>
 
-                {file && (
-                    <div className="flex items-center gap-2">
-                        <button onClick={() => { setFile(null); setRedactions([]); }} className="text-sm font-bold text-red-500 hover:text-red-400">Close File</button>
-                    </div>
-                )}
+                <div className="flex items-center gap-2">
+                    <button onClick={() => { setFile(null); setRedactions([]); }} className="text-sm font-bold text-red-500 hover:text-red-400">Close File</button>
+                </div>
             </div>
 
             <div className="flex-1 flex overflow-hidden">
-
-                {!file ? (
-                    <div className="max-w-4xl mx-auto w-full p-4 flex flex-col items-center justify-center">
-
-                        <FileUploader
-                            onFilesSelected={handleFilesSelected}
-                            accept=".pdf"
-                            maxSizeMB={30}
-                            darkMode={darkMode}
-                        />
-                    </div>
-                ) : (
-                    <>
-                        {/* Sidebar - Thumbnails (Placeholder) */}
-                        <div className={`w-64 border-r flex flex-col hidden lg:flex ${darkMode ? 'border-slate-700 bg-slate-800' : 'border-slate-200 bg-slate-50'}`}>
+                {/* Sidebar - Thumbnails (Placeholder) */}
+                <div className={`w-64 border-r flex flex-col hidden lg:flex ${darkMode ? 'border-slate-700 bg-slate-800' : 'border-slate-200 bg-slate-50'}`}>
                             <div className="p-4 border-b border-inherit font-bold text-sm uppercase tracking-wider text-slate-500">Pages</div>
                             <div className="flex-1 overflow-y-auto p-4 space-y-4">
                                 {/* We can iterate pages here later */}
@@ -383,10 +383,7 @@ const RedactTool: React.FC<RedactToolProps> = ({ darkMode, notify }) => {
                                 </button>
                             </div>
                         </div>
-                    </>
-                )}
             </div>
-
         </div>
     );
 };

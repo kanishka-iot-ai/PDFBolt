@@ -423,31 +423,32 @@ const EditTool: React.FC<EditToolProps> = ({ darkMode, notify }) => {
         setSelectedElementId(null);
     };
 
+    if (!file) {
+        return (
+            <div className="max-w-4xl mx-auto px-4 py-2 animate-fadeIn">
+                <FileUploader onFilesSelected={handleFilesSelected} accept=".pdf" maxSizeMB={50} darkMode={darkMode} />
+            </div>
+        );
+    }
+
     return (
-        <div className={`min-h-screen flex flex-col ${darkMode ? 'bg-slate-900 text-white' : 'bg-slate-50 text-slate-900'}`}>
+        <div className={`rounded-2xl border overflow-hidden shadow-2xl flex flex-col ${darkMode ? 'bg-slate-900 border-slate-700 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'}`} style={{ minHeight: '80vh' }}>
             {/* Header */}
-            <div className={`h-16 border-b flex items-center justify-between px-6 ${darkMode ? 'border-slate-700 bg-slate-900' : 'border-slate-200 bg-white'}`}>
-                <h1 className="font-black text-xl">Edit PDF</h1>
-                {file && (
-                    <div className="flex gap-2">
-                        <button onClick={() => setFile(null)} className="text-red-500 font-bold text-sm">Close</button>
-                        <button onClick={savePdf} className="flex items-center gap-2 bg-yellow-500 text-white px-4 py-2 rounded-lg font-bold hover:bg-yellow-600 transition-colors">
-                            <Save size={18} /> Save PDF
-                        </button>
-                    </div>
-                )}
+            <div className={`h-16 border-b flex items-center justify-between px-6 shrink-0 ${darkMode ? 'border-slate-700 bg-slate-900' : 'border-slate-200 bg-white'}`}>
+                <div className="flex items-center gap-3 truncate">
+                    <span className="font-bold text-sm truncate max-w-md">{file.name}</span>
+                </div>
+                <div className="flex gap-2">
+                    <button onClick={() => setFile(null)} className="text-red-500 font-bold text-sm">Close</button>
+                    <button onClick={savePdf} className="flex items-center gap-2 bg-yellow-500 text-white px-4 py-2 rounded-lg font-bold hover:bg-yellow-600 transition-colors">
+                        <Save size={18} /> Save PDF
+                    </button>
+                </div>
             </div>
 
             <div className="flex-1 flex overflow-hidden">
-                {!file ? (
-                    <div className="max-w-xl mx-auto flex flex-col items-center justify-center p-4">
-                        <FileUploader onFilesSelected={handleFilesSelected} accept=".pdf" darkMode={darkMode} />
-                    </div>
-                ) : (
-
-                    <>
-                        {/* Toolbar */}
-                        <div className={`w-16 flex flex-col items-center py-6 gap-4 border-r ${darkMode ? 'border-slate-700 bg-slate-800' : 'border-slate-200 bg-white'}`}>
+                {/* Toolbar */}
+                <div className={`w-16 flex flex-col items-center py-6 gap-4 border-r ${darkMode ? 'border-slate-700 bg-slate-800' : 'border-slate-200 bg-white'}`}>
                             <button
                                 onClick={() => setMode('select')}
                                 aria-label="Select and move elements"
@@ -565,8 +566,6 @@ const EditTool: React.FC<EditToolProps> = ({ darkMode, notify }) => {
                             <span className="text-xs font-bold w-12 text-center">{Math.round(scale * 100)}%</span>
                             <button onClick={() => setScale(s => Math.min(3, s + 0.2))} className="p-1 hover:bg-slate-100 rounded-full"><ZoomIn size={16} /></button>
                         </div>
-                    </>
-                )}
             </div>
         </div>
     );
