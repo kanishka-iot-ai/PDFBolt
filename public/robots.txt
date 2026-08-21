@@ -9,12 +9,11 @@ Allow: /business-pdf-tools
 Allow: /developer-pdf-tools
 Allow: /compare/
 
-# Private API endpoints, temporary processing jobs, and test files
+# Private API endpoints, temporary processing jobs, and internal shares
 Disallow: /api/
 Disallow: /jobs/
 Disallow: /storage/
 Disallow: /qr-success
-Disallow: /test-files
 
 # Sitemaps
 Sitemap: https://pdfbolt.in/sitemap.xml

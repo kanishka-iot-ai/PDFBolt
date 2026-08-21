@@ -502,7 +502,7 @@ def generate_prerendered_pages():
 
         custom_noscript = f"""
     <noscript>
-      <div style="padding: 40px; max-width: 800px; margin: 0 auto; font-family: system-ui, -apple-system, sans-serif; line-height: 1.6;">
+      <div style="padding: 40px; max-width: 900px; margin: 0 auto; font-family: system-ui, -apple-system, sans-serif; line-height: 1.6;">
         <h1 style="font-size: 2rem; font-weight: 900; margin-bottom: 1rem; color: #0f172a;">{h1}</h1>
         <p style="font-size: 1.1rem; color: #334155; margin-bottom: 1.5rem;">{description}</p>
         
@@ -520,10 +520,95 @@ def generate_prerendered_pages():
           </ol>
         </div>
 
-        <h2 style="font-size: 1.25rem; font-weight: 700; color: #0f172a;">Related PDF Tools & Guides</h2>
+        <h2 style="font-size: 1.25rem; font-weight: 700; color: #0f172a;">Contextual PDF Tools & Resources</h2>
         <ul style="padding-left: 20px; margin-bottom: 2rem;">
           {related_html}
         </ul>
+
+        <div style="border-top: 2px solid #e2e8f0; padding-top: 24px; margin-top: 32px;">
+          <h2 style="font-size: 1.25rem; font-weight: 700; color: #0f172a; margin-bottom: 16px;">PDFBolt Full Platform Directory</h2>
+          
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 24px;">
+            <div>
+              <h3 style="font-size: 0.95rem; font-weight: 700; color: #334155; margin-bottom: 8px;">Core PDF Tools</h3>
+              <ul style="padding-left: 16px; margin: 0; font-size: 0.85rem; line-height: 1.8;">
+                <li><a href="/merge-pdf" style="color: #b45309; text-decoration: underline;">Merge PDF</a></li>
+                <li><a href="/split-pdf" style="color: #b45309; text-decoration: underline;">Split PDF</a></li>
+                <li><a href="/compress-pdf" style="color: #b45309; text-decoration: underline;">Compress PDF</a></li>
+                <li><a href="/pdf-to-word" style="color: #b45309; text-decoration: underline;">PDF to Word</a></li>
+                <li><a href="/pdf-to-excel" style="color: #b45309; text-decoration: underline;">PDF to Excel</a></li>
+                <li><a href="/pdf-to-ppt" style="color: #b45309; text-decoration: underline;">PDF to PowerPoint</a></li>
+                <li><a href="/pdf-to-jpg" style="color: #b45309; text-decoration: underline;">PDF to JPG</a></li>
+                <li><a href="/word-to-pdf" style="color: #b45309; text-decoration: underline;">Word to PDF</a></li>
+                <li><a href="/excel-to-pdf" style="color: #b45309; text-decoration: underline;">Excel to PDF</a></li>
+                <li><a href="/ppt-to-pdf" style="color: #b45309; text-decoration: underline;">PPT to PDF</a></li>
+                <li><a href="/jpg-to-pdf" style="color: #b45309; text-decoration: underline;">JPG to PDF</a></li>
+                <li><a href="/html-to-pdf" style="color: #b45309; text-decoration: underline;">HTML to PDF</a></li>
+                <li><a href="/edit-pdf" style="color: #b45309; text-decoration: underline;">Edit PDF</a></li>
+                <li><a href="/protect-pdf" style="color: #b45309; text-decoration: underline;">Protect PDF</a></li>
+                <li><a href="/unlock-pdf" style="color: #b45309; text-decoration: underline;">Unlock PDF</a></li>
+                <li><a href="/sign-pdf" style="color: #b45309; text-decoration: underline;">Sign PDF</a></li>
+                <li><a href="/redact-pdf" style="color: #b45309; text-decoration: underline;">Redact PDF</a></li>
+                <li><a href="/ocr-pdf" style="color: #b45309; text-decoration: underline;">OCR PDF</a></li>
+                <li><a href="/scan-to-pdf" style="color: #b45309; text-decoration: underline;">Scan to PDF</a></li>
+                <li><a href="/scan-handwriting-to-pdf" style="color: #b45309; text-decoration: underline;">Scan Handwriting</a></li>
+                <li><a href="/rotate-pdf" style="color: #b45309; text-decoration: underline;">Rotate PDF</a></li>
+                <li><a href="/organize-pdf" style="color: #b45309; text-decoration: underline;">Organize PDF</a></li>
+                <li><a href="/add-page-numbers-to-pdf" style="color: #b45309; text-decoration: underline;">Add Page Numbers</a></li>
+                <li><a href="/watermark-pdf" style="color: #b45309; text-decoration: underline;">Watermark PDF</a></li>
+                <li><a href="/delete-pdf-pages" style="color: #b45309; text-decoration: underline;">Delete PDF Pages</a></li>
+                <li><a href="/compare-pdf" style="color: #b45309; text-decoration: underline;">Compare PDF</a></li>
+                <li><a href="/repair-pdf" style="color: #b45309; text-decoration: underline;">Repair PDF</a></li>
+                <li><a href="/pdf-to-qr-code" style="color: #b45309; text-decoration: underline;">PDF to QR Code</a></li>
+                <li><a href="/analyze-pdf" style="color: #b45309; text-decoration: underline;">AI PDF Analyzer</a></li>
+                <li><a href="/pdf-builder" style="color: #b45309; text-decoration: underline;">Interactive PDF Builder</a></li>
+              </ul>
+            </div>
+
+            <div>
+              <h3 style="font-size: 0.95rem; font-weight: 700; color: #334155; margin-bottom: 8px;">How-To Guides</h3>
+              <ul style="padding-left: 16px; margin: 0; font-size: 0.85rem; line-height: 1.8;">
+                <li><a href="/guides" style="color: #b45309; text-decoration: underline;">All Guides Hub</a></li>
+                <li><a href="/guides/how-to-convert-pdf-to-word" style="color: #b45309; text-decoration: underline;">Convert PDF to Word</a></li>
+                <li><a href="/guides/how-to-convert-pdf-to-excel" style="color: #b45309; text-decoration: underline;">Convert PDF to Excel</a></li>
+                <li><a href="/guides/how-to-convert-pdf-to-ppt" style="color: #b45309; text-decoration: underline;">Convert PDF to PowerPoint</a></li>
+                <li><a href="/guides/how-to-compress-a-pdf" style="color: #b45309; text-decoration: underline;">Compress Below 2MB</a></li>
+                <li><a href="/guides/how-to-merge-pdf-files" style="color: #b45309; text-decoration: underline;">Merge Multiple PDFs</a></li>
+                <li><a href="/guides/how-to-split-a-pdf" style="color: #b45309; text-decoration: underline;">Split PDF Pages</a></li>
+                <li><a href="/guides/how-to-edit-a-pdf" style="color: #b45309; text-decoration: underline;">Edit PDF Online</a></li>
+                <li><a href="/guides/how-to-protect-a-pdf" style="color: #b45309; text-decoration: underline;">Password Protect PDF</a></li>
+                <li><a href="/guides/how-to-sign-a-pdf" style="color: #b45309; text-decoration: underline;">Electronically Sign PDF</a></li>
+                <li><a href="/guides/how-to-redact-a-pdf" style="color: #b45309; text-decoration: underline;">Permanently Redact PDF</a></li>
+                <li><a href="/guides/how-to-ocr-a-pdf" style="color: #b45309; text-decoration: underline;">OCR Scanned PDFs</a></li>
+                <li><a href="/guides/how-to-remove-pages-from-pdf" style="color: #b45309; text-decoration: underline;">Remove Unwanted Pages</a></li>
+              </ul>
+            </div>
+
+            <div>
+              <h3 style="font-size: 0.95rem; font-weight: 700; color: #334155; margin-bottom: 8px;">Encyclopedia & Hubs</h3>
+              <ul style="padding-left: 16px; margin: 0; font-size: 0.85rem; line-height: 1.8;">
+                <li><a href="/encyclopedia" style="color: #b45309; text-decoration: underline;">Encyclopedia Hub</a></li>
+                <li><a href="/encyclopedia/what-is-pdf" style="color: #b45309; text-decoration: underline;">What is a PDF (ISO 32000)</a></li>
+                <li><a href="/encyclopedia/pdf-vs-pdfa" style="color: #b45309; text-decoration: underline;">PDF vs PDF/A Archival</a></li>
+                <li><a href="/encyclopedia/what-is-ocr" style="color: #b45309; text-decoration: underline;">How OCR Technology Works</a></li>
+                <li><a href="/encyclopedia/vector-vs-raster-pdf" style="color: #b45309; text-decoration: underline;">Vector vs Raster PDFs</a></li>
+                <li><a href="/encyclopedia/pdf-security-and-encryption" style="color: #b45309; text-decoration: underline;">PDF Security & Encryption</a></li>
+                <li><a href="/encyclopedia/searchable-pdf-vs-scanned-pdf" style="color: #b45309; text-decoration: underline;">Searchable vs Scanned PDF</a></li>
+                <li><a href="/student-pdf-tools" style="color: #b45309; text-decoration: underline;">Student PDF Hub</a></li>
+                <li><a href="/business-pdf-tools" style="color: #b45309; text-decoration: underline;">Business & Legal Hub</a></li>
+                <li><a href="/developer-pdf-tools" style="color: #b45309; text-decoration: underline;">Developer Architecture</a></li>
+                <li><a href="/compare/online-pdf-tools" style="color: #b45309; text-decoration: underline;">PDF Tools Comparison</a></li>
+                <li><a href="/tools/pdf-size-calculator" style="color: #b45309; text-decoration: underline;">PDF Size Calculator</a></li>
+                <li><a href="/test-files" style="color: #b45309; text-decoration: underline;">Sample PDF Test Files</a></li>
+                <li><a href="/tutorials" style="color: #b45309; text-decoration: underline;">Video Tutorials</a></li>
+                <li><a href="/about" style="color: #b45309; text-decoration: underline;">About PDFBolt</a></li>
+                <li><a href="/privacy" style="color: #b45309; text-decoration: underline;">Privacy Policy</a></li>
+                <li><a href="/terms" style="color: #b45309; text-decoration: underline;">Terms of Service</a></li>
+                <li><a href="/contact" style="color: #b45309; text-decoration: underline;">Contact Support</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
 
         <p><strong>Note:</strong> PDFBolt operates 100% in your browser. Please enable JavaScript to access the interactive tool.</p>
       </div>
