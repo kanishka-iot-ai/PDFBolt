@@ -45,7 +45,9 @@ export default defineConfig(({ mode }) => {
           drop_debugger: true,
         },
       },
-      modulePreload: false,
+      modulePreload: {
+        polyfill: false,
+      },
       rollupOptions: {
         output: {
           chunkFileNames: 'assets/[name]-[hash].js',
