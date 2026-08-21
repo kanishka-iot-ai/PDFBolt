@@ -7,20 +7,20 @@ import {
     ChevronRight,
     ZoomIn,
     ZoomOut,
-    Eraser,
     Search,
     ShieldAlert,
     Sparkles,
     CheckSquare,
     Square,
     Download,
-    Eye,
     CheckCircle2,
     Lock,
-    Trash2
+    RefreshCw,
+    SlidersHorizontal,
+    FileText
 } from 'lucide-react';
 import { useActiveWork } from '../context/ActiveWorkContext';
-import { detectSensitiveDataClient, redactPdf, SensitiveItem } from '../services/sanitizeService';
+import { detectSensitiveDataClient, redactPdf, SensitiveItem, SENSITIVE_PATTERNS } from '../services/sanitizeService';
 import { apiClient } from '../services/apiClient';
 
 // Initialize Worker
@@ -73,6 +73,54 @@ const RedactTool: React.FC<RedactToolProps> = ({ darkMode, notify }) => {
         return () => setHasActiveWork(false);
     }, [file, resultBlobUrl, setHasActiveWork]);
 
+    // Unified Scan Function
+    const triggerScan = async (targetFile: File) => {
+        setScanning(true);
+        setStatusMessage('Scanning document with multi-pass geometry & PII detectors...');
+        const aggregatedFindings: SensitiveItem[] = [];
+        const seen = new Set<string>();
+
+        const addItem = (item: any) => {
+            const key = `${item.type}_p${item.page}_${item.value?.toLowerCase()}`;
+            if (!seen.has(key)) {
+                seen.add(key);
+                aggregatedFindings.push({
+                    id: item.id || `${item.type}_p${item.page}_${Math.random().toString(36).substr(2, 6)}`,
+                    type: item.type,
+                    label: item.label || item.type,
+                    value: item.value,
+                    masked: item.masked || (item.value ? `${item.value.slice(0, 2)}****${item.value.slice(-2)}` : '***'),
+                    page: item.page || 1,
+                    selected: true
+                });
+            }
+        };
+
+        try {
+            // 1. Run local client-side geometry-aware detector
+            const clientFindings = await detectSensitiveDataClient(targetFile);
+            clientFindings.forEach(addItem);
+
+            // 2. Query backend deep detector if online
+            const isBackendUp = await apiClient.checkBackend();
+            if (isBackendUp) {
+                try {
+                    const serverFindings = await apiClient.scanPdfSensitive(targetFile);
+                    serverFindings.forEach(addItem);
+                } catch (bErr) {
+                    console.warn('Backend scan notice:', bErr);
+                }
+            }
+
+            setDetectedItems(aggregatedFindings);
+        } catch (err) {
+            console.error('Scan error:', err);
+        } finally {
+            setScanning(false);
+            setStatusMessage(null);
+        }
+    };
+
     // Handle File Upload
     const handleFilesSelected = async (files: File[]) => {
         if (files.length === 0) return;
@@ -98,17 +146,13 @@ const RedactTool: React.FC<RedactToolProps> = ({ darkMode, notify }) => {
             setPdfDoc(loadedPdf);
             setCurrentPage(1);
 
-            // Auto-scan for sensitive items
-            setScanning(true);
-            setStatusMessage('Scanning document for Aadhaar, PAN, and sensitive PII...');
-            const findings = await detectSensitiveDataClient(uploadedFile);
-            setDetectedItems(findings);
+            // Trigger deep scan
+            await triggerScan(uploadedFile);
         } catch (error) {
             console.error('Error loading PDF:', error);
             alert('Failed to load PDF.');
         } finally {
             setLoading(false);
-            setScanning(false);
             setStatusMessage(null);
         }
     };
@@ -356,6 +400,15 @@ const RedactTool: React.FC<RedactToolProps> = ({ darkMode, notify }) => {
 
                 <div className="flex items-center gap-2">
                     <button
+                        onClick={() => file && triggerScan(file)}
+                        disabled={scanning}
+                        className="px-3 py-2 rounded-xl text-xs font-bold border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-2 transition-colors disabled:opacity-50"
+                        title="Re-scan document for sensitive PII"
+                    >
+                        <RefreshCw size={14} className={scanning ? 'animate-spin' : ''} />
+                        <span>{scanning ? 'Scanning...' : 'Re-Scan'}</span>
+                    </button>
+                    <button
                         onClick={() => {
                             setFile(null);
                             setResultBlobUrl(null);
@@ -368,6 +421,14 @@ const RedactTool: React.FC<RedactToolProps> = ({ darkMode, notify }) => {
                     </button>
                 </div>
             </div>
+
+            {/* Scanning Progress Banner */}
+            {scanning && (
+                <div className="p-4 rounded-2xl border border-amber-200 bg-amber-50 dark:bg-amber-900/20 dark:border-amber-900/40 flex items-center gap-3 text-amber-800 dark:text-amber-300 animate-pulse">
+                    <Sparkles size={20} className="animate-spin text-amber-600 dark:text-amber-400" />
+                    <span className="text-sm font-bold">Scanning document with multi-pass geometry & PII detectors (Aadhaar, PAN, Phone, Email, Bank Accounts)...</span>
+                </div>
+            )}
 
             {/* Completed Output Banner */}
             {resultBlobUrl && (
@@ -454,24 +515,28 @@ const RedactTool: React.FC<RedactToolProps> = ({ darkMode, notify }) => {
                                         Auto-Detected Sensitive Information
                                     </h3>
                                     <p className="text-xs text-slate-400">
-                                        Deterministic scanner found {detectedItems.length} candidate sensitive tokens (Aadhaar, PAN, Phone, Email, Bank Details).
+                                        {detectedItems.length > 0
+                                            ? `Found ${detectedItems.length} candidate sensitive items (Aadhaar, PAN, Phone, Email, Bank Details).`
+                                            : 'No standard patterns detected on document text layer. Click Re-Scan or use Find & Redact below.'}
                                     </p>
                                 </div>
 
-                                <div className="flex items-center gap-2">
-                                    <button
-                                        onClick={() => selectAllDetected(true)}
-                                        className="px-3 py-1.5 rounded-lg border text-xs font-bold hover:bg-slate-100 dark:hover:bg-slate-700"
-                                    >
-                                        Select All
-                                    </button>
-                                    <button
-                                        onClick={() => selectAllDetected(false)}
-                                        className="px-3 py-1.5 rounded-lg border text-xs font-bold hover:bg-slate-100 dark:hover:bg-slate-700"
-                                    >
-                                        Deselect All
-                                    </button>
-                                </div>
+                                {detectedItems.length > 0 && (
+                                    <div className="flex items-center gap-2">
+                                        <button
+                                            onClick={() => selectAllDetected(true)}
+                                            className="px-3 py-1.5 rounded-lg border text-xs font-bold hover:bg-slate-100 dark:hover:bg-slate-700"
+                                        >
+                                            Select All
+                                        </button>
+                                        <button
+                                            onClick={() => selectAllDetected(false)}
+                                            className="px-3 py-1.5 rounded-lg border text-xs font-bold hover:bg-slate-100 dark:hover:bg-slate-700"
+                                        >
+                                            Deselect All
+                                        </button>
+                                    </div>
+                                )}
                             </div>
 
                             {/* Category Filter Pills */}
@@ -495,10 +560,28 @@ const RedactTool: React.FC<RedactToolProps> = ({ darkMode, notify }) => {
 
                             {/* Detected Items List */}
                             {detectedItems.length === 0 ? (
-                                <div className="p-8 text-center border border-dashed rounded-2xl text-slate-400 space-y-2">
-                                    <ShieldAlert className="mx-auto w-8 h-8 text-slate-300" />
-                                    <p className="text-sm font-bold">No standard sensitive PII patterns detected on document text layer.</p>
-                                    <p className="text-xs text-slate-400">Use "Find & Redact" to specify custom text, or "Manual Visual Studio" to draw boxes.</p>
+                                <div className="p-8 text-center border border-dashed rounded-2xl text-slate-400 space-y-4">
+                                    <ShieldAlert className="mx-auto w-10 h-10 text-slate-300 dark:text-slate-600" />
+                                    <div className="space-y-1">
+                                        <p className="text-base font-bold">No standard sensitive tokens detected automatically.</p>
+                                        <p className="text-xs text-slate-400 max-w-md mx-auto">
+                                            If your document is a scanned image or has custom names/numbers, you can search and purge exact terms or draw boxes manually.
+                                        </p>
+                                    </div>
+                                    <div className="flex flex-wrap gap-3 justify-center pt-2">
+                                        <button
+                                            onClick={() => setActiveMode('search')}
+                                            className="px-4 py-2 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-xs font-bold flex items-center gap-2 hover:opacity-90"
+                                        >
+                                            <Search size={14} /> Find & Redact by Name / Word
+                                        </button>
+                                        <button
+                                            onClick={() => setActiveMode('manual')}
+                                            className="px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-bold flex items-center gap-2 hover:bg-slate-100 dark:hover:bg-slate-700"
+                                        >
+                                            <FileText size={14} /> Draw Boxes in Visual Studio
+                                        </button>
+                                    </div>
                                 </div>
                             ) : (
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-96 overflow-y-auto pr-1">
@@ -507,29 +590,34 @@ const RedactTool: React.FC<RedactToolProps> = ({ darkMode, notify }) => {
                                         .map(item => (
                                             <div
                                                 key={item.id}
-                                                onClick={() => toggleItemSelection(item.id)}
+                                                onClick={() => {
+                                                    toggleItemSelection(item.id);
+                                                    if (item.page && item.page !== currentPage) {
+                                                        setCurrentPage(item.page);
+                                                    }
+                                                }}
                                                 className={`p-4 rounded-xl border-2 flex items-center justify-between cursor-pointer transition-all ${
                                                     item.selected
                                                         ? 'border-red-500 bg-red-50/50 dark:bg-red-900/10 shadow-sm'
                                                         : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 opacity-60'
                                                 }`}
                                             >
-                                                <div className="flex items-center gap-3">
+                                                <div className="flex items-center gap-3 truncate">
                                                     {item.selected ? (
                                                         <CheckSquare size={20} className="text-red-600 shrink-0" />
                                                     ) : (
                                                         <Square size={20} className="text-slate-400 shrink-0" />
                                                     )}
-                                                    <div>
-                                                        <span className="text-xs font-black uppercase text-red-700 dark:text-red-400 block">
+                                                    <div className="truncate">
+                                                        <span className="text-xs font-black uppercase text-red-700 dark:text-red-400 block truncate">
                                                             {item.label}
                                                         </span>
-                                                        <span className="font-mono font-bold text-sm tracking-wider">
+                                                        <span className="font-mono font-bold text-sm tracking-wider block truncate">
                                                             {item.masked}
                                                         </span>
                                                     </div>
                                                 </div>
-                                                <span className="px-2.5 py-1 rounded-full text-[10px] font-black uppercase bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300">
+                                                <span className="px-2.5 py-1 rounded-full text-[10px] font-black uppercase bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 shrink-0">
                                                     Page {item.page}
                                                 </span>
                                             </div>
@@ -537,20 +625,22 @@ const RedactTool: React.FC<RedactToolProps> = ({ darkMode, notify }) => {
                                 </div>
                             )}
 
-                            <button
-                                disabled={loading || selectedCount === 0}
-                                onClick={handleApplyAutoRedactions}
-                                className="w-full py-5 bg-red-600 hover:bg-red-700 text-white font-black text-xl rounded-2xl shadow-xl hover:scale-[1.01] transition-all disabled:opacity-40 flex items-center justify-center gap-3"
-                            >
-                                {loading ? (
-                                    <div className="w-6 h-6 border-3 border-white/30 border-t-white rounded-full animate-spin"></div>
-                                ) : (
-                                    <>
-                                        <Lock size={20} />
-                                        <span>Redact Selected Items ({selectedCount})</span>
-                                    </>
-                                )}
-                            </button>
+                            {detectedItems.length > 0 && (
+                                <button
+                                    disabled={loading || selectedCount === 0}
+                                    onClick={handleApplyAutoRedactions}
+                                    className="w-full py-5 bg-red-600 hover:bg-red-700 text-white font-black text-xl rounded-2xl shadow-xl hover:scale-[1.01] transition-all disabled:opacity-40 flex items-center justify-center gap-3"
+                                >
+                                    {loading ? (
+                                        <div className="w-6 h-6 border-3 border-white/30 border-t-white rounded-full animate-spin"></div>
+                                    ) : (
+                                        <>
+                                            <Lock size={20} />
+                                            <span>Redact Selected Items ({selectedCount})</span>
+                                        </>
+                                    )}
+                                </button>
+                            )}
                         </div>
                     )}
 

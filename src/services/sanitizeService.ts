@@ -9,24 +9,109 @@ export interface SensitiveItem {
 }
 
 export const SENSITIVE_PATTERNS: Record<string, { regex: RegExp; label: string }> = {
-    PAN: { regex: /\b[A-Z]{5}[0-9]{4}[A-Z]\b/g, label: 'PAN Card' },
-    AADHAAR: { regex: /\b[2-9]\d{3}\s\d{4}\s\d{4}\b|\b[2-9]\d{11}\b/g, label: 'Aadhaar Number' },
-    PHONE_IN: { regex: /(?:\+91[\-\s]?)?[6-9]\d{9}\b/g, label: 'Indian Mobile' },
-    IFSC: { regex: /\b[A-Z]{4}0[A-Z0-9]{6}\b/g, label: 'Bank IFSC' },
-    UPI: { regex: /\b[\w\.\-]+@(okhdfcbank|okaxis|okicici|oksbi|paytm|ybl|apl|upi|axl|ibl|barodampay|federal)\b/gi, label: 'UPI ID' },
-    EMAIL: { regex: /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g, label: 'Email Address' },
-    CREDIT_CARD: { regex: /\b(?:\d{4}[-\s]?){3}\d{4}\b/g, label: 'Card Number' },
-    BANK_ACCOUNT: { regex: /\b(?:A\/C|Account|Acc|AC|A\/c)[\s:#.-]*(\d{9,18})\b|\b\d{9,18}\b/gi, label: 'Bank Account' }
+    PAN: {
+        regex: /\b[A-Z]{5}[0-9]{4}[A-Z]\b|[A-Za-z]\s*[A-Za-z]\s*[A-Za-z]\s*[A-Za-z]\s*[A-Za-z]\s*\d\s*\d\s*\d\s*\d\s*[A-Za-z]/gi,
+        label: 'PAN Card'
+    },
+    AADHAAR: {
+        regex: /\b[2-9]\d{3}[\s-]?\d{4}[\s-]?\d{4}\b|\b[2-9]\d{11}\b/g,
+        label: 'Aadhaar Number'
+    },
+    PHONE_IN: {
+        regex: /(?:\+91[\s-]?)?[6-9]\d{9}\b|(?:\+91[\s-]?)?[6-9]\d{4}[\s-]?\d{5}\b|(?:\+91[\s-]?)?[6-9]\d{2}[\s-]?\d{3}[\s-]?\d{4}\b/g,
+        label: 'Mobile Number'
+    },
+    IFSC: {
+        regex: /\b[A-Z]{4}0[A-Z0-9]{6}\b/gi,
+        label: 'Bank IFSC'
+    },
+    UPI: {
+        regex: /[a-zA-Z0-9.\-_]{2,}@(okhdfcbank|okaxis|okicici|oksbi|paytm|ybl|apl|upi|axl|ibl|barodampay|federal|postbank|idfcbank|kotak|sbi|hdfc|icici|axis|indus|airtel|gpay)\b/gi,
+        label: 'UPI ID'
+    },
+    EMAIL: {
+        regex: /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/gi,
+        label: 'Email Address'
+    },
+    CREDIT_CARD: {
+        regex: /\b(?:\d{4}[\s-]?){3}\d{4}\b/g,
+        label: 'Card Number'
+    },
+    BANK_ACCOUNT: {
+        regex: /(?:A\/C|Account|Acc|AC|A\/c|Acct|Acc No|Account No|Account Number)[\s:#.-]*([0-9]{9,18})/gi,
+        label: 'Bank Account'
+    },
+    DOB: {
+        regex: /(?:DOB|Date of Birth|D\.O\.B|Birth Date)[\s:#.-]*([0-9]{1,2}[\/\-\.][0-9]{1,2}[\/\-\.][0-9]{2,4})/gi,
+        label: 'Date of Birth'
+    },
+    NAME: {
+        regex: /(?:Name|Patient|Customer|Account Holder|Cardholder)[\s:#.-]+([A-Z][a-z]+(?:\s+[A-Z][a-z]+){1,3})/g,
+        label: 'Name / Person'
+    }
 };
 
 export function maskSensitiveValue(val: string): string {
-    const clean = val.trim();
+    const clean = val.trim().replace(/\s+/g, ' ');
     if (clean.length <= 4) return '***';
     return clean.slice(0, 2) + '*'.repeat(Math.max(2, clean.length - 4)) + clean.slice(-2);
 }
 
 /**
- * Scans PDF text page-by-page client-side for sensitive PII patterns and custom keywords.
+ * Intelligent geometry-aware text reconstruction from raw PDF glyph coordinates.
+ */
+function assemblePageText(textContent: any): { fullText: string; denseText: string } {
+    if (!textContent || !textContent.items || textContent.items.length === 0) {
+        return { fullText: '', denseText: '' };
+    }
+
+    const items = textContent.items as any[];
+    const lines: Record<number, any[]> = {};
+
+    for (const item of items) {
+        const str = item.str || '';
+        if (!str) continue;
+        const tx = item.transform || [1, 0, 0, 1, 0, 0];
+        const y = Math.round((tx[5] || 0) / 3.5) * 3.5;
+        const x = tx[4] || 0;
+        const width = item.width || (str.length * 6);
+        const height = item.height || 12;
+
+        if (!lines[y]) lines[y] = [];
+        lines[y].push({ str, x, y: tx[5] || 0, width, height });
+    }
+
+    const lineKeys = Object.keys(lines).map(Number).sort((a, b) => b - a);
+    const formattedLines: string[] = [];
+    const denseTokens: string[] = [];
+
+    for (const yKey of lineKeys) {
+        const lineItems = lines[yKey].sort((a, b) => a.x - b.x);
+        let lineStr = '';
+        let lastRight: number | null = null;
+
+        for (const it of lineItems) {
+            if (lastRight !== null) {
+                const gap = it.x - lastRight;
+                if (gap >= 2.0) {
+                    lineStr += ' ';
+                }
+            }
+            lineStr += it.str;
+            denseTokens.push(it.str);
+            lastRight = it.x + it.width;
+        }
+        formattedLines.push(lineStr);
+    }
+
+    return {
+        fullText: formattedLines.join('\n'),
+        denseText: denseTokens.join('')
+    };
+}
+
+/**
+ * Scans PDF text page-by-page client-side with multi-pass geometry-aware analysis & OCR fallback.
  */
 export async function detectSensitiveDataClient(file: File, customTerms: string[] = []): Promise<SensitiveItem[]> {
     const pdfjsLib = await import('pdfjs-dist');
@@ -36,28 +121,49 @@ export async function detectSensitiveDataClient(file: File, customTerms: string[
     const arrayBuffer = await file.arrayBuffer();
     const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
     const findings: SensitiveItem[] = [];
+    const seenValues = new Set<string>();
+
+    const addFinding = (pType: string, label: string, rawVal: string, pageNum: number) => {
+        const cleanVal = rawVal.trim().replace(/\s+/g, ' ');
+        const dedupKey = `${pType}_p${pageNum}_${cleanVal.toLowerCase()}`;
+        if (seenValues.has(dedupKey)) return;
+        seenValues.add(dedupKey);
+
+        findings.push({
+            id: `${pType}_p${pageNum}_${Math.random().toString(36).substr(2, 6)}`,
+            type: pType,
+            label,
+            value: cleanVal,
+            masked: maskSensitiveValue(cleanVal),
+            page: pageNum,
+            selected: true
+        });
+    };
 
     try {
+        let totalTextLen = 0;
+
         for (let i = 1; i <= pdf.numPages; i++) {
             const page = await pdf.getPage(i);
             const textContent = await page.getTextContent();
-            const pageText = textContent.items.map((item: any) => item.str || '').join(' ');
+            const { fullText, denseText } = assemblePageText(textContent);
+            totalTextLen += fullText.length;
 
-            // 1. Scan built-in regex patterns
-            for (const [pType, { regex, label }] of Object.entries(SENSITIVE_PATTERNS)) {
-                regex.lastIndex = 0;
-                let match;
-                while ((match = regex.exec(pageText)) !== null) {
-                    const val = match[0];
-                    findings.push({
-                        id: `${pType}_p${i}_${match.index}_${Math.random().toString(36).substr(2, 4)}`,
-                        type: pType,
-                        label,
-                        value: val,
-                        masked: maskSensitiveValue(val),
-                        page: i,
-                        selected: true
-                    });
+            const textSources = [fullText, denseText];
+
+            // 1. Scan built-in regex patterns on reconstructed text
+            for (const textSample of textSources) {
+                if (!textSample) continue;
+
+                for (const [pType, { regex, label }] of Object.entries(SENSITIVE_PATTERNS)) {
+                    regex.lastIndex = 0;
+                    let match;
+                    while ((match = regex.exec(textSample)) !== null) {
+                        const val = match[1] || match[0];
+                        if (val && val.trim().length >= 3) {
+                            addFinding(pType, label, val, i);
+                        }
+                    }
                 }
             }
 
@@ -67,18 +173,44 @@ export async function detectSensitiveDataClient(file: File, customTerms: string[
                 if (!tClean) continue;
                 const termRegex = new RegExp(tClean.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
                 let match;
-                while ((match = termRegex.exec(pageText)) !== null) {
+                while ((match = termRegex.exec(fullText)) !== null) {
                     const val = match[0];
-                    findings.push({
-                        id: `CUSTOM_p${i}_${match.index}_${Math.random().toString(36).substr(2, 4)}`,
-                        type: 'CUSTOM_QUERY',
-                        label: `Custom: "${tClean}"`,
-                        value: val,
-                        masked: maskSensitiveValue(val),
-                        page: i,
-                        selected: true
-                    });
+                    addFinding('CUSTOM_QUERY', `Custom: "${tClean}"`, val, i);
                 }
+            }
+        }
+
+        // 3. Fallback: If document is scanned / image-based (< 30 text characters), perform Tesseract OCR on Page 1
+        if (totalTextLen < 30 && pdf.numPages > 0) {
+            try {
+                const page1 = await pdf.getPage(1);
+                const viewport = page1.getViewport({ scale: 1.5 });
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = viewport.width;
+                canvas.height = viewport.height;
+                if (ctx) {
+                    await page1.render({ canvasContext: ctx, viewport }).promise;
+                    const TesseractMod: any = await import('tesseract.js');
+                    const recognizeFn = TesseractMod.recognize || TesseractMod.default?.recognize;
+                    if (recognizeFn) {
+                        const ocrRes = await recognizeFn(canvas, 'eng');
+                        const ocrText = ocrRes?.data?.text || '';
+
+                        for (const [pType, { regex, label }] of Object.entries(SENSITIVE_PATTERNS)) {
+                            regex.lastIndex = 0;
+                            let match;
+                            while ((match = regex.exec(ocrText)) !== null) {
+                                const val = match[1] || match[0];
+                                if (val && val.trim().length >= 3) {
+                                    addFinding(pType, label, val, 1);
+                                }
+                            }
+                        }
+                    }
+                }
+            } catch (ocrErr) {
+                console.warn('OCR fallback scanner notice:', ocrErr);
             }
         }
     } finally {

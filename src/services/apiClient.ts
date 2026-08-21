@@ -127,6 +127,29 @@ class ApiClient {
   }
 
   /**
+   * Scans a PDF document for sensitive PII patterns via backend.
+   */
+  async scanPdfSensitive(file: File, customTerms: string[] = []): Promise<any[]> {
+    const formData = new FormData();
+    formData.append('file', file);
+    if (customTerms.length > 0) {
+      formData.append('custom_terms', JSON.stringify(customTerms));
+    }
+
+    const response = await fetch(`${this.baseUrl}/redact/scan`, {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (!response.ok) {
+      throw new Error(`Scan failed with status ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data.findings || [];
+  }
+
+  /**
    * Submits two files for differential comparison processing.
    */
   async submitCompareJob(fileA: File, fileB: File, settings: Record<string, any> = {}): Promise<BackendJobResult> {
