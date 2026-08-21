@@ -619,19 +619,19 @@ def generate_prerendered_pages():
         html = re.sub(r'<title>.*?</title>', f'<title>{title}</title>', base_template)
 
         # Replace Description
-        html = re.sub(r'<meta name="description" id="seo-description"\s+content=".*?"', f'<meta name="description" id="seo-description"\n    content="{description}"', html)
+        html = re.sub(r'<meta name="description"[^>]*content=".*?"', f'<meta name="description" data-rh="true"\n    content="{description}"', html)
 
         # Replace Canonical
-        html = re.sub(r'<link rel="canonical" href=".*?" />', f'<link rel="canonical" href="{canonical_url}" />', html)
+        html = re.sub(r'<link rel="canonical"[^>]*>', f'<link rel="canonical" data-rh="true" href="{canonical_url}" />', html)
 
         # Replace OpenGraph
-        html = re.sub(r'<meta property="og:title" content=".*?"', f'<meta property="og:title" content="{title}"', html)
-        html = re.sub(r'<meta property="og:description"\s+content=".*?"', f'<meta property="og:description"\n    content="{description}"', html)
-        html = re.sub(r'<meta property="og:url" content=".*?"', f'<meta property="og:url" content="{canonical_url}"', html)
+        html = re.sub(r'<meta property="og:title"[^>]*>', f'<meta property="og:title" data-rh="true" content="{title}" />', html)
+        html = re.sub(r'<meta property="og:description"[^>]*>', f'<meta property="og:description" data-rh="true"\n    content="{description}" />', html)
+        html = re.sub(r'<meta property="og:url"[^>]*>', f'<meta property="og:url" data-rh="true" content="{canonical_url}" />', html)
 
         # Replace Twitter
-        html = re.sub(r'<meta name="twitter:title" content=".*?"', f'<meta name="twitter:title" content="{title}"', html)
-        html = re.sub(r'<meta name="twitter:description"\s+content=".*?"', f'<meta name="twitter:description"\n    content="{description}"', html)
+        html = re.sub(r'<meta name="twitter:title"[^>]*>', f'<meta name="twitter:title" data-rh="true" content="{title}" />', html)
+        html = re.sub(r'<meta name="twitter:description"[^>]*>', f'<meta name="twitter:description" data-rh="true"\n    content="{description}" />', html)
 
         # Replace Noscript
         html = re.sub(r'<noscript>.*?</noscript>', custom_noscript, html, flags=re.DOTALL)
