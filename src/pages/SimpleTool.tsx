@@ -555,8 +555,9 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
           />
         </div>
       ) : (
-        <div className="animate-fadeIn max-w-3xl mx-auto space-y-12">
-          {/* File Status Card */}
+        <div className="animate-fadeIn max-w-3xl mx-auto space-y-6">
+
+          {/* ── 1. FILE HEADER CARD ── */}
           <div className={`p-5 sm:p-8 rounded-[2rem] border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 transition-all ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100 shadow-xl'}`}>
             <div className="flex items-center gap-6 text-left">
               <div className="bg-yellow-500/10 p-4 rounded-2xl">
@@ -576,471 +577,472 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
             )}
           </div>
 
-          {/* Progress Bar - shown during processing */}
+          {/* ── 2. PROCESSING STATE ── */}
           {processing && (
-            <div className="space-y-4">
-              <ProgressBar
-                progress={progress}
-                label={`Processing ${title}...`}
-                darkMode={darkMode}
-                status={processingStatus}
-                fileName={file?.name || `${multiFiles.length} files`}
-              />
-            </div>
+            <ProgressBar
+              progress={progress}
+              label={`Processing ${title}...`}
+              darkMode={darkMode}
+              status={processingStatus}
+              fileName={file?.name || `${multiFiles.length} files`}
+            />
           )}
 
+          {/* ── 3. TOOL CONFIGURATION + IMAGE LAYOUT (hidden once result is ready) ── */}
           {!result && (
-            <div className={`p-6 sm:p-10 rounded-[2rem] border shadow-2xl text-left transition-all ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'}`}>
-              <div className="flex items-center gap-3 mb-8">
-                <Settings2 className="text-yellow-600 w-6 h-6" />
-                <h2 className={`text-2xl font-black uppercase tracking-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>Tool Configuration</h2>
-              </div>
+            <>
+              <div className={`p-6 sm:p-10 rounded-[2rem] border shadow-2xl text-left transition-all ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'}`}>
+                <div className="flex items-center gap-3 mb-8">
+                  <Settings2 className="text-yellow-600 w-6 h-6" />
+                  <h2 className={`text-2xl font-black uppercase tracking-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>Tool Configuration</h2>
+                </div>
 
-              {isSignTool && (
-                <div className="space-y-6">
-                  <div className="space-y-2">
-                    <div className="flex justify-between items-center mb-2">
-                      <p className="text-sm font-bold text-slate-500">Draw Signature</p>
-                      <div className="flex gap-2">
-                        <button onClick={saveSignature} className="text-xs font-bold text-green-600 hover:text-green-700 bg-green-50 px-3 py-1 rounded-lg border border-green-200 uppercase">Save</button>
-                        <button onClick={loadSignature} className="text-xs font-bold text-blue-600 hover:text-blue-700 bg-blue-50 px-3 py-1 rounded-lg border border-blue-200 uppercase">Load</button>
-                      </div>
-                    </div>
-                    <div className="border-2 border-slate-300 dark:border-slate-600 rounded-2xl overflow-hidden bg-white touch-none">
-                      <SignatureCanvas
-                        ref={signatureCanvasRef}
-                        darkMode={darkMode}
-                        penColor={penColor}
-                        strokeWidth={strokeWidth}
-                        backgroundColor={signatureBgColor}
-                      />
-                    </div>
-
-                    <div className="flex flex-col gap-4 mt-4">
-                      {/* Controls Row 1 */}
-                      <div className="flex flex-col sm:flex-row justify-between gap-4 sm:items-center">
+                {isSignTool && (
+                  <div className="space-y-6">
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-center mb-2">
+                        <p className="text-sm font-bold text-slate-500">Draw Signature</p>
                         <div className="flex gap-2">
-                          <button onClick={undoSignature} className="text-xs font-bold text-blue-500 uppercase hover:text-blue-600">Undo</button>
-                          <button onClick={clearSignature} className="text-xs font-bold text-red-500 uppercase hover:text-red-600">Clear</button>
+                          <button onClick={saveSignature} className="text-xs font-bold text-green-600 hover:text-green-700 bg-green-50 px-3 py-1 rounded-lg border border-green-200 uppercase">Save</button>
+                          <button onClick={loadSignature} className="text-xs font-bold text-blue-600 hover:text-blue-700 bg-blue-50 px-3 py-1 rounded-lg border border-blue-200 uppercase">Load</button>
                         </div>
+                      </div>
+                      <div className="border-2 border-slate-300 dark:border-slate-600 rounded-2xl overflow-hidden bg-white touch-none">
+                        <SignatureCanvas
+                          ref={signatureCanvasRef}
+                          darkMode={darkMode}
+                          penColor={penColor}
+                          strokeWidth={strokeWidth}
+                          backgroundColor={signatureBgColor}
+                        />
+                      </div>
 
-                        <div className="flex gap-4 items-center">
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs font-bold text-slate-500 uppercase">Width:</span>
-                            {(['thin', 'medium', 'thick'] as const).map((w) => (
+                      <div className="flex flex-col gap-4 mt-4">
+                        <div className="flex flex-col sm:flex-row justify-between gap-4 sm:items-center">
+                          <div className="flex gap-2">
+                            <button onClick={undoSignature} className="text-xs font-bold text-blue-500 uppercase hover:text-blue-600">Undo</button>
+                            <button onClick={clearSignature} className="text-xs font-bold text-red-500 uppercase hover:text-red-600">Clear</button>
+                          </div>
+                          <div className="flex gap-4 items-center">
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs font-bold text-slate-500 uppercase">Width:</span>
+                              {(['thin', 'medium', 'thick'] as const).map((w) => (
+                                <button
+                                  key={w}
+                                  onClick={() => setStrokeWidth(w)}
+                                  className={`px-2 py-1 rounded-md text-xs font-bold border transition-all ${strokeWidth === w ? 'bg-slate-800 text-white dark:bg-white dark:text-slate-900 border-slate-800' : 'bg-transparent text-slate-500 border-slate-200'}`}
+                                >
+                                  {w === 'thin' ? '1px' : w === 'medium' ? '2px' : '4px'}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex flex-col sm:flex-row justify-between gap-4 sm:items-center border-t pt-4 border-slate-100 dark:border-slate-800">
+                          <div className="flex gap-2 items-center">
+                            <span className="text-xs font-bold text-slate-500 uppercase">Color:</span>
+                            {['#000', '#0066FF', '#FF0000', '#008000', '#800080'].map((color) => (
                               <button
-                                key={w}
-                                onClick={() => setStrokeWidth(w)}
-                                className={`px-2 py-1 rounded-md text-xs font-bold border transition-all ${strokeWidth === w ? 'bg-slate-800 text-white dark:bg-white dark:text-slate-900 border-slate-800' : 'bg-transparent text-slate-500 border-slate-200'}`}
-                              >
-                                {w === 'thin' ? '1px' : w === 'medium' ? '2px' : '4px'}
-                              </button>
+                                key={color}
+                                onClick={() => setPenColor(color)}
+                                className={`w-6 h-6 rounded-full border-2 transition-all ${penColor === color ? 'border-yellow-500 scale-110' : 'border-slate-300'}`}
+                                style={{ backgroundColor: color }}
+                                title={color}
+                              />
+                            ))}
+                            <div className="relative w-6 h-6 rounded-full overflow-hidden border-2 border-slate-300">
+                              <input
+                                type="color"
+                                value={penColor}
+                                onChange={(e) => setPenColor(e.target.value)}
+                                className="absolute inset-0 w-[150%] h-[150%] -top-[25%] -left-[25%] p-0 border-0 cursor-pointer"
+                                title="Custom Color"
+                              />
+                            </div>
+                          </div>
+                          <div className="flex gap-2 items-center">
+                            <span className="text-xs font-bold text-slate-500 uppercase">Background:</span>
+                            {[
+                              { name: 'Transparent', val: 'rgba(255,255,255,0)' },
+                              { name: 'White', val: '#ffffff' },
+                              { name: 'Paper', val: '#f8f9fa' }
+                            ].map((bg) => (
+                              <button
+                                key={bg.name}
+                                onClick={() => setSignatureBgColor(bg.val)}
+                                className={`w-6 h-6 rounded-full border-2 transition-all ${signatureBgColor === bg.val ? 'border-yellow-500 scale-110' : 'border-slate-300'}`}
+                                style={{ backgroundColor: bg.val === 'rgba(255,255,255,0)' ? 'white' : bg.val, backgroundImage: bg.val === 'rgba(255,255,255,0)' ? 'linear-gradient(45deg, #ccc 25%, transparent 25%), linear-gradient(-45deg, #ccc 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #ccc 75%), linear-gradient(-45deg, transparent 75%, #ccc 75%)' : 'none', backgroundSize: '10px 10px' }}
+                                title={bg.name}
+                              />
                             ))}
                           </div>
                         </div>
                       </div>
-
-                      {/* Controls Row 2 */}
-                      <div className="flex flex-col sm:flex-row justify-between gap-4 sm:items-center border-t pt-4 border-slate-100 dark:border-slate-800">
-                        <div className="flex gap-2 items-center">
-                          <span className="text-xs font-bold text-slate-500 uppercase">Color:</span>
-                          {['#000', '#0066FF', '#FF0000', '#008000', '#800080'].map((color) => (
-                            <button
-                              key={color}
-                              onClick={() => setPenColor(color)}
-                              className={`w-6 h-6 rounded-full border-2 transition-all ${penColor === color ? 'border-yellow-500 scale-110' : 'border-slate-300'}`}
-                              style={{ backgroundColor: color }}
-                              title={color}
-                            />
-                          ))}
-                          <div className="relative w-6 h-6 rounded-full overflow-hidden border-2 border-slate-300">
-                            <input
-                              type="color"
-                              value={penColor}
-                              onChange={(e) => setPenColor(e.target.value)}
-                              className="absolute inset-0 w-[150%] h-[150%] -top-[25%] -left-[25%] p-0 border-0 cursor-pointer"
-                              title="Custom Color"
-                            />
-                          </div>
-                        </div>
-
-                        <div className="flex gap-2 items-center">
-                          <span className="text-xs font-bold text-slate-500 uppercase">Background:</span>
-                          {[
-                            { name: 'Transparent', val: 'rgba(255,255,255,0)' },
-                            { name: 'White', val: '#ffffff' },
-                            { name: 'Paper', val: '#f8f9fa' }
-                          ].map((bg) => (
-                            <button
-                              key={bg.name}
-                              onClick={() => setSignatureBgColor(bg.val)}
-                              className={`w-6 h-6 rounded-full border-2 transition-all ${signatureBgColor === bg.val ? 'border-yellow-500 scale-110' : 'border-slate-300'}`}
-                              style={{ backgroundColor: bg.val === 'rgba(255,255,255,0)' ? 'white' : bg.val, backgroundImage: bg.val === 'rgba(255,255,255,0)' ? 'linear-gradient(45deg, #ccc 25%, transparent 25%), linear-gradient(-45deg, #ccc 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #ccc 75%), linear-gradient(-45deg, transparent 75%, #ccc 75%)' : 'none', backgroundSize: '10px 10px' }}
-                              title={bg.name}
-                            />
-                          ))}
-                        </div>
+                    </div>
+                    <div className="space-y-2">
+                      <p className="text-xs font-black uppercase tracking-widest text-slate-500">Position</p>
+                      <div className="flex gap-4">
+                        <button
+                          onClick={() => setSignaturePosition('bottom-right')}
+                          className={`flex-1 py-3 rounded-xl text-sm font-bold border-2 transition-all ${signaturePosition === 'bottom-right' ? 'border-indigo-600 text-indigo-600 bg-indigo-50 dark:bg-indigo-900/20' : 'border-slate-200 dark:border-slate-700'}`}
+                        >
+                          Bottom Right
+                        </button>
+                        <button
+                          onClick={() => setSignaturePosition('bottom-left')}
+                          className={`flex-1 py-3 rounded-xl text-sm font-bold border-2 transition-all ${signaturePosition === 'bottom-left' ? 'border-indigo-600 text-indigo-600 bg-indigo-50 dark:bg-indigo-900/20' : 'border-slate-200 dark:border-slate-700'}`}
+                        >
+                          Bottom Left
+                        </button>
                       </div>
                     </div>
                   </div>
+                )}
 
-                  <div className="space-y-2">
-                    <p className="text-xs font-black uppercase tracking-widest text-slate-500">Position</p>
-                    <div className="flex gap-4">
-                      <button
-                        onClick={() => setSignaturePosition('bottom-right')}
-                        className={`flex-1 py-3 rounded-xl text-sm font-bold border-2 transition-all ${signaturePosition === 'bottom-right' ? 'border-indigo-600 text-indigo-600 bg-indigo-50 dark:bg-indigo-900/20' : 'border-slate-200 dark:border-slate-700'}`}
-                      >
-                        Bottom Right
-                      </button>
-                      <button
-                        onClick={() => setSignaturePosition('bottom-left')}
-                        className={`flex-1 py-3 rounded-xl text-sm font-bold border-2 transition-all ${signaturePosition === 'bottom-left' ? 'border-indigo-600 text-indigo-600 bg-indigo-50 dark:bg-indigo-900/20' : 'border-slate-200 dark:border-slate-700'}`}
-                      >
-                        Bottom Left
-                      </button>
+                {mode === 'watermark' && (
+                  <div className="space-y-6">
+                    <div className="space-y-2">
+                      <label className="block text-xs font-black uppercase tracking-widest text-slate-500">Watermark Text</label>
+                      <input
+                        type="text"
+                        value={watermarkText}
+                        onChange={(e) => setWatermarkText(e.target.value)}
+                        placeholder="CONFIDENTIAL"
+                        className={`w-full p-6 rounded-2xl text-xl font-bold border-2 focus:ring-4 transition-all outline-none ${darkMode ? 'bg-slate-900 border-slate-700 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'}`}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-center">
+                        <label className="block text-xs font-black uppercase tracking-widest text-slate-500">Font Size ({watermarkSize})</label>
+                        <span className="text-sm font-bold text-indigo-600">{watermarkSize}px</span>
+                      </div>
+                      <input
+                        type="range"
+                        min="10"
+                        max="200"
+                        value={watermarkSize}
+                        onChange={(e) => setWatermarkSize(parseInt(e.target.value))}
+                        className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600"
+                      />
                     </div>
                   </div>
-                </div>
-              )}
+                )}
 
-              {mode === 'watermark' && (
-                <div className="space-y-6">
-                  <div className="space-y-2">
-                    <label className="block text-xs font-black uppercase tracking-widest text-slate-500">Watermark Text</label>
+                {mode === 'ocr' && (
+                  <div className="p-4 bg-blue-50 text-blue-800 rounded-2xl mb-4">
+                    <p className="font-bold">Info: OCR processing happens locally and may take some time for large files.</p>
+                  </div>
+                )}
+
+                {mode === 'compare' && (
+                  <div className={`p-6 rounded-2xl border ${darkMode ? 'bg-slate-900 border-slate-700' : 'bg-amber-50/70 border-amber-200'}`}>
+                    <div className="flex items-center gap-3 mb-3">
+                      <span className="p-2 rounded-xl bg-yellow-500/20 text-yellow-700 dark:text-yellow-400 font-black">
+                        <Zap size={18} />
+                      </span>
+                      <div>
+                        <h4 className={`font-bold text-sm ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+                          Document Differential Analyzer
+                        </h4>
+                        <p className={`text-xs ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+                          Comparing {multiFiles.length >= 2 ? `${multiFiles[0].name} and ${multiFiles[1].name}` : file ? file.name : 'selected PDF documents'}.
+                        </p>
+                      </div>
+                    </div>
+                    <p className={`text-xs leading-relaxed ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+                      PDFBolt extracts structured text and visual elements page-by-page to detect additions, deletions, modified paragraphs, and structural alterations. A comprehensive summary comparison PDF report will be generated.
+                    </p>
+                  </div>
+                )}
+
+                {mode === 'redact' && (
+                  <div className="p-4 bg-orange-50 text-orange-800 rounded-2xl mb-4">
+                    <p className="font-bold">Warning: This will convert all pages to images to permanently sanitize hidden text. Quality may be slightly reduced.</p>
+                  </div>
+                )}
+
+                {mode === 'compress' && (
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {['low', 'recommended', 'extreme'].map((l) => (
+                      <button
+                        key={l}
+                        onClick={() => setCompressionLevel(l)}
+                        className={`p-6 rounded-[2rem] border-4 transition-all flex flex-col items-center gap-2 ${compressionLevel === l
+                          ? 'bg-red-600 border-red-500 text-white shadow-xl scale-105'
+                          : darkMode ? 'bg-slate-700 border-slate-600 text-slate-400' : 'bg-white border-slate-200 text-slate-600'
+                          }`}
+                      >
+                        <span className="font-black text-lg uppercase">{l === 'low' ? 'Pro' : l === 'recommended' ? 'Smart' : 'Lite'}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {needsPageInput && (
+                  <div className="space-y-4">
+                    <label className="block text-xs font-black uppercase tracking-widest text-slate-500 mb-2">Page Numbers or Range</label>
                     <input
                       type="text"
-                      value={watermarkText}
-                      onChange={(e) => setWatermarkText(e.target.value)}
-                      placeholder="CONFIDENTIAL"
-                      className={`w-full p-6 rounded-2xl text-xl font-bold border-2 focus:ring-4 transition-all outline-none ${darkMode ? 'bg-slate-900 border-slate-700 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'}`}
+                      value={pageInput}
+                      onChange={(e) => setPageInput(e.target.value)}
+                      placeholder={mode === 'split' ? "e.g. 1-5, 8, 11-15" : "e.g. 2, 4, 10"}
+                      className={`w-full p-6 rounded-2xl text-xl font-bold border-2 focus:ring-4 transition-all outline-none ${darkMode ? 'bg-slate-900 border-slate-700 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
+                        }`}
                     />
                   </div>
+                )}
 
-                  <div className="space-y-2">
-                    <div className="flex justify-between items-center">
-                      <label className="block text-xs font-black uppercase tracking-widest text-slate-500">Font Size ({watermarkSize})</label>
-                      <span className="text-sm font-bold text-indigo-600">{watermarkSize}px</span>
+                {needsPassword && (
+                  <div className="space-y-6">
+                    <div className="space-y-3">
+                      <label className="block text-xs font-black uppercase tracking-widest text-slate-500">
+                        {mode === 'protect' ? 'Set Encryption Password' : 'Enter Document Password'}
+                      </label>
+                      <div className="relative">
+                        <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
+                        <input
+                          type={showPassword ? 'text' : 'password'}
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          placeholder={mode === 'protect' ? 'Create a strong password...' : 'Enter the password to remove restrictions...'}
+                          className={`w-full p-6 pl-14 pr-14 rounded-2xl text-xl font-bold border-2 focus:ring-4 transition-all outline-none ${
+                            darkMode ? 'bg-slate-900 border-slate-700 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
+                          }`}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-2 transition-colors"
+                          aria-label={showPassword ? 'Hide password' : 'Show password'}
+                        >
+                          {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                        </button>
+                      </div>
                     </div>
-                    <input
-                      type="range"
-                      min="10"
-                      max="200"
-                      value={watermarkSize}
-                      onChange={(e) => setWatermarkSize(parseInt(e.target.value))}
-                      className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600"
-                    />
+
+                    {mode === 'unlock' && (
+                      <div className={`p-4 rounded-xl text-xs flex items-center gap-3 border ${
+                        darkMode ? 'bg-slate-800/60 border-slate-700 text-slate-300' : 'bg-blue-50/80 border-blue-100 text-blue-800'
+                      }`}>
+                        <Lock size={16} className="shrink-0 text-blue-600 dark:text-blue-400" />
+                        <span>PDFBolt permanently removes password protection and permission locks from documents you have authorized access to. Passwords are never stored or transmitted.</span>
+                      </div>
+                    )}
                   </div>
-                </div>
-              )}
+                )}
 
-              {mode === 'ocr' && (
-                <div className="p-4 bg-blue-50 text-blue-800 rounded-2xl mb-4">
-                  <p className="font-bold">Info: OCR processing happens locally and may take some time for large files.</p>
-                </div>
-              )}
+                {isImageTool && (
+                  <div className="space-y-4">
+                    <div className="flex flex-wrap gap-2">
+                      {multiFiles.map((f, i) => (
+                        <div key={i} className="relative w-16 h-16 rounded-lg overflow-hidden border border-slate-200">
+                          <img src={imagePreviewUrls[i]} className="w-full h-full object-cover" alt={f.name} />
+                          <button onClick={() => setMultiFiles(prev => prev.filter((_, idx) => idx !== i))} className="absolute top-0 right-0 bg-red-600 text-white p-0.5"><X size={10} /></button>
+                        </div>
+                      ))}
+                    </div>
 
-              {mode === 'compare' && (
-                <div className={`p-6 rounded-2xl border ${darkMode ? 'bg-slate-900 border-slate-700' : 'bg-amber-50/70 border-amber-200'}`}>
-                  <div className="flex items-center gap-3 mb-3">
-                    <span className="p-2 rounded-xl bg-yellow-500/20 text-yellow-700 dark:text-yellow-400 font-black">
-                      <Zap size={18} />
+                    {/* Image Layout Settings — inline inside config panel */}
+                    {multiFiles.length > 0 && (
+                      <div className="mt-6 pt-6 border-t border-slate-100 dark:border-slate-700">
+                        <h3 className="text-xs font-black uppercase tracking-widest text-slate-500 mb-4 flex items-center gap-2">
+                          <Settings2 className="w-4 h-4 text-yellow-500" /> PDF Layout Settings
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                          <div className="space-y-3">
+                            <label className="text-xs font-bold uppercase text-slate-500">Page Size</label>
+                            <div className="flex flex-col gap-2">
+                              {['fit', 'a4', 'letter'].map(size => (
+                                <button
+                                  key={size}
+                                  onClick={() => setImgPageSize(size as ImagePageSize)}
+                                  className={`py-2 px-4 rounded-xl border-2 font-bold text-sm transition-all ${imgPageSize === size ? 'border-yellow-500 bg-yellow-50 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400' : 'border-slate-200 dark:border-slate-700'}`}
+                                >
+                                  {size === 'fit' ? 'Fit Image' : size.toUpperCase()}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+
+                          <div className={`space-y-3 transition-opacity ${imgPageSize === 'fit' ? 'opacity-50 pointer-events-none' : ''}`}>
+                            <label className="text-xs font-bold uppercase text-slate-500">Orientation</label>
+                            <div className="flex flex-col gap-2">
+                              {['portrait', 'landscape'].map(or => (
+                                <button
+                                  key={or}
+                                  onClick={() => setImgOrientation(or as ImageOrientation)}
+                                  className={`py-2 px-4 rounded-xl border-2 font-bold text-sm transition-all ${imgOrientation === or ? 'border-yellow-500 bg-yellow-50 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400' : 'border-slate-200 dark:border-slate-700'}`}
+                                >
+                                  {or.charAt(0).toUpperCase() + or.slice(1)}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+
+                          <div className={`space-y-3 transition-opacity ${imgPageSize === 'fit' ? 'opacity-50 pointer-events-none' : ''}`}>
+                            <label className="text-xs font-bold uppercase text-slate-500">Margins</label>
+                            <div className="flex flex-col gap-2">
+                              {['none', 'small', 'standard'].map(m => (
+                                <button
+                                  key={m}
+                                  onClick={() => setImgMargin(m as ImageMargin)}
+                                  className={`py-2 px-4 rounded-xl border-2 font-bold text-sm transition-all ${imgMargin === m ? 'border-yellow-500 bg-yellow-50 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400' : 'border-slate-200 dark:border-slate-700'}`}
+                                >
+                                  {m.charAt(0).toUpperCase() + m.slice(1)}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* ── 4. PRIMARY ACTION ── */}
+              <button
+                disabled={processing || (needsPageInput && !pageInput) || (needsPassword && !password) || (isImageTool && multiFiles.length === 0)}
+                onClick={process}
+                className="w-full px-8 py-6 sm:py-8 bg-red-600 text-white rounded-[2rem] font-black text-2xl sm:text-3xl shadow-2xl hover:bg-red-700 hover:scale-[1.02] disabled:opacity-30 transition-all flex items-center justify-center gap-4 group"
+              >
+                {processing ? <div className="w-8 h-8 border-4 border-white/30 border-t-white rounded-full animate-spin"></div> : <span>Process {title}</span>}
+              </button>
+            </>
+          )}
+
+          {/* ── 5. RESULT STATE ── */}
+          {result && !processing && (
+            <div key={resultKey} className="flex flex-col items-center gap-6 w-full animate-fadeIn">
+
+              {/* Success Banner */}
+              <div className="flex items-center gap-4 text-green-500 font-black bg-green-50 dark:bg-green-900/20 px-10 py-5 rounded-[2rem] border border-green-100 dark:border-green-800 w-full justify-center">
+                <CheckCircle2 size={32} />
+                <span className="text-2xl">Processing Complete</span>
+              </div>
+
+              {/* Repair Report */}
+              {mode === 'repair' && repairReport && (
+                <div className="w-full p-6 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-md text-left space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-black uppercase tracking-wider text-slate-500">Structural Recovery Report</span>
+                    <span className={`px-3 py-1 rounded-full text-xs font-black uppercase ${repairReport.status === 'repaired' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'}`}>
+                      {repairReport.status === 'repaired' ? 'Fully Repaired' : 'Partial Recovery'}
                     </span>
-                    <div>
-                      <h4 className={`font-bold text-sm ${darkMode ? 'text-white' : 'text-slate-900'}`}>
-                        Document Differential Analyzer
-                      </h4>
-                      <p className={`text-xs ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
-                        Comparing {multiFiles.length >= 2 ? `${multiFiles[0].name} and ${multiFiles[1].name}` : file ? file.name : 'selected PDF documents'}.
-                      </p>
-                    </div>
                   </div>
-                  <p className={`text-xs leading-relaxed ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
-                    PDFBolt extracts structured text and visual elements page-by-page to detect additions, deletions, modified paragraphs, and structural alterations. A comprehensive summary comparison PDF report will be generated.
-                  </p>
-                </div>
-              )}
 
-              {mode === 'redact' && (
-                <div className="p-4 bg-orange-50 text-orange-800 rounded-2xl mb-4">
-                  <p className="font-bold">Warning: This will convert all pages to images to permanently sanitize hidden text. Quality may be slightly reduced.</p>
-                </div>
-              )}
-
-
-              {mode === 'compress' && (
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  {['low', 'recommended', 'extreme'].map((l) => (
-                    <button
-                      key={l}
-                      onClick={() => setCompressionLevel(l)}
-                      className={`p-6 rounded-[2rem] border-4 transition-all flex flex-col items-center gap-2 ${compressionLevel === l
-                        ? 'bg-red-600 border-red-500 text-white shadow-xl scale-105'
-                        : darkMode ? 'bg-slate-700 border-slate-600 text-slate-400' : 'bg-white border-slate-200 text-slate-600'
-                        }`}
-                    >
-                      <span className="font-black text-lg uppercase">{l === 'low' ? 'Pro' : l === 'recommended' ? 'Smart' : 'Lite'}</span>
-                    </button>
-                  ))}
-                </div>
-              )}
-
-              {needsPageInput && (
-                <div className="space-y-4">
-                  <label className="block text-xs font-black uppercase tracking-widest text-slate-500 mb-2">Page Numbers or Range</label>
-                  <input
-                    type="text"
-                    value={pageInput}
-                    onChange={(e) => setPageInput(e.target.value)}
-                    placeholder={mode === 'split' ? "e.g. 1-5, 8, 11-15" : "e.g. 2, 4, 10"}
-                    className={`w-full p-6 rounded-2xl text-xl font-bold border-2 focus:ring-4 transition-all outline-none ${darkMode ? 'bg-slate-900 border-slate-700 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
-                      }`}
-                  />
-                </div>
-              )}
-
-              {needsPassword && (
-                <div className="space-y-6">
-                  <div className="space-y-3">
-                    <label className="block text-xs font-black uppercase tracking-widest text-slate-500">
-                      {mode === 'protect' ? 'Set Encryption Password' : 'Enter Document Password'}
-                    </label>
-                    <div className="relative">
-                      <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
-                      <input
-                        type={showPassword ? 'text' : 'password'}
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        placeholder={mode === 'protect' ? 'Create a strong password...' : 'Enter the password to remove restrictions...'}
-                        className={`w-full p-6 pl-14 pr-14 rounded-2xl text-xl font-bold border-2 focus:ring-4 transition-all outline-none ${
-                          darkMode ? 'bg-slate-900 border-slate-700 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
-                        }`}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-2 transition-colors"
-                        aria-label={showPassword ? 'Hide password' : 'Show password'}
-                      >
-                        {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                      </button>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+                    <div className="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-xl border border-slate-100 dark:border-slate-800">
+                      <div className="text-xl font-black text-slate-800 dark:text-white">{repairReport.original_pages}</div>
+                      <div className="text-[10px] font-bold uppercase text-slate-400">Original Pages</div>
+                    </div>
+                    <div className="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-xl border border-slate-100 dark:border-slate-800">
+                      <div className="text-xl font-black text-green-600">{repairReport.recovered_pages}</div>
+                      <div className="text-[10px] font-bold uppercase text-slate-400">Recovered</div>
+                    </div>
+                    <div className="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-xl border border-slate-100 dark:border-slate-800">
+                      <div className={`text-xl font-black ${repairReport.pages_lost > 0 ? 'text-red-500' : 'text-slate-400'}`}>{repairReport.pages_lost}</div>
+                      <div className="text-[10px] font-bold uppercase text-slate-400">Lost</div>
+                    </div>
+                    <div className="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-xl border border-slate-100 dark:border-slate-800">
+                      <div className="text-xl font-black text-yellow-600 dark:text-yellow-400">{repairReport.repair_score}%</div>
+                      <div className="text-[10px] font-bold uppercase text-slate-400">Score</div>
                     </div>
                   </div>
 
-                  {mode === 'unlock' && (
-                    <div className={`p-4 rounded-xl text-xs flex items-center gap-3 border ${
-                      darkMode ? 'bg-slate-800/60 border-slate-700 text-slate-300' : 'bg-blue-50/80 border-blue-100 text-blue-800'
-                    }`}>
-                      <Lock size={16} className="shrink-0 text-blue-600 dark:text-blue-400" />
-                      <span>PDFBolt permanently removes password protection and permission locks from documents you have authorized access to. Passwords are never stored or transmitted.</span>
+                  {repairReport.warnings && repairReport.warnings.length > 0 && (
+                    <div className="p-3 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/30 rounded-xl text-xs text-amber-800 dark:text-amber-300">
+                      {repairReport.warnings.map((w: string, i: number) => <div key={i}>⚠️ {w}</div>)}
                     </div>
                   )}
                 </div>
               )}
 
-              {isImageTool && (
-                <div className="space-y-4">
-                  <div className="flex flex-wrap gap-2">
-                    {multiFiles.map((f, i) => (
-                      <div key={i} className="relative w-16 h-16 rounded-lg overflow-hidden border border-slate-200">
-                        <img src={imagePreviewUrls[i]} className="w-full h-full object-cover" alt={f.name} />
-                        <button onClick={() => setMultiFiles(prev => prev.filter((_, idx) => idx !== i))} className="absolute top-0 right-0 bg-red-600 text-white p-0.5"><X size={10} /></button>
-                      </div>
+              {/* Download Area */}
+              {Array.isArray(result) ? (
+                <div className="flex flex-col items-center gap-6 w-full">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full">
+                    {result.map((item, idx) => (
+                      <a
+                        key={idx}
+                        href={item.url}
+                        download={item.name}
+                        className="flex items-center justify-between p-4 bg-white dark:bg-slate-800 border rounded-xl hover:shadow-lg transition-all"
+                      >
+                        <span className="truncate font-bold max-w-[200px]">{item.name}</span>
+                        <Download size={20} className="text-yellow-600" />
+                      </a>
                     ))}
                   </div>
+
+                  <button
+                    onClick={async () => {
+                      const JSZip = (await import('jszip')).default;
+                      const zip = new JSZip();
+
+                      const promises = result.map(async (item) => {
+                        const blob = await fetch(item.url).then(r => r.blob());
+                        zip.file(item.name, blob);
+                      });
+
+                      await Promise.all(promises);
+
+                      const zipContent = await zip.generateAsync({ type: 'blob' });
+                      const zipUrl = URL.createObjectURL(zipContent);
+
+                      const link = document.createElement('a');
+                      link.href = zipUrl;
+                      link.download = `converted_images.zip`;
+                      link.click();
+
+                      setTimeout(() => URL.revokeObjectURL(zipUrl), 1000);
+                      notify.success();
+                    }}
+                    className="w-full max-w-sm py-4 bg-slate-900 text-white rounded-2xl font-black text-lg shadow-xl hover:scale-105 transition-all flex items-center justify-center gap-3"
+                  >
+                    <Download size={24} /> Download All (ZIP)
+                  </button>
+                </div>
+              ) : (
+                <div className="flex flex-col sm:flex-row gap-4 w-full">
+                  {canPreviewResult && (
+                    <button onClick={() => setShowPreview(true)} className="flex-1 py-5 rounded-2xl font-black border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-100 transition-all flex items-center justify-center gap-2">
+                      <Eye size={20} /> Preview
+                    </button>
+                  )}
+                  <a
+                    href={result}
+                    download={`pdfbolt_${mode}_output.${resultMeta.extension}`}
+                    onClick={() => notify.success()}
+                    className="flex-1 flex items-center justify-center gap-4 py-5 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-2xl font-black text-xl shadow-2xl hover:from-yellow-600 hover:to-orange-600 hover:scale-105 transition-all"
+                  >
+                    <Download size={24} /> Download {resultMeta.label}
+                  </a>
                 </div>
               )}
+
+              {/* Non-Intrusive Result Screen Sponsored Slot (Far below download button) */}
+              <AdSlot placement="RESULT_BOTTOM" />
+
+              {/* Process Another File CTA */}
+              <button
+                onClick={clearSelection}
+                className={`w-full py-4 rounded-2xl font-black text-sm uppercase tracking-wider border-2 transition-all hover:scale-[1.01] flex items-center justify-center gap-2 ${
+                  darkMode
+                    ? 'border-slate-700 bg-slate-800 text-slate-300 hover:border-yellow-500/60 hover:text-yellow-400'
+                    : 'border-slate-200 bg-slate-50 text-slate-600 hover:border-yellow-400 hover:bg-white hover:text-slate-900'
+                }`}
+              >
+                <FileText size={16} /> Process Another File
+              </button>
+
             </div>
           )}
 
-          <div className="flex flex-col items-center gap-8">
-            {!result && (
-              <div className="flex flex-col gap-4 w-full max-w-xl">
-                <button
-                  disabled={processing || (needsPageInput && !pageInput) || (needsPassword && !password) || (isImageTool && multiFiles.length === 0)}
-                  onClick={process}
-                  className="w-full px-8 py-6 sm:py-8 bg-red-600 text-white rounded-[2rem] font-black text-2xl sm:text-3xl shadow-2xl hover:bg-red-700 hover:scale-[1.02] disabled:opacity-30 transition-all flex items-center justify-center gap-4 group"
-                >
-                  {processing ? <div className="w-8 h-8 border-4 border-white/30 border-t-white rounded-full animate-spin"></div> : <span>Process {title}</span>}
-                </button>
-              </div>
-            )}
-
-            {result && !processing && (
-              <div key={resultKey} className="flex flex-col items-center gap-8 w-full">
-                <div className="flex items-center gap-4 text-green-500 font-black bg-green-50 dark:bg-green-900/20 px-10 py-5 rounded-[2rem] border border-green-100 dark:border-green-800">
-                  <CheckCircle2 size={32} />
-                  <span className="text-2xl">Processing Complete</span>
-                </div>
-
-                {mode === 'repair' && repairReport && (
-                  <div className="w-full max-w-xl p-6 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-md text-left space-y-4">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-black uppercase tracking-wider text-slate-500">Structural Recovery Report</span>
-                      <span className={`px-3 py-1 rounded-full text-xs font-black uppercase ${repairReport.status === 'repaired' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'}`}>
-                        {repairReport.status === 'repaired' ? 'Fully Repaired' : 'Partial Recovery'}
-                      </span>
-                    </div>
-
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
-                      <div className="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-xl border border-slate-100 dark:border-slate-800">
-                        <div className="text-xl font-black text-slate-800 dark:text-white">{repairReport.original_pages}</div>
-                        <div className="text-[10px] font-bold uppercase text-slate-400">Original Pages</div>
-                      </div>
-                      <div className="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-xl border border-slate-100 dark:border-slate-800">
-                        <div className="text-xl font-black text-green-600">{repairReport.recovered_pages}</div>
-                        <div className="text-[10px] font-bold uppercase text-slate-400">Recovered</div>
-                      </div>
-                      <div className="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-xl border border-slate-100 dark:border-slate-800">
-                        <div className={`text-xl font-black ${repairReport.pages_lost > 0 ? 'text-red-500' : 'text-slate-400'}`}>{repairReport.pages_lost}</div>
-                        <div className="text-[10px] font-bold uppercase text-slate-400">Lost</div>
-                      </div>
-                      <div className="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-xl border border-slate-100 dark:border-slate-800">
-                        <div className="text-xl font-black text-yellow-600 dark:text-yellow-400">{repairReport.repair_score}%</div>
-                        <div className="text-[10px] font-bold uppercase text-slate-400">Score</div>
-                      </div>
-                    </div>
-
-                    {repairReport.warnings && repairReport.warnings.length > 0 && (
-                      <div className="p-3 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/30 rounded-xl text-xs text-amber-800 dark:text-amber-300">
-                        {repairReport.warnings.map((w: string, i: number) => <div key={i}>⚠️ {w}</div>)}
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {Array.isArray(result) ? (
-                  <div className="flex flex-col items-center gap-8 w-full">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full">
-                      {result.map((item, idx) => (
-                        <a
-                          key={idx}
-                          href={item.url}
-                          download={item.name}
-                          className="flex items-center justify-between p-4 bg-white dark:bg-slate-800 border rounded-xl hover:shadow-lg transition-all"
-                        >
-                          <span className="truncate font-bold max-w-[200px]">{item.name}</span>
-                          <Download size={20} className="text-yellow-600" />
-                        </a>
-                      ))}
-                    </div>
-
-                    {/* Download All as ZIP Button */}
-                    <button
-                      onClick={async () => {
-                        const JSZip = (await import('jszip')).default;
-                        const zip = new JSZip();
-
-                        // Fetch all blobs
-                        const promises = result.map(async (item) => {
-                          const blob = await fetch(item.url).then(r => r.blob());
-                          zip.file(item.name, blob);
-                        });
-
-                        await Promise.all(promises);
-
-                        const zipContent = await zip.generateAsync({ type: 'blob' });
-                        const zipUrl = URL.createObjectURL(zipContent);
-
-                        const link = document.createElement('a');
-                        link.href = zipUrl;
-                        link.download = `converted_images.zip`;
-                        link.click();
-
-                        setTimeout(() => URL.revokeObjectURL(zipUrl), 1000);
-                        notify.success();
-                      }}
-                      className="w-full max-w-sm py-4 bg-slate-900 text-white rounded-2xl font-black text-lg shadow-xl hover:scale-105 transition-all flex items-center justify-center gap-3"
-                    >
-                      <Download size={24} /> Download All (ZIP)
-                    </button>
-                  </div>
-                ) : (
-                  <div className="flex flex-col sm:flex-row gap-4 w-full">
-                    {/* Standard single file download */}
-                    {canPreviewResult && (
-                      <button onClick={() => setShowPreview(true)} className="flex-1 py-5 rounded-2xl font-black border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-100 transition-all flex items-center justify-center gap-2">
-                        <Eye size={20} /> Preview
-                      </button>
-                    )}
-                    <a
-                      href={result}
-                      download={`pdfbolt_${mode}_output.${resultMeta.extension}`}
-                      onClick={() => notify.success()}
-                      className="flex-1 flex items-center justify-center gap-4 py-5 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-2xl font-black text-xl shadow-2xl hover:from-yellow-600 hover:to-orange-600 hover:scale-105 transition-all"
-                    >
-                      <Download size={24} /> Download {resultMeta.label}
-                    </a>
-                  </div>
-                )}
-
-                {/* Non-Intrusive Result Screen Sponsored Slot (Far below download button) */}
-                <AdSlot placement="RESULT_BOTTOM" />
-              </div>
-            )}
-          </div>
-
         </div>
       )}
 
-      {isImageTool && !result && multiFiles.length > 0 && (
-        <div className="max-w-3xl mx-auto mt-8 p-8 rounded-[2.5rem] border shadow-xl bg-white dark:bg-slate-800 dark:border-slate-700 text-left">
-          <h2 className="text-xl font-black uppercase mb-6 flex items-center gap-3">
-            <Settings2 className="w-6 h-6 text-yellow-500" /> PDF Layout Settings
-          </h2>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Page Size */}
-            <div className="space-y-3">
-              <label className="text-xs font-bold uppercase text-slate-500">Page Size</label>
-              <div className="flex flex-col gap-2">
-                {['fit', 'a4', 'letter'].map(size => (
-                  <button
-                    key={size}
-                    onClick={() => setImgPageSize(size as ImagePageSize)}
-                    className={`py-2 px-4 rounded-xl border-2 font-bold text-sm transition-all ${imgPageSize === size ? 'border-yellow-500 bg-yellow-50 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400' : 'border-slate-200 dark:border-slate-700'}`}
-                  >
-                    {size === 'fit' ? 'Fit Image' : size.toUpperCase()}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Orientation (Only if not Fit) */}
-            <div className={`space-y-3 transition-opacity ${imgPageSize === 'fit' ? 'opacity-50 pointer-events-none' : ''}`}>
-              <label className="text-xs font-bold uppercase text-slate-500">Orientation</label>
-              <div className="flex flex-col gap-2">
-                {['portrait', 'landscape'].map(or => (
-                  <button
-                    key={or}
-                    onClick={() => setImgOrientation(or as ImageOrientation)}
-                    className={`py-2 px-4 rounded-xl border-2 font-bold text-sm transition-all ${imgOrientation === or ? 'border-yellow-500 bg-yellow-50 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400' : 'border-slate-200 dark:border-slate-700'}`}
-                  >
-                    {or.charAt(0).toUpperCase() + or.slice(1)}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Margin */}
-            <div className={`space-y-3 transition-opacity ${imgPageSize === 'fit' ? 'opacity-50 pointer-events-none' : ''}`}>
-              <label className="text-xs font-bold uppercase text-slate-500">Margins</label>
-              <div className="flex flex-col gap-2">
-                {['none', 'small', 'standard'].map(m => (
-                  <button
-                    key={m}
-                    onClick={() => setImgMargin(m as ImageMargin)}
-                    className={`py-2 px-4 rounded-xl border-2 font-bold text-sm transition-all ${imgMargin === m ? 'border-yellow-500 bg-yellow-50 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400' : 'border-slate-200 dark:border-slate-700'}`}
-                  >
-                    {m.charAt(0).toUpperCase() + m.slice(1)}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
+      {/* Full-screen PDF Preview Modal */}
       {showPreview && canPreviewResult && (
         <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-slate-900/95 backdrop-blur-xl animate-fadeIn">
           <div className="relative w-full max-w-6xl h-[92vh] bg-white dark:bg-slate-800 rounded-[3rem] overflow-hidden shadow-2xl flex flex-col">
