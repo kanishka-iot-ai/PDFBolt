@@ -43,7 +43,7 @@ export const TOOLS: ToolMetadata[] = [
       { q: 'Will bookmark structures or hyperlinks remain intact?', a: 'Yes, original vector graphics, text layers, and links are fully preserved in the output.' }
     ],
     relatedTools: [ToolType.SPLIT, ToolType.ORGANIZE, ToolType.COMPRESS, ToolType.PAGE_NUMBERS],
-    relatedGuides: ['how-to-merge-pdf-files', 'how-to-organize-pdf-pages']
+    relatedGuides: ['how-to-merge-pdf-files', 'how-to-remove-pages-from-pdf']
   },
   {
     id: ToolType.SPLIT,
@@ -101,7 +101,7 @@ export const TOOLS: ToolMetadata[] = [
       { q: 'Will compressed text become blurry?', a: 'No. Vector fonts and text layers are preserved digitally without rasterization.' }
     ],
     relatedTools: [ToolType.MERGE, ToolType.PDF_TO_JPG, ToolType.REPAIR],
-    relatedGuides: ['how-to-compress-a-pdf', 'how-to-reduce-pdf-size']
+    relatedGuides: ['how-to-compress-a-pdf']
   },
   {
     id: ToolType.PDF_TO_WORD,
@@ -217,7 +217,7 @@ export const TOOLS: ToolMetadata[] = [
       { q: 'Are image colors accurately preserved?', a: 'Yes, sRGB and CMYK color profiles are mapped to clean 24-bit TrueColor JPGs.' }
     ],
     relatedTools: [ToolType.JPG_TO_PDF, ToolType.SCAN_TO_PDF, ToolType.COMPRESS],
-    relatedGuides: ['how-to-extract-images-from-pdf']
+    relatedGuides: ['how-to-ocr-a-pdf']
   },
   {
     id: ToolType.WORD_TO_PDF,
@@ -246,7 +246,7 @@ export const TOOLS: ToolMetadata[] = [
       { q: 'Is my document private?', a: '100% private. Conversion processes in your local browser memory without storing files on any server.' }
     ],
     relatedTools: [ToolType.PDF_TO_WORD, ToolType.MERGE, ToolType.PROTECT],
-    relatedGuides: ['how-to-convert-word-to-pdf']
+    relatedGuides: ['how-to-convert-pdf-to-word']
   },
   {
     id: ToolType.EXCEL_TO_PDF,
@@ -275,7 +275,7 @@ export const TOOLS: ToolMetadata[] = [
       { q: 'Will wide tables be cut off horizontally?', a: 'Our auto-fit algorithm scales tables to fit standard A4/Letter margins neatly.' }
     ],
     relatedTools: [ToolType.PDF_TO_EXCEL, ToolType.MERGE],
-    relatedGuides: ['how-to-convert-excel-to-pdf']
+    relatedGuides: ['how-to-convert-pdf-to-excel']
   },
   {
     id: ToolType.PPT_TO_PDF,
@@ -304,7 +304,7 @@ export const TOOLS: ToolMetadata[] = [
       { q: 'Are high-resolution graphics compressed?', a: 'Slide visuals are rendered at high DPI, maintaining sharp diagrams and photos.' }
     ],
     relatedTools: [ToolType.PDF_TO_PPT, ToolType.MERGE],
-    relatedGuides: ['how-to-convert-ppt-to-pdf']
+    relatedGuides: ['how-to-convert-pdf-to-ppt']
   },
   {
     id: ToolType.JPG_TO_PDF,
@@ -333,7 +333,7 @@ export const TOOLS: ToolMetadata[] = [
       { q: 'Can I reorder images before generating the PDF?', a: 'Yes, simply drag and drop the image thumbnails to sequence them in your desired order.' }
     ],
     relatedTools: [ToolType.PDF_TO_JPG, ToolType.MERGE, ToolType.SCAN_TO_PDF],
-    relatedGuides: ['how-to-convert-images-to-pdf']
+    relatedGuides: ['how-to-ocr-a-pdf']
   },
   {
     id: ToolType.HTML_TO_PDF,
@@ -362,7 +362,7 @@ export const TOOLS: ToolMetadata[] = [
       { q: 'Are external web requests made?', a: 'No. Rendering occurs entirely in your browser memory for maximum security.' }
     ],
     relatedTools: [ToolType.PDF_TO_WORD, ToolType.EDIT],
-    relatedGuides: ['how-to-convert-html-to-pdf']
+    relatedGuides: ['how-to-convert-pdf-to-word']
   },
   {
     id: ToolType.EDIT,
@@ -391,7 +391,7 @@ export const TOOLS: ToolMetadata[] = [
       { q: 'Does editing flatten or blur the original text?', a: 'No, vector text layers remain sharp and unmodified beneath your annotations.' }
     ],
     relatedTools: [ToolType.SIGN, ToolType.REDACT, ToolType.WATERMARK, ToolType.PAGE_NUMBERS],
-    relatedGuides: ['how-to-edit-a-pdf', 'how-to-annotate-pdf-files']
+    relatedGuides: ['how-to-edit-a-pdf']
   },
   {
     id: ToolType.PROTECT,
@@ -420,7 +420,7 @@ export const TOOLS: ToolMetadata[] = [
       { q: 'Do you store or log my password?', 'a': 'Never. Encryption keys are generated in browser memory and immediately discarded.' }
     ],
     relatedTools: [ToolType.UNLOCK, ToolType.REDACT, ToolType.SIGN],
-    relatedGuides: ['how-to-protect-a-pdf', 'how-to-encrypt-pdf-documents']
+    relatedGuides: ['how-to-protect-a-pdf']
   },
   {
     id: ToolType.UNLOCK,
@@ -449,7 +449,7 @@ export const TOOLS: ToolMetadata[] = [
       { q: 'Is the unlocked file identical to the original?', a: 'Yes, exact vector fonts, layout, and visual fidelity are 100% preserved.' }
     ],
     relatedTools: [ToolType.PROTECT, ToolType.REDACT, ToolType.EDIT],
-    relatedGuides: ['how-to-unlock-a-protected-pdf']
+    relatedGuides: ['how-to-protect-a-pdf']
   },
   {
     id: ToolType.SIGN,
@@ -507,7 +507,7 @@ export const TOOLS: ToolMetadata[] = [
       { q: 'Can I redact multiple pages at once?', a: 'Yes, you can navigate through the entire document and place redaction boxes across all pages before burning.' }
     ],
     relatedTools: [ToolType.PROTECT, ToolType.EDIT, ToolType.DELETE_PAGES],
-    relatedGuides: ['how-to-redact-a-pdf', 'how-to-sanitize-pdf-documents']
+    relatedGuides: ['how-to-redact-a-pdf']
   },
   {
     id: ToolType.OCR,
@@ -536,7 +536,7 @@ export const TOOLS: ToolMetadata[] = [
       { q: 'Does it enhance low-contrast scans?', a: 'Yes, built-in OpenCV filters automatically enhance contrast and remove background noise for higher accuracy.' }
     ],
     relatedTools: [ToolType.SCAN_TO_PDF, ToolType.SCAN_HANDWRITING, ToolType.PDF_TO_WORD],
-    relatedGuides: ['how-to-ocr-a-pdf', 'how-to-make-a-pdf-searchable']
+    relatedGuides: ['how-to-ocr-a-pdf']
   },
   {
     id: ToolType.SCAN_TO_PDF,
@@ -565,7 +565,7 @@ export const TOOLS: ToolMetadata[] = [
       { q: 'Can I apply high-contrast filters to remove shadows?', a: 'Yes, choose between Color, Grayscale, and B&W Document modes to eliminate shadows.' }
     ],
     relatedTools: [ToolType.SCAN_HANDWRITING, ToolType.OCR, ToolType.JPG_TO_PDF],
-    relatedGuides: ['how-to-scan-documents-to-pdf']
+    relatedGuides: ['how-to-ocr-a-pdf']
   },
   {
     id: ToolType.SCAN_HANDWRITING,
@@ -594,7 +594,7 @@ export const TOOLS: ToolMetadata[] = [
       { q: 'Is my handwriting processed privately?', a: 'Yes, OCR recognition runs locally in your browser without uploading notes to third-party servers.' }
     ],
     relatedTools: [ToolType.SCAN_TO_PDF, ToolType.OCR, ToolType.PDF_TO_WORD],
-    relatedGuides: ['how-to-digitize-handwritten-notes']
+    relatedGuides: ['how-to-ocr-a-pdf']
   },
   {
     id: ToolType.ROTATE,
@@ -623,7 +623,7 @@ export const TOOLS: ToolMetadata[] = [
       { q: 'Is the rotation permanent?', a: 'Yes, the rotation is saved into the PDF header and displays correctly across all devices.' }
     ],
     relatedTools: [ToolType.ORGANIZE, ToolType.DELETE_PAGES, ToolType.SPLIT],
-    relatedGuides: ['how-to-rotate-pdf-pages']
+    relatedGuides: ['how-to-remove-pages-from-pdf']
   },
   {
     id: ToolType.ORGANIZE,
@@ -652,7 +652,7 @@ export const TOOLS: ToolMetadata[] = [
       { q: 'Are bookmarks and links preserved?', a: 'Yes, intact page structures and contents are preserved during page reorganization.' }
     ],
     relatedTools: [ToolType.MERGE, ToolType.SPLIT, ToolType.ROTATE, ToolType.DELETE_PAGES],
-    relatedGuides: ['how-to-organize-pdf-pages']
+    relatedGuides: ['how-to-remove-pages-from-pdf']
   },
   {
     id: ToolType.PAGE_NUMBERS,
@@ -681,7 +681,7 @@ export const TOOLS: ToolMetadata[] = [
       { q: 'Does adding page numbers alter existing text?', a: 'No, page numbers are placed on a clean overlay layer without displacing existing document text.' }
     ],
     relatedTools: [ToolType.WATERMARK, ToolType.EDIT, ToolType.MERGE],
-    relatedGuides: ['how-to-add-page-numbers-to-pdf']
+    relatedGuides: ['how-to-edit-a-pdf']
   },
   {
     id: ToolType.WATERMARK,
@@ -710,7 +710,7 @@ export const TOOLS: ToolMetadata[] = [
       { q: 'Can watermarks be easily stripped by basic readers?', a: 'Watermarks are embedded directly into the PDF content stream for robust visibility.' }
     ],
     relatedTools: [ToolType.PROTECT, ToolType.EDIT, ToolType.PAGE_NUMBERS],
-    relatedGuides: ['how-to-watermark-a-pdf']
+    relatedGuides: ['how-to-edit-a-pdf']
   },
   {
     id: ToolType.DELETE_PAGES,
@@ -768,7 +768,7 @@ export const TOOLS: ToolMetadata[] = [
       { q: 'Can I compare documents with different page counts?', a: 'Yes, the comparison engine handles inserted or deleted pages gracefully.' }
     ],
     relatedTools: [ToolType.EDIT, ToolType.MERGE],
-    relatedGuides: ['how-to-compare-two-pdf-files']
+    relatedGuides: ['how-to-edit-a-pdf']
   },
   {
     id: ToolType.REPAIR,
@@ -797,7 +797,7 @@ export const TOOLS: ToolMetadata[] = [
       { q: 'What if the file is completely unreadable?', a: 'Our multi-tier engine utilizes deep structural reconstruction to recover every recoverable page.' }
     ],
     relatedTools: [ToolType.COMPRESS, ToolType.UNLOCK],
-    relatedGuides: ['how-to-repair-corrupted-pdf']
+    relatedGuides: ['how-to-compress-a-pdf']
   },
   {
     id: ToolType.PDF_TO_QR,
@@ -826,7 +826,7 @@ export const TOOLS: ToolMetadata[] = [
       { q: 'What image formats can I download the QR code in?', a: 'You can download the QR code as high-resolution PNG or SVG for professional printing.' }
     ],
     relatedTools: [ToolType.COMPRESS, ToolType.PROTECT],
-    relatedGuides: ['how-to-create-qr-codes-for-pdf']
+    relatedGuides: ['how-to-protect-a-pdf']
   },
   {
     id: ToolType.ANALYZER,
@@ -965,7 +965,7 @@ export const GUIDES: Guide[] = [
     faqs: [
       { q: 'Can I add more files after starting?', a: 'Yes, use the "Add More Files" button at any time to include additional documents.' }
     ],
-    relatedGuides: ['how-to-split-a-pdf', 'how-to-add-page-numbers-to-pdf', 'how-to-organize-pdf-pages'],
+    relatedGuides: ['how-to-split-a-pdf', 'how-to-edit-a-pdf', 'how-to-remove-pages-from-pdf'],
     relatedTools: [ToolType.MERGE, ToolType.SPLIT, ToolType.PAGE_NUMBERS, ToolType.ROTATE]
   },
   {
@@ -996,7 +996,7 @@ export const GUIDES: Guide[] = [
     faqs: [
       { q: 'Will the exported PPTX work on Keynote and Google Slides?', a: 'Yes, it outputs standardized Office OpenXML (.pptx) supported universally.' }
     ],
-    relatedGuides: ['how-to-convert-pdf-to-word', 'how-to-convert-images-to-pdf'],
+    relatedGuides: ['how-to-convert-pdf-to-word', 'how-to-ocr-a-pdf'],
     relatedTools: [ToolType.PDF_TO_PPT, ToolType.PPT_TO_PDF]
   },
   {
@@ -1059,7 +1059,7 @@ export const GUIDES: Guide[] = [
     faqs: [
       { q: 'Can someone inspect the PDF code to see redacted text?', a: 'No. True redaction removes the underlying text glyphs completely.' }
     ],
-    relatedGuides: ['how-to-protect-a-pdf', 'how-to-sanitize-pdf-documents'],
+    relatedGuides: ['how-to-protect-a-pdf', 'how-to-redact-a-pdf'],
     relatedTools: [ToolType.REDACT, ToolType.PROTECT, ToolType.EDIT]
   },
   {
@@ -1090,7 +1090,7 @@ export const GUIDES: Guide[] = [
     faqs: [
       { q: 'Can I remove the password later?', a: 'Yes, you can remove passwords using our Unlock PDF tool at any time.' }
     ],
-    relatedGuides: ['how-to-unlock-a-protected-pdf', 'how-to-redact-a-pdf'],
+    relatedGuides: ['how-to-protect-a-pdf', 'how-to-redact-a-pdf'],
     relatedTools: [ToolType.PROTECT, ToolType.UNLOCK, ToolType.REDACT]
   },
   {
@@ -1152,7 +1152,7 @@ export const GUIDES: Guide[] = [
     faqs: [
       { q: 'Can I change font sizes and colors?', a: 'Yes, full font size, color palette, and stroke controls are provided.' }
     ],
-    relatedGuides: ['how-to-sign-a-pdf', 'how-to-watermark-a-pdf'],
+    relatedGuides: ['how-to-sign-a-pdf', 'how-to-edit-a-pdf'],
     relatedTools: [ToolType.EDIT, ToolType.SIGN, ToolType.WATERMARK]
   },
   {
@@ -1214,7 +1214,7 @@ export const GUIDES: Guide[] = [
     faqs: [
       { q: 'What languages are supported?', a: 'English and common Latin script alphabets are supported natively.' }
     ],
-    relatedGuides: ['how-to-convert-pdf-to-word', 'how-to-scan-documents-to-pdf'],
+    relatedGuides: ['how-to-convert-pdf-to-word', 'how-to-ocr-a-pdf'],
     relatedTools: [ToolType.OCR, ToolType.SCAN_TO_PDF, ToolType.PDF_TO_WORD]
   },
   {
@@ -1245,7 +1245,7 @@ export const GUIDES: Guide[] = [
     faqs: [
       { q: 'Can I undo a page deletion?', a: 'Yes, simply deselect the thumbnail before downloading the final file.' }
     ],
-    relatedGuides: ['how-to-split-a-pdf', 'how-to-organize-pdf-pages'],
+    relatedGuides: ['how-to-split-a-pdf', 'how-to-remove-pages-from-pdf'],
     relatedTools: [ToolType.DELETE_PAGES, ToolType.SPLIT, ToolType.ORGANIZE]
   }
 ];
@@ -1546,7 +1546,7 @@ export const WORKFLOWS: Workflow[] = [
       { q: 'What libraries power PDFBolt under the hood?', a: 'We leverage pdf-lib, pdfjs-dist, Tesseract.js, ExcelJS, mammoth, and html2canvas with Web Worker concurrency.' }
     ],
     relatedTools: [ToolType.COMPARE, ToolType.OCR, ToolType.REPAIR],
-    relatedGuides: ['what-is-pdf', 'what-is-ocr', 'pdf-vs-pdfa']
+    relatedGuides: []
   }
 ];
 

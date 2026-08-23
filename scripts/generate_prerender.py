@@ -615,6 +615,55 @@ def generate_prerendered_pages():
     </noscript>
 """
 
+        # Tool-specific JSON-LD schemas
+        json_ld_blocks = []
+        
+        # 1. BreadcrumbList Schema
+        breadcrumb_schema = {
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+                {
+                    "@type": "ListItem",
+                    "position": 1,
+                    "name": "Home",
+                    "item": CANONICAL_DOMAIN
+                },
+                {
+                    "@type": "ListItem",
+                    "position": 2,
+                    "name": "PDF Tools",
+                    "item": f"{CANONICAL_DOMAIN}/tools"
+                },
+                {
+                    "@type": "ListItem",
+                    "position": 3,
+                    "name": h1,
+                    "item": canonical_url
+                }
+            ]
+        }
+        json_ld_blocks.append(f'<script type="application/ld+json">\n{json.dumps(breadcrumb_schema, indent=2)}\n</script>')
+
+        # 2. HowTo Schema
+        if page.get("how_to"):
+            how_to_schema = {
+                "@context": "https://schema.org",
+                "@type": "HowTo",
+                "name": f"How to Use {h1}",
+                "description": description,
+                "step": [
+                    {
+                        "@type": "HowToStep",
+                        "position": idx + 1,
+                        "name": f"Step {idx + 1}",
+                        "text": step_text
+                    }
+                    for idx, step_text in enumerate(page["how_to"])
+                ]
+            }
+            json_ld_blocks.append(f'<script type="application/ld+json">\n{json.dumps(how_to_schema, indent=2)}\n</script>')
+
         # Replace Title
         html = re.sub(r'<title>.*?</title>', f'<title>{title}</title>', base_template)
 
@@ -633,8 +682,17 @@ def generate_prerendered_pages():
         html = re.sub(r'<meta name="twitter:title"[^>]*>', f'<meta name="twitter:title" data-rh="true" content="{title}" />', html)
         html = re.sub(r'<meta name="twitter:description"[^>]*>', f'<meta name="twitter:description" data-rh="true"\n    content="{description}" />', html)
 
-        # Replace Noscript
-        html = re.sub(r'<noscript>.*?</noscript>', custom_noscript, html, flags=re.DOTALL)
+        # Append tool-specific JSON-LD schemas before </head>
+        extra_json_ld_str = "\n  " + "\n  ".join(json_ld_blocks)
+        html = html.replace("</head>", f"{extra_json_ld_str}\n</head>")
+
+        # Cleanly replace ONLY the fallback noscript inside #root, preserving GTM noscript in body
+        html = re.sub(
+            r'(<div id="root">\s*(?:<!--.*?-->\s*)?)<noscript>.*?</noscript>',
+            r'\1' + custom_noscript.strip(),
+            html,
+            flags=re.DOTALL
+        )
 
         with open(target_file, "w", encoding="utf-8") as out:
             out.write(html)

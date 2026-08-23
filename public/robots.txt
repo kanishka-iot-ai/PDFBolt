@@ -14,7 +14,6 @@ Disallow: /api/
 Disallow: /jobs/
 Disallow: /storage/
 Disallow: /qr-success
-Disallow: /test-files
 
 # Sitemaps
 Sitemap: https://pdfbolt.in/sitemap.xml
