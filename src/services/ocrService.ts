@@ -32,12 +32,26 @@ export async function ocrPdfToSearchablePdf(
     try {
         const numPages = pdf.numPages;
         for (let i = 1; i <= numPages; i++) {
-            onProgress?.(Math.round(((i - 1) / numPages) * 70) + 15);
+            onProgress?.(Math.round(((i - 1) / numPages) * 75) + 15);
             const page = await pdf.getPage(i);
-            const viewport = page.getViewport({ scale: 2.0 });
+            
+            // ⚡ Core Brain Optimization: Fast Digital Vector Check
+            const textContent = await page.getTextContent();
+            const hasDigitalText = textContent.items && textContent.items.length >= 10;
 
+            if (hasDigitalText) {
+                // Page already has digital text - extract directly at 100x speed
+                const rawItems = textContent.items.map((it: any) => (typeof it.str === 'string' ? it.str : '')).filter(Boolean);
+                const digitalText = structureText(rawItems.join(' '));
+                fullText += `\n--- Page ${i} ---\n${digitalText}\n`;
+                totalWords += digitalText.split(/\s+/).filter(Boolean).length;
+                continue;
+            }
+
+            // Scanned Page: Render at optimized 1.6x scale and run Tesseract OCR
+            const viewport = page.getViewport({ scale: 1.6 });
             const canvas = document.createElement('canvas');
-            const context = canvas.getContext('2d');
+            const context = canvas.getContext('2d', { willReadFrequently: true });
             canvas.height = viewport.height;
             canvas.width = viewport.width;
 
@@ -105,7 +119,7 @@ export async function ocrPdfToSearchablePdf(
         }
 
         onProgress?.(95);
-        const pdfBytes = await pdfDoc.save();
+        const pdfBytes = await pdfDoc.save({ useObjectStreams: true });
         return {
             pdfBytes,
             fullText: fullText.trim(),

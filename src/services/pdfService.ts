@@ -318,13 +318,18 @@ export async function compressPdfAdvanced(
         }
       }
 
-      const imgData = canvas.toDataURL('image/jpeg', quality);
+      // High-performance binary blob extraction
+      const imgBytes = await new Promise<ArrayBuffer>((resolve, reject) => {
+        canvas.toBlob(async (blob) => {
+          if (!blob) return reject(new Error("Canvas export failed"));
+          resolve(await blob.arrayBuffer());
+        }, 'image/jpeg', quality);
+      });
 
       if (i === 1) {
-        previewCompressedDataUrl = imgData;
+        previewCompressedDataUrl = canvas.toDataURL('image/jpeg', quality);
       }
 
-      const imgBytes = await fetch(imgData).then(res => res.arrayBuffer());
       const jpgImage = await targetPdf.embedJpg(imgBytes);
       const pdfPage = targetPdf.addPage([jpgImage.width / scale, jpgImage.height / scale]);
       pdfPage.drawImage(jpgImage, {
@@ -335,16 +340,10 @@ export async function compressPdfAdvanced(
       });
     }
 
-    // Save with Object Streams for minimal file weight
-    const base64 = await targetPdf.saveAsBase64({
+    // Direct Native WASM save with Object Streams
+    const result = await targetPdf.save({
       useObjectStreams: options.useObjectStreams !== false
     });
-
-    const binary = atob(base64);
-    const result = new Uint8Array(binary.length);
-    for (let i = 0; i < binary.length; i++) {
-      result[i] = binary.charCodeAt(i);
-    }
 
     if (result.length === 0) {
       throw new Error("Compression resulted in an empty file.");

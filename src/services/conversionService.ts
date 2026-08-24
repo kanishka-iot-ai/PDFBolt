@@ -167,23 +167,38 @@ export async function pdfToJpg(file: File): Promise<{ name: string, blob: Blob }
   const arrayBuffer = await file.arrayBuffer();
   const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
   const images: { name: string, blob: Blob }[] = [];
+  const numPages = pdf.numPages;
+
   try {
-    for (let i = 1; i <= pdf.numPages; i++) {
-      const page = await pdf.getPage(i);
-      const scale = 2.5; // High crisp resolution
-      const viewport = page.getViewport({ scale });
+    const pageNumbers = Array.from({ length: numPages }, (_, idx) => idx + 1);
+    const BATCH_SIZE = 3;
 
-      const canvas = document.createElement('canvas');
-      const context = canvas.getContext('2d');
-      canvas.height = viewport.height;
-      canvas.width = viewport.width;
+    for (let i = 0; i < pageNumbers.length; i += BATCH_SIZE) {
+      const batch = pageNumbers.slice(i, i + BATCH_SIZE);
+      const batchResults = await Promise.all(
+        batch.map(async (pageNum) => {
+          const page = await pdf.getPage(pageNum);
+          const scale = 2.0; // Optimized crisp resolution
+          const viewport = page.getViewport({ scale });
 
-      if (context) {
-        await page.render({ canvasContext: context, viewport }).promise;
-        const blob = await new Promise<Blob | null>(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.92));
-        if (blob) {
-          images.push({ name: `page_${i}.jpg`, blob });
-        }
+          const canvas = document.createElement('canvas');
+          const context = canvas.getContext('2d', { willReadFrequently: true });
+          if (!context) return null;
+
+          canvas.height = viewport.height;
+          canvas.width = viewport.width;
+
+          await page.render({ canvasContext: context, viewport }).promise;
+          const blob = await new Promise<Blob | null>((resolve) =>
+            canvas.toBlob(resolve, 'image/jpeg', 0.92)
+          );
+
+          return blob ? { name: `page_${pageNum}.jpg`, blob } : null;
+        })
+      );
+
+      for (const item of batchResults) {
+        if (item) images.push(item);
       }
     }
   } finally {
