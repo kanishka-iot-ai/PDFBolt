@@ -137,6 +137,10 @@ interface MainLayoutProps {
 
 const MainLayout: React.FC<MainLayoutProps> = ({ darkMode, setDarkMode, soundEnabled, setSoundEnabled, notify }) => {
   const { hasActiveWork } = useActiveWork();
+  const location = useLocation();
+
+  const isToolPage = location.pathname.startsWith('/tool/') ||
+    TOOLS.some(t => t.path === location.pathname || t.canonicalPath === location.pathname);
 
   return (
     <div className={`min-h-screen flex flex-col transition-colors duration-300 font-sans ${darkMode ? 'dark bg-slate-900 text-white' : 'bg-white text-slate-900'}`}>
@@ -249,7 +253,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ darkMode, setDarkMode, soundEna
           </Routes>
         </Suspense>
       </main>
-      {!hasActiveWork && <Footer darkMode={darkMode} />}
+      {!hasActiveWork && !isToolPage && <Footer darkMode={darkMode} />}
     </div>
   );
 };
