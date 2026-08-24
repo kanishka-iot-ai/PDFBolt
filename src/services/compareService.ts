@@ -24,26 +24,34 @@ export async function comparePdfDocuments(fileA: File, fileB: File): Promise<Com
     const bufA = await fileA.arrayBuffer();
     const pdfA = await pdfjsLib.getDocument({ data: bufA }).promise;
     const linesA: string[] = [];
-    for (let i = 1; i <= pdfA.numPages; i++) {
-        const page = await pdfA.getPage(i);
-        const textContent = await page.getTextContent();
-        const pageText = textContent.items
-            .map((item: any) => ('str' in item ? item.str : ''))
-            .join(' ');
-        linesA.push(...pageText.split(/(?<=[.?!])\s+|\n+/).map(s => s.trim()).filter(Boolean));
+    try {
+        for (let i = 1; i <= pdfA.numPages; i++) {
+            const page = await pdfA.getPage(i);
+            const textContent = await page.getTextContent();
+            const pageText = textContent.items
+                .map((item: any) => ('str' in item ? item.str : ''))
+                .join(' ');
+            linesA.push(...pageText.split(/(?<=[.?!])\s+|\n+/).map(s => s.trim()).filter(Boolean));
+        }
+    } finally {
+        pdfA.destroy();
     }
 
     // 2. Extract text from File B
     const bufB = await fileB.arrayBuffer();
     const pdfB = await pdfjsLib.getDocument({ data: bufB }).promise;
     const linesB: string[] = [];
-    for (let i = 1; i <= pdfB.numPages; i++) {
-        const page = await pdfB.getPage(i);
-        const textContent = await page.getTextContent();
-        const pageText = textContent.items
-            .map((item: any) => ('str' in item ? item.str : ''))
-            .join(' ');
-        linesB.push(...pageText.split(/(?<=[.?!])\s+|\n+/).map(s => s.trim()).filter(Boolean));
+    try {
+        for (let i = 1; i <= pdfB.numPages; i++) {
+            const page = await pdfB.getPage(i);
+            const textContent = await page.getTextContent();
+            const pageText = textContent.items
+                .map((item: any) => ('str' in item ? item.str : ''))
+                .join(' ');
+            linesB.push(...pageText.split(/(?<=[.?!])\s+|\n+/).map(s => s.trim()).filter(Boolean));
+        }
+    } finally {
+        pdfB.destroy();
     }
 
     // 3. Compute Diff

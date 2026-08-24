@@ -410,6 +410,33 @@ export async function deletePages(file: File, indicesStr: string): Promise<Uint8
 }
 
 /**
+ * Reorders pages of a PDF based on a user-supplied comma-separated new order.
+ * Example: "3,1,2" on a 3-page PDF outputs pages 3 → 1 → 2.
+ */
+export async function reorderPages(file: File, orderStr: string): Promise<Uint8Array> {
+  const bytes = await file.arrayBuffer();
+  const pdf = await PDFDocument.load(bytes);
+  const total = pdf.getPageCount();
+
+  const segments = orderStr.split(',').map(s => s.trim()).filter(Boolean);
+  if (segments.length === 0) throw new Error('Enter a new page order, e.g. "3,1,2,4".');
+
+  const indices = segments.map(seg => {
+    if (!/^\d+$/.test(seg)) throw new Error(`Invalid page number: "${seg}".`);
+    const n = parseInt(seg, 10);
+    if (n < 1 || n > total) throw new Error(`Page ${n} is outside this PDF (${total} pages).`);
+    return n - 1; // 0-indexed
+  });
+
+  const target = await PDFDocument.create();
+  const copied = await target.copyPages(pdf, indices);
+  copied.forEach(p => target.addPage(p));
+
+  if (target.getPageCount() === 0) throw new Error('No pages in the reordered output.');
+  return await target.save();
+}
+
+/**
  * Watermarks PDF.
  */
 export async function watermarkPdf(file: File, text: string, fontSize: number = 50): Promise<Uint8Array> {

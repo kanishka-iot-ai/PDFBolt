@@ -196,8 +196,9 @@ export async function pptToPdf(file: File): Promise<Uint8Array> {
 
     const parser = new DOMParser();
 
-    for (let i = 0; i < slideFileNames.length; i++) {
-        const slidePath = slideFileNames[i];
+    try {
+        for (let i = 0; i < slideFileNames.length; i++) {
+            const slidePath = slideFileNames[i];
         const xmlText = await zip.file(slidePath)!.async('text');
         const xmlDoc = parser.parseFromString(xmlText, 'application/xml');
 
@@ -289,8 +290,10 @@ export async function pptToPdf(file: File): Promise<Uint8Array> {
         }
     }
 
-    // Clean up created blob URLs
-    Object.values(mediaMap).forEach(url => URL.revokeObjectURL(url));
+    } finally {
+        // Always clean up created blob URLs to prevent memory leaks
+        Object.values(mediaMap).forEach(url => URL.revokeObjectURL(url));
+    }
 
     return new Uint8Array(pdf.output('arraybuffer'));
 }

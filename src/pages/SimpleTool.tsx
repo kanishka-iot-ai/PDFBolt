@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import FileUploader from '../components/FileUploader';
 import SignatureCanvas, { SignatureCanvasRef } from '../components/SignatureCanvas';
 import { createZipFromFiles } from '../services/zipService';
-import { rotateFile, addPageNumbers, compressPdf, watermarkPdf, deletePages, splitPdf, imagesToPdf } from '../services/pdfService';
+import { rotateFile, addPageNumbers, compressPdf, watermarkPdf, deletePages, reorderPages, splitPdf, imagesToPdf } from '../services/pdfService';
 import { wordToPdf, excelToPdf, htmlToPdf, pdfToJpg, pdfToWord, pdfToExcel } from '../services/conversionService';
 import { protectPdf, unlockPdf, removePermissions, signPdf } from '../services/securityService';
 import { ocrPdf } from '../services/ocrService';
@@ -269,9 +269,13 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
         if (!pageInput) throw new Error("Please enter a page range (e.g. 1-2, 4)");
         b = await splitPdf(file, pageInput);
       }
-      else if ((mode === 'delete-pages' || mode === 'organize') && file) {
-        if (!pageInput) throw new Error("Please enter page numbers (e.g. 2, 4, 10)");
+      else if (mode === 'delete-pages' && file) {
+        if (!pageInput) throw new Error("Please enter page numbers to delete (e.g. 2, 4, 10)");
         b = await deletePages(file, pageInput);
+      }
+      else if (mode === 'organize' && file) {
+        if (!pageInput) throw new Error("Please enter the new page order (e.g. 3,1,2,4)");
+        b = await reorderPages(file, pageInput);
       }
       // -- CONVERSION TOOLS --
       // -- CONVERSION TOOLS --
@@ -411,8 +415,9 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
         }
       }
       else if (mode === 'compare' && (multiFiles.length >= 1 || file)) {
-        const fileA = multiFiles[0] || file!;
-        const fileB = multiFiles[1] || multiFiles[0] || file!;
+        if (multiFiles.length < 2) throw new Error("Please upload exactly 2 PDF files to compare. Upload the second file by clicking the file area again.");
+        const fileA = multiFiles[0];
+        const fileB = multiFiles[1];
         const isBackendUp = await apiClient.checkBackend();
         if (isBackendUp) {
           try {
@@ -547,7 +552,7 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
       {!file && multiFiles.length === 0 ? (
         <div className="space-y-12">
           <FileUploader
-            multiple={isImageTool}
+            multiple={isImageTool || mode === 'compare'}
             accept={getAcceptAttribute(mode, isImageTool)}
             onFilesSelected={handle}
             darkMode={darkMode}
@@ -565,15 +570,33 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
               </div>
               <div className="overflow-hidden">
                 <h2 className={`text-xl font-black truncate max-w-[250px] ${darkMode ? 'text-white' : 'text-slate-900'}`}>
-                  {isImageTool ? `${multiFiles.length} Images Selected` : isZip ? `${multiFiles.length} Files (Folder)` : file?.name}
+                  {isImageTool
+                    ? `${multiFiles.length} Images Selected`
+                    : isZip
+                    ? `${multiFiles.length} Files (Folder)`
+                    : mode === 'compare' && multiFiles.length >= 2
+                    ? `${multiFiles[0].name} vs ${multiFiles[1].name}`
+                    : file?.name}
                 </h2>
                 <p className="text-slate-500 font-bold uppercase text-[10px] tracking-widest">
-                  {result ? 'FILE READY' : 'AWAITING CONFIGURATION'}
+                  {result
+                    ? 'FILE READY'
+                    : mode === 'compare' && multiFiles.length < 2
+                    ? `FILE 1 OF 2 LOADED — UPLOAD 1 MORE`
+                    : 'AWAITING CONFIGURATION'}
                 </p>
               </div>
             </div>
             {!processing && (
-              <button onClick={clearSelection} className="text-yellow-600 font-black text-xs hover:underline uppercase tracking-tighter">Clear All</button>
+              <div className="flex items-center gap-3">
+                {mode === 'compare' && multiFiles.length === 1 && !result && (
+                  <label className="text-blue-600 font-black text-xs hover:underline uppercase tracking-tighter cursor-pointer">
+                    + Add 2nd File
+                    <input type="file" accept=".pdf" className="hidden" onChange={e => { if (e.target.files?.[0]) handle([e.target.files[0]]); }} />
+                  </label>
+                )}
+                <button onClick={clearSelection} className="text-yellow-600 font-black text-xs hover:underline uppercase tracking-tighter">Clear All</button>
+              </div>
             )}
           </div>
 
@@ -744,8 +767,12 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
                         <h4 className={`font-bold text-sm ${darkMode ? 'text-white' : 'text-slate-900'}`}>
                           Document Differential Analyzer
                         </h4>
-                        <p className={`text-xs ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
-                          Comparing {multiFiles.length >= 2 ? `${multiFiles[0].name} and ${multiFiles[1].name}` : file ? file.name : 'selected PDF documents'}.
+                        <p className={`text-xs font-semibold ${multiFiles.length >= 2 ? 'text-green-600 dark:text-green-400' : 'text-amber-600 dark:text-amber-400'}`}>
+                          {multiFiles.length >= 2
+                            ? `✓ Comparing "${multiFiles[0].name}" vs "${multiFiles[1].name}"`
+                            : multiFiles.length === 1
+                            ? `1 of 2 files uploaded — upload one more PDF to compare`
+                            : 'Upload exactly 2 PDF files to begin comparison'}
                         </p>
                       </div>
                     </div>
@@ -780,15 +807,28 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
 
                 {needsPageInput && (
                   <div className="space-y-4">
-                    <label className="block text-xs font-black uppercase tracking-widest text-slate-500 mb-2">Page Numbers or Range</label>
+                    <label className="block text-xs font-black uppercase tracking-widest text-slate-500 mb-2">
+                      {mode === 'organize' ? 'New Page Order' : mode === 'split' ? 'Page Range to Extract' : 'Pages to Delete'}
+                    </label>
                     <input
                       type="text"
                       value={pageInput}
                       onChange={(e) => setPageInput(e.target.value)}
-                      placeholder={mode === 'split' ? "e.g. 1-5, 8, 11-15" : "e.g. 2, 4, 10"}
+                      placeholder={
+                        mode === 'organize'
+                          ? 'e.g. 3,1,2,4 — enter all pages in new order'
+                          : mode === 'split'
+                          ? 'e.g. 1-5, 8, 11-15'
+                          : 'e.g. 2, 4, 10'
+                      }
                       className={`w-full p-6 rounded-2xl text-xl font-bold border-2 focus:ring-4 transition-all outline-none ${darkMode ? 'bg-slate-900 border-slate-700 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
                         }`}
                     />
+                    {mode === 'organize' && (
+                      <p className="text-xs text-slate-500 font-medium">
+                        Enter every page number in the order you want them. Duplicate entries allowed (to repeat pages).
+                      </p>
+                    )}
                   </div>
                 )}
 
