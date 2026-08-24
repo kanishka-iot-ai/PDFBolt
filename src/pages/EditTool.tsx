@@ -1,9 +1,8 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import * as pdfjsLib from 'pdfjs-dist';
 import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
 import FileUploader from '../components/FileUploader';
-import { ChevronLeft, ChevronRight, ZoomIn, ZoomOut, Eraser, Type, Image as ImageIcon, PenTool, Download, Save, MousePointer, Move, Trash2, Check } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ZoomIn, ZoomOut, Type, Image as ImageIcon, PenTool, Save, Move, Trash2 } from 'lucide-react';
 import { useActiveWork } from '../context/ActiveWorkContext';
 
 // Initialize Worker
@@ -49,6 +48,7 @@ const EditTool: React.FC<EditToolProps> = ({ darkMode, notify }) => {
     const [currentPage, setCurrentPage] = useState(1);
     const [scale, setScale] = useState(1.0);
     const [loading, setLoading] = useState(false);
+    const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
     // Sync active work
     useEffect(() => {
@@ -60,29 +60,41 @@ const EditTool: React.FC<EditToolProps> = ({ darkMode, notify }) => {
     const [mode, setMode] = useState<EditorMode>('select');
     const [textElements, setTextElements] = useState<TextElement[]>([]);
     const [imageElements, setImageElements] = useState<ImageElement[]>([]);
-
-    // Drawing State
     const [isDrawing, setIsDrawing] = useState(false);
-    const canvasRef = useRef<HTMLCanvasElement>(null); // Rendering PDF
-    const drawingCanvasRef = useRef<HTMLCanvasElement>(null); // Drawing layer
-    const containerRef = useRef<HTMLDivElement>(null);
 
-    // Store drawing data URLs per page to persistence? 
-    // For simplicity in this version, we'll just have one drawing canvas per page active? 
-    // Ideally we store "paths" but for "Offline PDF Edit" usually we just bake it. 
-    // Let's store "pageDrawings" as dataURLs.
+    // Canvas references
+    const canvasRef = useRef<HTMLCanvasElement>(null);
+    const drawingCanvasRef = useRef<HTMLCanvasElement>(null);
+    const containerRef = useRef<HTMLDivElement>(null);
+    const resizeCleanupRef = useRef<(() => void) | null>(null);
+
+    // Store drawing data URLs per page
     const [pageDrawings, setPageDrawings] = useState<Record<number, string>>({}); // pageNum -> dataURL
 
     // Selection/Drag State
     const [selectedElementId, setSelectedElementId] = useState<string | null>(null);
     const [dragOffset, setDragOffset] = useState<{ x: number, y: number } | null>(null);
 
+    // Cleanup resize listeners on unmount
+    useEffect(() => {
+        return () => {
+            if (resizeCleanupRef.current) {
+                resizeCleanupRef.current();
+                resizeCleanupRef.current = null;
+            }
+        };
+    }, []);
+
     // --- PDF Loading & Rendering ---
     const handleFilesSelected = async (files: File[]) => {
         if (files.length === 0) return;
         const uploadedFile = files[0];
-        if (uploadedFile.type !== 'application/pdf') return alert('Please upload a valid PDF file.');
+        if (uploadedFile.type !== 'application/pdf' && !uploadedFile.name.toLowerCase().endsWith('.pdf')) {
+            setErrorMsg('Please upload a valid PDF file.');
+            return;
+        }
 
+        setErrorMsg(null);
         setFile(uploadedFile);
         setLoading(true);
         try {
@@ -90,9 +102,8 @@ const EditTool: React.FC<EditToolProps> = ({ darkMode, notify }) => {
             const loadedPdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
             setPdfDoc(loadedPdf);
             setCurrentPage(1);
-        } catch (error) {
-            console.error('Error loading PDF:', error);
-            alert('Failed to load PDF.');
+        } catch {
+            setErrorMsg('Failed to load PDF. The file may be password-protected or corrupted.');
         } finally {
             setLoading(false);
         }
@@ -124,127 +135,136 @@ const EditTool: React.FC<EditToolProps> = ({ darkMode, notify }) => {
                         img.onload = () => ctx.drawImage(img, 0, 0);
                     }
                 }
-            } catch (error) {
-                console.error('Error rendering page:', error);
+            } catch {
+                // Non-fatal page render error
             }
         };
         renderPage();
-    }, [pdfDoc, currentPage, scale]);
+    }, [pdfDoc, currentPage, scale, pageDrawings]);
 
     // --- Tools Logic ---
 
     const handleAddText = () => {
-        const input = prompt("Enter text:", "New Text");
-        if (!input) return;
+        const input = window.prompt("Enter text to add:", "New Text");
+        if (!input || input.trim() === '') return;
 
         const newText: TextElement = {
             id: generateId(),
             page: currentPage,
-            x: 50, // Default position
+            x: 50,
             y: 50,
-            text: input,
-            fontSize: 24,
-            color: '#000000'
+            text: input.trim(),
+            fontSize: 16,
+            color: darkMode ? '#FFFFFF' : '#000000'
         };
-        setTextElements([...textElements, newText]);
-        setMode('select');
+
+        setTextElements(prev => [...prev, newText]);
         setSelectedElementId(newText.id);
+        setMode('select');
     };
 
-    const handleAddImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (!e.target.files || e.target.files.length === 0) return;
-        const imgFile = e.target.files[0];
-        const arrayBuffer = await imgFile.arrayBuffer();
+    const handleAddImage = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
         const reader = new FileReader();
+        reader.onload = async (event) => {
+            const dataUrl = event.target?.result as string;
+            const bytes = await file.arrayBuffer();
 
-        reader.onload = () => {
-            const newImg: ImageElement = {
-                id: generateId(),
-                page: currentPage,
-                x: 100,
-                y: 100,
-                width: 200,
-                height: 200, // Default size, maybe adjust based on actual img aspect ratio later
-                dataUrl: reader.result as string,
-                bytes: arrayBuffer
+            const img = new Image();
+            img.src = dataUrl;
+            img.onload = () => {
+                const newImg: ImageElement = {
+                    id: generateId(),
+                    page: currentPage,
+                    x: 50,
+                    y: 50,
+                    width: img.width > 200 ? 200 : img.width,
+                    height: img.width > 200 ? (img.height * (200 / img.width)) : img.height,
+                    dataUrl,
+                    bytes
+                };
+                setImageElements(prev => [...prev, newImg]);
+                setSelectedElementId(newImg.id);
+                setMode('select');
             };
-            setImageElements([...imageElements, newImg]);
-            setMode('select');
-            setSelectedElementId(newImg.id);
         };
-        reader.readAsDataURL(imgFile);
+        reader.readAsDataURL(file);
+        e.target.value = '';
     };
 
-    // --- Drag & Drop Logic ---
-
-    const getMousePos = (e: React.MouseEvent | React.TouchEvent) => {
-        if (!containerRef.current) return { x: 0, y: 0 };
-        const rect = containerRef.current.getBoundingClientRect();
-        // Handle touch or mouse
-        const clientX = 'touches' in e ? e.touches[0].clientX : (e as React.MouseEvent).clientX;
-        const clientY = 'touches' in e ? e.touches[0].clientY : (e as React.MouseEvent).clientY;
-        return {
-            x: (clientX - rect.left) / scale, // Unscale to match PDF points logic roughly
-            y: (clientY - rect.top) / scale
-        };
+    const deleteSelected = () => {
+        if (!selectedElementId) return;
+        setTextElements(prev => prev.filter(el => el.id !== selectedElementId));
+        setImageElements(prev => prev.filter(el => el.id !== selectedElementId));
+        setSelectedElementId(null);
     };
+
+    // --- Mouse Event Handlers for Moving & Resizing ---
 
     const handleContainerMouseDown = (e: React.MouseEvent) => {
         if (mode === 'draw') {
             startDrawing(e);
-            return;
-        }
-        // Deselect if clicking empty space
-        if (e.target === containerRef.current || e.target === drawingCanvasRef.current) {
-            setSelectedElementId(null);
-        }
-    };
-
-    const handleElementMouseDown = (e: React.MouseEvent, id: string, type: 'text' | 'image') => {
-        e.stopPropagation();
-        if (mode !== 'select') return;
-
-        setSelectedElementId(id);
-        const pos = getMousePos(e);
-
-        let elem;
-        if (type === 'text') elem = textElements.find(t => t.id === id);
-        else elem = imageElements.find(i => i.id === id);
-
-        if (elem) {
-            setDragOffset({
-                x: pos.x - elem.x,
-                y: pos.y - elem.y
-            });
+        } else if (mode === 'select') {
+            // Deselect if clicked on container background
+            if (e.target === canvasRef.current || e.target === drawingCanvasRef.current) {
+                setSelectedElementId(null);
+            }
         }
     };
 
     const handleMouseMove = (e: React.MouseEvent) => {
-        if (mode === 'draw' && isDrawing) {
+        if (mode === 'draw') {
             draw(e);
-            return;
-        }
+        } else if (mode === 'select' && selectedElementId && dragOffset && containerRef.current) {
+            const rect = containerRef.current.getBoundingClientRect();
+            const currentX = (e.clientX - rect.left) / scale;
+            const currentY = (e.clientY - rect.top) / scale;
 
-        if (mode === 'select' && selectedElementId && dragOffset) {
-            const pos = getMousePos(e);
-            const newX = pos.x - dragOffset.x;
-            const newY = pos.y - dragOffset.y;
+            const newX = currentX - dragOffset.x;
+            const newY = currentY - dragOffset.y;
 
-            setTextElements(prev => prev.map(t => t.id === selectedElementId ? { ...t, x: newX, y: newY } : t));
-            setImageElements(prev => prev.map(i => i.id === selectedElementId ? { ...i, x: newX, y: newY } : i));
+            setTextElements(prev => prev.map(el => el.id === selectedElementId ? { ...el, x: newX, y: newY } : el));
+            setImageElements(prev => prev.map(el => el.id === selectedElementId ? { ...el, x: newX, y: newY } : el));
         }
     };
 
     const handleMouseUp = () => {
-        if (mode === 'draw') stopDrawing();
-        setDragOffset(null);
+        if (mode === 'draw') {
+            stopDrawing();
+        } else if (mode === 'select') {
+            setDragOffset(null);
+        }
+    };
+
+    const handleElementMouseDown = (e: React.MouseEvent, id: string) => {
+        if (mode !== 'select') return;
+        e.stopPropagation();
+        setSelectedElementId(id);
+
+        if (!containerRef.current) return;
+        const rect = containerRef.current.getBoundingClientRect();
+        const clickX = (e.clientX - rect.left) / scale;
+        const clickY = (e.clientY - rect.top) / scale;
+
+        const textEl = textElements.find(t => t.id === id);
+        const imgEl = imageElements.find(i => i.id === id);
+        const targetEl = textEl || imgEl;
+
+        if (targetEl) {
+            setDragOffset({
+                x: clickX - targetEl.x,
+                y: clickY - targetEl.y
+            });
+        }
     };
 
     const startResize = (e: React.MouseEvent, id: string) => {
         e.stopPropagation();
         const img = imageElements.find(i => i.id === id);
         if (!img) return;
-        
+
         const startX = e.clientX;
         const startWidth = img.width;
         const startHeight = img.height;
@@ -258,6 +278,17 @@ const EditTool: React.FC<EditToolProps> = ({ darkMode, notify }) => {
         };
 
         const onMouseUpEvent = () => {
+            window.removeEventListener('mousemove', onMouseMove);
+            window.removeEventListener('mouseup', onMouseUpEvent);
+            resizeCleanupRef.current = null;
+        };
+
+        // If there was a previous unremoved listener, remove it first
+        if (resizeCleanupRef.current) {
+            resizeCleanupRef.current();
+        }
+
+        resizeCleanupRef.current = () => {
             window.removeEventListener('mousemove', onMouseMove);
             window.removeEventListener('mouseup', onMouseUpEvent);
         };
@@ -275,7 +306,7 @@ const EditTool: React.FC<EditToolProps> = ({ darkMode, notify }) => {
         const rect = drawingCanvasRef.current.getBoundingClientRect();
         ctx.beginPath();
         ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
-        ctx.strokeStyle = darkMode ? '#FFFF00' : '#000000'; // Yellow in dark mode, Black in light
+        ctx.strokeStyle = darkMode ? '#FFFF00' : '#000000';
         ctx.lineWidth = 3;
         ctx.lineCap = 'round';
     };
@@ -293,7 +324,6 @@ const EditTool: React.FC<EditToolProps> = ({ darkMode, notify }) => {
     const stopDrawing = () => {
         if (!isDrawing) return;
         setIsDrawing(false);
-        // Save current canvas to store
         if (drawingCanvasRef.current) {
             const dataUrl = drawingCanvasRef.current.toDataURL('image/png');
             setPageDrawings(prev => ({ ...prev, [currentPage]: dataUrl }));
@@ -304,20 +334,17 @@ const EditTool: React.FC<EditToolProps> = ({ darkMode, notify }) => {
     const savePdf = async () => {
         if (!file || !pdfDoc) return;
         setLoading(true);
+        setErrorMsg(null);
         try {
             const { PDFDocument, rgb } = await import('pdf-lib');
             const arrayBuffer = await file.arrayBuffer();
             const pdf = await PDFDocument.load(arrayBuffer);
 
-            // Process Pages
             const pages = pdf.getPages();
 
             // 1. Embed Images First (Efficiency)
-            // Map of ImageElement.id -> PDFImage
             const embeddedImages: Record<string, any> = {};
             for (const imgEl of imageElements) {
-                // Determine type from bytes/header or just try-catch? 
-                // dataUrl usually has mime type.
                 let imgObj;
                 if (imgEl.dataUrl.startsWith('data:image/png')) {
                     imgObj = await pdf.embedPng(imgEl.bytes);
@@ -326,10 +353,13 @@ const EditTool: React.FC<EditToolProps> = ({ darkMode, notify }) => {
                 } else {
                     const img = new Image();
                     img.src = imgEl.dataUrl;
-                    await new Promise(resolve => { img.onload = resolve; });
+                    await new Promise((resolve) => {
+                        img.onload = resolve;
+                        img.onerror = resolve; // Don't hang on error
+                    });
                     const canvas = document.createElement('canvas');
-                    canvas.width = img.width;
-                    canvas.height = img.height;
+                    canvas.width = img.width || 100;
+                    canvas.height = img.height || 100;
                     const ctx = canvas.getContext('2d');
                     if (ctx) {
                         ctx.drawImage(img, 0, 0);
@@ -342,10 +372,10 @@ const EditTool: React.FC<EditToolProps> = ({ darkMode, notify }) => {
                 }
             }
 
-            // 2. Process Drawing Canvases (Convert to PNG and Embed)
+            // 2. Process Drawing Canvases
             const embeddedDrawings: Record<number, any> = {};
             for (const [pageNumStr, dataUrl] of Object.entries(pageDrawings)) {
-                if (dataUrl && dataUrl.length > 100) { // Check if not empty
+                if (dataUrl && dataUrl.length > 100) {
                     const drawingImage = await pdf.embedPng(dataUrl);
                     embeddedDrawings[Number(pageNumStr)] = drawingImage;
                 }
@@ -355,78 +385,86 @@ const EditTool: React.FC<EditToolProps> = ({ darkMode, notify }) => {
             for (let i = 0; i < pages.length; i++) {
                 const pageNum = i + 1;
                 const page = pages[i];
-                const { height } = page.getSize(); // PDF sizing // pdf-lib uses points (72dpi), coords from bottom-left
+                const { height } = page.getSize();
 
                 // Draw Drawings (Full Page Overlay)
                 if (embeddedDrawings[pageNum]) {
-                    page.drawImage(embeddedDrawings[pageNum], {
+                    const img = embeddedDrawings[pageNum];
+                    page.drawImage(img, {
                         x: 0,
                         y: 0,
                         width: page.getWidth(),
-                        height: page.getHeight(),
+                        height: page.getHeight()
                     });
                 }
 
-                // Draw Images
-                const pageImages = imageElements.filter(e => e.page === pageNum);
-                pageImages.forEach(img => {
-                    const embed = embeddedImages[img.id];
-                    if (embed) {
-                        page.drawImage(embed, {
-                            x: img.x, // Need to scale? No, we stored unscaled PDF-point coords? 
-                            // Wait, getMousePos divides by `scale` (viewport scale). 
-                            // Pdfjs-dist viewport at scale 1 usually matches PDF points 1:1 if 72dpi.
-                            // So `img.x` should be in PDF points.
-                            y: height - img.y - img.height, // Flip Y for pdf-lib
-                            width: img.width,
-                            height: img.height
+                // Draw Text Elements
+                const pageTexts = textElements.filter(el => el.page === pageNum);
+                for (const t of pageTexts) {
+                    const hexToRgb = (hex: string) => {
+                        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+                        return result ? {
+                            r: parseInt(result[1], 16) / 255,
+                            g: parseInt(result[2], 16) / 255,
+                            b: parseInt(result[3], 16) / 255
+                        } : { r: 0, g: 0, b: 0 };
+                    };
+                    const c = hexToRgb(t.color);
+                    page.drawText(t.text, {
+                        x: t.x,
+                        y: height - t.y - t.fontSize,
+                        size: t.fontSize,
+                        color: rgb(c.r, c.g, c.b)
+                    });
+                }
+
+                // Draw Image Elements
+                const pageImgs = imageElements.filter(el => el.page === pageNum);
+                for (const imgEl of pageImgs) {
+                    const pdfImg = embeddedImages[imgEl.id];
+                    if (pdfImg) {
+                        page.drawImage(pdfImg, {
+                            x: imgEl.x,
+                            y: height - imgEl.y - imgEl.height,
+                            width: imgEl.width,
+                            height: imgEl.height
                         });
                     }
-                });
-
-                // Draw Text
-                const pageTexts = textElements.filter(e => e.page === pageNum);
-                pageTexts.forEach(txt => {
-                    page.drawText(txt.text, {
-                        x: txt.x,
-                        y: height - txt.y - txt.fontSize + 12, // Approximate adjustment for baseline
-                        size: txt.fontSize,
-                        color: rgb(0, 0, 0) // Support colors later
-                    });
-                });
+                }
             }
 
             const pdfBytes = await pdf.save();
             const blob = new Blob([pdfBytes], { type: 'application/pdf' });
             const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = `edited_${file.name}`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            setTimeout(() => URL.revokeObjectURL(url), 1000);
-            if (notify && notify.success) notify.success("PDF Edited Successfully!");
 
-        } catch (error) {
-            console.error(error);
-            alert("Error saving PDF");
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `edited_${file.name}`;
+            a.click();
+            setTimeout(() => URL.revokeObjectURL(url), 1500);
+
+            notify?.success?.();
+        } catch {
+            setErrorMsg('Failed to save edited PDF. Please check your added elements and try again.');
         } finally {
             setLoading(false);
         }
     };
 
-    // --- Deletion ---
-    const deleteSelected = () => {
-        if (!selectedElementId) return;
-        setTextElements(prev => prev.filter(t => t.id !== selectedElementId));
-        setImageElements(prev => prev.filter(i => i.id !== selectedElementId));
-        setSelectedElementId(null);
-    };
-
     if (!file) {
         return (
-            <div className="max-w-4xl mx-auto px-4 py-2 animate-fadeIn">
+            <div className="max-w-4xl mx-auto py-12 px-4 space-y-6">
+                <div className="text-center space-y-4">
+                    <h1 className="text-4xl font-extrabold tracking-tight">Edit PDF Documents</h1>
+                    <p className="text-slate-500 max-w-xl mx-auto">
+                        Add text, images, and freehand drawings to your PDF directly in your browser.
+                    </p>
+                </div>
+                {errorMsg && (
+                    <div className="p-4 rounded-xl bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-300 text-sm font-semibold text-center">
+                        {errorMsg}
+                    </div>
+                )}
                 <FileUploader onFilesSelected={handleFilesSelected} accept=".pdf" maxSizeMB={50} darkMode={darkMode} />
             </div>
         );
@@ -440,11 +478,12 @@ const EditTool: React.FC<EditToolProps> = ({ darkMode, notify }) => {
                     <span className="font-bold text-sm truncate max-w-md">{file.name}</span>
                 </div>
                 <div className="flex gap-2">
-                    <button onClick={() => setFile(null)} className="text-red-500 font-bold text-sm">Close</button>
+                    <button type="button" onClick={() => setFile(null)} className="text-red-500 font-bold text-sm px-3 py-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors">Close</button>
                     <button
+                        type="button"
                         onClick={savePdf}
                         disabled={loading}
-                        className="flex items-center gap-2 bg-yellow-500 text-white px-4 py-2 rounded-lg font-bold hover:bg-yellow-600 disabled:opacity-50 transition-colors"
+                        className="flex items-center gap-2 bg-yellow-500 text-slate-950 px-4 py-2 rounded-lg font-bold hover:bg-yellow-400 disabled:opacity-50 transition-colors"
                     >
                         <Save size={18} /> {loading ? 'Saving...' : 'Save PDF'}
                     </button>
@@ -454,123 +493,162 @@ const EditTool: React.FC<EditToolProps> = ({ darkMode, notify }) => {
             <div className="flex-1 flex overflow-hidden">
                 {/* Toolbar */}
                 <div className={`w-16 flex flex-col items-center py-6 gap-4 border-r ${darkMode ? 'border-slate-700 bg-slate-800' : 'border-slate-200 bg-white'}`}>
-                            <button
-                                onClick={() => setMode('select')}
-                                aria-label="Select and move elements"
-                                className={`p-3 rounded-xl transition-all ${mode === 'select' ? 'bg-yellow-500 text-white' : 'hover:bg-slate-100 dark:hover:bg-slate-700'}`}
-                                title="Select / Move"
-                            >
-                                <Move size={20} />
-                            </button>
-                            <button
-                                onClick={handleAddText}
-                                aria-label="Add text element"
-                                className={`p-3 rounded-xl transition-all ${mode === 'text' ? 'bg-yellow-500 text-white' : 'hover:bg-slate-100 dark:hover:bg-slate-700'}`}
-                                title="Add Text"
-                            >
-                                <Type size={20} />
-                            </button>
-                            <label className={`p-3 rounded-xl transition-all cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700`} aria-label="Upload and insert image">
-                                <ImageIcon size={20} />
-                                <input type="file" accept="image/*" className="hidden" onChange={handleAddImage} />
-                            </label>
-                            <button
-                                onClick={() => setMode('draw')}
-                                aria-label="Freehand drawing tool"
-                                className={`p-3 rounded-xl transition-all ${mode === 'draw' ? 'bg-yellow-500 text-white' : 'hover:bg-slate-100 dark:hover:bg-slate-700'}`}
-                                title="Free Hand Draw"
-                            >
-                                <PenTool size={20} />
-                            </button>
+                    <button
+                        type="button"
+                        onClick={() => setMode('select')}
+                        aria-label="Select and move elements"
+                        className={`p-3 rounded-xl transition-all ${mode === 'select' ? 'bg-yellow-500 text-slate-950 font-bold' : 'hover:bg-slate-100 dark:hover:bg-slate-700'}`}
+                        title="Select / Move"
+                    >
+                        <Move size={20} />
+                    </button>
+                    <button
+                        type="button"
+                        onClick={handleAddText}
+                        aria-label="Add text element"
+                        className={`p-3 rounded-xl transition-all ${mode === 'text' ? 'bg-yellow-500 text-slate-950 font-bold' : 'hover:bg-slate-100 dark:hover:bg-slate-700'}`}
+                        title="Add Text"
+                    >
+                        <Type size={20} />
+                    </button>
+                    <label className="p-3 rounded-xl transition-all cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700" aria-label="Upload and insert image" title="Add Image">
+                        <ImageIcon size={20} />
+                        <input type="file" accept="image/*" className="hidden" onChange={handleAddImage} />
+                    </label>
+                    <button
+                        type="button"
+                        onClick={() => setMode('draw')}
+                        aria-label="Freehand drawing tool"
+                        className={`p-3 rounded-xl transition-all ${mode === 'draw' ? 'bg-yellow-500 text-slate-950 font-bold' : 'hover:bg-slate-100 dark:hover:bg-slate-700'}`}
+                        title="Free Hand Draw"
+                    >
+                        <PenTool size={20} />
+                    </button>
 
-                            <div className="w-8 h-px bg-slate-200 dark:bg-slate-700 my-2"></div>
+                    <div className="w-8 h-px bg-slate-200 dark:bg-slate-700 my-2"></div>
 
-                            {selectedElementId && (
-                                <button onClick={deleteSelected} aria-label="Delete selected element" className="p-3 text-red-500 hover:bg-red-50 rounded-xl" title="Delete Selected">
-                                    <Trash2 size={20} />
-                                </button>
-                            )}
-                        </div>
+                    {selectedElementId && (
+                        <button
+                            type="button"
+                            onClick={deleteSelected}
+                            aria-label="Delete selected element"
+                            className="p-3 text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-xl"
+                            title="Delete Selected"
+                        >
+                            <Trash2 size={20} />
+                        </button>
+                    )}
+                </div>
 
-                        {/* Editor Area */}
-                        <div className="flex-1 relative bg-slate-200 dark:bg-slate-950 overflow-auto flex items-center justify-center p-8">
-                            <div
-                                className="relative shadow-2xl"
-                                ref={containerRef}
-                                style={{ width: canvasRef.current?.width || 'auto', height: canvasRef.current?.height || 'auto' }}
-                                onMouseMove={handleMouseMove}
-                                onMouseDown={handleContainerMouseDown}
-                                onMouseUp={handleMouseUp}
-                                onMouseLeave={handleMouseUp}
-                            >
-                                {/* PDF Layer */}
-                                <canvas ref={canvasRef} className="block relative z-0" />
+                {/* Editor Area */}
+                <div className="flex-1 relative bg-slate-200 dark:bg-slate-950 overflow-auto flex items-center justify-center p-8">
+                    <div
+                        className="relative shadow-2xl"
+                        ref={containerRef}
+                        style={{ width: canvasRef.current?.width || 'auto', height: canvasRef.current?.height || 'auto' }}
+                        onMouseMove={handleMouseMove}
+                        onMouseDown={handleContainerMouseDown}
+                        onMouseUp={handleMouseUp}
+                        onMouseLeave={handleMouseUp}
+                    >
+                        {/* PDF Layer */}
+                        <canvas ref={canvasRef} className="block relative z-0" />
 
-                                {/* Drawing Layer */}
-                                <canvas
-                                    ref={drawingCanvasRef}
-                                    className={`absolute inset-0 z-10 ${mode === 'draw' ? 'cursor-crosshair' : 'pointer-events-none'}`}
-                                />
+                        {/* Drawing Layer */}
+                        <canvas
+                            ref={drawingCanvasRef}
+                            className={`absolute inset-0 z-10 ${mode === 'draw' ? 'cursor-crosshair' : 'pointer-events-none'}`}
+                        />
 
-                                {/* Elements Layer */}
-                                <div className="absolute inset-0 z-20 pointer-events-none">
-                                    {/* Text Elements */}
-                                    {textElements.filter(el => el.page === currentPage).map(el => (
-                                        <div
-                                            key={el.id}
-                                            onMouseDown={(e) => handleElementMouseDown(e, el.id, 'text')}
-                                            className={`absolute cursor-move px-1 border-2 pointer-events-auto ${selectedElementId === el.id ? 'border-yellow-500' : 'border-transparent hover:border-blue-300'}`}
-                                            style={{
-                                                left: el.x * scale,
-                                                top: el.y * scale,
-                                                fontSize: el.fontSize * scale,
-                                                color: el.color,
-                                                fontFamily: 'Helvetica, Arial, sans-serif'
-                                            }}
-                                        >
-                                            {el.text}
-                                        </div>
-                                    ))}
-
-                                    {/* Image Elements */}
-                                    {imageElements.filter(el => el.page === currentPage).map(el => (
-                                        <div
-                                            key={el.id}
-                                            onMouseDown={(e) => handleElementMouseDown(e, el.id, 'image')}
-                                            className={`absolute cursor-move pointer-events-auto ${selectedElementId === el.id ? 'ring-2 ring-yellow-500' : ''}`}
-                                            style={{
-                                                left: el.x * scale,
-                                                top: el.y * scale,
-                                                width: el.width * scale,
-                                                height: el.height * scale
-                                            }}
-                                        >
-                                            <img src={el.dataUrl} className="w-full h-full object-contain" draggable={false} />
-                                            {/* Simple Resize Handle (Bottom Right) */}
-                                            {selectedElementId === el.id && (
-                                                <div 
-                                                    onMouseDown={(e) => startResize(e, el.id)}
-                                                    className="absolute bottom-0 right-0 w-4 h-4 bg-yellow-500 rounded-full cursor-se-resize translate-x-1/2 translate-y-1/2"
-                                                ></div>
-                                            )}
-                                        </div>
-                                    ))}
+                        {/* Elements Layer */}
+                        <div className="absolute inset-0 z-20 pointer-events-none">
+                            {/* Text Elements */}
+                            {textElements.filter(el => el.page === currentPage).map(el => (
+                                <div
+                                    key={el.id}
+                                    onMouseDown={(e) => handleElementMouseDown(e, el.id)}
+                                    className={`absolute cursor-move px-1 border-2 pointer-events-auto select-none ${selectedElementId === el.id ? 'border-yellow-500' : 'border-transparent hover:border-blue-300'}`}
+                                    style={{
+                                        left: el.x * scale,
+                                        top: el.y * scale,
+                                        fontSize: el.fontSize * scale,
+                                        color: el.color,
+                                        fontFamily: 'Helvetica, Arial, sans-serif'
+                                    }}
+                                >
+                                    {el.text}
                                 </div>
-                            </div>
+                            ))}
+
+                            {/* Image Elements */}
+                            {imageElements.filter(el => el.page === currentPage).map(el => (
+                                <div
+                                    key={el.id}
+                                    onMouseDown={(e) => handleElementMouseDown(e, el.id)}
+                                    className={`absolute cursor-move pointer-events-auto ${selectedElementId === el.id ? 'ring-2 ring-yellow-500' : ''}`}
+                                    style={{
+                                        left: el.x * scale,
+                                        top: el.y * scale,
+                                        width: el.width * scale,
+                                        height: el.height * scale
+                                    }}
+                                >
+                                    <img src={el.dataUrl} alt={`Layer item ${el.id}`} className="w-full h-full object-contain" draggable={false} />
+                                    {/* Simple Resize Handle (Bottom Right) */}
+                                    {selectedElementId === el.id && (
+                                        <div
+                                            onMouseDown={(e) => startResize(e, el.id)}
+                                            className="absolute bottom-0 right-0 w-4 h-4 bg-yellow-500 rounded-full cursor-se-resize translate-x-1/2 translate-y-1/2"
+                                        ></div>
+                                    )}
+                                </div>
+                            ))}
                         </div>
+                    </div>
+                </div>
 
-                        {/* Page Navigation */}
-                        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-white dark:bg-slate-800 px-4 py-2 rounded-full shadow-xl border border-slate-200 dark:border-slate-700 flex items-center gap-4 z-50">
-                            <button onClick={() => setCurrentPage(c => Math.max(1, c - 1))} disabled={currentPage === 1} className="p-1 hover:bg-slate-100 rounded-full"><ChevronLeft /></button>
-                            <span className="font-bold">{currentPage} / {pdfDoc?.numPages}</span>
-                            <button onClick={() => setCurrentPage(c => Math.min(pdfDoc?.numPages, c + 1))} disabled={!pdfDoc || currentPage === pdfDoc.numPages} className="p-1 hover:bg-slate-100 rounded-full"><ChevronRight /></button>
+                {/* Page Navigation */}
+                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-white dark:bg-slate-800 px-4 py-2 rounded-full shadow-xl border border-slate-200 dark:border-slate-700 flex items-center gap-4 z-50">
+                    <button
+                        type="button"
+                        aria-label="Previous page"
+                        onClick={() => setCurrentPage(c => Math.max(1, c - 1))}
+                        disabled={currentPage === 1}
+                        className="p-1 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full disabled:opacity-40"
+                    >
+                        <ChevronLeft />
+                    </button>
+                    <span className="font-bold text-xs">{currentPage} / {pdfDoc?.numPages || 1}</span>
+                    <button
+                        type="button"
+                        aria-label="Next page"
+                        onClick={() => setCurrentPage(c => Math.min(pdfDoc?.numPages || 1, c + 1))}
+                        disabled={!pdfDoc || currentPage === pdfDoc.numPages}
+                        className="p-1 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full disabled:opacity-40"
+                    >
+                        <ChevronRight />
+                    </button>
 
-                            <div className="w-px h-4 bg-slate-300 mx-2"></div>
+                    <div className="w-px h-4 bg-slate-300 dark:bg-slate-700 mx-2"></div>
 
-                            <button onClick={() => setScale(s => Math.max(0.5, s - 0.2))} className="p-1 hover:bg-slate-100 rounded-full"><ZoomOut size={16} /></button>
-                            <span className="text-xs font-bold w-12 text-center">{Math.round(scale * 100)}%</span>
-                            <button onClick={() => setScale(s => Math.min(3, s + 0.2))} className="p-1 hover:bg-slate-100 rounded-full"><ZoomIn size={16} /></button>
-                        </div>
+                    <button
+                        type="button"
+                        aria-label="Zoom out"
+                        onClick={() => setScale(s => Math.max(0.5, s - 0.2))}
+                        className="p-1 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full"
+                    >
+                        <ZoomOut size={16} />
+                    </button>
+                    <span className="text-xs font-bold w-12 text-center">{Math.round(scale * 100)}%</span>
+                    <button
+                        type="button"
+                        aria-label="Zoom in"
+                        onClick={() => setScale(s => Math.min(3, s + 0.2))}
+                        className="p-1 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full"
+                    >
+                        <ZoomIn size={16} />
+                    </button>
+                </div>
             </div>
         </div>
     );

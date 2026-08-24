@@ -33,7 +33,6 @@ const STROKE_WIDTHS = {
 
 const SignatureCanvas = forwardRef<SignatureCanvasRef, SignatureCanvasProps>(
     ({
-        darkMode = false,
         penColor = "#000",
         strokeWidth = 'medium',
         backgroundColor = "rgba(255,255,255,0)",
@@ -45,6 +44,13 @@ const SignatureCanvas = forwardRef<SignatureCanvasRef, SignatureCanvasProps>(
         const sigPadRef = useRef<SignaturePad | null>(null);
         const [currentBgColor, setCurrentBgColor] = useState(backgroundColor);
 
+        const onBeginRef = useRef(onBegin);
+        const onEndRef = useRef(onEnd);
+        useEffect(() => {
+            onBeginRef.current = onBegin;
+            onEndRef.current = onEnd;
+        }, [onBegin, onEnd]);
+
         useEffect(() => {
             const canvas = canvasRef.current;
             if (!canvas) return;
@@ -52,8 +58,10 @@ const SignatureCanvas = forwardRef<SignatureCanvasRef, SignatureCanvasProps>(
             // Resize for high DPI screens (retina support)
             const resizeCanvas = () => {
                 const ratio = Math.max(window.devicePixelRatio || 1, 1);
-                canvas.width = canvas.offsetWidth * ratio;
-                canvas.height = canvas.offsetHeight * ratio;
+                const width = canvas.offsetWidth || 500;
+                const height = canvas.offsetHeight || 200;
+                canvas.width = width * ratio;
+                canvas.height = height * ratio;
                 const ctx = canvas.getContext("2d");
                 if (ctx) {
                     ctx.scale(ratio, ratio);
@@ -61,7 +69,7 @@ const SignatureCanvas = forwardRef<SignatureCanvasRef, SignatureCanvasProps>(
                     // Apply background color
                     if (currentBgColor && currentBgColor !== "rgba(255,255,255,0)") {
                         ctx.fillStyle = currentBgColor;
-                        ctx.fillRect(0, 0, canvas.width, canvas.height);
+                        ctx.fillRect(0, 0, width, height);
                     }
                 }
 
@@ -77,17 +85,16 @@ const SignatureCanvas = forwardRef<SignatureCanvasRef, SignatureCanvasProps>(
             resizeCanvas();
             window.addEventListener("resize", resizeCanvas);
 
-            const width = STROKE_WIDTHS[strokeWidth];
-
+            const widthConfig = STROKE_WIDTHS[strokeWidth];
             const previousData = sigPadRef.current?.toData();
 
-            // Initialize signature pad with world-class settings
+            // Initialize signature pad with smooth rendering settings
             sigPadRef.current = new SignaturePad(canvas, {
-                minWidth: width.min,
-                maxWidth: width.max,
+                minWidth: widthConfig.min,
+                maxWidth: widthConfig.max,
                 penColor: penColor,
                 backgroundColor: currentBgColor,
-                throttle: 16, // 60fps for smooth rendering
+                throttle: 16,
                 velocityFilterWeight: 0.7,
                 minDistance: 5,
             });
@@ -96,13 +103,12 @@ const SignatureCanvas = forwardRef<SignatureCanvasRef, SignatureCanvasProps>(
                 sigPadRef.current.fromData(previousData);
             }
 
-            // Add event listeners
-            if (onBegin) {
-                sigPadRef.current.addEventListener("beginStroke", onBegin);
-            }
-            if (onEnd) {
-                sigPadRef.current.addEventListener("endStroke", onEnd);
-            }
+            // Event listeners with stable refs
+            const handleBegin = () => onBeginRef.current?.();
+            const handleEnd = () => onEndRef.current?.();
+
+            sigPadRef.current.addEventListener("beginStroke", handleBegin);
+            sigPadRef.current.addEventListener("endStroke", handleEnd);
 
             return () => {
                 window.removeEventListener("resize", resizeCanvas);
@@ -110,7 +116,7 @@ const SignatureCanvas = forwardRef<SignatureCanvasRef, SignatureCanvasProps>(
                     sigPadRef.current.off();
                 }
             };
-        }, [onBegin, onEnd, strokeWidth, penColor, currentBgColor]);
+        }, [strokeWidth, penColor, currentBgColor]);
 
         // Update pen color when prop changes
         useEffect(() => {
@@ -128,24 +134,14 @@ const SignatureCanvas = forwardRef<SignatureCanvasRef, SignatureCanvasProps>(
             }
         }, [strokeWidth]);
 
-        // Expose methods to parent component
         useImperativeHandle(ref, () => ({
             clear: () => {
                 sigPadRef.current?.clear();
-                // Reapply background after clearing
-                const canvas = canvasRef.current;
-                if (canvas && currentBgColor && currentBgColor !== "rgba(255,255,255,0)") {
-                    const ctx = canvas.getContext("2d");
-                    if (ctx) {
-                        ctx.fillStyle = currentBgColor;
-                        ctx.fillRect(0, 0, canvas.width, canvas.height);
-                    }
-                }
             },
             undo: () => {
                 const data = sigPadRef.current?.toData();
                 if (data && data.length > 0) {
-                    data.pop();
+                    data.pop(); // Remove the last stroke
                     sigPadRef.current?.fromData(data);
                 }
             },
@@ -153,40 +149,46 @@ const SignatureCanvas = forwardRef<SignatureCanvasRef, SignatureCanvasProps>(
                 return sigPadRef.current?.isEmpty() ?? true;
             },
             toDataURL: (type = "image/png", bgColor?: string) => {
-                if (!sigPadRef.current) return "";
-
-                // If background color is specified, temporarily apply it
-                if (bgColor) {
-                    const originalBg = sigPadRef.current.backgroundColor;
-                    sigPadRef.current.backgroundColor = bgColor;
-                    const dataUrl = sigPadRef.current.toDataURL(type);
-                    sigPadRef.current.backgroundColor = originalBg;
-                    return dataUrl;
-                }
-
-                return sigPadRef.current.toDataURL(type);
-            },
-            toBlob: async (bgColor?: string) => {
                 const canvas = canvasRef.current;
-                if (!canvas) return null;
+                if (!canvas) return "";
 
-                // If background color specified, create a new canvas with background
-                if (bgColor && bgColor !== "rgba(255,255,255,0)") {
-                    const tempCanvas = document.createElement('canvas');
+                const exportBgColor = bgColor || currentBgColor;
+                if (exportBgColor && exportBgColor !== "rgba(255,255,255,0)") {
+                    const tempCanvas = document.createElement("canvas");
                     tempCanvas.width = canvas.width;
                     tempCanvas.height = canvas.height;
-                    const ctx = tempCanvas.getContext('2d');
+                    const ctx = tempCanvas.getContext("2d");
                     if (ctx) {
-                        ctx.fillStyle = bgColor;
+                        ctx.fillStyle = exportBgColor;
                         ctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
                         ctx.drawImage(canvas, 0, 0);
-                        return new Promise<Blob | null>((resolve) => {
-                            tempCanvas.toBlob(resolve, "image/png");
-                        });
+                        return tempCanvas.toDataURL(type);
                     }
                 }
+                return canvas.toDataURL(type);
+            },
+            toBlob: (bgColor?: string): Promise<Blob | null> => {
+                return new Promise((resolve) => {
+                    const canvas = canvasRef.current;
+                    if (!canvas) {
+                        resolve(null);
+                        return;
+                    }
 
-                return new Promise<Blob | null>((resolve) => {
+                    const exportBgColor = bgColor || currentBgColor;
+                    if (exportBgColor && exportBgColor !== "rgba(255,255,255,0)") {
+                        const tempCanvas = document.createElement("canvas");
+                        tempCanvas.width = canvas.width;
+                        tempCanvas.height = canvas.height;
+                        const ctx = tempCanvas.getContext("2d");
+                        if (ctx) {
+                            ctx.fillStyle = exportBgColor;
+                            ctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+                            ctx.drawImage(canvas, 0, 0);
+                            tempCanvas.toBlob(resolve, "image/png");
+                            return;
+                        }
+                    }
                     canvas.toBlob(resolve, "image/png");
                 });
             },
@@ -207,14 +209,9 @@ const SignatureCanvas = forwardRef<SignatureCanvasRef, SignatureCanvasProps>(
                 if (canvas) {
                     const ctx = canvas.getContext("2d");
                     if (ctx) {
-                        // Save current signature
                         const data = sigPadRef.current?.toData();
-
-                        // Clear and apply new background
                         ctx.fillStyle = color;
                         ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-                        // Restore signature
                         if (data && data.length > 0) {
                             sigPadRef.current?.fromData(data);
                         }
@@ -238,9 +235,8 @@ const SignatureCanvas = forwardRef<SignatureCanvasRef, SignatureCanvasProps>(
         return (
             <canvas
                 ref={canvasRef}
-                width={500}
-                height={200}
                 style={{ touchAction: "none" }}
+                aria-label="Signature drawing canvas"
                 className={`w-full h-48 cursor-crosshair touch-none ${className}`}
             />
         );

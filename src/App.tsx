@@ -255,22 +255,38 @@ const MainLayout: React.FC<MainLayoutProps> = ({ darkMode, setDarkMode, soundEna
 };
 
 const App: React.FC = () => {
-  const [darkMode, setDarkMode] = useState(() => localStorage.getItem('theme') === 'dark');
-  const [soundEnabled, setSoundEnabled] = useState(() => localStorage.getItem('sound') !== 'false');
+  const [darkMode, setDarkMode] = useState(() => {
+    try {
+      return localStorage.getItem('theme') === 'dark';
+    } catch {
+      return false;
+    }
+  });
+  const [soundEnabled, setSoundEnabled] = useState(() => {
+    try {
+      return localStorage.getItem('sound') !== 'false';
+    } catch {
+      return true;
+    }
+  });
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', darkMode);
-    localStorage.setItem('theme', darkMode ? 'dark' : 'light');
+    try {
+      localStorage.setItem('theme', darkMode ? 'dark' : 'light');
+    } catch {}
   }, [darkMode]);
 
   useEffect(() => {
-    localStorage.setItem('sound', soundEnabled ? 'true' : 'false');
+    try {
+      localStorage.setItem('sound', soundEnabled ? 'true' : 'false');
+    } catch {}
   }, [soundEnabled]);
 
   const notify: NotifySystem = {
     success: () => soundEnabled && soundEngine.playSuccess(),
     complete: () => soundEnabled && soundEngine.playComplete(),
-    error: () => soundEnabled && soundEngine.playError(),
+    error: () => soundEngine.playError(),
     upload: () => soundEnabled && soundEngine.playUpload(),
   };
 
@@ -295,4 +311,5 @@ const App: React.FC = () => {
     </ErrorBoundary>
   );
 };
+
 export default App;

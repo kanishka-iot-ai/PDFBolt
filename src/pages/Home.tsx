@@ -199,11 +199,13 @@ const Home: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
           </div>
 
           {/* Category Filter Pills */}
-          <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar py-1 w-full sm:w-auto -mx-4 px-4 sm:mx-0 sm:px-0">
+          <div role="tablist" aria-label="PDF tool categories" className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar py-1 w-full sm:w-auto -mx-4 px-4 sm:mx-0 sm:px-0">
             {categories.map(cat => (
               <button
                 key={cat.id}
                 type="button"
+                role="tab"
+                aria-selected={activeCategory === cat.id && !searchQuery}
                 onClick={() => {
                   setSearchQuery('');
                   setActiveCategory(cat.id);

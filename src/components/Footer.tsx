@@ -1,17 +1,24 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ShieldCheck, Lock, CheckCircle, Heart, Headphones, AlertTriangle, Layers, BookOpen, Calculator } from 'lucide-react';
+import { ShieldCheck, Lock, CheckCircle, Heart, Headphones, AlertTriangle } from 'lucide-react';
 import PaymentModal from './PaymentModal';
 
 const Footer: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
   const [showPayment, setShowPayment] = useState(false);
   const [showWipeModal, setShowWipeModal] = useState(false);
+  const [isWiping, setIsWiping] = useState(false);
 
   const handleWipeData = async () => {
-    const { clearAllAppData } = await import('../utils/privacy');
-    await clearAllAppData();
-    setShowWipeModal(false);
-    window.location.reload();
+    setIsWiping(true);
+    try {
+      const { clearAllAppData } = await import('../utils/privacy');
+      await clearAllAppData();
+      setShowWipeModal(false);
+      window.location.reload();
+    } catch {
+      setIsWiping(false);
+      setShowWipeModal(false);
+    }
   };
 
   return (
@@ -20,7 +27,7 @@ const Footer: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
         
         {/* Brand & Privacy Column */}
         <div className="lg:col-span-1">
-          <Link to="/" className="inline-block mb-4 group" aria-label="PDFBolt Home">
+          <Link to="/" className="inline-block mb-4 group" aria-label="Go to PDFBolt home">
             <img 
               src="/pdfbolt-logo.webp" 
               alt="PDFBolt" 
@@ -98,36 +105,34 @@ const Footer: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
         <div>
           <p className={`font-black uppercase text-xs tracking-widest mb-4 ${darkMode ? 'text-slate-200' : 'text-slate-900'}`}>Support & Legal</p>
           <ul className="space-y-2.5 text-xs font-semibold mb-6">
-            <li><Link to="/" aria-label="Go to PDFBolt home" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Home</Link></li>
             <li><Link to="/about" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">About PDFBolt</Link></li>
-            <li><Link to="/privacy" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Privacy Policy</Link></li>
+            <li><Link to="/contact" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors flex items-center gap-1.5"><Headphones size={13} /> Contact & Support</Link></li>
+            <li><Link to="/privacy" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors flex items-center gap-1.5"><ShieldCheck size={13} className="text-emerald-500" /> Privacy Policy</Link></li>
             <li><Link to="/terms" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Terms of Service</Link></li>
-            <li><Link to="/contact" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors flex items-center gap-1"><Headphones size={12} /> Contact Support</Link></li>
-            <li><a href="https://www.trustpilot.com/review/pdfbolt.in" target="_blank" rel="noopener noreferrer" className="text-emerald-700 dark:text-emerald-400 font-bold hover:underline flex items-center gap-1">★ Review on Trustpilot</a></li>
+            <li><Link to="/offline-mode" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors flex items-center gap-1.5"><CheckCircle size={13} className="text-green-500" /> Offline PWA</Link></li>
+            <li><Link to="/cookies" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Cookie Preferences</Link></li>
           </ul>
 
-
-          <div className="bg-gradient-to-br from-yellow-400 to-orange-500 text-slate-950 p-4 rounded-2xl text-center shadow-md">
-            <Heart className="mx-auto mb-1 text-slate-950 fill-current" size={20} />
-            <p className="text-[11px] font-black uppercase mb-2">Keep PDFBolt 100% Free</p>
-            <button
-              onClick={() => setShowPayment(true)}
-              className="text-[10px] bg-slate-950 text-white px-4 py-2 rounded-xl font-black uppercase hover:bg-slate-800 transition-colors w-full shadow-sm"
-            >
-              Donate Now
-            </button>
-          </div>
+          <button 
+            type="button"
+            onClick={() => setShowPayment(true)}
+            className="w-full py-3 rounded-2xl bg-yellow-500 hover:bg-yellow-400 text-slate-950 font-black text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-lg shadow-yellow-500/20 mb-4 cursor-pointer"
+          >
+            <Heart size={14} className="fill-current" /> Support PDFBolt
+          </button>
         </div>
+
       </div>
 
-      {/* Separator */}
-      <div className="max-w-7xl mx-auto px-6 mt-16 pt-8 border-t border-slate-200 dark:border-slate-800">
-        <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-          <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-8">
-            <div className="flex items-center gap-2 text-emerald-800 dark:text-emerald-300 text-xs font-black uppercase tracking-widest bg-emerald-50 dark:bg-emerald-950/40 px-3 py-1.5 rounded-md border border-emerald-600/20">
-              <CheckCircle size={14} /> 100% Client-Side Processing
-            </div>
+      <div className="max-w-7xl mx-auto px-6 mt-16 pt-8 border-t border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <p className="text-xs font-medium text-slate-600 dark:text-slate-400 text-center sm:text-left">
+          Files are processed entirely within your browser using WebAssembly. No documents are uploaded to external servers.
+        </p>
+
+        <div className="flex items-center gap-6">
+          <div className="flex gap-4 text-xs font-semibold">
             <button
+              type="button"
               onClick={() => setShowWipeModal(true)}
               className="text-xs font-black uppercase tracking-widest text-red-700 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 transition-colors py-1 cursor-pointer"
             >
@@ -135,7 +140,6 @@ const Footer: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
             </button>
           </div>
           <p className="text-[10px] font-bold uppercase tracking-widest text-slate-600 dark:text-slate-400">© {new Date().getFullYear()} PDFBolt. All rights reserved.</p>
-
         </div>
       </div>
 
@@ -147,27 +151,36 @@ const Footer: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
 
       {/* Custom Wipe Data Modal */}
       {showWipeModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-fadeIn">
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="wipe-modal-title"
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-fadeIn"
+        >
           <div className={`w-full max-w-md p-8 rounded-[2rem] shadow-2xl animate-scaleIn ${darkMode ? 'bg-slate-800 border border-slate-700' : 'bg-white'}`}>
             <div className="w-16 h-16 bg-red-100 dark:bg-red-500/20 text-red-500 rounded-full flex items-center justify-center mb-6 mx-auto">
               <AlertTriangle size={32} />
             </div>
-            <h3 className={`text-2xl font-black text-center mb-4 ${darkMode ? 'text-white' : 'text-slate-900'}`}>Wipe All Site Data?</h3>
+            <h3 id="wipe-modal-title" className={`text-2xl font-black text-center mb-4 ${darkMode ? 'text-white' : 'text-slate-900'}`}>Wipe All Site Data?</h3>
             <p className={`text-center font-medium mb-8 text-xs leading-relaxed ${darkMode ? 'text-slate-300' : 'text-slate-600'}`}>
               This action will clear all cached tools, fonts, and application data (approx 24MB). You will need to re-download these assets on your next visit.
             </p>
             <div className="flex gap-4">
               <button 
+                type="button"
                 onClick={() => setShowWipeModal(false)}
+                disabled={isWiping}
                 className={`flex-1 py-3 rounded-xl font-bold text-xs transition-colors ${darkMode ? 'bg-slate-700 text-white hover:bg-slate-600' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}
               >
                 Cancel
               </button>
               <button 
+                type="button"
                 onClick={handleWipeData}
-                className="flex-1 py-3 rounded-xl font-bold text-xs bg-red-500 text-white hover:bg-red-600 transition-colors shadow-lg shadow-red-500/30"
+                disabled={isWiping}
+                className="flex-1 py-3 rounded-xl font-bold text-xs bg-red-500 text-white hover:bg-red-600 transition-colors shadow-lg shadow-red-500/30 disabled:opacity-50"
               >
-                Yes, Wipe Data
+                {isWiping ? 'Wiping...' : 'Yes, Wipe Data'}
               </button>
             </div>
           </div>

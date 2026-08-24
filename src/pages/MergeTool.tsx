@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import FileUploader from '../components/FileUploader';
 import { mergeFiles } from '../services/pdfService';
-import { FileText, Download, Trash2, ArrowUp, ArrowDown, CheckCircle2, Plus, ArrowRight } from 'lucide-react';
+import { FileText, Download, Trash2, ArrowUp, ArrowDown, CheckCircle2, Plus, ArrowRight, AlertTriangle, X } from 'lucide-react';
 import { NotifySystem } from '../types';
 import ProgressBar from '../components/ProgressBar';
 import { validateFiles, ALLOWED_MIME_TYPES, MAX_FILE_SIZE } from '../utils/fileValidation';
@@ -17,6 +17,7 @@ const MergeTool: React.FC<{ darkMode: boolean; notify: NotifySystem }> = ({ dark
   const [progress, setProgress] = useState(0);
   const [processingStatus, setProcessingStatus] = useState<'processing' | 'complete' | 'error'>('processing');
   const [resultKey, setResultKey] = useState(0);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   // Sync active work state
   useEffect(() => {
@@ -24,7 +25,6 @@ const MergeTool: React.FC<{ darkMode: boolean; notify: NotifySystem }> = ({ dark
     return () => setHasActiveWork(false);
   }, [files.length, result, processing, setHasActiveWork]);
 
-  // Cleanup blob URLs only on component unmount
   // Cleanup blob URLs only when result changes or component unmounts
   useEffect(() => {
     return () => {
@@ -35,7 +35,8 @@ const MergeTool: React.FC<{ darkMode: boolean; notify: NotifySystem }> = ({ dark
   }, [result]);
 
   const handleFiles = async (nf: File[]) => {
-    if (nf.length === 0) return; // Prevent reset on empty updates
+    if (nf.length === 0) return;
+    setErrorMessage(null);
 
     // Validate PDF files
     const validation = await validateFiles(nf, {
@@ -46,14 +47,8 @@ const MergeTool: React.FC<{ darkMode: boolean; notify: NotifySystem }> = ({ dark
     });
 
     if (!validation.valid) {
-      alert(validation.error || 'Invalid PDF files');
+      setErrorMessage(validation.error || 'Invalid PDF files selected.');
       return;
-    }
-
-    if (validation.warning) {
-      if (!confirm(`${validation.warning}\n\nDo you want to continue?`)) {
-        return;
-      }
     }
 
     setFiles(p => [...p, ...nf]);
@@ -77,6 +72,7 @@ const MergeTool: React.FC<{ darkMode: boolean; notify: NotifySystem }> = ({ dark
     if (files.length < 2) return;
     setProcessing(true);
     setResult(null);
+    setErrorMessage(null);
     setProgress(10);
     setProcessingStatus('processing');
     try {
@@ -90,7 +86,6 @@ const MergeTool: React.FC<{ darkMode: boolean; notify: NotifySystem }> = ({ dark
       setProgress(80);
       const blob = new Blob([b] as BlobPart[], { type: 'application/pdf' });
 
-      // Revoke old URL before creating new one to prevent memory leaks
       if (result) {
         URL.revokeObjectURL(result);
       }
@@ -102,10 +97,9 @@ const MergeTool: React.FC<{ darkMode: boolean; notify: NotifySystem }> = ({ dark
       setProcessingStatus('complete');
       notify.complete();
     } catch (err: any) {
-      console.error(err);
       setProcessingStatus('error');
       notify.error();
-      alert(err.message || 'Merge failed. Please ensure all files are valid PDFs.');
+      setErrorMessage(err.message || 'Merge failed. Please ensure all files are valid PDFs.');
     } finally {
       setProcessing(false);
     }
@@ -113,6 +107,24 @@ const MergeTool: React.FC<{ darkMode: boolean; notify: NotifySystem }> = ({ dark
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-2 animate-fadeIn">
+      {/* Error notification banner */}
+      {errorMessage && (
+        <div className="mb-6 p-4 rounded-2xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900 text-red-900 dark:text-red-200 flex items-center justify-between gap-3 animate-slideDown">
+          <div className="flex items-center gap-2.5">
+            <AlertTriangle className="text-red-500 shrink-0" size={18} />
+            <span className="text-xs sm:text-sm font-semibold">{errorMessage}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setErrorMessage(null)}
+            aria-label="Dismiss error"
+            className="text-red-500 hover:text-red-700"
+          >
+            <X size={16} />
+          </button>
+        </div>
+      )}
+
       {files.length === 0 ? (
         <div className="max-w-4xl mx-auto">
           <FileUploader onFilesSelected={handleFiles} darkMode={darkMode} />
@@ -147,6 +159,7 @@ const MergeTool: React.FC<{ darkMode: boolean; notify: NotifySystem }> = ({ dark
                   </div>
                   {!processing && (
                     <button
+                      type="button"
                       onClick={() => { setFiles([]); setResult(null); }}
                       className="text-red-500 hover:text-red-600 font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer"
                     >
@@ -157,7 +170,7 @@ const MergeTool: React.FC<{ darkMode: boolean; notify: NotifySystem }> = ({ dark
 
                 <div className="space-y-3 max-h-[380px] overflow-y-auto pr-1">
                   {files.map((f, i) => (
-                    <div key={`${f.name}-${i}`} className={`flex items-center justify-between p-4 rounded-2xl border transition-all ${
+                    <div key={`${f.name}-${f.size}-${f.lastModified}`} className={`flex items-center justify-between p-4 rounded-2xl border transition-all ${
                       darkMode ? 'bg-slate-900/60 border-slate-700/60' : 'bg-slate-50 border-slate-200 shadow-sm'
                     }`}>
                       <div className="flex items-center gap-3.5 overflow-hidden">
@@ -171,25 +184,28 @@ const MergeTool: React.FC<{ darkMode: boolean; notify: NotifySystem }> = ({ dark
                       </div>
                       <div className="flex gap-1.5 shrink-0">
                         <button
+                          type="button"
                           onClick={() => move(i, 'up')}
                           disabled={i === 0 || processing}
-                          aria-label="Move file up"
+                          aria-label={`Move ${f.name} up`}
                           className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 disabled:opacity-20 transition-colors cursor-pointer"
                         >
                           <ArrowUp size={14} />
                         </button>
                         <button
+                          type="button"
                           onClick={() => move(i, 'down')}
                           disabled={i === files.length - 1 || processing}
-                          aria-label="Move file down"
+                          aria-label={`Move ${f.name} down`}
                           className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 disabled:opacity-20 transition-colors cursor-pointer"
                         >
                           <ArrowDown size={14} />
                         </button>
                         <button
+                          type="button"
                           onClick={() => { setFiles(files.filter((_, idx) => idx !== i)); setResult(null); }}
                           disabled={processing}
-                          aria-label="Remove file"
+                          aria-label={`Remove ${f.name}`}
                           className="p-1.5 text-red-600 bg-red-50 dark:bg-red-900/20 rounded-lg hover:bg-red-100 transition-colors cursor-pointer"
                         >
                           <Trash2 size={14} />
@@ -201,6 +217,7 @@ const MergeTool: React.FC<{ darkMode: boolean; notify: NotifySystem }> = ({ dark
 
                 <div className="pt-4 border-t border-slate-100 dark:border-slate-700/60 mt-4">
                   <button
+                    type="button"
                     onClick={() => fileInputRef.current?.click()}
                     disabled={processing}
                     className="w-full py-3.5 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-2xl text-slate-500 dark:text-slate-400 hover:text-yellow-600 hover:border-yellow-500 transition-all flex items-center justify-center gap-2 font-black uppercase text-xs tracking-widest cursor-pointer"
@@ -238,6 +255,7 @@ const MergeTool: React.FC<{ darkMode: boolean; notify: NotifySystem }> = ({ dark
 
                 <div className="pt-2">
                   <button
+                    type="button"
                     disabled={processing || files.length < 2}
                     onClick={process}
                     className="w-full py-5 sm:py-6 bg-gradient-to-r from-red-600 to-rose-600 text-white rounded-2xl font-black text-xl sm:text-2xl shadow-xl hover:from-red-700 hover:to-rose-700 hover:scale-[1.02] active:scale-[0.99] disabled:opacity-30 transition-all flex items-center justify-center gap-3 cursor-pointer"
@@ -272,6 +290,7 @@ const MergeTool: React.FC<{ darkMode: boolean; notify: NotifySystem }> = ({ dark
             <Download size={24} /> Download Merged PDF
           </a>
           <button
+            type="button"
             onClick={() => { setFiles([]); setResult(null); }}
             className={`w-full py-4 rounded-2xl font-black text-sm uppercase tracking-wider border-2 transition-all hover:scale-[1.01] flex items-center justify-center gap-2 ${
               darkMode

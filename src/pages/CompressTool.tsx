@@ -1,6 +1,4 @@
 import React, { useState } from 'react';
-import { Helmet } from 'react-helmet-async';
-import { Link } from 'react-router-dom';
 import { inspectPdfForCompression, compressPdfAdvanced, PdfCompressionStats, CompressionResult, CompressionOptions } from '../services/pdfService';
 import FileUploader from '../components/FileUploader';
 import ProgressBar from '../components/ProgressBar';
@@ -18,14 +16,8 @@ import {
   Download, 
   RefreshCw, 
   ArrowRight, 
-  Layers, 
   Eye, 
-  ShieldCheck, 
-  Zap, 
-  Check, 
-  Star, 
-  Target,
-  Maximize2
+  Target
 } from 'lucide-react';
 
 interface CompressToolProps {
@@ -373,6 +365,7 @@ const CompressTool: React.FC<CompressToolProps> = ({ darkMode, notify }) => {
                         min="20"
                         max="95"
                         value={customQuality}
+                        aria-label="JPEG Quality Percentage"
                         onChange={(e) => setCustomQuality(Number(e.target.value))}
                         className="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-yellow-500"
                       />
@@ -419,11 +412,11 @@ const CompressTool: React.FC<CompressToolProps> = ({ darkMode, notify }) => {
                     { label: '< 10 MB (Email)', val: 10 },
                     { label: '< 5 MB (Portal)', val: 5 },
                     { label: '< 2 MB (Gov/Job)', val: 2 },
-                  ].map((preset, idx) => {
+                  ].map((preset) => {
                     const isSelected = preset.val === 'auto' ? targetMode === 'auto' : targetMode === 'preset' && targetSizeMB === preset.val;
                     return (
                       <button
-                        key={idx}
+                        key={preset.label}
                         type="button"
                         onClick={() => {
                           if (preset.val === 'auto') {
@@ -562,18 +555,24 @@ const CompressTool: React.FC<CompressToolProps> = ({ darkMode, notify }) => {
 
             {/* Quality Comparison Modal */}
             {showPreviewModal && result.previewOriginalDataUrl && result.previewCompressedDataUrl && (
-              <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-sm animate-fadeIn">
+              <div
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="comparison-inspection-title"
+                className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-sm animate-fadeIn"
+              >
                 <div className={`w-full max-w-4xl p-6 sm:p-8 rounded-3xl shadow-2xl space-y-6 ${
                   darkMode ? 'bg-slate-900 border border-slate-700' : 'bg-white'
                 }`}>
                   <div className="flex justify-between items-center">
                     <div>
-                      <h3 className={`text-xl font-black ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+                      <h3 id="comparison-inspection-title" className={`text-xl font-black ${darkMode ? 'text-white' : 'text-slate-900'}`}>
                         Side-by-Side Quality Inspection
                       </h3>
                       <p className="text-xs text-slate-400">Page 1 Original vs. Compressed Rendering</p>
                     </div>
                     <button
+                      type="button"
                       onClick={() => setShowPreviewModal(false)}
                       className="text-slate-400 hover:text-white text-xs font-bold uppercase px-3 py-1.5 rounded-lg bg-slate-800"
                     >
@@ -603,6 +602,7 @@ const CompressTool: React.FC<CompressToolProps> = ({ darkMode, notify }) => {
 
                   <div className="flex justify-end pt-4">
                     <button
+                      type="button"
                       onClick={handleDownload}
                       className="px-6 py-3 bg-yellow-500 text-slate-950 font-black text-xs uppercase tracking-wider rounded-xl shadow-md"
                     >

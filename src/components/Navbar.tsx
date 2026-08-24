@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   Moon, Sun, FileText, Menu, X, Volume2, VolumeX, ChevronDown,
-  ArrowRight, Sparkles, Calculator, Home, AlertTriangle
+  ArrowRight, Sparkles, Calculator, Home, AlertTriangle, Heart
 } from 'lucide-react';
 import PaymentModal from './PaymentModal';
 import { TOOLS, getIcon } from '../constants';
@@ -35,15 +35,15 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [dropdownRef]);
+  }, []);
 
-  // Categories mapping
+  // Categories mapping with static hover color classes for Tailwind JIT
   const toolCategories = [
-    { id: 'edit', name: 'Edit & Organize', color: 'text-red-500', bg: 'bg-red-50 dark:bg-red-900/10' },
-    { id: 'convert-to', name: 'Convert To PDF', color: 'text-blue-500', bg: 'bg-blue-50 dark:bg-blue-900/10' },
-    { id: 'convert-from', name: 'Convert From PDF', color: 'text-green-500', bg: 'bg-green-50 dark:bg-green-900/10' },
-    { id: 'security', name: 'Security', color: 'text-orange-500', bg: 'bg-orange-50 dark:bg-orange-900/10' },
-    { id: 'utilities', name: 'Utilities', color: 'text-slate-500', bg: 'bg-slate-50 dark:bg-slate-800/50' }
+    { id: 'edit', name: 'Edit & Organize', color: 'text-red-500', hoverColor: 'group-hover:text-red-500', bg: 'bg-red-50 dark:bg-red-900/10' },
+    { id: 'convert-to', name: 'Convert To PDF', color: 'text-blue-500', hoverColor: 'group-hover:text-blue-500', bg: 'bg-blue-50 dark:bg-blue-900/10' },
+    { id: 'convert-from', name: 'Convert From PDF', color: 'text-green-500', hoverColor: 'group-hover:text-green-500', bg: 'bg-green-50 dark:bg-green-900/10' },
+    { id: 'security', name: 'Security', color: 'text-orange-500', hoverColor: 'group-hover:text-orange-500', bg: 'bg-orange-50 dark:bg-orange-900/10' },
+    { id: 'utilities', name: 'Utilities', color: 'text-slate-500', hoverColor: 'group-hover:text-yellow-500', bg: 'bg-slate-50 dark:bg-slate-800/50' }
   ];
 
   const getCategorizedTools = (categoryId: string) => {
@@ -53,7 +53,6 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
   // Safe navigation interceptor for Home / Logo navigation when active work exists
   const handleSafeNavigation = (e: React.MouseEvent, targetPath: string) => {
     if (location.pathname === targetPath) {
-      // Already on page
       return;
     }
 
@@ -103,7 +102,6 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
     );
   };
 
-
   return (
     <>
       <nav className={`sticky top-0 z-50 transition-all duration-300 glass border-b ${darkMode ? 'border-slate-800 bg-slate-900/80' : 'border-slate-200 bg-white/80'} shadow-sm`}>
@@ -124,7 +122,6 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
               decoding="async"
               className="h-9 md:h-10 w-auto object-contain transition-transform duration-300 group-hover:scale-105" 
             />
-
           </Link>
           
           <div className="hidden lg:flex items-center gap-6">
@@ -137,17 +134,17 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
             {/* All Tools Mega Menu Dropdown */}
             <div className="relative" ref={dropdownRef}>
               <button 
+                type="button"
                 onClick={() => setIsToolsOpen(!isToolsOpen)}
                 className={`flex items-center gap-1.5 text-sm font-bold transition-colors outline-none focus-visible:ring-2 focus-visible:ring-yellow-500 rounded-lg px-1.5 py-0.5 ${isToolsOpen ? 'text-yellow-700 dark:text-yellow-400' : 'text-slate-700 dark:text-slate-200 hover:text-yellow-700 dark:hover:text-yellow-400'}`}
                 aria-expanded={isToolsOpen}
               >
                 All Tools <ChevronDown size={16} className={`transition-transform duration-300 ${isToolsOpen ? 'rotate-180' : ''}`} />
               </button>
-
               
               {/* Mega Menu */}
               {isToolsOpen && (
-                <div className={`absolute top-full -left-48 mt-4 w-[840px] rounded-3xl shadow-2xl border animate-slideDown overflow-hidden ${darkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-200'}`}>
+                <div className={`absolute top-full -left-32 md:-left-48 mt-4 w-[840px] max-w-[95vw] rounded-3xl shadow-2xl border animate-slideDown overflow-hidden ${darkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-200'}`}>
                   <div className="grid grid-cols-3 gap-0">
                     <div className="col-span-2 p-6 grid grid-cols-2 gap-6">
                       {toolCategories.slice(0, 4).map(cat => (
@@ -164,7 +161,7 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
                                   }}
                                   className={`group flex items-center gap-2.5 p-2 rounded-xl transition-colors ${darkMode ? 'hover:bg-slate-800' : 'hover:bg-slate-50'}`}
                                 >
-                                  <div className={`p-1.5 rounded-lg ${darkMode ? 'bg-slate-800 text-slate-300' : 'bg-white shadow-sm text-slate-600'} group-hover:${cat.color} group-hover:scale-110 transition-all`}>
+                                  <div className={`p-1.5 rounded-lg ${darkMode ? 'bg-slate-800 text-slate-300' : 'bg-white shadow-sm text-slate-600'} ${cat.hoverColor} group-hover:scale-110 transition-all`}>
                                     {React.cloneElement(getIcon(tool.icon) as React.ReactElement, { className: 'w-4 h-4' })}
                                   </div>
                                   <span className={`text-sm font-semibold ${darkMode ? 'text-slate-300 group-hover:text-white' : 'text-slate-600 group-hover:text-slate-900'}`}>
@@ -265,6 +262,7 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
 
             {/* Support Button */}
             <button
+              type="button"
               onClick={() => setShowPayment(true)}
               className="px-4 py-1.5 bg-yellow-500 text-slate-950 text-xs font-black uppercase tracking-widest rounded-full hover:bg-yellow-400 shadow-md transition-all flex items-center gap-2"
             >
@@ -275,6 +273,7 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
             
             <div className="flex items-center gap-1">
               <button 
+                type="button"
                 onClick={toggleSound} 
                 aria-label={soundEnabled ? "Mute audio effects" : "Enable audio effects"}
                 className={`p-2 rounded-full transition-colors ${darkMode ? 'hover:bg-slate-800 text-slate-300' : 'hover:bg-slate-100 text-slate-700'}`}
@@ -282,6 +281,7 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
                 {soundEnabled ? <Volume2 size={18} /> : <VolumeX size={18} />}
               </button>
               <button 
+                type="button"
                 onClick={toggleDarkMode} 
                 aria-label={darkMode ? "Switch to light mode" : "Switch to dark mode"}
                 className={`p-2 rounded-full transition-colors ${darkMode ? 'bg-slate-800 text-yellow-400' : 'bg-slate-100 text-slate-700'}`}
@@ -302,6 +302,7 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
               <Home size={16} /> Home
             </Link>
             <button 
+              type="button"
               onClick={toggleDarkMode} 
               aria-label={darkMode ? "Switch to light mode" : "Switch to dark mode"}
               className={`p-2 rounded-full ${darkMode ? 'text-yellow-400' : 'text-slate-700'}`}
@@ -309,6 +310,7 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
               {darkMode ? <Sun size={18} /> : <Moon size={18} />}
             </button>
             <button 
+              type="button"
               onClick={() => setIsOpen(!isOpen)} 
               className={`p-2 rounded-xl ${darkMode ? 'text-white' : 'text-slate-900'}`} 
               aria-label={isOpen ? "Close navigation menu" : "Open navigation menu"}
@@ -412,13 +414,43 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
             >
               🧮 Size Calculator
             </Link>
+
+            {/* Mobile Actions: Sound & Donate */}
+            <div className="pt-4 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between gap-4">
+              <button
+                type="button"
+                onClick={toggleSound}
+                className={`flex items-center gap-2 text-xs font-bold px-4 py-2.5 rounded-xl border ${
+                  darkMode ? 'bg-slate-800 border-slate-700 text-slate-300' : 'bg-slate-100 border-slate-200 text-slate-700'
+                }`}
+              >
+                {soundEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
+                <span>{soundEnabled ? 'Sound On' : 'Sound Off'}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setIsOpen(false);
+                  setShowPayment(true);
+                }}
+                className="flex-1 flex items-center justify-center gap-1.5 px-4 py-2.5 bg-yellow-500 text-slate-950 font-black text-xs uppercase tracking-wider rounded-xl shadow-md"
+              >
+                <Heart size={14} className="fill-current" /> Donate
+              </button>
+            </div>
           </div>
         )}
       </nav>
 
       {/* Unsaved Active Work Confirmation Modal */}
       {showLeaveModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm animate-fadeIn">
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="leave-modal-title"
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm animate-fadeIn"
+        >
           <div className={`w-full max-w-md p-8 rounded-[2.5rem] shadow-2xl border animate-scaleIn ${
             darkMode ? 'bg-slate-900 border-slate-700 text-white' : 'bg-white border-slate-200 text-slate-900'
           }`}>
@@ -426,7 +458,7 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
               <AlertTriangle size={32} />
             </div>
             
-            <h3 className="text-2xl font-black text-center mb-2">Leave this tool?</h3>
+            <h3 id="leave-modal-title" className="text-2xl font-black text-center mb-2">Leave this tool?</h3>
             <p className={`text-center font-medium mb-8 text-xs sm:text-sm leading-relaxed ${
               darkMode ? 'text-slate-300' : 'text-slate-600'
             }`}>
@@ -435,6 +467,7 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
 
             <div className="flex gap-3">
               <button 
+                type="button"
                 onClick={handleCancelLeave}
                 className={`flex-1 py-3.5 rounded-2xl font-bold text-xs uppercase tracking-wider transition-colors border ${
                   darkMode ? 'bg-slate-800 border-slate-700 text-white hover:bg-slate-700' : 'bg-slate-100 border-slate-200 text-slate-700 hover:bg-slate-200'
@@ -443,6 +476,7 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
                 Stay
               </button>
               <button 
+                type="button"
                 onClick={handleConfirmLeave}
                 className="flex-1 py-3.5 rounded-2xl font-black text-xs uppercase tracking-wider bg-yellow-500 hover:bg-yellow-400 text-slate-950 transition-all shadow-lg shadow-yellow-500/20"
               >

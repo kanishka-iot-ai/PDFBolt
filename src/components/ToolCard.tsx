@@ -69,7 +69,12 @@ const ToolCard: React.FC<ToolCardProps> = ({ tool, darkMode, compact = false }) 
           {/* Header Row: Icon & Optional Core Badge */}
           <div className="flex items-center justify-between mb-3 sm:mb-4">
             <div className={`p-2.5 sm:p-3 rounded-xl border transition-transform duration-200 group-hover:scale-105 ${iconStyle}`}>
-              {React.cloneElement(getIcon(tool.icon) as React.ReactElement, { className: 'w-5 h-5 sm:w-6 sm:h-6' })}
+              {(() => {
+                const icon = getIcon(tool.icon);
+                return React.isValidElement(icon)
+                  ? React.cloneElement(icon as React.ReactElement<any>, { className: 'w-5 h-5 sm:w-6 sm:h-6' })
+                  : null;
+              })()}
             </div>
 
             {isCore && !compact && (

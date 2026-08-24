@@ -1,6 +1,5 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { AlertTriangle, RefreshCw, Mail } from 'lucide-react';
-import { Link } from 'react-router-dom';
 
 interface Props {
     children: ReactNode;
@@ -23,15 +22,8 @@ class ErrorBoundary extends Component<Props, State> {
         return { hasError: true, error };
     }
 
-    componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-        console.error('Error caught by boundary:', error, errorInfo);
+    componentDidCatch(_error: Error, errorInfo: ErrorInfo) {
         this.setState({ errorInfo });
-
-        // Log to error tracking service (e.g., Sentry) if configured
-        if (window.location.hostname !== 'localhost') {
-            // Production error logging would go here
-            console.error('Production error:', { error, errorInfo });
-        }
     }
 
     handleReset = () => {
@@ -76,8 +68,9 @@ class ErrorBoundary extends Component<Props, State> {
 
                         <div className="flex flex-col sm:flex-row gap-4 justify-center">
                             <button
+                                type="button"
                                 onClick={this.handleReset}
-                                className="px-8 py-4 bg-yellow-500 text-slate-950 rounded-2xl font-black text-lg shadow-xl shadow-yellow-500/20 hover:bg-yellow-400 hover:-translate-y-1 transition-all flex items-center justify-center gap-2"
+                                className="px-8 py-4 bg-yellow-500 text-slate-950 rounded-2xl font-black text-lg shadow-xl shadow-yellow-500/20 hover:bg-yellow-400 hover:-translate-y-1 transition-all flex items-center justify-center gap-2 cursor-pointer"
                             >
                                 <RefreshCw size={20} />
                                 Restart Application
@@ -91,7 +84,6 @@ class ErrorBoundary extends Component<Props, State> {
                                 Report Issue
                             </a>
                         </div>
-
 
                         <p className="text-xs font-medium text-slate-500 dark:text-slate-500 mt-8">
                             If this keeps happening, try clearing your browser cache.

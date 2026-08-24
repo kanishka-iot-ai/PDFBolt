@@ -1,6 +1,6 @@
-import React, { useState, useRef } from 'react';
-import { Upload, FileText, X, AlertTriangle, CheckCircle2, ShieldCheck, Folder } from 'lucide-react';
-import { formatFileSize, sanitizeFileName, HumanError } from '../utils/fileValidation';
+import React, { useRef } from 'react';
+import { Upload, X, AlertTriangle, ShieldCheck, Folder } from 'lucide-react';
+import { HumanError } from '../utils/fileValidation';
 
 interface FileUploaderProps {
   onFilesSelected: (files: File[]) => void | Promise<void>;
@@ -23,8 +23,7 @@ const FileUploader: React.FC<FileUploaderProps> = ({
   error,
   onClearError
 }) => {
-  const [isDragging, setIsDragging] = useState(false);
-  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [isDragging, setIsDragging] = React.useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const folderInputRef = useRef<HTMLInputElement>(null);
 
@@ -37,41 +36,56 @@ const FileUploader: React.FC<FileUploaderProps> = ({
     setIsDragging(false);
   };
 
+  /**
+   * Recursively read ALL entries from a DirectoryReader.
+   * The Web FileSystem API returns at most 100 entries per readEntries() call,
+   * so we must loop until the result is empty.
+   */
+  const readAllEntries = (dirReader: any): Promise<any[]> =>
+    new Promise((resolve) => {
+      const all: any[] = [];
+      const readBatch = () => {
+        dirReader.readEntries((batch: any[]) => {
+          if (batch.length === 0) {
+            resolve(all);
+          } else {
+            all.push(...batch);
+            readBatch(); // keep reading until empty batch
+          }
+        }, () => resolve(all)); // on error, return what we have
+      };
+      readBatch();
+    });
+
+  const scanEntry = async (entry: any, allFiles: File[]): Promise<void> => {
+    if (entry.isFile) {
+      await new Promise<void>((resolve) => {
+        entry.file(
+          (file: File) => { allFiles.push(file); resolve(); },
+          () => resolve() // error callback — skip unreadable files instead of hanging
+        );
+      });
+    } else if (entry.isDirectory) {
+      const dirReader = entry.createReader();
+      const entries = await readAllEntries(dirReader);
+      for (const childEntry of entries) {
+        await scanEntry(childEntry, allFiles);
+      }
+    }
+  };
+
   const handleDrop = async (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
     onClearError?.();
 
     const items = Array.from(e.dataTransfer.items);
-    if (items && items.length > 0 && items[0].webkitGetAsEntry) {
+    if (items.length > 0 && items[0].webkitGetAsEntry) {
       const allFiles: File[] = [];
-      
-      const scanEntry = async (entry: any) => {
-        if (entry.isFile) {
-          return new Promise<void>((resolve) => {
-            entry.file((file: File) => {
-              allFiles.push(file);
-              resolve();
-            });
-          });
-        } else if (entry.isDirectory) {
-          const dirReader = entry.createReader();
-          const entries = await new Promise<any[]>((resolve) => {
-            dirReader.readEntries(resolve);
-          });
-          for (const childEntry of entries) {
-            await scanEntry(childEntry);
-          }
-        }
-      };
-
       for (const item of items) {
         const entry = item.webkitGetAsEntry();
-        if (entry) {
-          await scanEntry(entry);
-        }
+        if (entry) await scanEntry(entry, allFiles);
       }
-
       if (allFiles.length > 0) {
         processFiles(allFiles);
         return;
@@ -83,19 +97,27 @@ const FileUploader: React.FC<FileUploaderProps> = ({
   };
 
   const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
+    if (e.target.files && e.target.files.length > 0) {
       onClearError?.();
       processFiles(Array.from(e.target.files) as File[]);
     }
+    // Reset so the same file can be re-selected after removal
+    e.target.value = '';
   };
 
   const processFiles = (files: File[]) => {
     if (files.length === 0) return;
-    setSelectedFiles(files);
     onFilesSelected(files);
   };
 
-  // Supported format tags
+  const handleDropzoneKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      fileInputRef.current?.click();
+    }
+  };
+
+  // Supported format badge
   const formatBadge = accept.includes('pdf') ? 'PDF' : accept.toUpperCase().replace(/\./g, ' ');
 
   return (
@@ -125,7 +147,12 @@ const FileUploader: React.FC<FileUploaderProps> = ({
             )}
           </div>
           {onClearError && (
-            <button onClick={onClearError} aria-label="Dismiss error notification" className="text-red-400 hover:text-red-600">
+            <button
+              type="button"
+              onClick={onClearError}
+              aria-label="Dismiss error notification"
+              className="text-red-400 hover:text-red-600"
+            >
               <X size={18} />
             </button>
           )}
@@ -134,10 +161,14 @@ const FileUploader: React.FC<FileUploaderProps> = ({
 
       {/* Main Upload Dropzone */}
       <div
+        role="button"
+        tabIndex={0}
+        aria-label={`Upload ${formatBadge} file${multiple ? 's' : ''}`}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
         onClick={() => fileInputRef.current?.click()}
+        onKeyDown={handleDropzoneKeyDown}
         className={`relative border-3 border-dashed rounded-[2.5rem] p-8 sm:p-12 text-center cursor-pointer transition-all duration-300 transform active:scale-[0.99] ${
           isDragging
             ? 'border-yellow-500 bg-yellow-500/10 scale-[1.01]'

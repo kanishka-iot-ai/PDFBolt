@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import FileUploader from '../components/FileUploader';
 import QRCode from 'qrcode';
 import {
-  Download, Share2, QrCode as QrIcon, Copy, Check,
-  AlertTriangle, Eye, X, ExternalLink,
-  ShieldCheck, ShieldAlert, Lock, Clock, Key,
-  Zap, Info, Fingerprint, Trash2, Shield, Cloud, RefreshCw
+  Download, QrCode as QrIcon, Copy, Check, Eye, X,
+  ShieldCheck, Clock, Key,
+  Zap, Trash2, Shield, RefreshCw
 } from 'lucide-react';
 import { NotifySystem } from '../types';
 import { validateFiles, ALLOWED_MIME_TYPES, MAX_FILE_SIZE } from '../utils/fileValidation';
@@ -36,6 +35,8 @@ const QRTool: React.FC<QRToolProps> = ({ darkMode, notify }) => {
   const [localPdfUrl, setLocalPdfUrl] = useState<string | null>(null);
   const [showPreview, setShowPreview] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const copyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Security Config
   const [pin, setPin] = useState('');
@@ -48,6 +49,7 @@ const QRTool: React.FC<QRToolProps> = ({ darkMode, notify }) => {
   useEffect(() => {
     return () => {
       if (localPdfUrl) URL.revokeObjectURL(localPdfUrl);
+      if (copyTimeoutRef.current) clearTimeout(copyTimeoutRef.current);
     };
   }, [localPdfUrl]);
 
@@ -55,6 +57,7 @@ const QRTool: React.FC<QRToolProps> = ({ darkMode, notify }) => {
     if (!file) return;
     setIsGenerating(true);
     setIsRevoked(false);
+    setErrorMessage(null);
 
     try {
       // 1. Submit to Backend QR Share API
@@ -77,10 +80,9 @@ const QRTool: React.FC<QRToolProps> = ({ darkMode, notify }) => {
         if (res.ok) {
           responseData = await res.json();
         }
-      } catch (apiErr) {
-        console.warn("Backend QR share API unreachable, trying fallback...", apiErr);
+      } catch {
+        // Fallback for offline/standalone mode
       }
-
 
       let finalShareUrl = '';
       let generatedShareId = '';
@@ -98,37 +100,30 @@ const QRTool: React.FC<QRToolProps> = ({ darkMode, notify }) => {
         generatedShareId = fallbackId;
         const expMs = Date.now() + (durationSeconds * 1000);
         generatedExpiry = new Date(expMs).toISOString();
-        const payload = btoa(JSON.stringify({
-          t: Date.now(),
-          e: expMs,
-          o: oneTimeScan,
-          p: requirePin ? 'v' : 'n',
-          k: fallbackId
-        }));
-        finalShareUrl = `${window.location.origin}/qr-success?p=${payload}${requirePin && pin ? `&auth=${btoa(pin)}` : ''}`;
+        finalShareUrl = `${window.location.origin}/s/${fallbackId}#local_preview`;
       }
 
       setShareId(generatedShareId);
-      setShareLink(finalShareUrl);
       setRevocationToken(generatedRevocationToken);
       setExpiresAt(generatedExpiry);
+      setShareLink(finalShareUrl);
 
-      // Generate Clean High-Contrast QR Code pointing to the application share landing route
-      const generatedQr = await QRCode.toDataURL(finalShareUrl, {
-        width: 800,
-        margin: 4,
-        errorCorrectionLevel: 'H',
+      // 2. Generate QR Code Image Data URL
+      const qrData = await QRCode.toDataURL(finalShareUrl, {
+        width: 600,
+        margin: 2,
         color: {
-          dark: '#000000',
+          dark: '#0f172a',
           light: '#ffffff'
         },
+        errorCorrectionLevel: 'H'
       });
 
-      setQrUrl(generatedQr);
+      setQrUrl(qrData);
       setResultKey(prev => prev + 1);
       notify.complete();
-    } catch (err: any) {
-      console.error("QR Generation Error:", err);
+    } catch {
+      setErrorMessage("Failed to generate secure QR share. Please check your network and try again.");
       notify.error();
     } finally {
       setIsGenerating(false);
@@ -136,64 +131,58 @@ const QRTool: React.FC<QRToolProps> = ({ darkMode, notify }) => {
   };
 
   const handleRevokeShare = async () => {
-    if (!shareId || !revocationToken) {
-      setIsRevoked(true);
-      setQrUrl(null);
-      notify.success();
-      return;
-    }
-
+    if (!shareId) return;
     setIsRevoking(true);
     try {
-      const res = await fetch(`${API_BASE_URL}/qr-shares/${shareId}/revoke`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ revocation_token: revocationToken })
-      });
-      if (res.ok) {
-        setIsRevoked(true);
-        setQrUrl(null);
-        notify.success();
-      } else {
-        alert("Failed to revoke share. The share may have already expired or been deleted.");
+      if (revocationToken) {
+        await fetch(`${API_BASE_URL}/qr-shares/${shareId}`, {
+          method: 'DELETE',
+          headers: {
+            'X-Revocation-Token': revocationToken
+          }
+        });
       }
-    } catch (err) {
-      console.error("Revocation error:", err);
       setIsRevoked(true);
       setQrUrl(null);
+      setShareLink(null);
+      setShareId(null);
+      setRevocationToken(null);
+      notify.success();
+    } catch {
+      setIsRevoked(true);
+      setQrUrl(null);
+      setShareLink(null);
     } finally {
       setIsRevoking(false);
     }
   };
 
   const handleFile = async (files: File[]) => {
-    const selected = files[0];
+    if (files.length === 0) return;
+    setErrorMessage(null);
 
-    const validation = await validateFiles([selected], {
+    const validation = await validateFiles(files, {
       allowedTypes: ALLOWED_MIME_TYPES.PDF,
-      maxSize: MAX_FILE_SIZE.QR,
+      maxSize: MAX_FILE_SIZE.PDF,
       maxFiles: 1,
       checkStructure: true
     });
 
     if (!validation.valid) {
-      alert(validation.error || 'Invalid PDF file');
+      setErrorMessage(validation.error || 'Please select a valid PDF file.');
       return;
     }
 
-    if (validation.warning) {
-      if (!confirm(`${validation.warning}\n\nDo you want to continue?`)) {
-        return;
-      }
-    }
-
-    setFile(selected);
-    setLocalPdfUrl(URL.createObjectURL(selected));
-    notify.upload();
+    const selectedFile = files[0];
+    setFile(selectedFile);
+    if (localPdfUrl) URL.revokeObjectURL(localPdfUrl);
+    setLocalPdfUrl(URL.createObjectURL(selectedFile));
     setQrUrl(null);
+    setShareLink(null);
     setShareId(null);
     setRevocationToken(null);
     setIsRevoked(false);
+    notify.upload();
   };
 
   const getSecurityScore = () => {
@@ -204,21 +193,39 @@ const QRTool: React.FC<QRToolProps> = ({ darkMode, notify }) => {
     return score;
   };
 
-  const copyLink = () => {
+  const copyLink = async () => {
     if (shareLink) {
-      navigator.clipboard.writeText(shareLink);
-      setCopied(true);
-      notify.success();
-      setTimeout(() => setCopied(false), 2000);
+      try {
+        await navigator.clipboard.writeText(shareLink);
+        setCopied(true);
+        notify.success();
+        if (copyTimeoutRef.current) clearTimeout(copyTimeoutRef.current);
+        copyTimeoutRef.current = setTimeout(() => setCopied(false), 2000);
+      } catch {
+        // Fallback
+      }
     }
   };
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-2 animate-fadeIn">
+      {errorMessage && (
+        <div className="mb-6 p-4 rounded-2xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900 text-red-900 dark:text-red-200 flex items-center justify-between gap-3 animate-slideDown">
+          <span className="text-xs sm:text-sm font-semibold">{errorMessage}</span>
+          <button
+            type="button"
+            onClick={() => setErrorMessage(null)}
+            aria-label="Dismiss error"
+            className="text-red-500 hover:text-red-700"
+          >
+            <X size={16} />
+          </button>
+        </div>
+      )}
+
       {!file ? (
         <FileUploader multiple={false} onFilesSelected={handleFile} darkMode={darkMode} maxSizeMB={100} />
       ) : (
-
         <div className="grid lg:grid-cols-2 gap-12 items-start">
           {/* Configuration Panel */}
           <div className="space-y-6">
@@ -243,36 +250,51 @@ const QRTool: React.FC<QRToolProps> = ({ darkMode, notify }) => {
               </div>
 
               <div className="space-y-6">
-                {/* Retention Duration Selector */}
-                <div className="p-6 rounded-2xl border-2 border-slate-100 dark:border-slate-700">
-                  <div className="flex items-center gap-3 mb-3 text-slate-400">
-                    <Clock size={18} />
-                    <label className="text-[10px] font-black uppercase tracking-widest">Retention Duration</label>
+                {/* Selected File Overview */}
+                <div className={`p-4 rounded-2xl border flex items-center justify-between ${darkMode ? 'bg-slate-900/60 border-slate-700' : 'bg-slate-50 border-slate-200'}`}>
+                  <div className="truncate max-w-[220px]">
+                    <p className="font-bold text-xs truncate">{file.name}</p>
+                    <p className="text-[10px] text-slate-400 font-bold">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
                   </div>
+                  <button
+                    type="button"
+                    onClick={() => { setFile(null); setQrUrl(null); }}
+                    className="text-red-500 text-xs font-bold hover:underline"
+                  >
+                    Change
+                  </button>
+                </div>
+
+                {/* Expiry / Retention Options */}
+                <div className="space-y-2">
+                  <label className="text-xs font-bold uppercase text-slate-400 tracking-wider">Access Duration</label>
                   <select
                     value={durationSeconds}
                     onChange={(e) => setDurationSeconds(Number(e.target.value))}
-                    className={`w-full bg-transparent font-black text-lg outline-none cursor-pointer ${darkMode ? 'text-white bg-slate-800' : 'text-slate-900 bg-white'}`}
+                    className={`w-full p-4 rounded-xl font-bold text-sm border outline-none transition-all ${
+                      darkMode ? 'bg-slate-900 border-slate-700 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
+                    }`}
                   >
-                    {RETENTION_OPTIONS.map(opt => (
-                      <option key={opt.seconds} value={opt.seconds} className={darkMode ? 'bg-slate-800 text-white' : 'bg-white text-slate-900'}>
-                        {opt.label} — {opt.description}
+                    {RETENTION_OPTIONS.map((opt) => (
+                      <option key={opt.seconds} value={opt.seconds} disabled={opt.disabled}>
+                        {opt.label}
                       </option>
                     ))}
                   </select>
-                  <p className="text-[10px] font-bold text-slate-500 mt-2">
-                    Estimated Expiry: {new Date(Date.now() + durationSeconds * 1000).toLocaleString()}
-                  </p>
                 </div>
 
-                {/* PIN Protection */}
-                <div className={`p-6 rounded-2xl border-2 transition-all ${requirePin ? 'border-yellow-500/50 bg-yellow-500/5' : 'border-slate-100 dark:border-slate-700'}`}>
+                {/* PIN Code Protection Toggle */}
+                <div className={`p-6 rounded-2xl border-2 transition-all ${requirePin ? 'border-yellow-600 bg-yellow-500/5' : 'border-slate-100 dark:border-slate-700'}`}>
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-3">
                       <Key className={requirePin ? 'text-yellow-600' : 'text-slate-400'} size={20} />
                       <label className="font-black text-sm uppercase tracking-tight">PIN Encryption</label>
                     </div>
                     <button
+                      type="button"
+                      role="switch"
+                      aria-checked={requirePin}
+                      aria-label="Toggle PIN encryption"
                       onClick={() => setRequirePin(!requirePin)}
                       className={`w-12 h-6 rounded-full transition-all relative ${requirePin ? 'bg-yellow-600' : 'bg-slate-200 dark:bg-slate-700'}`}
                     >
@@ -299,6 +321,10 @@ const QRTool: React.FC<QRToolProps> = ({ darkMode, notify }) => {
                       <label className="text-[10px] font-black uppercase tracking-widest">Digital Shred (One-Time Scan)</label>
                     </div>
                     <button
+                      type="button"
+                      role="switch"
+                      aria-checked={oneTimeScan}
+                      aria-label="Toggle digital shred one-time scan"
                       onClick={() => setOneTimeScan(!oneTimeScan)}
                       className={`w-10 h-5 rounded-full transition-all relative ${oneTimeScan ? 'bg-amber-500' : 'bg-slate-200 dark:bg-slate-700'}`}
                     >
@@ -309,9 +335,10 @@ const QRTool: React.FC<QRToolProps> = ({ darkMode, notify }) => {
                 </div>
 
                 <button
+                  type="button"
                   onClick={generateSecureQR}
                   disabled={isGenerating || (requirePin && pin.length < 4)}
-                  className="w-full py-5 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 disabled:opacity-30 text-white rounded-2xl font-black text-lg shadow-xl transition-all active:scale-95 flex items-center justify-center gap-3"
+                  className="w-full py-5 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 disabled:opacity-30 text-white rounded-2xl font-black text-lg shadow-xl transition-all active:scale-95 flex items-center justify-center gap-3 cursor-pointer"
                 >
                   {isGenerating ? <div className="w-6 h-6 border-4 border-white/30 border-t-white rounded-full animate-spin"></div> : <><Zap size={20} /> Generate Secure QR Share</>}
                 </button>
@@ -343,6 +370,7 @@ const QRTool: React.FC<QRToolProps> = ({ darkMode, notify }) => {
                     This QR share has been revoked and the file has been deleted from cloud storage.
                   </p>
                   <button
+                    type="button"
                     onClick={() => { setIsRevoked(false); setFile(null); }}
                     className="px-6 py-3 bg-slate-900 text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-slate-800"
                   >
@@ -359,7 +387,7 @@ const QRTool: React.FC<QRToolProps> = ({ darkMode, notify }) => {
               ) : (
                 <div key={resultKey} className="animate-fadeIn">
                   <div className="relative group mx-auto w-fit mb-6">
-                    <img src={qrUrl} alt="Secure QR" className="w-80 h-80 rounded-[2.5rem] border-8 border-slate-50 dark:border-slate-900 shadow-2xl mx-auto" />
+                    <img src={qrUrl} alt="Secure QR Code" className="w-80 h-80 rounded-[2.5rem] border-8 border-slate-50 dark:border-slate-900 shadow-2xl mx-auto" />
                     <div className="absolute top-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-[10px] font-black flex items-center gap-1 shadow-lg">
                       <ShieldCheck size={12} /> ENCRYPTED
                     </div>
@@ -375,12 +403,14 @@ const QRTool: React.FC<QRToolProps> = ({ darkMode, notify }) => {
 
                     <div className="flex gap-3">
                       <button
+                        type="button"
                         onClick={() => setShowPreview(true)}
                         className="flex-1 py-3.5 bg-slate-100 dark:bg-slate-900 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-yellow-50 dark:hover:bg-yellow-900/20 transition-all flex items-center justify-center gap-2"
                       >
                         <Eye size={16} /> Preview
                       </button>
                       <button
+                        type="button"
                         onClick={() => {
                           const a = document.createElement('a');
                           a.href = qrUrl;
@@ -394,6 +424,7 @@ const QRTool: React.FC<QRToolProps> = ({ darkMode, notify }) => {
                     </div>
 
                     <button
+                      type="button"
                       onClick={copyLink}
                       className={`w-full py-4 rounded-xl font-black text-sm uppercase tracking-widest transition-all flex items-center justify-center gap-2 ${copied ? 'bg-green-600 text-white' : 'bg-slate-900 text-white'}`}
                     >
@@ -402,15 +433,17 @@ const QRTool: React.FC<QRToolProps> = ({ darkMode, notify }) => {
 
                     {/* Instant User Revocation Button */}
                     <button
+                      type="button"
                       onClick={handleRevokeShare}
                       disabled={isRevoking}
-                      className="w-full py-3.5 bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/30 rounded-xl font-black text-xs uppercase tracking-widest transition-all flex items-center justify-center gap-2"
+                      className="w-full py-3.5 bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/30 rounded-xl font-black text-xs uppercase tracking-widest transition-all flex items-center justify-center gap-2 disabled:opacity-50"
                     >
                       {isRevoking ? <RefreshCw size={16} className="animate-spin" /> : <><Trash2 size={16} /> Revoke Share & Delete File</>}
                     </button>
 
                     {/* Share Another File Button */}
                     <button
+                      type="button"
                       onClick={() => {
                         setFile(null);
                         setQrUrl(null);
@@ -437,11 +470,21 @@ const QRTool: React.FC<QRToolProps> = ({ darkMode, notify }) => {
 
       {/* Preview Modal */}
       {showPreview && localPdfUrl && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-6 animate-fadeIn">
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="qr-preview-title"
+          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-6 animate-fadeIn"
+        >
           <div className={`w-full max-w-4xl h-[85vh] rounded-[2.5rem] overflow-hidden flex flex-col ${darkMode ? 'bg-slate-900' : 'bg-white'}`}>
             <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
-              <h3 className="font-black text-lg">Document Preview</h3>
-              <button onClick={() => setShowPreview(false)} className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800">
+              <h3 id="qr-preview-title" className="font-black text-lg">Document Preview</h3>
+              <button
+                type="button"
+                onClick={() => setShowPreview(false)}
+                aria-label="Close preview"
+                className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800"
+              >
                 <X size={20} />
               </button>
             </div>

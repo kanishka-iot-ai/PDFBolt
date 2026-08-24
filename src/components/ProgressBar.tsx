@@ -108,7 +108,13 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
             </div>
 
             {/* Progress Bar */}
-            <div className={`w-full h-4 rounded-full overflow-hidden relative shadow-inner ${darkMode ? 'bg-slate-800' : 'bg-slate-100'
+            <div
+                role="progressbar"
+                aria-valuenow={Math.round(Math.min(progress, 100))}
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-label={label || 'Operation progress'}
+                className={`w-full h-4 rounded-full overflow-hidden relative shadow-inner ${darkMode ? 'bg-slate-800' : 'bg-slate-100'
                 }`}>
                 <div
                     className={`h-full transition-all duration-500 ease-out relative ${

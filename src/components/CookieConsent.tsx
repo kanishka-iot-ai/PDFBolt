@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ShieldCheck, Cookie, Check, X } from 'lucide-react';
+import { Cookie } from 'lucide-react';
 
 interface CookieConsentProps {
   darkMode: boolean;
@@ -75,14 +75,16 @@ const CookieConsent: React.FC<CookieConsentProps> = ({ darkMode }) => {
 
         <div className="flex items-center gap-2 pt-1">
           <button
+            type="button"
             onClick={handleAcceptAll}
-            className="flex-1 py-2 px-3 bg-yellow-500 text-slate-950 text-xs font-black uppercase tracking-wider rounded-xl hover:bg-yellow-400 transition-all shadow-md text-center"
+            className="flex-1 py-2 px-3 bg-yellow-500 text-slate-950 text-xs font-black uppercase tracking-wider rounded-xl hover:bg-yellow-400 transition-all shadow-md text-center cursor-pointer"
           >
             Accept All
           </button>
           <button
+            type="button"
             onClick={handleEssentialOnly}
-            className={`py-2 px-3 text-xs font-bold rounded-xl transition-all ${
+            className={`py-2 px-3 text-xs font-bold rounded-xl transition-all cursor-pointer ${
               darkMode ? 'bg-slate-800 hover:bg-slate-700 text-slate-300' : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
             }`}
           >

@@ -7,8 +7,11 @@ interface PDFThumbnailProps {
   alt?: string;
 }
 
-// In-memory cache for rendered thumbnails to prevent duplicate canvas renders
+// Deduplicated data-URL cache (data URLs don't need revocation)
 const thumbnailCache = new Map<string, string>();
+
+// Worker URL set once at module level — not on every render
+let _workerSet = false;
 
 const PDFThumbnail: React.FC<PDFThumbnailProps> = ({ file, className = '', alt = 'PDF Preview' }) => {
   const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(null);
@@ -18,46 +21,66 @@ const PDFThumbnail: React.FC<PDFThumbnailProps> = ({ file, className = '', alt =
 
   useEffect(() => {
     isMounted.current = true;
+    let active = true; // local cancellation flag for this effect run
+
     const cacheKey = `${file.name}-${file.size}-${file.lastModified}`;
 
     if (thumbnailCache.has(cacheKey)) {
       setThumbnailUrl(thumbnailCache.get(cacheKey)!);
       setLoading(false);
-      return;
-    }
-
-    // Direct Image Handling
-    if (file.type.startsWith('image/')) {
-      const objUrl = URL.createObjectURL(file);
-      setThumbnailUrl(objUrl);
-      thumbnailCache.set(cacheKey, objUrl);
-      setLoading(false);
       return () => {
-        // Keep object URL in cache
+        active = false;
+        isMounted.current = false;
       };
     }
 
-    // PDF First Page Rendering via PDF.js
-    if (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) {
-      let active = true;
+    // Direct image handling — use data URL (not object URL) to allow caching safely
+    if (file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        if (!active) return;
+        const dataUrl = e.target?.result as string;
+        thumbnailCache.set(cacheKey, dataUrl);
+        if (isMounted.current) {
+          setThumbnailUrl(dataUrl);
+          setLoading(false);
+        }
+      };
+      reader.onerror = () => {
+        if (!active) return;
+        if (isMounted.current) { setError(true); setLoading(false); }
+      };
+      reader.readAsDataURL(file);
+      return () => {
+        active = false;
+        isMounted.current = false;
+      };
+    }
 
+    // PDF: render first page via pdfjs
+    if (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) {
       const renderFirstPage = async () => {
         try {
           setLoading(true);
           const pdfjsLib = await import('pdfjs-dist');
-          const pdfjsWorker = (await import('pdfjs-dist/build/pdf.worker.min.mjs?url')).default;
-          pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
+
+          if (!_workerSet) {
+            const url = (await import('pdfjs-dist/build/pdf.worker.min.mjs?url')).default;
+            pdfjsLib.GlobalWorkerOptions.workerSrc = url;
+            _workerSet = true;
+          }
+
+          if (!active) return;
 
           const arrayBuffer = await file.arrayBuffer();
           if (!active) return;
 
           const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-          if (!active) return;
+          if (!active) { pdf.destroy(); return; }
 
           const page = await pdf.getPage(1);
-          if (!active) return;
+          if (!active) { pdf.destroy(); return; }
 
-          // Render at 1.5x scale for crisp thumbnail clarity
           const viewport = page.getViewport({ scale: 1.5 });
           const canvas = document.createElement('canvas');
           canvas.width = viewport.width;
@@ -67,8 +90,11 @@ const PDFThumbnail: React.FC<PDFThumbnailProps> = ({ file, className = '', alt =
           if (!context) throw new Error('Canvas 2D context unavailable');
 
           await page.render({ canvasContext: context, viewport }).promise;
+          pdf.destroy();
+
           if (!active) return;
 
+          // Store as data URL — safe to cache without memory leak
           const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
           thumbnailCache.set(cacheKey, dataUrl);
 
@@ -76,9 +102,8 @@ const PDFThumbnail: React.FC<PDFThumbnailProps> = ({ file, className = '', alt =
             setThumbnailUrl(dataUrl);
             setLoading(false);
           }
-        } catch (err) {
-          console.warn('[PDFThumbnail] Thumbnail generation failed, falling back to icon:', err);
-          if (isMounted.current) {
+        } catch {
+          if (isMounted.current && active) {
             setError(true);
             setLoading(false);
           }
@@ -86,17 +111,14 @@ const PDFThumbnail: React.FC<PDFThumbnailProps> = ({ file, className = '', alt =
       };
 
       renderFirstPage();
-
-      return () => {
-        active = false;
-      };
     } else {
-      // Non-PDF / Non-Image files (Docx, Xlsx, PPTX)
+      // Non-PDF / Non-Image
       setLoading(false);
       setError(true);
     }
 
     return () => {
+      active = false;
       isMounted.current = false;
     };
   }, [file]);

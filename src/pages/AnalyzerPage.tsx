@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Link } from 'react-router-dom';
 import { analyzePdfDocument, buildPresentationFromAnalysis, askDocumentQuestion, DocumentAnalysis } from '../services/analyzerService';
 import { pdfToWord, pdfToExcel } from '../services/conversionService';
 import FileUploader from '../components/FileUploader';
-import { FileText, Sparkles, Presentation, Table, FileCode, CheckCircle2, ArrowRight, Download, MessageSquare, Clock, Layers, Hash, BookOpen, Send, RefreshCw } from 'lucide-react';
+import { FileText, Sparkles, Presentation, Table, CheckCircle2, Download, MessageSquare, Clock, Layers, Hash, Send, RefreshCw } from 'lucide-react';
 import { saveAs } from 'file-saver';
 import { NotifySystem } from '../types';
 import AdSlot from '../components/AdSlot';
+import { useActiveWork } from '../context/ActiveWorkContext';
 
 interface AnalyzerPageProps {
   darkMode: boolean;
@@ -15,6 +15,7 @@ interface AnalyzerPageProps {
 }
 
 const AnalyzerPage: React.FC<AnalyzerPageProps> = ({ darkMode, notify }) => {
+  const { setHasActiveWork } = useActiveWork();
   const [file, setFile] = useState<File | null>(null);
   const [analyzing, setAnalyzing] = useState(false);
   const [analysis, setAnalysis] = useState<DocumentAnalysis | null>(null);
@@ -24,6 +25,11 @@ const AnalyzerPage: React.FC<AnalyzerPageProps> = ({ darkMode, notify }) => {
   const [question, setQuestion] = useState('');
   const [chatHistory, setChatHistory] = useState<{ q: string; a: string }[]>([]);
   const [asking, setAsking] = useState(false);
+
+  useEffect(() => {
+    setHasActiveWork(file !== null || analyzing);
+    return () => setHasActiveWork(false);
+  }, [file, analyzing, setHasActiveWork]);
 
   const handleFilesSelected = async (files: File[]) => {
     if (files.length === 0) return;
@@ -38,8 +44,7 @@ const AnalyzerPage: React.FC<AnalyzerPageProps> = ({ darkMode, notify }) => {
       const result = await analyzePdfDocument(selectedFile);
       setAnalysis(result);
       notify.complete();
-    } catch (err) {
-      console.error('Analysis failed', err);
+    } catch {
       notify.error();
     } finally {
       setAnalyzing(false);
@@ -57,8 +62,7 @@ const AnalyzerPage: React.FC<AnalyzerPageProps> = ({ darkMode, notify }) => {
       const answer = await askDocumentQuestion(q, analysis);
       setChatHistory(prev => [...prev, { q, a: answer }]);
       notify.success();
-    } catch (err) {
-      console.error('Ask question failed', err);
+    } catch {
       notify.error();
     } finally {
       setAsking(false);
@@ -73,8 +77,7 @@ const AnalyzerPage: React.FC<AnalyzerPageProps> = ({ darkMode, notify }) => {
       const blob = await buildPresentationFromAnalysis(analysis);
       saveAs(blob, `${analysis.fileName.replace(/\.pdf$/i, '')}_presentation.pptx`);
       notify.complete();
-    } catch (err) {
-      console.error('PPTX build failed', err);
+    } catch {
       notify.error();
     } finally {
       setBuildingOutput(null);
@@ -89,8 +92,7 @@ const AnalyzerPage: React.FC<AnalyzerPageProps> = ({ darkMode, notify }) => {
       const blob = new Blob([bytes as any], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
       saveAs(blob, `${file.name.replace(/\.pdf$/i, '')}_report.docx`);
       notify.complete();
-    } catch (err) {
-      console.error('DOCX build failed', err);
+    } catch {
       notify.error();
     } finally {
       setBuildingOutput(null);
@@ -105,8 +107,7 @@ const AnalyzerPage: React.FC<AnalyzerPageProps> = ({ darkMode, notify }) => {
       const blob = new Blob([bytes as any], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
       saveAs(blob, `${file.name.replace(/\.pdf$/i, '')}_data.xlsx`);
       notify.complete();
-    } catch (err) {
-      console.error('XLSX build failed', err);
+    } catch {
       notify.error();
     } finally {
       setBuildingOutput(null);
@@ -196,7 +197,7 @@ ${analysis.keyFindings.map((kf, i) => `${i + 1}. ${kf}`).join('\n')}
         )}
 
         {analysis && (
-          <div className="space-y-10 animate-slideDown">
+          <div className="space-y-10 animate-slideUp">
             {/* Header with Switch File */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-6 border-b border-slate-200 dark:border-slate-800">
               <div>
@@ -206,6 +207,7 @@ ${analysis.keyFindings.map((kf, i) => `${i + 1}. ${kf}`).join('\n')}
                 </h2>
               </div>
               <button
+                type="button"
                 onClick={() => { setAnalysis(null); setFile(null); }}
                 className={`px-4 py-2 rounded-xl text-xs font-bold border transition-colors flex items-center gap-2 ${
                   darkMode ? 'border-slate-700 text-slate-300 hover:bg-slate-800' : 'border-slate-200 text-slate-700 hover:bg-slate-100'
@@ -224,8 +226,8 @@ ${analysis.keyFindings.map((kf, i) => `${i + 1}. ${kf}`).join('\n')}
                 { label: 'Tables Detected', val: analysis.tableCount, icon: <Table size={18} className="text-purple-600 dark:text-purple-400" /> },
                 { label: 'Images', val: analysis.imageCount, icon: <Sparkles size={18} className="text-amber-600 dark:text-amber-400" /> },
                 { label: 'Characters', val: analysis.characterCount.toLocaleString(), icon: <Hash size={18} className="text-rose-600 dark:text-rose-400" /> },
-              ].map((m, idx) => (
-                <div key={idx} className={`p-5 rounded-2xl border ${darkMode ? 'bg-slate-800/40 border-slate-700' : 'bg-white border-slate-200 shadow-sm'}`}>
+              ].map((m) => (
+                <div key={m.label} className={`p-5 rounded-2xl border ${darkMode ? 'bg-slate-800/40 border-slate-700' : 'bg-white border-slate-200 shadow-sm'}`}>
                   <div className="flex items-center gap-2 mb-2">{m.icon} <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase">{m.label}</span></div>
                   <div className={`text-xl font-black ${darkMode ? 'text-white' : 'text-slate-900'}`}>{m.val}</div>
                 </div>
@@ -236,14 +238,13 @@ ${analysis.keyFindings.map((kf, i) => `${i + 1}. ${kf}`).join('\n')}
             <div className={`p-6 rounded-3xl border ${darkMode ? 'bg-slate-800/30 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
               <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 block mb-3">Extracted Core Topics</span>
               <div className="flex flex-wrap gap-2">
-                {analysis.topics.map((t, idx) => (
-                  <span key={idx} className="px-3 py-1.5 rounded-xl bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 text-xs font-black">
+                {analysis.topics.map((t) => (
+                  <span key={t} className="px-3 py-1.5 rounded-xl bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 text-xs font-black">
                     #{t}
                   </span>
                 ))}
               </div>
             </div>
-
 
             {/* Executive Summary & Key Findings */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -262,7 +263,7 @@ ${analysis.keyFindings.map((kf, i) => `${i + 1}. ${kf}`).join('\n')}
                   </h4>
                   <ul className="space-y-2.5">
                     {analysis.keyFindings.map((kf, i) => (
-                      <li key={i} className="flex items-start gap-2 text-xs leading-relaxed">
+                      <li key={`${kf.substring(0, 20)}-${i}`} className="flex items-start gap-2 text-xs leading-relaxed">
                         <CheckCircle2 size={16} className="text-emerald-500 flex-shrink-0 mt-0.5" />
                         <span className={darkMode ? 'text-slate-300' : 'text-slate-600'}>{kf}</span>
                       </li>
@@ -288,6 +289,7 @@ ${analysis.keyFindings.map((kf, i) => `${i + 1}. ${kf}`).join('\n')}
 
                   <div className="space-y-3">
                     <button
+                      type="button"
                       onClick={handleExportPPTX}
                       disabled={!!buildingOutput}
                       className="w-full py-3 px-4 bg-yellow-500 hover:bg-yellow-400 disabled:opacity-50 text-slate-950 font-black text-xs uppercase tracking-wider rounded-xl transition-all flex items-center justify-between shadow-md"
@@ -297,6 +299,7 @@ ${analysis.keyFindings.map((kf, i) => `${i + 1}. ${kf}`).join('\n')}
                     </button>
 
                     <button
+                      type="button"
                       onClick={handleExportDOCX}
                       disabled={!!buildingOutput}
                       className={`w-full py-3 px-4 rounded-xl font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-between border ${
@@ -308,6 +311,7 @@ ${analysis.keyFindings.map((kf, i) => `${i + 1}. ${kf}`).join('\n')}
                     </button>
 
                     <button
+                      type="button"
                       onClick={handleExportXLSX}
                       disabled={!!buildingOutput}
                       className={`w-full py-3 px-4 rounded-xl font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-between border ${
@@ -320,6 +324,7 @@ ${analysis.keyFindings.map((kf, i) => `${i + 1}. ${kf}`).join('\n')}
 
                     <div className="flex gap-2 pt-2">
                       <button
+                        type="button"
                         onClick={handleExportNotes}
                         className={`flex-1 py-2.5 rounded-xl font-bold text-[11px] uppercase border text-center ${
                           darkMode ? 'border-slate-700 text-slate-300 hover:bg-slate-800' : 'border-slate-200 text-slate-700 hover:bg-white'
@@ -328,6 +333,7 @@ ${analysis.keyFindings.map((kf, i) => `${i + 1}. ${kf}`).join('\n')}
                         Study Notes (MD)
                       </button>
                       <button
+                        type="button"
                         onClick={handleExportJSON}
                         className={`flex-1 py-2.5 rounded-xl font-bold text-[11px] uppercase border text-center ${
                           darkMode ? 'border-slate-700 text-slate-300 hover:bg-slate-800' : 'border-slate-200 text-slate-700 hover:bg-white'
@@ -359,9 +365,10 @@ ${analysis.keyFindings.map((kf, i) => `${i + 1}. ${kf}`).join('\n')}
 
               {/* Suggested Questions */}
               <div className="flex flex-wrap gap-2">
-                {analysis.suggestedQuestions.map((sq, i) => (
+                {analysis.suggestedQuestions.map((sq) => (
                   <button
-                    key={i}
+                    type="button"
+                    key={sq}
                     onClick={() => handleAsk(sq)}
                     disabled={asking}
                     className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all text-left ${
@@ -377,7 +384,7 @@ ${analysis.keyFindings.map((kf, i) => `${i + 1}. ${kf}`).join('\n')}
               {chatHistory.length > 0 && (
                 <div className="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-800">
                   {chatHistory.map((item, idx) => (
-                    <div key={idx} className="space-y-2">
+                    <div key={`${item.q}-${idx}`} className="space-y-2">
                       <div className="flex items-start gap-2 text-xs font-bold text-yellow-700 dark:text-yellow-400">
                         <span>You:</span> <span>{item.q}</span>
                       </div>
@@ -391,7 +398,6 @@ ${analysis.keyFindings.map((kf, i) => `${i + 1}. ${kf}`).join('\n')}
                 </div>
               )}
 
-
               {/* Input Form */}
               <form
                 onSubmit={(e) => { e.preventDefault(); handleAsk(); }}
@@ -402,6 +408,7 @@ ${analysis.keyFindings.map((kf, i) => `${i + 1}. ${kf}`).join('\n')}
                   value={question}
                   onChange={(e) => setQuestion(e.target.value)}
                   placeholder="Ask a question about this document..."
+                  aria-label="Ask a question about this document"
                   disabled={asking}
                   className={`flex-grow px-4 py-3.5 rounded-xl border text-xs font-semibold outline-none focus:ring-2 focus:ring-yellow-500 ${
                     darkMode ? 'bg-slate-900 border-slate-700 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'

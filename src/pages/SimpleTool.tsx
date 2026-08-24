@@ -153,8 +153,13 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
   const saveSignature = () => {
     if (signatureCanvasRef.current && !signatureCanvasRef.current.isEmpty()) {
       const data = signatureCanvasRef.current.getData();
-      setSavedSignature(JSON.stringify(data));
-      localStorage.setItem('pdfbolt.signature', JSON.stringify(data));
+      const json = JSON.stringify(data);
+      setSavedSignature(json);
+      try {
+        localStorage.setItem('pdfbolt.signature', json);
+      } catch {
+        // Ignore QuotaExceededError / SecurityError in private/restricted environments
+      }
       notify.success();
       setStatusMessage('Signature saved for this browser.');
     } else {
@@ -165,15 +170,20 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
   const loadSignature = () => {
     const storedSignature = savedSignature || localStorage.getItem('pdfbolt.signature');
     if (storedSignature && signatureCanvasRef.current) {
-      const data = JSON.parse(storedSignature);
-      signatureCanvasRef.current.setData(data);
-      setSavedSignature(storedSignature);
-      notify.success();
-      setStatusMessage('Signature loaded.');
+      try {
+        const data = JSON.parse(storedSignature);
+        signatureCanvasRef.current.setData(data);
+        setSavedSignature(storedSignature);
+        notify.success();
+        setStatusMessage('Signature loaded.');
+      } catch {
+        setStatusMessage('Saved signature data is corrupted. Please draw a new one.');
+      }
     } else {
       setStatusMessage('No saved signature found in this browser.');
     }
   };
+
 
   useEffect(() => {
     setSavedSignature(localStorage.getItem('pdfbolt.signature'));
@@ -190,10 +200,11 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
   }, [result]);
 
   useEffect(() => {
+    if (!isImageTool) return;
     const urls = multiFiles.map(f => URL.createObjectURL(f));
     setImagePreviewUrls(urls);
     return () => urls.forEach(url => URL.revokeObjectURL(url));
-  }, [multiFiles]);
+  }, [multiFiles, isImageTool]);
 
   const handle = async (f: File[]) => {
     if (f.length === 0) return; // Prevent reset on empty updates
@@ -660,10 +671,11 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
                     <div className="w-full space-y-4">
                       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 max-h-[360px] overflow-y-auto p-1">
                         {multiFiles.map((f, i) => (
-                          <div key={i} className="relative group rounded-2xl overflow-hidden border-2 border-slate-200 dark:border-slate-700 aspect-[3/4] bg-slate-100 dark:bg-slate-900 shadow-md">
+                          <div key={`${f.name}-${f.size}-${f.lastModified}-${i}`} className="relative group rounded-2xl overflow-hidden border-2 border-slate-200 dark:border-slate-700 aspect-[3/4] bg-slate-100 dark:bg-slate-900 shadow-md">
                             <img src={imagePreviewUrls[i]} className="w-full h-full object-cover" alt={f.name} />
                             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                               <button
+                                type="button"
                                 onClick={() => setMultiFiles(prev => prev.filter((_, idx) => idx !== i))}
                                 className="p-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors cursor-pointer"
                                 aria-label="Remove image"
@@ -721,7 +733,7 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
                         ) : (
                           <label className="flex flex-col items-center justify-center py-2 cursor-pointer text-blue-600 dark:text-blue-400 hover:underline text-xs font-bold">
                             <span>+ Upload 2nd File</span>
-                            <input type="file" accept=".pdf" className="hidden" onChange={e => { if (e.target.files?.[0]) handle([e.target.files[0]]); }} />
+                            <input type="file" accept=".pdf" className="hidden" onChange={e => { if (e.target.files?.[0]) { handle([e.target.files[0]]); e.target.value = ''; } }} />
                           </label>
                         )}
                       </div>
@@ -894,7 +906,7 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
                         min="10"
                         max="200"
                         value={watermarkSize}
-                        onChange={(e) => setWatermarkSize(parseInt(e.target.value))}
+                        onChange={(e) => setWatermarkSize(parseInt(e.target.value, 10) || 48)}
                         className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600"
                       />
                     </div>
@@ -1025,9 +1037,16 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
                   <div className="space-y-4">
                     <div className="flex flex-wrap gap-2">
                       {multiFiles.map((f, i) => (
-                        <div key={i} className="relative w-16 h-16 rounded-lg overflow-hidden border border-slate-200">
+                        <div key={`${f.name}-${f.size}-${f.lastModified}-${i}`} className="relative w-16 h-16 rounded-lg overflow-hidden border border-slate-200">
                           <img src={imagePreviewUrls[i]} className="w-full h-full object-cover" alt={f.name} />
-                          <button onClick={() => setMultiFiles(prev => prev.filter((_, idx) => idx !== i))} className="absolute top-0 right-0 bg-red-600 text-white p-0.5"><X size={10} /></button>
+                          <button
+                            type="button"
+                            aria-label="Remove image"
+                            onClick={() => setMultiFiles(prev => prev.filter((_, idx) => idx !== i))}
+                            className="absolute top-0 right-0 bg-red-600 text-white p-0.5"
+                          >
+                            <X size={10} />
+                          </button>
                         </div>
                       ))}
                     </div>
