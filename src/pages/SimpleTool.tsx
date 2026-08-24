@@ -9,7 +9,7 @@ import { ocrPdf } from '../services/ocrService';
 import { pptToPdf, pdfToPpt } from '../services/pptService';
 import { redactPdf, repairPdf } from '../services/sanitizeService';
 import { comparePdfDocuments } from '../services/compareService';
-import { FileText, Download, CheckCircle2, Settings2, Eye, EyeOff, X, Image as ImageIcon, Lock, Zap } from 'lucide-react';
+import { FileText, Download, CheckCircle2, Settings2, Eye, EyeOff, X, Image as ImageIcon, Lock, Zap, ArrowRight, Trash2, Plus } from 'lucide-react';
 import { NotifySystem } from '../types';
 
 import ProgressBar from '../components/ProgressBar';
@@ -17,6 +17,14 @@ import { validateFiles, validateOutputIntegrity, ALLOWED_MIME_TYPES, MAX_FILE_SI
 import { apiClient } from '../services/apiClient';
 import AdSlot from '../components/AdSlot';
 import { useActiveWork } from '../context/ActiveWorkContext';
+
+const formatBytes = (bytes?: number) => {
+  if (!bytes || bytes === 0) return '0 B';
+  const k = 1024;
+  const sizes = ['B', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+};
 
 type ResultKind = 'pdf' | 'zip' | 'docx' | 'pptx' | 'xlsx' | 'txt';
 type ImagePageSize = 'fit' | 'a4' | 'letter';
@@ -550,7 +558,7 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
       )}
 
       {!file && multiFiles.length === 0 ? (
-        <div className="space-y-12">
+        <div className="max-w-4xl mx-auto space-y-12">
           <FileUploader
             multiple={isImageTool || mode === 'compare'}
             accept={getAcceptAttribute(mode, isImageTool)}
@@ -559,65 +567,198 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
             allowFolder={mode === 'compress'}
           />
         </div>
-      ) : (
-        <div className="animate-fadeIn max-w-3xl mx-auto space-y-6">
+      ) : !result ? (
+        <div className="animate-fadeIn max-w-6xl mx-auto space-y-6">
 
-          {/* ── 1. FILE HEADER CARD ── */}
-          <div className={`p-5 sm:p-8 rounded-[2rem] border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 transition-all ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100 shadow-xl'}`}>
-            <div className="flex items-center gap-6 text-left">
-              <div className="bg-yellow-500/10 p-4 rounded-2xl">
-                {isImageTool ? <ImageIcon className="text-yellow-500 w-10 h-10" /> : <FileText className="text-yellow-500 w-10 h-10" />}
-              </div>
-              <div className="overflow-hidden">
-                <h2 className={`text-xl font-black truncate max-w-[250px] ${darkMode ? 'text-white' : 'text-slate-900'}`}>
-                  {isImageTool
-                    ? `${multiFiles.length} Images Selected`
-                    : isZip
-                    ? `${multiFiles.length} Files (Folder)`
-                    : mode === 'compare' && multiFiles.length >= 2
-                    ? `${multiFiles[0].name} vs ${multiFiles[1].name}`
-                    : file?.name}
-                </h2>
-                <p className="text-slate-500 font-bold uppercase text-[10px] tracking-widest">
-                  {result
-                    ? 'FILE READY'
-                    : mode === 'compare' && multiFiles.length < 2
-                    ? `FILE 1 OF 2 LOADED — UPLOAD 1 MORE`
-                    : 'AWAITING CONFIGURATION'}
-                </p>
-              </div>
-            </div>
-            {!processing && (
-              <div className="flex items-center gap-3">
-                {mode === 'compare' && multiFiles.length === 1 && !result && (
-                  <label className="text-blue-600 font-black text-xs hover:underline uppercase tracking-tighter cursor-pointer">
-                    + Add 2nd File
-                    <input type="file" accept=".pdf" className="hidden" onChange={e => { if (e.target.files?.[0]) handle([e.target.files[0]]); }} />
-                  </label>
-                )}
-                <button onClick={clearSelection} className="text-yellow-600 font-black text-xs hover:underline uppercase tracking-tighter">Clear All</button>
-              </div>
-            )}
-          </div>
-
-          {/* ── 2. PROCESSING STATE ── */}
+          {/* ── 1. PROCESSING PROGRESS (Visible during background operations) ── */}
           {processing && (
-            <ProgressBar
-              progress={progress}
-              label={`Processing ${title}...`}
-              darkMode={darkMode}
-              status={processingStatus}
-              fileName={file?.name || `${multiFiles.length} files`}
-            />
+            <div className="mb-4">
+              <ProgressBar
+                progress={progress}
+                label={`Processing ${title}...`}
+                darkMode={darkMode}
+                status={processingStatus}
+                fileName={file?.name || `${multiFiles.length} files`}
+              />
+            </div>
           )}
 
-          {/* ── 3. TOOL CONFIGURATION + IMAGE LAYOUT (hidden once result is ready) ── */}
-          {!result && (
-            <>
-              <div className={`p-6 sm:p-10 rounded-[2rem] border shadow-2xl text-left transition-all ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'}`}>
-                <div className="flex items-center gap-3 mb-8">
-                  <Settings2 className="text-yellow-600 w-6 h-6" />
-                  <h2 className={`text-2xl font-black uppercase tracking-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>Tool Configuration</h2>
+          {/* ── 2. TWO-COLUMN WORKSPACE (Interactive Stage + Control Sidebar) ── */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start text-left">
+
+            {/* LEFT COLUMN: Document / Files Visual Stage (Cols 1-7 on lg, 1-8 on xl) */}
+            <div className="lg:col-span-7 xl:col-span-8 space-y-4">
+              <div className={`p-6 sm:p-8 rounded-[2.5rem] border min-h-[420px] flex flex-col justify-between transition-all ${
+                darkMode ? 'bg-slate-800/80 border-slate-700' : 'bg-white border-slate-200 shadow-xl'
+              }`}>
+                {/* Stage Header Bar */}
+                <div className="flex items-center justify-between gap-4 pb-4 border-b border-slate-100 dark:border-slate-700/60">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span className="text-[11px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">
+                      {isImageTool
+                        ? `${multiFiles.length} Image${multiFiles.length > 1 ? 's' : ''} Selected`
+                        : isZip
+                        ? `${multiFiles.length} Files Selected`
+                        : mode === 'compare'
+                        ? 'Compare Documents Stage'
+                        : 'Document Stage'}
+                    </span>
+                  </div>
+                  {!processing && (
+                    <button
+                      onClick={clearSelection}
+                      className="text-red-500 hover:text-red-600 font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer"
+                    >
+                      Clear Selection
+                    </button>
+                  )}
+                </div>
+
+                {/* Stage Canvas Area */}
+                <div className="py-8 flex flex-col items-center justify-center flex-grow">
+                  {/* Single Document Card */}
+                  {file && !isImageTool && mode !== 'compare' && (
+                    <div className="relative group">
+                      <div className={`w-52 sm:w-60 h-68 sm:h-76 rounded-2xl border-2 shadow-2xl flex flex-col items-center justify-between p-6 transition-all duration-300 group-hover:scale-[1.02] ${
+                        darkMode ? 'bg-slate-900 border-slate-700' : 'bg-slate-50 border-slate-200'
+                      }`}>
+                        <div className="p-4 rounded-2xl bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 mt-2">
+                          <FileText size={52} />
+                        </div>
+                        <div className="w-full text-center overflow-hidden">
+                          <p className={`font-black text-sm truncate max-w-full ${darkMode ? 'text-white' : 'text-slate-900'}`} title={file.name}>
+                            {file.name}
+                          </p>
+                          <p className="text-[11px] font-bold text-slate-400 mt-1">
+                            {formatBytes(file.size)}
+                          </p>
+                        </div>
+                        <span className="text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full bg-yellow-500/10 text-yellow-700 dark:text-yellow-400">
+                          {file.name.split('.').pop()?.toUpperCase() || 'PDF'}
+                        </span>
+                      </div>
+                      {!processing && (
+                        <button
+                          onClick={clearSelection}
+                          aria-label="Remove file"
+                          className="absolute -top-3 -right-3 w-8 h-8 rounded-full bg-red-600 text-white shadow-lg flex items-center justify-center hover:bg-red-700 transition-colors cursor-pointer"
+                        >
+                          <X size={16} />
+                        </button>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Multi-Image Gallery Stage */}
+                  {isImageTool && (
+                    <div className="w-full space-y-4">
+                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 max-h-[360px] overflow-y-auto p-1">
+                        {multiFiles.map((f, i) => (
+                          <div key={i} className="relative group rounded-2xl overflow-hidden border-2 border-slate-200 dark:border-slate-700 aspect-[3/4] bg-slate-100 dark:bg-slate-900 shadow-md">
+                            <img src={imagePreviewUrls[i]} className="w-full h-full object-cover" alt={f.name} />
+                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                              <button
+                                onClick={() => setMultiFiles(prev => prev.filter((_, idx) => idx !== i))}
+                                className="p-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors cursor-pointer"
+                                aria-label="Remove image"
+                              >
+                                <Trash2 size={14} />
+                              </button>
+                            </div>
+                            <div className="absolute bottom-1 left-1 right-1 bg-black/70 backdrop-blur-sm rounded-md px-1.5 py-0.5 text-[9px] text-white truncate font-bold">
+                              {f.name}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Compare Document Stage */}
+                  {mode === 'compare' && (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 w-full max-w-lg">
+                      {/* Document 1 */}
+                      <div className={`p-5 rounded-2xl border-2 relative ${
+                        multiFiles[0] ? (darkMode ? 'bg-slate-900 border-slate-700' : 'bg-slate-50 border-slate-200') : 'border-dashed border-slate-300 dark:border-slate-700'
+                      }`}>
+                        <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-2">Original Document (File 1)</span>
+                        {multiFiles[0] ? (
+                          <div className="flex items-center gap-3">
+                            <FileText size={28} className="text-yellow-500 shrink-0" />
+                            <div className="overflow-hidden">
+                              <p className="font-bold text-xs truncate">{multiFiles[0].name}</p>
+                              <p className="text-[10px] text-slate-400">{formatBytes(multiFiles[0].size)}</p>
+                            </div>
+                          </div>
+                        ) : (
+                          <p className="text-xs text-slate-400 font-semibold py-4 text-center">Awaiting File 1</p>
+                        )}
+                      </div>
+
+                      {/* Document 2 */}
+                      <div className={`p-5 rounded-2xl border-2 relative ${
+                        multiFiles[1] ? (darkMode ? 'bg-slate-900 border-slate-700' : 'bg-slate-50 border-slate-200') : 'border-dashed border-blue-300 dark:border-blue-700/60'
+                      }`}>
+                        <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-2">Modified Document (File 2)</span>
+                        {multiFiles[1] ? (
+                          <div className="flex items-center gap-3">
+                            <FileText size={28} className="text-blue-500 shrink-0" />
+                            <div className="overflow-hidden">
+                              <p className="font-bold text-xs truncate">{multiFiles[1].name}</p>
+                              <p className="text-[10px] text-slate-400">{formatBytes(multiFiles[1].size)}</p>
+                            </div>
+                          </div>
+                        ) : (
+                          <label className="flex flex-col items-center justify-center py-2 cursor-pointer text-blue-600 dark:text-blue-400 hover:underline text-xs font-bold">
+                            <span>+ Upload 2nd File</span>
+                            <input type="file" accept=".pdf" className="hidden" onChange={e => { if (e.target.files?.[0]) handle([e.target.files[0]]); }} />
+                          </label>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Stage Footer Bar */}
+                <div className="pt-4 border-t border-slate-100 dark:border-slate-700/60 flex items-center justify-between flex-wrap gap-2">
+                  <div className="flex items-center gap-2 text-[11px] font-bold text-slate-400">
+                    <span>⚡ 100% In-Browser Privacy</span>
+                  </div>
+                  <label className="inline-flex items-center gap-1.5 text-xs font-black text-yellow-600 dark:text-yellow-400 hover:underline uppercase tracking-wider cursor-pointer">
+                    <Plus size={14} /> Add / Replace File
+                    <input
+                      type="file"
+                      accept={getAcceptAttribute(mode, isImageTool)}
+                      multiple={isImageTool || mode === 'compare'}
+                      className="hidden"
+                      onChange={e => {
+                        if (e.target.files && e.target.files.length > 0) {
+                          handle(Array.from(e.target.files));
+                          e.target.value = '';
+                        }
+                      }}
+                    />
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            {/* RIGHT COLUMN: Tool Configuration & Primary Action Sidebar (Cols 8-12 on lg, 9-12 on xl) */}
+            <div className="lg:col-span-5 xl:col-span-4 space-y-4">
+              <div className={`p-6 sm:p-8 rounded-[2.5rem] border shadow-2xl space-y-6 ${
+                darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200'
+              }`}>
+                <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-700">
+                  <div className="flex items-center gap-3">
+                    <Settings2 className="text-yellow-600 w-5 h-5" />
+                    <h2 className={`text-base sm:text-lg font-black uppercase tracking-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+                      {title}
+                    </h2>
+                  </div>
+                  <span className="text-[10px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-300">
+                    Options
+                  </span>
                 </div>
 
                 {isSignTool && (
@@ -938,28 +1079,37 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
                     )}
                   </div>
                 )}
+                {/* ── 4. PRIMARY ACTION ── */}
+                <div className="pt-2">
+                  <button
+                    disabled={processing || (needsPageInput && !pageInput) || (needsPassword && !password) || (isImageTool && multiFiles.length === 0) || (mode === 'compare' && multiFiles.length < 2)}
+                    onClick={process}
+                    className="w-full py-5 sm:py-6 bg-gradient-to-r from-red-600 to-rose-600 text-white rounded-2xl font-black text-xl sm:text-2xl shadow-xl hover:from-red-700 hover:to-rose-700 hover:scale-[1.02] active:scale-[0.99] disabled:opacity-30 transition-all flex items-center justify-center gap-3 cursor-pointer"
+                  >
+                    {processing ? (
+                      <div className="w-7 h-7 border-4 border-white/30 border-t-white rounded-full animate-spin"></div>
+                    ) : (
+                      <>
+                        <span>Process {title}</span>
+                        <ArrowRight size={22} />
+                      </>
+                    )}
+                  </button>
+                </div>
               </div>
+            </div>
 
-              {/* ── 4. PRIMARY ACTION ── */}
-              <button
-                disabled={processing || (needsPageInput && !pageInput) || (needsPassword && !password) || (isImageTool && multiFiles.length === 0)}
-                onClick={process}
-                className="w-full px-8 py-6 sm:py-8 bg-red-600 text-white rounded-[2rem] font-black text-2xl sm:text-3xl shadow-2xl hover:bg-red-700 hover:scale-[1.02] disabled:opacity-30 transition-all flex items-center justify-center gap-4 group"
-              >
-                {processing ? <div className="w-8 h-8 border-4 border-white/30 border-t-white rounded-full animate-spin"></div> : <span>Process {title}</span>}
-              </button>
-            </>
-          )}
+          </div>
+        </div>
+      ) : (
+        /* ── 5. RESULT STATE ── */
+        <div key={resultKey} className="flex flex-col items-center gap-6 max-w-3xl mx-auto w-full animate-fadeIn">
 
-          {/* ── 5. RESULT STATE ── */}
-          {result && !processing && (
-            <div key={resultKey} className="flex flex-col items-center gap-6 w-full animate-fadeIn">
-
-              {/* Success Banner */}
-              <div className="flex items-center gap-4 text-green-500 font-black bg-green-50 dark:bg-green-900/20 px-10 py-5 rounded-[2rem] border border-green-100 dark:border-green-800 w-full justify-center">
-                <CheckCircle2 size={32} />
-                <span className="text-2xl">Processing Complete</span>
-              </div>
+          {/* Success Banner */}
+          <div className="flex items-center gap-4 text-green-500 font-black bg-green-50 dark:bg-green-900/20 px-10 py-5 rounded-[2rem] border border-green-100 dark:border-green-800 w-full justify-center">
+            <CheckCircle2 size={32} />
+            <span className="text-2xl">Processing Complete</span>
+          </div>
 
               {/* Repair Report */}
               {mode === 'repair' && repairReport && (
@@ -1078,9 +1228,6 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
 
             </div>
           )}
-
-        </div>
-      )}
 
       {/* Full-screen PDF Preview Modal */}
       {showPreview && canPreviewResult && (

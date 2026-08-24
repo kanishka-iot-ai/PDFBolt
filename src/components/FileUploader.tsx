@@ -138,7 +138,7 @@ const FileUploader: React.FC<FileUploaderProps> = ({
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
         onClick={() => fileInputRef.current?.click()}
-        className={`relative border-3 border-dashed rounded-[2.5rem] p-12 md:p-16 text-center cursor-pointer transition-all duration-300 transform active:scale-[0.99] ${
+        className={`relative border-3 border-dashed rounded-[2.5rem] p-8 sm:p-12 text-center cursor-pointer transition-all duration-300 transform active:scale-[0.99] ${
           isDragging
             ? 'border-yellow-500 bg-yellow-500/10 scale-[1.01]'
             : darkMode
@@ -166,17 +166,17 @@ const FileUploader: React.FC<FileUploaderProps> = ({
         />
 
         <div className="flex flex-col items-center">
-          <div className={`w-20 h-20 rounded-3xl mb-6 flex items-center justify-center transition-transform group-hover:scale-110 ${
+          <div className={`w-16 h-16 rounded-2xl mb-4 flex items-center justify-center transition-transform group-hover:scale-110 ${
             darkMode ? 'bg-slate-700/60 text-yellow-400' : 'bg-yellow-50 text-yellow-600'
           }`}>
-            <Upload className="w-10 h-10" />
+            <Upload className="w-8 h-8" />
           </div>
 
-          <h2 className={`text-2xl sm:text-4xl font-black mb-3 tracking-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+          <h2 className={`text-2xl sm:text-3xl font-black mb-2 tracking-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>
             Drop your {formatBadge} here
           </h2>
 
-          <p className={`text-sm sm:text-base mb-8 max-w-md mx-auto ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+          <p className={`text-xs sm:text-sm mb-6 max-w-md mx-auto ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
             Drag & drop from your desktop, or click below to browse files.
           </p>
 
@@ -188,7 +188,7 @@ const FileUploader: React.FC<FileUploaderProps> = ({
                 e.stopPropagation();
                 fileInputRef.current?.click();
               }}
-              className="px-8 py-4 bg-yellow-500 hover:bg-yellow-400 text-slate-950 font-black text-sm uppercase tracking-wider rounded-2xl shadow-lg transition-all transform hover:-translate-y-0.5"
+              className="px-8 py-3.5 bg-yellow-500 hover:bg-yellow-400 text-slate-950 font-black text-sm uppercase tracking-wider rounded-2xl shadow-lg transition-all transform hover:-translate-y-0.5 cursor-pointer"
             >
               Select {multiple ? 'Files' : 'File'}
             </button>
@@ -200,7 +200,7 @@ const FileUploader: React.FC<FileUploaderProps> = ({
                   e.stopPropagation();
                   folderInputRef.current?.click();
                 }}
-                className={`px-6 py-4 rounded-2xl font-bold text-sm uppercase tracking-wider transition-all flex items-center justify-center gap-2 border ${
+                className={`px-6 py-3.5 rounded-2xl font-bold text-sm uppercase tracking-wider transition-all flex items-center justify-center gap-2 border cursor-pointer ${
                   darkMode ? 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700' : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
                 }`}
               >
@@ -210,9 +210,9 @@ const FileUploader: React.FC<FileUploaderProps> = ({
           </div>
 
           {/* Trust Badges */}
-          <div className="mt-10 flex flex-wrap justify-center items-center gap-6 text-xs font-semibold text-slate-400">
+          <div className="mt-6 flex flex-wrap justify-center items-center gap-4 text-xs font-semibold text-slate-400">
             <span className="flex items-center gap-1.5">
-              <ShieldCheck size={16} className="text-emerald-500" /> 100% Client-Side Privacy
+              <ShieldCheck size={15} className="text-emerald-500" /> 100% Client-Side Privacy
             </span>
             <span>•</span>
             <span>Max {maxSizeMB}MB</span>

@@ -114,13 +114,12 @@ const SEOLandingPage: React.FC<SEOLandingPageProps> = ({ toolId, darkMode, child
         {howToSchema && <script type="application/ld+json">{JSON.stringify(howToSchema)}</script>}
         {faqSchema && <script type="application/ld+json">{JSON.stringify(faqSchema)}</script>}
       </Helmet>
-
       {/* 1. HERO HEADER (Compact & Modern) */}
-      <div className={`pt-6 pb-6 sm:pt-8 sm:pb-8 border-b ${darkMode ? 'border-slate-800 bg-slate-900/50' : 'border-slate-100 bg-slate-50'}`}>
+      <div className={`pt-4 pb-4 sm:pt-6 sm:pb-6 border-b ${darkMode ? 'border-slate-800 bg-slate-900/50' : 'border-slate-100 bg-slate-50'}`}>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
           
           {/* Breadcrumb Visual Navigation */}
-          <nav className="flex justify-center items-center gap-2 text-xs font-semibold mb-3 text-slate-500">
+          <nav className="flex justify-center items-center gap-2 text-xs font-semibold mb-2 text-slate-500">
             <Link to="/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Home</Link>
             <span>/</span>
             <Link to="/tools" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">PDF Tools</Link>
@@ -128,69 +127,68 @@ const SEOLandingPage: React.FC<SEOLandingPageProps> = ({ toolId, darkMode, child
             <span className="text-yellow-700 dark:text-yellow-400 font-bold">{tool.title}</span>
           </nav>
 
-          <h1 className={`text-3xl sm:text-4xl md:text-5xl font-black mb-3 tracking-tight leading-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+          <h1 className={`text-2xl sm:text-3xl md:text-4xl font-black mb-2 tracking-tight leading-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>
             {tool.title}
           </h1>
-          <p className={`text-sm sm:text-base md:text-lg max-w-2xl mx-auto mb-5 font-medium ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+          <p className={`text-xs sm:text-sm md:text-base max-w-2xl mx-auto mb-3 font-medium ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
             {tool.description}
           </p>
 
           {/* Privacy & Speed Badges */}
-          <div className="flex flex-wrap justify-center gap-2 sm:gap-4">
-            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold text-xs">
-              <ShieldCheck size={14} /> {tool.id === 'pdf-to-qr' ? 'Encrypted Ephemeral Cloud' : '100% Local In-Browser Privacy'}
+          <div className="flex flex-wrap justify-center gap-2 sm:gap-3">
+            <div className="flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold text-[11px]">
+              <ShieldCheck size={13} /> {tool.id === 'pdf-to-qr' ? 'Encrypted Ephemeral Cloud' : '100% Local In-Browser Privacy'}
             </div>
-            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 font-bold text-xs">
-              <UserX size={14} /> Free & No Sign-Up
+            <div className="flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 font-bold text-[11px]">
+              <UserX size={13} /> Free & No Sign-Up
             </div>
-            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 font-bold text-xs">
-              <Clock size={14} /> Instant Processing
+            <div className="flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 font-bold text-[11px]">
+              <Clock size={13} /> Instant Processing
             </div>
           </div>
         </div>
       </div>
 
       {/* 2. THE WORKING INTERACTIVE TOOL */}
-      <div className="relative z-10 py-4 sm:py-6">
+      <div className="relative z-10 py-3 sm:py-5">
         {children}
       </div>
 
       {/* 3. NON-INTRUSIVE HIGH-VISIBILITY AD PLACEMENT (BELOW UPLOADER) */}
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 my-4 sm:my-6">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 my-3 sm:my-5">
         <AdSlot placement="TOOL_CONTENT_BOTTOM" />
       </div>
 
-      {/* 4. RELATED PDF TOOLS */}
+      {/* 4. RELATED PDF TOOLS (Sleek Suggestive Bottom Bar) */}
       {relatedToolsList.length > 0 && (
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
-          <section className="pt-8 border-t border-slate-200 dark:border-slate-800">
-            <h2 className={`text-xl font-black mb-6 flex items-center gap-2 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
-              <Layers className="text-yellow-500" /> Related PDF Tools
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4">
+          <section className="pt-4 border-t border-slate-200 dark:border-slate-800">
+            <div className="flex items-center justify-between gap-2 mb-3">
+              <h2 className={`text-xs font-black uppercase tracking-wider flex items-center gap-2 ${darkMode ? 'text-slate-300' : 'text-slate-700'}`}>
+                <Layers size={14} className="text-yellow-500" /> Suggestive PDF Tools
+              </h2>
+              <span className="text-[10px] text-slate-400 font-semibold">100% Free & Private</span>
+            </div>
+            <div className="flex items-center gap-3 overflow-x-auto no-scrollbar py-1 -mx-4 px-4 sm:mx-0 sm:px-0">
               {relatedToolsList.map(rt => rt && (
                 <Link
                   key={rt.id}
                   to={rt.canonicalPath || rt.path}
-                  className={`p-4 rounded-2xl border transition-all duration-200 hover:-translate-y-1 hover:shadow-md flex flex-col justify-between ${
-                    darkMode ? 'bg-slate-800/60 border-slate-700 hover:border-yellow-500/50' : 'bg-white border-slate-200 hover:border-yellow-500/50'
+                  className={`p-3 rounded-2xl border transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md flex items-center gap-3 shrink-0 min-w-[200px] max-w-[260px] ${
+                    darkMode ? 'bg-slate-800/80 border-slate-700 hover:border-yellow-500/50 text-white' : 'bg-white border-slate-200 hover:border-yellow-500/50 text-slate-900'
                   }`}
                 >
-                  <div>
-                    <div className="p-2 w-fit rounded-lg bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 mb-3">
-                      {React.cloneElement(getIcon(rt.icon) as React.ReactElement, { className: 'w-5 h-5' })}
-                    </div>
-
-                    <h3 className={`font-bold text-sm mb-1 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+                  <div className="p-2 rounded-xl bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 shrink-0">
+                    {React.cloneElement(getIcon(rt.icon) as React.ReactElement, { className: 'w-4 h-4' })}
+                  </div>
+                  <div className="overflow-hidden">
+                    <h3 className="font-bold text-xs truncate">
                       {rt.title}
                     </h3>
-                    <p className={`text-xs line-clamp-2 ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+                    <p className="text-[10px] text-slate-400 truncate">
                       {rt.description}
                     </p>
                   </div>
-                  <span className="inline-flex items-center gap-1 text-xs font-bold text-yellow-700 dark:text-yellow-400 mt-3">
-                    Open Tool <ArrowRight size={12} />
-                  </span>
                 </Link>
               ))}
             </div>
@@ -200,6 +198,5 @@ const SEOLandingPage: React.FC<SEOLandingPageProps> = ({ toolId, darkMode, child
     </div>
   );
 };
-
 
 export default SEOLandingPage;
