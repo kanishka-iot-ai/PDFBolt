@@ -20,8 +20,8 @@ const RETENTION_OPTIONS = [
   { label: '15 Minutes (Recommended)', seconds: 900, description: 'Ephemeral zero-retention transfer' },
   { label: '1 Hour', seconds: 3600, description: 'Quick meeting share' },
   { label: '24 Hours', seconds: 86400, description: 'Single session temporary access' },
-  { label: '7 Days (Cloud Storage Required)', seconds: 604800, description: 'Requires persistent cloud bucket', disabled: true },
-  { label: '30 Days (Cloud Storage Required)', seconds: 2592000, description: 'Requires persistent cloud bucket', disabled: true }
+  { label: '7 Days (PRO / Premium)', seconds: 604800, description: 'Requires Pro subscription', disabled: true },
+  { label: '30 Days (PRO / Premium)', seconds: 2592000, description: 'Requires Pro subscription', disabled: true }
 ];
 
 const QRTool: React.FC<QRToolProps> = ({ darkMode, notify }) => {
