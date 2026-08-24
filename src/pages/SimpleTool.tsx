@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import FileUploader from '../components/FileUploader';
 import SignatureCanvas, { SignatureCanvasRef } from '../components/SignatureCanvas';
 import { createZipFromFiles } from '../services/zipService';
-import { rotateFile, addPageNumbers, compressPdf, watermarkPdf, deletePages, reorderPages, splitPdf, imagesToPdf } from '../services/pdfService';
+import { rotateFile, addPageNumbers, compressPdf, compressPdfAdvanced, watermarkPdf, deletePages, reorderPages, splitPdf, imagesToPdf } from '../services/pdfService';
 import { wordToPdf, excelToPdf, htmlToPdf, pdfToJpg, pdfToWord, pdfToExcel } from '../services/conversionService';
 import { protectPdf, unlockPdf, removePermissions, signPdf } from '../services/securityService';
 import { ocrPdf } from '../services/ocrService';
@@ -107,6 +107,12 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
   const [imagePreviewUrls, setImagePreviewUrls] = useState<string[]>([]);
   const [pageCount, setPageCount] = useState<number | null>(null);
   const [rotateAngle, setRotateAngle] = useState(90);
+  const [compressionStats, setCompressionStats] = useState<{
+    originalSizeBytes: number;
+    compressedSizeBytes: number;
+    savedBytes: number;
+    savedPercent: number;
+  } | null>(null);
 
   // Sync active work
   useEffect(() => {
@@ -156,6 +162,7 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
     setShowPreview(false);
     setStatusMessage(null);
     setRepairReport(null);
+    setCompressionStats(null);
     setIsZip(false);
     setResultKind('pdf');
   };
@@ -165,6 +172,7 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
     setShowPreview(false);
     setStatusMessage(null);
     setRepairReport(null);
+    setCompressionStats(null);
     setProgress(0);
     setProcessingStatus('processing');
     setResultKind('pdf');
@@ -309,7 +317,16 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
           b = await createZipFromFiles(multiFiles);
           outputKind = 'zip';
         } else if (file) {
-          b = await compressPdf(file, compressionLevel);
+          const compRes = await compressPdfAdvanced(file, {
+            profile: compressionLevel === 'extreme' ? 'extreme' : compressionLevel === 'less' ? 'high' : 'balanced'
+          });
+          b = compRes.compressedBytes;
+          setCompressionStats({
+            originalSizeBytes: compRes.originalSizeBytes,
+            compressedSizeBytes: compRes.compressedSizeBytes,
+            savedBytes: compRes.savedBytes,
+            savedPercent: compRes.savedPercent
+          });
         } else {
           throw new Error("No file selected.");
         }
@@ -1120,6 +1137,45 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
             <CheckCircle2 size={32} />
             <span className="text-2xl">Processing Complete</span>
           </div>
+
+          {/* Compression Savings Report */}
+          {mode === 'compress' && compressionStats && (
+            <div className="w-full p-6 sm:p-8 rounded-3xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-xl text-center space-y-4">
+              <div>
+                <span className="text-[11px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400">
+                  Compression Complete
+                </span>
+                <h3 className="text-2xl sm:text-3xl font-black mt-1 text-slate-900 dark:text-white">
+                  Saved {formatBytes(compressionStats.savedBytes)} ({compressionStats.savedPercent}% Smaller)
+                </h3>
+              </div>
+
+              <div className="max-w-md mx-auto space-y-3 pt-2">
+                <div className="space-y-1 text-left">
+                  <div className="flex justify-between text-xs font-bold text-slate-400">
+                    <span>Original Size</span>
+                    <span>{formatBytes(compressionStats.originalSizeBytes)}</span>
+                  </div>
+                  <div className="w-full h-2.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                    <div className="w-full h-full bg-slate-400 dark:bg-slate-500 rounded-full"></div>
+                  </div>
+                </div>
+
+                <div className="space-y-1 text-left">
+                  <div className="flex justify-between text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                    <span>Compressed Output</span>
+                    <span>{formatBytes(compressionStats.compressedSizeBytes)}</span>
+                  </div>
+                  <div className="w-full h-2.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-emerald-500 rounded-full transition-all duration-500"
+                      style={{ width: `${Math.max(5, 100 - compressionStats.savedPercent)}%` }}
+                    ></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Repair Report */}
           {mode === 'repair' && repairReport && (

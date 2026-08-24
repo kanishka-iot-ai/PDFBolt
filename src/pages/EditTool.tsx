@@ -471,7 +471,7 @@ const EditTool: React.FC<EditToolProps> = ({ darkMode, notify }) => {
     }
 
     return (
-        <div className={`rounded-2xl border overflow-hidden shadow-2xl flex flex-col ${darkMode ? 'bg-slate-900 border-slate-700 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'}`} style={{ minHeight: '80vh' }}>
+        <div className={`rounded-2xl border overflow-hidden shadow-2xl flex flex-col w-full h-full ${darkMode ? 'bg-slate-900 border-slate-700 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'}`}>
             {/* Header */}
             <div className={`h-16 border-b flex items-center justify-between px-6 shrink-0 ${darkMode ? 'border-slate-700 bg-slate-900' : 'border-slate-200 bg-white'}`}>
                 <div className="flex items-center gap-3 truncate">

@@ -9,6 +9,7 @@ import {
 import { NotifySystem } from '../types';
 import { validateFiles, ALLOWED_MIME_TYPES, MAX_FILE_SIZE } from '../utils/fileValidation';
 import { API_BASE_URL } from '../services/apiClient';
+import { useActiveWork } from '../context/ActiveWorkContext';
 
 interface QRToolProps {
   darkMode: boolean;
@@ -24,6 +25,7 @@ const RETENTION_OPTIONS = [
 ];
 
 const QRTool: React.FC<QRToolProps> = ({ darkMode, notify }) => {
+  const { setHasActiveWork } = useActiveWork();
   const [file, setFile] = useState<File | null>(null);
   const [qrUrl, setQrUrl] = useState<string | null>(null);
   const [shareLink, setShareLink] = useState<string | null>(null);
@@ -36,6 +38,7 @@ const QRTool: React.FC<QRToolProps> = ({ darkMode, notify }) => {
   const [showPreview, setShowPreview] = useState(false);
   const [copied, setCopied] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
   const copyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Security Config
@@ -43,8 +46,13 @@ const QRTool: React.FC<QRToolProps> = ({ darkMode, notify }) => {
   const [requirePin, setRequirePin] = useState(false);
   const [oneTimeScan, setOneTimeScan] = useState(false);
   const [durationSeconds, setDurationSeconds] = useState(86400); // 24 hours default
-  const [isGenerating, setIsGenerating] = useState(false);
   const [resultKey, setResultKey] = useState(0);
+
+  // Sync active work state
+  useEffect(() => {
+    setHasActiveWork(file !== null || isGenerating);
+    return () => setHasActiveWork(false);
+  }, [file, isGenerating, setHasActiveWork]);
 
   useEffect(() => {
     return () => {
