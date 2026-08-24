@@ -458,6 +458,17 @@ const RedactTool: React.FC<RedactToolProps> = ({ darkMode, notify }) => {
                         >
                             Redact Another Item
                         </button>
+                        <button
+                            onClick={() => {
+                                setFile(null);
+                                setResultBlobUrl(null);
+                                setRedactions([]);
+                                setDetectedItems([]);
+                            }}
+                            className="px-6 py-4 rounded-2xl font-bold border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-all flex items-center gap-2"
+                        >
+                            <FileText size={16} /> Process Another File
+                        </button>
                     </div>
                 </div>
             )}

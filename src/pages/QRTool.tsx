@@ -408,6 +408,25 @@ const QRTool: React.FC<QRToolProps> = ({ darkMode, notify }) => {
                     >
                       {isRevoking ? <RefreshCw size={16} className="animate-spin" /> : <><Trash2 size={16} /> Revoke Share & Delete File</>}
                     </button>
+
+                    {/* Share Another File Button */}
+                    <button
+                      onClick={() => {
+                        setFile(null);
+                        setQrUrl(null);
+                        setShareLink(null);
+                        setShareId(null);
+                        setRevocationToken(null);
+                        setIsRevoked(false);
+                      }}
+                      className={`w-full py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 border ${
+                        darkMode
+                          ? 'border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-700'
+                          : 'border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100'
+                      }`}
+                    >
+                      <RefreshCw size={14} /> Share Another Document
+                    </button>
                   </div>
                 </div>
               )}

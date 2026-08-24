@@ -179,7 +179,16 @@ const MergeTool: React.FC<{ darkMode: boolean; notify: NotifySystem }> = ({ dark
                   <a href={result} download="merged_pdfbolt.pdf" onClick={() => notify.success()} className="w-full flex items-center justify-center gap-4 py-6 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-[2.5rem] font-black text-2xl shadow-2xl hover:from-yellow-600 hover:to-orange-600 hover:scale-105 transition-all">
                     <Download size={28} /> Download PDF
                   </a>
-                  <button onClick={() => { setFiles([]); setResult(null); }} className="text-slate-500 font-bold uppercase text-xs hover:underline">Start New Merge</button>
+                  <button
+                    onClick={() => { setFiles([]); setResult(null); }}
+                    className={`w-full py-4 rounded-2xl font-black text-sm uppercase tracking-wider border-2 transition-all hover:scale-[1.01] flex items-center justify-center gap-2 ${
+                      darkMode
+                        ? 'border-slate-700 bg-slate-800 text-slate-300 hover:border-yellow-500/60 hover:text-yellow-400'
+                        : 'border-slate-200 bg-slate-50 text-slate-600 hover:border-yellow-400 hover:bg-white hover:text-slate-900'
+                    }`}
+                  >
+                    <FileText size={16} /> Process Another Merge
+                  </button>
                 </div>
               )}
             </div>

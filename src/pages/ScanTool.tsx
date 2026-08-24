@@ -487,7 +487,7 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
                                 {capturedImages.length} {capturedImages.length === 1 ? 'Page' : 'Pages'} • AI Optimized • Ready for PDF
                             </p>
                         </div>
-                        <div className="flex gap-4 w-full md:w-auto">
+                        <div className="flex flex-wrap gap-4 w-full md:w-auto">
                             <button
                                 onClick={startCamera}
                                 className="flex-1 px-8 py-4 rounded-2xl border-2 border-slate-200 dark:border-slate-700 font-black hover:bg-slate-50 dark:hover:bg-slate-700 transition-all flex items-center justify-center gap-2 text-sm active:scale-95"
@@ -495,9 +495,18 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
                                 <Plus size={18} /> Add More
                             </button>
                             <button
+                                onClick={() => {
+                                    setCapturedImages([]);
+                                    stopCamera();
+                                }}
+                                className="px-6 py-4 rounded-2xl border-2 border-slate-200 dark:border-slate-700 font-bold hover:bg-slate-50 dark:hover:bg-slate-700 transition-all flex items-center justify-center gap-2 text-sm"
+                            >
+                                <RefreshCw size={16} /> Start New Scan
+                            </button>
+                            <button
                                 onClick={saveAsPdf}
                                 disabled={loading}
-                                className="flex-1 px-10 py-4 rounded-2xl bg-blue-600 text-white font-black hover:bg-blue-700 shadow-xl shadow-blue-500/20 transition-all flex items-center justify-center gap-2 text-sm active:scale-95"
+                                className="flex-1 px-10 py-4 rounded-2xl bg-blue-600 text-white font-black hover:bg-blue-700 shadow-xl shadow-blue-500/20 transition-all flex items-center justify-center gap-2 text-sm active:scale-95 disabled:opacity-50"
                             >
                                 {loading ? 'Processing...' : <><Download size={18} /> Save PDF Document</>}
                             </button>

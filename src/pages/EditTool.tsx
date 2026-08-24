@@ -405,6 +405,7 @@ const EditTool: React.FC<EditToolProps> = ({ darkMode, notify }) => {
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
             if (notify && notify.success) notify.success("PDF Edited Successfully!");
 
         } catch (error) {
@@ -440,8 +441,12 @@ const EditTool: React.FC<EditToolProps> = ({ darkMode, notify }) => {
                 </div>
                 <div className="flex gap-2">
                     <button onClick={() => setFile(null)} className="text-red-500 font-bold text-sm">Close</button>
-                    <button onClick={savePdf} className="flex items-center gap-2 bg-yellow-500 text-white px-4 py-2 rounded-lg font-bold hover:bg-yellow-600 transition-colors">
-                        <Save size={18} /> Save PDF
+                    <button
+                        onClick={savePdf}
+                        disabled={loading}
+                        className="flex items-center gap-2 bg-yellow-500 text-white px-4 py-2 rounded-lg font-bold hover:bg-yellow-600 disabled:opacity-50 transition-colors"
+                    >
+                        <Save size={18} /> {loading ? 'Saving...' : 'Save PDF'}
                     </button>
                 </div>
             </div>

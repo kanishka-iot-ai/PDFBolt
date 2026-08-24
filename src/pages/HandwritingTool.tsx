@@ -623,12 +623,23 @@ const HandwritingTool: React.FC<HandwritingToolProps> = ({ darkMode, notify }) =
             darkMode={darkMode}
           />
 
-          <div className="flex items-center justify-start pt-2">
+          <div className="flex items-center justify-between pt-2">
             <button
               onClick={() => setStep('review')}
               className="px-6 py-3 rounded-xl border border-slate-300 dark:border-slate-700 font-bold text-xs uppercase tracking-wider hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors flex items-center gap-2"
             >
               <ChevronLeft size={16} /> Back to Review & Edit
+            </button>
+
+            <button
+              onClick={() => {
+                setPages([]);
+                setStep('queue');
+                setCurrentPageIndex(0);
+              }}
+              className="px-6 py-3 rounded-xl border border-slate-300 dark:border-slate-700 font-bold text-xs uppercase tracking-wider hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors flex items-center gap-2"
+            >
+              <RefreshCw size={14} /> Process Another Document
             </button>
           </div>
         </div>

@@ -43,6 +43,24 @@ function resolveApiUrl(pathOrUrl?: string, fallback?: string): string {
   return value;
 }
 
+function formatHttpError(status: number, customMessage?: string): string {
+  if (customMessage && customMessage.trim()) return customMessage;
+  switch (status) {
+    case 400: return 'Invalid file or parameters provided for this operation.';
+    case 401:
+    case 403: return 'Access denied. You do not have permission to execute this operation.';
+    case 404: return 'Requested operation or processing resource was not found.';
+    case 408: return 'Request timed out. Please try again with a smaller file or lighter settings.';
+    case 413: return 'The uploaded file exceeds the maximum allowed size for server processing.';
+    case 429: return 'Too many processing requests. Please wait a moment and try again.';
+    case 500:
+    case 502:
+    case 503:
+    case 504: return 'Backend processing service is temporarily unavailable. Falling back to local engine.';
+    default: return `Processing failed with status ${status}.`;
+  }
+}
+
 class ApiClient {
   private baseUrl: string = API_BASE_URL;
   private backendAvailable: boolean | null = null;
@@ -93,7 +111,7 @@ class ApiClient {
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      const message = errorData.error?.message || `Backend processing failed with status ${response.status}`;
+      const message = formatHttpError(response.status, errorData.error?.message);
       throw new Error(message);
     }
 
@@ -142,7 +160,8 @@ class ApiClient {
     });
 
     if (!response.ok) {
-      throw new Error(`Scan failed with status ${response.status}`);
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(formatHttpError(response.status, errorData.error?.message));
     }
 
     const data = await response.json();
@@ -166,7 +185,7 @@ class ApiClient {
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.error?.message || "Compare processing failed on backend.");
+      throw new Error(formatHttpError(response.status, errorData.error?.message));
     }
 
     const jobData = await response.json();
@@ -206,7 +225,7 @@ class ApiClient {
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.error?.message || "Merge processing failed on backend.");
+      throw new Error(formatHttpError(response.status, errorData.error?.message));
     }
 
     const jobData = await response.json();
@@ -243,7 +262,7 @@ class ApiClient {
 
     if (!response.ok) {
       const err = await response.json().catch(() => ({}));
-      throw new Error(err.error?.message || "Document analysis failed.");
+      throw new Error(formatHttpError(response.status, err.error?.message));
     }
 
     return await response.json();

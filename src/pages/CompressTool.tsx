@@ -543,6 +543,17 @@ const CompressTool: React.FC<CompressToolProps> = ({ darkMode, notify }) => {
                 >
                   <RefreshCw size={14} /> Adjust Settings
                 </button>
+
+                <button
+                  onClick={() => { setResult(null); setStats(null); setFile(null); }}
+                  className={`px-6 py-4 rounded-2xl font-bold text-sm uppercase tracking-wider transition-all flex items-center justify-center gap-2 border ${
+                    darkMode
+                      ? 'border-slate-700 bg-slate-800/80 text-slate-300 hover:border-yellow-500/60 hover:text-yellow-400'
+                      : 'border-slate-200 bg-slate-50 text-slate-700 hover:border-yellow-400 hover:bg-white hover:text-slate-900'
+                  }`}
+                >
+                  <FileText size={14} /> Process Another File
+                </button>
               </div>
             </div>
 
