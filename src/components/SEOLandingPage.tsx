@@ -97,34 +97,8 @@ const SEOLandingPage: React.FC<SEOLandingPageProps> = ({ tool: toolProp, toolId,
     .map(id => TOOLS.find(t => t.id === id))
     .filter(Boolean);
 
-  // When files are actively loaded, render the focused single-viewport interactive workspace
-  if (hasActiveWork) {
-    return (
-      <div className="animate-fadeIn w-full h-[calc(100vh-64px)] overflow-hidden flex flex-col bg-[#f4f5f8] dark:bg-slate-950">
-        <Helmet>
-          <title>{tool.seoTitle || `${tool.title} – Free & Private Online Tool | PDFBolt`}</title>
-          <meta name="description" content={tool.description} />
-          <link rel="canonical" href={canonicalUrl} />
-          <meta property="og:title" content={tool.seoTitle || tool.title} />
-          <meta property="og:description" content={tool.description} />
-          <meta property="og:url" content={canonicalUrl} />
-          <script type="application/ld+json">{JSON.stringify(softwareSchema)}</script>
-          <script type="application/ld+json">{JSON.stringify(breadcrumbSchema)}</script>
-          {howToSchema && <script type="application/ld+json">{JSON.stringify(howToSchema)}</script>}
-          {faqSchema && <script type="application/ld+json">{JSON.stringify(faqSchema)}</script>}
-        </Helmet>
-
-        {/* The 2-Column Working Tool Area (Edge-to-Edge Full Height) */}
-        <div className="w-full h-full flex-grow overflow-hidden">
-          {children}
-        </div>
-      </div>
-    );
-  }
-
-  // Default Landing / Dropzone View (When no file uploaded yet)
   return (
-    <div className="animate-fadeIn w-full min-h-[calc(100vh-64px)] lg:h-[calc(100vh-64px)] lg:overflow-hidden flex flex-col justify-between bg-white dark:bg-slate-900">
+    <div className={`animate-fadeIn w-full ${hasActiveWork ? 'h-[calc(100vh-64px)] overflow-hidden bg-[#f4f5f8] dark:bg-slate-950 flex flex-col' : 'min-h-[calc(100vh-64px)] lg:h-[calc(100vh-64px)] lg:overflow-hidden flex flex-col justify-between bg-white dark:bg-slate-900'}`}>
       <Helmet>
         <title>{tool.seoTitle || `${tool.title} – Free & Private Online Tool | PDFBolt`}</title>
         <meta name="description" content={tool.description} />
@@ -138,39 +112,43 @@ const SEOLandingPage: React.FC<SEOLandingPageProps> = ({ tool: toolProp, toolId,
         {faqSchema && <script type="application/ld+json">{JSON.stringify(faqSchema)}</script>}
       </Helmet>
 
-      {/* 1. HERO HEADER (Clean, Minimal, Non-Scrolling) */}
-      <div className={`pt-6 pb-4 border-b shrink-0 ${darkMode ? 'border-slate-800 bg-slate-900/50' : 'border-slate-100 bg-slate-50'}`}>
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
-          {/* Breadcrumb Navigation */}
-          <nav className="flex justify-center items-center gap-2 text-xs font-semibold mb-1 text-slate-500">
-            <Link to="/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Home</Link>
-            <span>/</span>
-            <Link to="/tools" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">PDF Tools</Link>
-            <span>/</span>
-            <span className="text-yellow-700 dark:hover:text-yellow-400 font-bold">{tool.title}</span>
-          </nav>
+      {/* 1. HERO HEADER (Clean, Minimal, Shown only before file upload) */}
+      {!hasActiveWork && (
+        <div className={`pt-6 pb-4 border-b shrink-0 ${darkMode ? 'border-slate-800 bg-slate-900/50' : 'border-slate-100 bg-slate-50'}`}>
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
+            {/* Breadcrumb Navigation */}
+            <nav className="flex justify-center items-center gap-2 text-xs font-semibold mb-1 text-slate-500">
+              <Link to="/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Home</Link>
+              <span>/</span>
+              <Link to="/tools" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">PDF Tools</Link>
+              <span>/</span>
+              <span className="text-yellow-700 dark:text-yellow-400 font-bold">{tool.title}</span>
+            </nav>
 
-          <h1 className={`text-3xl sm:text-4xl md:text-5xl font-black mb-2 tracking-tight leading-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>
-            {tool.title}
-          </h1>
-          <p className={`text-sm sm:text-base max-w-xl mx-auto font-medium ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
-            {tool.description}
-          </p>
+            <h1 className={`text-3xl sm:text-4xl md:text-5xl font-black mb-2 tracking-tight leading-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+              {tool.title}
+            </h1>
+            <p className={`text-sm sm:text-base max-w-xl mx-auto font-medium ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+              {tool.description}
+            </p>
+          </div>
         </div>
-      </div>
+      )}
 
-      {/* 2. THE WORKING INTERACTIVE TOOL (Center Select File Area) */}
-      <div className="flex-grow flex items-center justify-center p-4 sm:p-6 my-auto">
+      {/* 2. THE WORKING INTERACTIVE TOOL (Full space when active, centered when landing) */}
+      <div className={hasActiveWork ? "w-full h-full flex-grow overflow-hidden" : "flex-grow flex items-center justify-center p-4 sm:p-6 my-auto"}>
         {children}
       </div>
 
-      {/* 3. NON-INTRUSIVE HIGH-VISIBILITY AD PLACEMENT (BELOW UPLOADER) */}
-      <div className="max-w-4xl mx-auto px-4 w-full my-2 shrink-0 flex justify-center">
-        <AdSlot placement="TOOL_CONTENT_BOTTOM" className="w-full flex justify-center" />
-      </div>
+      {/* 3. NON-INTRUSIVE HIGH-VISIBILITY AD PLACEMENT (Only on landing dropzone page) */}
+      {!hasActiveWork && (
+        <div className="max-w-4xl mx-auto px-4 w-full my-2 shrink-0 flex justify-center">
+          <AdSlot placement="TOOL_CONTENT_BOTTOM" className="w-full flex justify-center" />
+        </div>
+      )}
 
-      {/* 4. RELATED PDF TOOLS (Sleek Suggestive Bottom Bar) */}
-      {relatedToolsList.length > 0 && (
+      {/* 4. RELATED PDF TOOLS (Sleek Suggestive Bottom Bar - Only on landing page) */}
+      {!hasActiveWork && relatedToolsList.length > 0 && (
         <div className={`border-t px-6 py-2.5 shrink-0 ${darkMode ? 'border-slate-800 bg-slate-900/40' : 'border-slate-100 bg-white'}`}>
           <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
             <span className="text-[11px] font-black uppercase tracking-wider text-slate-400 shrink-0 hidden sm:inline">
