@@ -106,6 +106,7 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [imagePreviewUrls, setImagePreviewUrls] = useState<string[]>([]);
   const [pageCount, setPageCount] = useState<number | null>(null);
+  const [rotateAngle, setRotateAngle] = useState(90);
 
   // Sync active work
   useEffect(() => {
@@ -301,7 +302,7 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
       setProgress(25);
 
       // -- EDIT TOOLS --
-      if (mode === 'rotate' && file) b = await rotateFile(file, 90);
+      if (mode === 'rotate' && file) b = await rotateFile(file, rotateAngle);
       else if (mode === 'numbers' && file) b = await addPageNumbers(file);
       else if (mode === 'compress') {
         if (isZip && multiFiles.length > 0) {
@@ -932,6 +933,118 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
                 </div>
               )}
 
+              {/* Compression Level Settings */}
+              {mode === 'compress' && (
+                <div className="space-y-3">
+                  <label className="block text-xs font-black uppercase tracking-widest text-slate-500">Compression Level</label>
+                  {[
+                    { id: 'extreme', title: 'Extreme Compression', desc: 'Less quality, high compression', tag: 'Maximum Size Reduction' },
+                    { id: 'recommended', title: 'Recommended Compression', desc: 'Good quality, good compression', tag: 'Most Popular' },
+                    { id: 'less', title: 'Less Compression', desc: 'High quality, less compression', tag: 'Best Quality' }
+                  ].map((level) => (
+                    <button
+                      key={level.id}
+                      type="button"
+                      onClick={() => setCompressionLevel(level.id)}
+                      className={`w-full p-4 rounded-xl border-2 text-left transition-all flex items-start justify-between gap-3 cursor-pointer ${
+                        compressionLevel === level.id
+                          ? 'border-[#e53935] bg-red-50/50 dark:bg-red-950/20 text-slate-900 dark:text-white ring-2 ring-[#e53935]/20 shadow-sm'
+                          : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 text-slate-700 dark:text-slate-300'
+                      }`}
+                    >
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <p className="text-xs font-black uppercase tracking-wider">{level.title}</p>
+                          {level.id === 'recommended' && (
+                            <span className="text-[9px] font-black uppercase px-2 py-0.5 bg-red-100 text-red-700 rounded-full">Recommended</span>
+                          )}
+                        </div>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{level.desc}</p>
+                      </div>
+                      {compressionLevel === level.id && (
+                        <CheckCircle2 size={18} className="text-[#e53935] shrink-0 mt-0.5" />
+                      )}
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {/* Rotate Tool Settings */}
+              {mode === 'rotate' && (
+                <div className="space-y-3">
+                  <label className="block text-xs font-black uppercase tracking-widest text-slate-500">Rotation Angle</label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {[
+                      { angle: 90, label: '90° Right' },
+                      { angle: 180, label: '180° Flip' },
+                      { angle: 270, label: '90° Left' }
+                    ].map((rot) => (
+                      <button
+                        key={rot.angle}
+                        type="button"
+                        onClick={() => setRotateAngle(rot.angle)}
+                        className={`p-3 rounded-xl text-xs font-bold border transition-all text-center cursor-pointer ${
+                          rotateAngle === rot.angle
+                            ? 'bg-[#e53935] text-white border-[#e53935] font-black shadow-md'
+                            : 'border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50'
+                        }`}
+                      >
+                        {rot.label}
+                      </button>
+                    ))}
+                  </div>
+                  <p className="text-[11px] text-slate-400">Rotates all pages in the PDF document by the chosen degree.</p>
+                </div>
+              )}
+
+              {/* Add Page Numbers Settings */}
+              {mode === 'numbers' && (
+                <div className="space-y-3">
+                  <div className="p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50">
+                    <p className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white">Page Numbering</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                      Sequential page numbering will be added at the bottom-right margin across all pages.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* OCR PDF Settings */}
+              {mode === 'ocr' && (
+                <div className="space-y-3">
+                  <div className="p-4 rounded-xl border-2 border-emerald-500/50 bg-emerald-50/40 dark:bg-emerald-950/20">
+                    <p className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white">OCR Engine</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                      Extracts and converts scanned text into searchable, selectable PDF content.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Repair PDF Settings */}
+              {mode === 'repair' && (
+                <div className="space-y-3">
+                  <div className="p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50">
+                    <p className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white">Deep PDF Recovery</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                      Scans and recovers damaged cross-reference tables, corrupt trailers, and broken text streams.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Conversions Information Panel (PDF to Excel, PPT, JPG, Word, etc.) */}
+              {['pdf2excel', 'pdf2ppt', 'pdf2jpg', 'word2pdf', 'excel2pdf', 'ppt2pdf', 'html2pdf'].includes(mode) && (
+                <div className="space-y-3">
+                  <div className="p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50">
+                    <p className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white">Document Conversion</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                      Preserves typography, table alignment, vector assets, and page geometry during conversion.
+                    </p>
+                  </div>
+                </div>
+              )}
+
               {/* Images to PDF Settings */}
               {isImageTool && (
                 <div className="space-y-3 text-xs">
@@ -944,7 +1057,7 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
                           type="button"
                           onClick={() => setImgOrientation(o)}
                           className={`flex-1 py-2 rounded-xl font-bold border transition-all ${
-                            imgOrientation === o ? 'bg-yellow-500 text-slate-950 font-black border-yellow-500' : 'border-slate-200 dark:border-slate-700'
+                            imgOrientation === o ? 'bg-[#e53935] text-white font-black border-[#e53935]' : 'border-slate-200 dark:border-slate-700'
                           }`}
                         >
                           {o.charAt(0).toUpperCase() + o.slice(1)}
@@ -962,7 +1075,7 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
                           type="button"
                           onClick={() => setImgPageSize(s)}
                           className={`flex-1 py-2 rounded-xl font-bold border transition-all ${
-                            imgPageSize === s ? 'bg-yellow-500 text-slate-950 font-black border-yellow-500' : 'border-slate-200 dark:border-slate-700'
+                            imgPageSize === s ? 'bg-[#e53935] text-white font-black border-[#e53935]' : 'border-slate-200 dark:border-slate-700'
                           }`}
                         >
                           {s.toUpperCase()}

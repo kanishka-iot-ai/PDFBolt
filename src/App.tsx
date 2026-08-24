@@ -179,7 +179,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ darkMode, setDarkMode, soundEna
             {/* Canonical Tool Routes (Wrapped in Rich SEOLandingPage) */}
             <Route path="/merge-pdf" element={<SEOLandingPage toolId="merge" darkMode={darkMode}><MergeTool darkMode={darkMode} notify={notify} /></SEOLandingPage>} />
             <Route path="/split-pdf" element={<SEOLandingPage toolId="split" darkMode={darkMode}><SimpleTool title="Split PDF" mode="split" darkMode={darkMode} notify={notify} /></SEOLandingPage>} />
-            <Route path="/compress-pdf" element={<SEOLandingPage toolId="compress" darkMode={darkMode}><CompressTool darkMode={darkMode} notify={notify} /></SEOLandingPage>} />
+            <Route path="/compress-pdf" element={<SEOLandingPage toolId="compress" darkMode={darkMode}><SimpleTool title="Compress PDF" mode="compress" darkMode={darkMode} notify={notify} /></SEOLandingPage>} />
             <Route path="/pdf-to-word" element={<SEOLandingPage toolId="pdf-to-word" darkMode={darkMode}><SimpleTool title="PDF to Word" mode="pdf2word" darkMode={darkMode} notify={notify} /></SEOLandingPage>} />
             <Route path="/pdf-to-ppt" element={<SEOLandingPage toolId="pdf-to-ppt" darkMode={darkMode}><SimpleTool title="PDF to PPT" mode="pdf2ppt" darkMode={darkMode} notify={notify} /></SEOLandingPage>} />
             <Route path="/pdf-to-excel" element={<SEOLandingPage toolId="pdf-to-excel" darkMode={darkMode}><SimpleTool title="PDF to Excel" mode="pdf2excel" darkMode={darkMode} notify={notify} /></SEOLandingPage>} />
