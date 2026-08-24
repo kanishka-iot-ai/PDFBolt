@@ -55,21 +55,20 @@ const CookieConsent: React.FC<CookieConsentProps> = ({ darkMode }) => {
 
   return (
     <aside 
-      className="fixed bottom-4 left-4 right-4 md:left-auto md:right-6 md:max-w-md z-50 animate-slideUp"
+      className="fixed bottom-3 left-3 right-3 sm:bottom-4 sm:left-auto sm:right-6 sm:max-w-md z-50 animate-slideUp"
       aria-label="Cookie and Privacy Consent"
     >
-      <div className={`p-5 rounded-3xl border shadow-2xl backdrop-blur-xl ${
+      <div className={`p-4 sm:p-5 rounded-2xl sm:rounded-3xl border shadow-2xl backdrop-blur-xl ${
         darkMode ? 'bg-slate-900/95 border-slate-700 text-white' : 'bg-white/95 border-slate-200 text-slate-900'
       }`}>
-        <div className="flex items-start gap-3.5 mb-3">
-          <div className="p-2.5 rounded-2xl bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 shrink-0 mt-0.5">
-            <Cookie size={20} />
+        <div className="flex items-start gap-3 mb-2.5 sm:mb-3">
+          <div className="p-2 sm:p-2.5 rounded-xl sm:rounded-2xl bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 shrink-0 mt-0.5">
+            <Cookie size={18} className="sm:w-5 sm:h-5" />
           </div>
           <div>
-            <p className="text-sm font-black tracking-tight">Privacy & Advertising Preferences</p>
-            <p className="text-xs text-slate-600 dark:text-slate-400 mt-1 leading-relaxed">
-
-              PDFBolt processes all documents <strong>100% locally in your browser</strong>. We use cookies to enhance navigation and deliver relevant advertisements.
+            <p className="text-xs sm:text-sm font-black tracking-tight">Privacy & Advertising Preferences</p>
+            <p className="text-[11px] sm:text-xs text-slate-600 dark:text-slate-400 mt-0.5 sm:mt-1 leading-relaxed">
+              PDFBolt processes documents <strong>100% locally in your browser</strong>. We use cookies to enhance navigation and deliver relevant advertisements.
             </p>
           </div>
         </div>
@@ -91,7 +90,7 @@ const CookieConsent: React.FC<CookieConsentProps> = ({ darkMode }) => {
           </button>
           <Link
             to="/privacy"
-            className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 hover:text-yellow-700 dark:hover:text-yellow-400 underline ml-1"
+            className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 hover:text-yellow-700 dark:hover:text-yellow-400 underline ml-1 shrink-0"
           >
             Privacy
           </Link>

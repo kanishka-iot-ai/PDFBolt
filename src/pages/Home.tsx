@@ -90,11 +90,11 @@ const Home: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
     <div className="animate-fadeIn">
       {/* 1. NEW COMPACT HERO SECTION (Above the fold) */}
       <section
-        className={`relative pt-6 pb-6 sm:pt-10 sm:pb-8 text-center border-b ${
+        className={`relative overflow-hidden pt-6 pb-6 sm:pt-10 sm:pb-8 text-center border-b ${
           darkMode ? 'border-slate-800 bg-slate-950' : 'border-slate-100 bg-slate-50/80'
         }`}
       >
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[250px] bg-yellow-500/15 blur-[100px] rounded-full pointer-events-none"></div>
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[320px] sm:w-[600px] h-[200px] sm:h-[250px] bg-yellow-500/15 blur-[80px] sm:blur-[100px] rounded-full pointer-events-none"></div>
 
         <div className="max-w-4xl mx-auto px-4 sm:px-6 relative z-10">
           {/* Small Badge */}
@@ -199,7 +199,7 @@ const Home: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
           </div>
 
           {/* Category Filter Pills */}
-          <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar py-1">
+          <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar py-1 w-full sm:w-auto -mx-4 px-4 sm:mx-0 sm:px-0">
             {categories.map(cat => (
               <button
                 key={cat.id}
@@ -210,7 +210,7 @@ const Home: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
                   if (cat.id === 'all') setShowAllTools(true);
                   if (cat.id === 'popular') setShowAllTools(false);
                 }}
-                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all shrink-0 cursor-pointer ${
+                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all shrink-0 whitespace-nowrap cursor-pointer ${
                   activeCategory === cat.id && !searchQuery
                     ? 'bg-yellow-500 text-slate-950 shadow-md shadow-yellow-500/20'
                     : darkMode
