@@ -126,6 +126,10 @@ const AdSlot: React.FC<AdSlotProps> = ({
           data-adtest={isAdTestMode() ? 'on' : undefined}
         />
       </div>
+
+      <p className="mt-1 text-[9px] text-slate-400 dark:text-slate-500 font-medium select-none tracking-tight">
+        Third-party advertisement • PDFBolt is not affiliated with or endorsing advertised services.
+      </p>
     </aside>
   );
 };
