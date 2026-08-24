@@ -142,23 +142,39 @@ const MergeTool: React.FC<{ darkMode: boolean; notify: NotifySystem }> = ({ dark
               <AdSlot placement="TOOL_CONTENT_BOTTOM" className="w-full flex justify-center" />
             </div>
 
-            {/* Canvas Center Stage: Multi-PDF Grid */}
-            <div className="flex-grow flex flex-col items-center justify-center my-auto py-6">
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 max-h-[440px] overflow-y-auto p-2 w-full max-w-4xl">
+            {/* Canvas Center Stage: Multi-PDF Grid with Dynamic Adaptive Card Sizing */}
+            <div className="flex-grow flex flex-col items-center justify-center my-auto py-4">
+              <div className={`grid ${
+                files.length <= 2
+                  ? 'grid-cols-1 sm:grid-cols-2 max-w-lg'
+                  : files.length <= 4
+                  ? 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 max-w-3xl'
+                  : files.length <= 8
+                  ? 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 max-w-4xl'
+                  : 'grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 max-w-5xl'
+              } gap-3 sm:gap-4 max-h-[min(52vh,460px)] overflow-y-auto p-2 w-full justify-items-center`}>
                 {files.map((f, i) => (
                   <div key={`${f.name}-${f.size}-${f.lastModified}-${i}`} className="flex flex-col items-center">
                     {/* Top Pill Badge */}
-                    <div className="mb-2 px-2.5 py-0.5 rounded-full bg-slate-500/80 text-white text-[10px] font-bold shadow-sm">
+                    <div className="mb-1.5 px-2 py-0.5 rounded-full bg-slate-500/80 text-white text-[9px] font-bold shadow-sm">
                       Part {i + 1}
                     </div>
 
-                    {/* White Paper A4 Sheet */}
-                    <div className="relative group w-36 sm:w-44 bg-white dark:bg-slate-800 rounded-xl border border-slate-200/90 dark:border-slate-700 shadow-lg hover:shadow-xl transition-all duration-200 p-2 flex flex-col items-center">
+                    {/* White Paper A4 Sheet with Responsive Sizing */}
+                    <div className={`relative group ${
+                      files.length <= 2
+                        ? 'w-40 sm:w-48'
+                        : files.length <= 4
+                        ? 'w-32 sm:w-36'
+                        : files.length <= 8
+                        ? 'w-24 sm:w-28'
+                        : 'w-20 sm:w-24'
+                    } bg-white dark:bg-slate-800 rounded-xl border border-slate-200/90 dark:border-slate-700 shadow-lg hover:shadow-xl transition-all duration-200 p-1.5 flex flex-col items-center`}>
                       <div className="w-full aspect-[1/1.414] rounded-lg overflow-hidden bg-slate-50 dark:bg-slate-900 flex items-center justify-center border border-slate-100 dark:border-slate-800 shadow-inner">
                         <PDFThumbnail file={f} className="w-full h-full object-contain" alt={f.name} />
                       </div>
 
-                      <p className="mt-1.5 text-xs font-semibold text-slate-700 dark:text-slate-200 truncate max-w-full text-center px-1" title={f.name}>
+                      <p className="mt-1 text-[11px] font-semibold text-slate-700 dark:text-slate-200 truncate max-w-full text-center px-1" title={f.name}>
                         {f.name}
                       </p>
 
@@ -169,18 +185,18 @@ const MergeTool: React.FC<{ darkMode: boolean; notify: NotifySystem }> = ({ dark
                           onClick={() => move(i, 'up')}
                           disabled={i === 0 || processing}
                           aria-label={`Move ${f.name} up`}
-                          className="p-1 rounded bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-yellow-500 hover:text-black disabled:opacity-20 transition-colors"
+                          className="p-1 rounded bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-yellow-500 hover:text-black disabled:opacity-20 transition-colors cursor-pointer"
                         >
-                          <ArrowUp size={12} />
+                          <ArrowUp size={11} />
                         </button>
                         <button
                           type="button"
                           onClick={() => move(i, 'down')}
                           disabled={i === files.length - 1 || processing}
                           aria-label={`Move ${f.name} down`}
-                          className="p-1 rounded bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-yellow-500 hover:text-black disabled:opacity-20 transition-colors"
+                          className="p-1 rounded bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-yellow-500 hover:text-black disabled:opacity-20 transition-colors cursor-pointer"
                         >
-                          <ArrowDown size={12} />
+                          <ArrowDown size={11} />
                         </button>
                       </div>
 

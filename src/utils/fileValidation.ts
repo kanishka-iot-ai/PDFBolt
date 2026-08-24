@@ -23,8 +23,8 @@ export const ALLOWED_MIME_TYPES = {
 
 export const MAX_FILE_SIZE = {
     PDF: 100 * 1024 * 1024, // 100MB for general PDF operations
-    IMAGE: 50 * 1024 * 1024, // 50MB for images
-    DOCUMENT: 50 * 1024 * 1024, // 50MB for Word/Excel/PPT
+    IMAGE: 100 * 1024 * 1024, // 100MB for images
+    DOCUMENT: 100 * 1024 * 1024, // 100MB for Word/Excel/PPT
     QR: 100 * 1024 * 1024, // 100MB for QR code sharing
 };
 

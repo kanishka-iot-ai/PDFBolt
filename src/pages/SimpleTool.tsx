@@ -680,25 +680,25 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
             </div>
 
             {/* Canvas Center Stage */}
-            <div className="flex-grow flex flex-col items-center justify-center my-auto py-6">
+            <div className="flex-grow flex flex-col items-center justify-center my-auto py-4">
               {/* Single Document Card */}
               {file && !isImageTool && mode !== 'compare' && (
                 <div className="flex flex-col items-center">
                   {/* Floating Pill Badge on top: Size & Page count */}
-                  <div className="mb-2.5 px-3.5 py-1 rounded-full bg-slate-500/80 text-white text-[11px] font-bold shadow-sm tracking-wide">
+                  <div className="mb-2 px-3 py-0.5 rounded-full bg-slate-500/80 text-white text-[10px] font-bold shadow-sm tracking-wide">
                     {formatBytes(file.size)}{pageCount ? ` - ${pageCount} pages` : ''}
                   </div>
 
-                  {/* Clean White A4 Paper Card */}
+                  {/* Clean White A4 Paper Card (Adaptive & Ad-Safe) */}
                   <div className="relative group">
-                    <div className="w-48 sm:w-56 md:w-60 bg-white dark:bg-slate-800 rounded-xl border border-slate-200/90 dark:border-slate-700 shadow-xl hover:shadow-2xl transition-all duration-200 p-2.5 flex flex-col items-center">
+                    <div className="w-40 sm:w-48 md:w-52 bg-white dark:bg-slate-800 rounded-xl border border-slate-200/90 dark:border-slate-700 shadow-xl hover:shadow-2xl transition-all duration-200 p-2 flex flex-col items-center">
                       {/* Real Visual Page 1 Preview Thumbnail */}
-                      <div className="w-full aspect-[1/1.414] rounded-lg overflow-hidden bg-slate-50 dark:bg-slate-900 flex items-center justify-center border border-slate-100 dark:border-slate-800 shadow-inner">
+                      <div className="w-full aspect-[1/1.414] max-h-[320px] rounded-lg overflow-hidden bg-slate-50 dark:bg-slate-900 flex items-center justify-center border border-slate-100 dark:border-slate-800 shadow-inner">
                         <PDFThumbnail file={file} className="w-full h-full object-contain" alt={file.name} onPageCount={setPageCount} />
                       </div>
 
                       {/* File Name Label */}
-                      <p className="mt-2 text-xs font-semibold text-slate-700 dark:text-slate-200 truncate max-w-full text-center px-1" title={file.name}>
+                      <p className="mt-1.5 text-xs font-semibold text-slate-700 dark:text-slate-200 truncate max-w-full text-center px-1" title={file.name}>
                         {file.name}
                       </p>
                     </div>
@@ -718,24 +718,32 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
                 </div>
               )}
 
-              {/* Multi-Image Gallery Stage */}
+              {/* Multi-Image Gallery Stage with Adaptive Grid */}
               {isImageTool && (
-                <div className="w-full max-w-3xl space-y-4">
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 max-h-[380px] overflow-y-auto p-2">
+                <div className="w-full max-w-4xl space-y-3">
+                  <div className={`grid ${
+                    multiFiles.length <= 4
+                      ? 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 max-w-2xl'
+                      : multiFiles.length <= 8
+                      ? 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 max-w-3xl'
+                      : 'grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 max-w-4xl'
+                  } gap-3 max-h-[min(52vh,460px)] overflow-y-auto p-2 mx-auto justify-items-center`}>
                     {multiFiles.map((f, i) => (
-                      <div key={`${f.name}-${f.size}-${f.lastModified}-${i}`} className="relative group rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 aspect-[3/4] bg-white dark:bg-slate-800 shadow-md p-1.5 flex flex-col items-center">
+                      <div key={`${f.name}-${f.size}-${f.lastModified}-${i}`} className={`relative group rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 aspect-[3/4] ${
+                        multiFiles.length <= 4 ? 'w-32 sm:w-36' : multiFiles.length <= 8 ? 'w-24 sm:w-28' : 'w-20 sm:w-24'
+                      } bg-white dark:bg-slate-800 shadow-md p-1 flex flex-col items-center`}>
                         <img src={imagePreviewUrls[i]} className="w-full h-full object-cover rounded" alt={f.name} />
                         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                           <button
                             type="button"
                             onClick={() => setMultiFiles(prev => prev.filter((_, idx) => idx !== i))}
-                            className="p-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors cursor-pointer"
+                            className="p-1.5 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors cursor-pointer"
                             aria-label="Remove image"
                           >
-                            <Trash2 size={14} />
+                            <Trash2 size={13} />
                           </button>
                         </div>
-                        <div className="absolute bottom-1 left-1 right-1 bg-black/70 backdrop-blur-sm rounded px-1.5 py-0.5 text-[9px] text-white truncate font-bold text-center">
+                        <div className="absolute bottom-1 left-1 right-1 bg-black/70 backdrop-blur-sm rounded px-1 py-0.5 text-[8px] text-white truncate font-bold text-center">
                           {f.name}
                         </div>
                       </div>
