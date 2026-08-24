@@ -654,15 +654,6 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
 
   return (
     <div className="w-full h-full text-center animate-fadeIn">
-      {statusMessage && (
-        <div className={`max-w-3xl mx-auto my-4 rounded-2xl border px-5 py-4 text-sm font-bold text-left ${processingStatus === 'error'
-          ? 'bg-red-50 text-red-700 border-red-100 dark:bg-red-900/20 dark:text-red-200 dark:border-red-900/40'
-          : 'bg-blue-50 text-blue-700 border-blue-100 dark:bg-blue-900/20 dark:text-blue-200 dark:border-blue-900/40'
-          }`}>
-          {statusMessage}
-        </div>
-      )}
-
       {!file && multiFiles.length === 0 ? (
         <div className="max-w-4xl mx-auto px-4 py-8 space-y-12">
           <FileUploader
@@ -1225,111 +1216,6 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
             </div>
           )}
 
-          {/* OCR Recognition Report & Text Card */}
-          {mode === 'ocr' && ocrResultData && (
-            <div className="w-full p-6 sm:p-8 rounded-3xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-xl text-left space-y-4">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <div>
-                  <span className="text-[11px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400">
-                    OCR Recognition Complete
-                  </span>
-                  <h3 className="text-2xl font-black mt-0.5 text-slate-900 dark:text-white">
-                    Searchable PDF & Extracted Text Ready
-                  </h3>
-                </div>
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (ocrResultData.fullText) {
-                        navigator.clipboard.writeText(ocrResultData.fullText);
-                        setCopiedOcrText(true);
-                        notify.success();
-                        setTimeout(() => setCopiedOcrText(false), 2000);
-                      }
-                    }}
-                    className="px-3.5 py-2 rounded-xl bg-slate-900 dark:bg-slate-700 hover:bg-slate-800 text-white font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer"
-                  >
-                    {copiedOcrText ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} />}
-                    <span>{copiedOcrText ? 'Copied!' : 'Copy Text'}</span>
-                  </button>
-
-                  <a
-                    href={`data:text/plain;charset=utf-8,${encodeURIComponent(ocrResultData.fullText)}`}
-                    download={`pdfbolt_ocr_${file?.name ? file.name.replace(/\.pdf$/i, '') : 'transcript'}.txt`}
-                    className="px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold text-xs flex items-center gap-1.5 transition-all"
-                  >
-                    <Download size={14} />
-                    <span>Download TXT</span>
-                  </a>
-                </div>
-              </div>
-
-              {/* Statistics Grid */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-center">
-                <div className="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-xl border border-slate-100 dark:border-slate-800">
-                  <div className="text-xl font-black text-slate-900 dark:text-white">{ocrResultData.pageCount}</div>
-                  <div className="text-[10px] font-bold uppercase text-slate-400">Pages Processed</div>
-                </div>
-                <div className="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-xl border border-slate-100 dark:border-slate-800">
-                  <div className="text-xl font-black text-emerald-600 dark:text-emerald-400">{ocrResultData.wordCount}</div>
-                  <div className="text-[10px] font-bold uppercase text-slate-400">Words Recognized</div>
-                </div>
-                <div className="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-xl border border-slate-100 dark:border-slate-800 col-span-2 sm:col-span-1">
-                  <div className="text-xl font-black text-blue-600 dark:text-blue-400">Searchable PDF</div>
-                  <div className="text-[10px] font-bold uppercase text-slate-400">Layer Format</div>
-                </div>
-              </div>
-
-              {/* Extracted Text Preview Box */}
-              <div className="space-y-1.5">
-                <label className="text-[11px] font-black uppercase tracking-wider text-slate-400">
-                  Extracted Text Preview
-                </label>
-                <div className="max-h-48 overflow-y-auto p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 font-mono text-xs text-slate-800 dark:text-slate-200 whitespace-pre-wrap leading-relaxed select-text">
-                  {ocrResultData.fullText || 'No printable text recognized.'}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Repair Report */}
-          {mode === 'repair' && repairReport && (
-            <div className="w-full p-6 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-md text-left space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-black uppercase tracking-wider text-slate-500">Structural Recovery Report</span>
-                <span className={`px-3 py-1 rounded-full text-xs font-black uppercase ${repairReport.status === 'repaired' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'}`}>
-                  {repairReport.status === 'repaired' ? 'Fully Repaired' : 'Partial Recovery'}
-                </span>
-              </div>
-
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
-                <div className="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-xl border border-slate-100 dark:border-slate-800">
-                  <div className="text-xl font-black text-slate-800 dark:text-white">{repairReport.original_pages}</div>
-                  <div className="text-[10px] font-bold uppercase text-slate-400">Original Pages</div>
-                </div>
-                <div className="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-xl border border-slate-100 dark:border-slate-800">
-                  <div className="text-xl font-black text-green-600">{repairReport.recovered_pages}</div>
-                  <div className="text-[10px] font-bold uppercase text-slate-400">Recovered</div>
-                </div>
-                <div className="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-xl border border-slate-100 dark:border-slate-800">
-                  <div className={`text-xl font-black ${repairReport.pages_lost > 0 ? 'text-red-500' : 'text-slate-400'}`}>{repairReport.pages_lost}</div>
-                  <div className="text-[10px] font-bold uppercase text-slate-400">Lost</div>
-                </div>
-                <div className="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-xl border border-slate-100 dark:border-slate-800">
-                  <div className="text-xl font-black text-yellow-600 dark:text-yellow-400">{repairReport.repair_score}%</div>
-                  <div className="text-[10px] font-bold uppercase text-slate-400">Score</div>
-                </div>
-              </div>
-
-              {repairReport.warnings && repairReport.warnings.length > 0 && (
-                <div className="p-3 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/30 rounded-xl text-xs text-amber-800 dark:text-amber-300">
-                  {repairReport.warnings.map((w: string, i: number) => <div key={i}>⚠️ {w}</div>)}
-                </div>
-              )}
-            </div>
-          )}
-
               {/* Download Area */}
               {Array.isArray(result) ? (
                 <div className="flex flex-col items-center gap-6 w-full">
@@ -1393,10 +1279,7 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
                 </div>
               )}
 
-              {/* Non-Intrusive Result Screen Sponsored Slot (Far below download button) */}
-              <AdSlot placement="RESULT_BOTTOM" />
-
-              {/* Process Another File CTA */}
+              {/* Process Another File CTA (Prominently directly under Download) */}
               <button
                 onClick={clearSelection}
                 className={`w-full py-4 rounded-2xl font-black text-sm uppercase tracking-wider border-2 transition-all hover:scale-[1.01] flex items-center justify-center gap-2 ${
@@ -1407,6 +1290,9 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
               >
                 <FileText size={16} /> Process Another File
               </button>
+
+              {/* Non-Intrusive Result Screen Sponsored Slot (Far below download button) */}
+              <AdSlot placement="RESULT_BOTTOM" />
 
             </div>
           )}
