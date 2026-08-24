@@ -5,15 +5,17 @@ interface PDFThumbnailProps {
   file: File;
   className?: string;
   alt?: string;
+  onPageCount?: (pages: number) => void;
 }
 
-// Deduplicated data-URL cache (data URLs don't need revocation)
+// Deduplicated data-URL and page-count cache
 const thumbnailCache = new Map<string, string>();
+const pageCountCache = new Map<string, number>();
 
 // Worker URL set once at module level — not on every render
 let _workerSet = false;
 
-const PDFThumbnail: React.FC<PDFThumbnailProps> = ({ file, className = '', alt = 'PDF Preview' }) => {
+const PDFThumbnail: React.FC<PDFThumbnailProps> = ({ file, className = '', alt = 'PDF Preview', onPageCount }) => {
   const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -27,6 +29,9 @@ const PDFThumbnail: React.FC<PDFThumbnailProps> = ({ file, className = '', alt =
 
     if (thumbnailCache.has(cacheKey)) {
       setThumbnailUrl(thumbnailCache.get(cacheKey)!);
+      if (pageCountCache.has(cacheKey) && onPageCount) {
+        onPageCount(pageCountCache.get(cacheKey)!);
+      }
       setLoading(false);
       return () => {
         active = false;
@@ -41,6 +46,8 @@ const PDFThumbnail: React.FC<PDFThumbnailProps> = ({ file, className = '', alt =
         if (!active) return;
         const dataUrl = e.target?.result as string;
         thumbnailCache.set(cacheKey, dataUrl);
+        pageCountCache.set(cacheKey, 1);
+        if (onPageCount) onPageCount(1);
         if (isMounted.current) {
           setThumbnailUrl(dataUrl);
           setLoading(false);
@@ -75,8 +82,12 @@ const PDFThumbnail: React.FC<PDFThumbnailProps> = ({ file, className = '', alt =
           const arrayBuffer = await file.arrayBuffer();
           if (!active) return;
 
-          const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+          const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(arrayBuffer) }).promise;
           if (!active) { pdf.destroy(); return; }
+
+          const numPages = pdf.numPages;
+          pageCountCache.set(cacheKey, numPages);
+          if (onPageCount) onPageCount(numPages);
 
           const page = await pdf.getPage(1);
           if (!active) { pdf.destroy(); return; }
@@ -102,7 +113,8 @@ const PDFThumbnail: React.FC<PDFThumbnailProps> = ({ file, className = '', alt =
             setThumbnailUrl(dataUrl);
             setLoading(false);
           }
-        } catch {
+        } catch (err) {
+          console.warn('[PDFThumbnail] Error rendering first page thumbnail:', err);
           if (isMounted.current && active) {
             setError(true);
             setLoading(false);
