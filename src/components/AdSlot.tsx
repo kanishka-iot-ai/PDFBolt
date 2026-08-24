@@ -54,7 +54,7 @@ const AdSlot: React.FC<AdSlotProps> = ({
   const pushedRef = useRef<boolean>(false);
 
   useEffect(() => {
-    if (!adsActive || !clientId || !adSlotId || pushedRef.current) {
+    if (!adsActive || !clientId || pushedRef.current) {
       return;
     }
 
@@ -120,7 +120,7 @@ const AdSlot: React.FC<AdSlotProps> = ({
             ...style
           }}
           data-ad-client={clientId}
-          data-ad-slot={adSlotId}
+          data-ad-slot={adSlotId || undefined}
           data-ad-format={adFormat}
           data-full-width-responsive={isResponsive ? 'true' : 'false'}
           data-adtest={isAdTestMode() ? 'on' : undefined}
