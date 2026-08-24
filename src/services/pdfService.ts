@@ -4,7 +4,7 @@ import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;const degrees = (angle: number) => ({ type: 'degrees' as const, angle });
 
-function parsePageSelection(input: string, totalCount: number, allowRanges: boolean): number[] {
+function parsePageSelection(input: string, totalCount: number, allowRanges: boolean = true): number[] {
   const pages = new Set<number>();
   const segments = input.split(',').map(s => s.trim()).filter(Boolean);
 
@@ -14,13 +14,9 @@ function parsePageSelection(input: string, totalCount: number, allowRanges: bool
 
   for (const segment of segments) {
     if (segment.includes('-')) {
-      if (!allowRanges) {
-        throw new Error(`Ranges are not supported here: "${segment}". Use comma-separated page numbers.`);
-      }
-
       const match = segment.match(/^(\d+)\s*-\s*(\d+)$/);
       if (!match) {
-        throw new Error(`Invalid page range: "${segment}". Use a format like 1-3.`);
+        throw new Error(`Invalid page range: "${segment}". Use format like 1-3 or comma-separated pages.`);
       }
 
       const start = Number(match[1]);
@@ -396,7 +392,7 @@ export async function deletePages(file: File, indicesStr: string): Promise<Uint8
   const totalCount = pdf.getPageCount();
 
   // Sort descending to avoid index shifting problems
-  const uniqueIndices = parsePageSelection(indicesStr, totalCount, false).sort((a, b) => b - a);
+  const uniqueIndices = parsePageSelection(indicesStr, totalCount, true).sort((a, b) => b - a);
 
   uniqueIndices.forEach(idx => {
     if (idx >= 0 && idx < totalCount) {

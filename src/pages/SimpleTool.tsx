@@ -9,7 +9,7 @@ import { ocrPdf, ocrPdfToSearchablePdf } from '../services/ocrService';
 import { pptToPdf, pdfToPpt } from '../services/pptService';
 import { redactPdf, repairPdf } from '../services/sanitizeService';
 import { comparePdfDocuments } from '../services/compareService';
-import { FileText, Download, CheckCircle2, Settings2, Eye, EyeOff, X, Image as ImageIcon, Lock, Zap, ArrowRight, Trash2, Plus, Copy, Check } from 'lucide-react';
+import { FileText, Download, CheckCircle2, Settings2, Eye, EyeOff, X, Image as ImageIcon, Lock, Zap, ArrowRight, Trash2, Plus, Copy, Check, AlertCircle } from 'lucide-react';
 import { NotifySystem } from '../types';
 
 import ProgressBar from '../components/ProgressBar';
@@ -104,6 +104,7 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
   const [processingStatus, setProcessingStatus] = useState<'processing' | 'complete' | 'error'>('processing');
   const [resultKey, setResultKey] = useState(0);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
+  const [inputError, setInputError] = useState<string | null>(null);
   const [imagePreviewUrls, setImagePreviewUrls] = useState<string[]>([]);
   const [pageCount, setPageCount] = useState<number | null>(null);
   const [rotateAngle, setRotateAngle] = useState(90);
@@ -168,6 +169,7 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
     setResult(null);
     setShowPreview(false);
     setStatusMessage(null);
+    setInputError(null);
     setRepairReport(null);
     setCompressionStats(null);
     setOcrResultData(null);
@@ -180,6 +182,7 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
     setResult(null);
     setShowPreview(false);
     setStatusMessage(null);
+    setInputError(null);
     setRepairReport(null);
     setCompressionStats(null);
     setOcrResultData(null);
@@ -646,7 +649,7 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
       setProcessingStatus('error');
       notify.error();
       console.error(err);
-      setStatusMessage(err.message || 'Processing failed.');
+      setInputError(err.message || 'Processing failed. Please check inputs.');
     } finally {
       setProcessing(false);
     }
@@ -942,19 +945,39 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
                   <input
                     type="text"
                     value={pageInput}
-                    onChange={(e) => setPageInput(e.target.value)}
+                    onChange={(e) => {
+                      setPageInput(e.target.value);
+                      setInputError(null);
+                    }}
                     placeholder={
                       mode === 'organize'
                         ? 'e.g. 3,1,2,4'
                         : mode === 'split'
                         ? 'e.g. 1-5, 8, 11-15'
-                        : 'e.g. 2, 4, 10'
+                        : 'e.g. 2-4 or 1, 3'
                     }
-                    className={`w-full p-4 rounded-xl text-base font-bold border focus:ring-2 transition-all outline-none ${darkMode ? 'bg-slate-900 border-slate-700 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'}`}
+                    className={`w-full p-4 rounded-xl text-base font-bold border focus:ring-2 transition-all outline-none ${
+                      inputError
+                        ? 'border-red-500 ring-2 ring-red-500/20 bg-red-50/20 text-red-900 dark:text-red-200'
+                        : darkMode
+                        ? 'bg-slate-900 border-slate-700 text-white'
+                        : 'bg-slate-50 border-slate-200 text-slate-900'
+                    }`}
                   />
-                  <p className="text-[11px] text-slate-400">
-                    {mode === 'split' ? 'Extract specific pages or page ranges into a new PDF.' : 'Enter page numbers separated by commas.'}
-                  </p>
+                  {inputError ? (
+                    <div className="flex items-center gap-1.5 text-xs font-bold text-red-500 mt-1 animate-fadeIn">
+                      <AlertCircle size={14} className="shrink-0 text-red-500" />
+                      <span>{inputError}</span>
+                    </div>
+                  ) : (
+                    <p className="text-[11px] text-slate-400">
+                      {mode === 'split'
+                        ? 'Extract specific pages or page ranges into a new PDF (e.g. 1-3, 5).'
+                        : mode === 'delete-pages'
+                        ? 'Enter page numbers or ranges to delete (e.g. 2-4 or 1, 3).'
+                        : 'Enter new page order separated by commas (e.g. 3,1,2).'}
+                    </p>
+                  )}
                 </div>
               )}
 
@@ -970,10 +993,17 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
                       <input
                         type={showPassword ? 'text' : 'password'}
                         value={password}
-                        onChange={(e) => setPassword(e.target.value)}
+                        onChange={(e) => {
+                          setPassword(e.target.value);
+                          setInputError(null);
+                        }}
                         placeholder={mode === 'protect' ? 'Enter password...' : 'Enter unlock password...'}
                         className={`w-full p-3.5 pl-11 pr-11 rounded-xl text-sm font-bold border focus:ring-2 transition-all outline-none ${
-                          darkMode ? 'bg-slate-900 border-slate-700 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
+                          inputError
+                            ? 'border-red-500 ring-2 ring-red-500/20'
+                            : darkMode
+                            ? 'bg-slate-900 border-slate-700 text-white'
+                            : 'bg-slate-50 border-slate-200 text-slate-900'
                         }`}
                       />
                       <button
@@ -985,6 +1015,12 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
                         {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                       </button>
                     </div>
+                    {inputError && (
+                      <div className="flex items-center gap-1.5 text-xs font-bold text-red-500 mt-1 animate-fadeIn">
+                        <AlertCircle size={14} className="shrink-0 text-red-500" />
+                        <span>{inputError}</span>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
@@ -1145,6 +1181,12 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
 
             {/* Sidebar Bottom CTA Action Button */}
             <div className="p-6 pt-4 border-t border-slate-100 dark:border-slate-700/60 bg-white dark:bg-slate-800">
+              {inputError && !needsPageInput && !needsPassword && (
+                <div className="mb-3 p-3 rounded-xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 text-xs font-bold text-red-600 dark:text-red-300 flex items-center gap-2 animate-fadeIn">
+                  <AlertCircle size={16} className="shrink-0" />
+                  <span>{inputError}</span>
+                </div>
+              )}
               {processing ? (
                 <ProgressBar
                   progress={progress}
