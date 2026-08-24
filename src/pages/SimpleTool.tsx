@@ -5,11 +5,11 @@ import { createZipFromFiles } from '../services/zipService';
 import { rotateFile, addPageNumbers, compressPdf, compressPdfAdvanced, watermarkPdf, deletePages, reorderPages, splitPdf, imagesToPdf } from '../services/pdfService';
 import { wordToPdf, excelToPdf, htmlToPdf, pdfToJpg, pdfToWord, pdfToExcel } from '../services/conversionService';
 import { protectPdf, unlockPdf, removePermissions, signPdf } from '../services/securityService';
-import { ocrPdf } from '../services/ocrService';
+import { ocrPdf, ocrPdfToSearchablePdf } from '../services/ocrService';
 import { pptToPdf, pdfToPpt } from '../services/pptService';
 import { redactPdf, repairPdf } from '../services/sanitizeService';
 import { comparePdfDocuments } from '../services/compareService';
-import { FileText, Download, CheckCircle2, Settings2, Eye, EyeOff, X, Image as ImageIcon, Lock, Zap, ArrowRight, Trash2, Plus } from 'lucide-react';
+import { FileText, Download, CheckCircle2, Settings2, Eye, EyeOff, X, Image as ImageIcon, Lock, Zap, ArrowRight, Trash2, Plus, Copy, Check } from 'lucide-react';
 import { NotifySystem } from '../types';
 
 import ProgressBar from '../components/ProgressBar';
@@ -148,6 +148,13 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
     warnings?: string[];
   } | null>(null);
 
+  const [ocrResultData, setOcrResultData] = useState<{
+    fullText: string;
+    wordCount: number;
+    pageCount: number;
+  } | null>(null);
+  const [copiedOcrText, setCopiedOcrText] = useState(false);
+
   const isImageTool = mode === 'jpg2pdf';
   const needsPassword = ['protect', 'unlock'].includes(mode);
   const isSignTool = mode === 'sign';
@@ -163,6 +170,8 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
     setStatusMessage(null);
     setRepairReport(null);
     setCompressionStats(null);
+    setOcrResultData(null);
+    setCopiedOcrText(false);
     setIsZip(false);
     setResultKind('pdf');
   };
@@ -173,6 +182,8 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
     setStatusMessage(null);
     setRepairReport(null);
     setCompressionStats(null);
+    setOcrResultData(null);
+    setCopiedOcrText(false);
     setProgress(0);
     setProcessingStatus('processing');
     setResultKind('pdf');
@@ -429,8 +440,44 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
         }
       }
       else if (mode === 'ocr' && file) {
-        b = await ocrPdf(file);
-        outputKind = 'txt';
+        setProgress(20);
+        setStatusMessage('Running OCR engine & recognizing text layers...');
+        const isBackendUp = await apiClient.checkBackend();
+        let searchablePdfBytes: Uint8Array | null = null;
+        let ocrText = '';
+        let wordCount = 0;
+        let pageCount = 1;
+
+        if (isBackendUp) {
+          try {
+            const res = await apiClient.submitJob('ocr', file);
+            const arrayBuf = await res.outputBlob.arrayBuffer();
+            searchablePdfBytes = new Uint8Array(arrayBuf);
+            if ((res as any).fullText) {
+              ocrText = (res as any).fullText;
+              wordCount = ocrText.split(/\s+/).filter(Boolean).length;
+            }
+          } catch (backendErr) {
+            console.warn("Backend OCR failed, switching to local WebAssembly OCR engine:", backendErr);
+            searchablePdfBytes = null;
+          }
+        }
+
+        if (!searchablePdfBytes) {
+          const ocrRes = await ocrPdfToSearchablePdf(file, (pct) => setProgress(pct));
+          searchablePdfBytes = ocrRes.pdfBytes;
+          ocrText = ocrRes.fullText;
+          wordCount = ocrRes.wordCount;
+          pageCount = ocrRes.pageCount;
+        }
+
+        b = searchablePdfBytes;
+        outputKind = 'pdf';
+        setOcrResultData({
+          fullText: ocrText,
+          wordCount: wordCount || ocrText.split(/\s+/).filter(Boolean).length,
+          pageCount: pageCount || 1
+        });
       }
       else if (mode === 'redact' && file) {
         b = await redactPdf(file);
@@ -521,22 +568,23 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
         }
       }
       else if (mode === 'unlock' && file) {
-        if (!password) throw new Error("Please enter the document password.");
-        setStatusMessage('Decrypting PDF and removing security restrictions...');
+        if (!password) throw new Error("Please enter the PDF password.");
         const isBackendUp = await apiClient.checkBackend();
-
         if (isBackendUp) {
           try {
             const res = await apiClient.submitJob('unlock', file, { password });
             const arrayBuf = await res.outputBlob.arrayBuffer();
             b = new Uint8Array(arrayBuf);
-          } catch (backendErr: any) {
-            console.warn("Backend unlock failed, falling back to local decryption engine:", backendErr);
+          } catch (backendErr) {
+            console.warn("Backend unlock failed, falling back to local engine:", backendErr);
             b = await unlockPdf(file, password);
           }
         } else {
           b = await unlockPdf(file, password);
         }
+      }
+      else if (mode === 'remove-permissions' && file) {
+        b = await removePermissions(file);
       }
       else if (mode === 'sign' && file) {
         // Use signature_pad for professional signature
@@ -1172,6 +1220,74 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
                       style={{ width: `${Math.max(5, 100 - compressionStats.savedPercent)}%` }}
                     ></div>
                   </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* OCR Recognition Report & Text Card */}
+          {mode === 'ocr' && ocrResultData && (
+            <div className="w-full p-6 sm:p-8 rounded-3xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-xl text-left space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                  <span className="text-[11px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400">
+                    OCR Recognition Complete
+                  </span>
+                  <h3 className="text-2xl font-black mt-0.5 text-slate-900 dark:text-white">
+                    Searchable PDF & Extracted Text Ready
+                  </h3>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (ocrResultData.fullText) {
+                        navigator.clipboard.writeText(ocrResultData.fullText);
+                        setCopiedOcrText(true);
+                        notify.success();
+                        setTimeout(() => setCopiedOcrText(false), 2000);
+                      }
+                    }}
+                    className="px-3.5 py-2 rounded-xl bg-slate-900 dark:bg-slate-700 hover:bg-slate-800 text-white font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer"
+                  >
+                    {copiedOcrText ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} />}
+                    <span>{copiedOcrText ? 'Copied!' : 'Copy Text'}</span>
+                  </button>
+
+                  <a
+                    href={`data:text/plain;charset=utf-8,${encodeURIComponent(ocrResultData.fullText)}`}
+                    download={`pdfbolt_ocr_${file?.name ? file.name.replace(/\.pdf$/i, '') : 'transcript'}.txt`}
+                    className="px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold text-xs flex items-center gap-1.5 transition-all"
+                  >
+                    <Download size={14} />
+                    <span>Download TXT</span>
+                  </a>
+                </div>
+              </div>
+
+              {/* Statistics Grid */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-center">
+                <div className="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-xl border border-slate-100 dark:border-slate-800">
+                  <div className="text-xl font-black text-slate-900 dark:text-white">{ocrResultData.pageCount}</div>
+                  <div className="text-[10px] font-bold uppercase text-slate-400">Pages Processed</div>
+                </div>
+                <div className="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-xl border border-slate-100 dark:border-slate-800">
+                  <div className="text-xl font-black text-emerald-600 dark:text-emerald-400">{ocrResultData.wordCount}</div>
+                  <div className="text-[10px] font-bold uppercase text-slate-400">Words Recognized</div>
+                </div>
+                <div className="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-xl border border-slate-100 dark:border-slate-800 col-span-2 sm:col-span-1">
+                  <div className="text-xl font-black text-blue-600 dark:text-blue-400">Searchable PDF</div>
+                  <div className="text-[10px] font-bold uppercase text-slate-400">Layer Format</div>
+                </div>
+              </div>
+
+              {/* Extracted Text Preview Box */}
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-black uppercase tracking-wider text-slate-400">
+                  Extracted Text Preview
+                </label>
+                <div className="max-h-48 overflow-y-auto p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 font-mono text-xs text-slate-800 dark:text-slate-200 whitespace-pre-wrap leading-relaxed select-text">
+                  {ocrResultData.fullText || 'No printable text recognized.'}
                 </div>
               </div>
             </div>

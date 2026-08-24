@@ -1,23 +1,40 @@
+export interface OcrResult {
+    pdfBytes: Uint8Array;
+    fullText: string;
+    pageCount: number;
+    wordCount: number;
+}
+
 /**
- * Performs OCR on a PDF file.
- * Strategy: Render PDF pages as images -> OpenCV Preprocessing -> Run Tesseract.
+ * Performs true OCR on a PDF file and embeds a searchable text layer.
+ * Strategy: Render PDF pages at 2.0x scale -> OpenCV Preprocessing -> Tesseract.js Recognition -> Embed OCR text layer via pdf-lib.
  */
-export async function ocrPdf(file: File): Promise<string> {
+export async function ocrPdfToSearchablePdf(
+    file: File,
+    onProgress?: (pct: number) => void
+): Promise<OcrResult> {
     const pdfjsLib = await import('pdfjs-dist');
     const pdfjsWorker = (await import('pdfjs-dist/build/pdf.worker.min.mjs?url')).default;
     pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
+    const { PDFDocument, StandardFonts, rgb } = await import('pdf-lib');
     const Tesseract = (await import('tesseract.js')).default;
 
     const arrayBuffer = await file.arrayBuffer();
-    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+    const pdfDoc = await PDFDocument.load(arrayBuffer, { ignoreEncryption: true });
+    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer.slice(0) }).promise;
+    const helveticaFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
+
     let fullText = "";
+    let totalWords = 0;
 
     const worker = await Tesseract.createWorker('eng');
 
     try {
-        for (let i = 1; i <= pdf.numPages; i++) {
+        const numPages = pdf.numPages;
+        for (let i = 1; i <= numPages; i++) {
+            onProgress?.(Math.round(((i - 1) / numPages) * 70) + 15);
             const page = await pdf.getPage(i);
-            const viewport = page.getViewport({ scale: 2.5 });
+            const viewport = page.getViewport({ scale: 2.0 });
 
             const canvas = document.createElement('canvas');
             const context = canvas.getContext('2d');
@@ -27,22 +44,88 @@ export async function ocrPdf(file: File): Promise<string> {
             if (context) {
                 await page.render({ canvasContext: context, viewport }).promise;
 
-                // PRODUCTION-LEVEL PREPROCESSING (OpenCV.js)
+                // OpenCV enhancement if available
                 const processedDataUrl = await enhanceImageWithOpenCV(canvas);
 
-                const { data: { text } } = await worker.recognize(processedDataUrl);
-
-                // Structure & Clean
-                const structured = structureText(text);
+                const { data } = await worker.recognize(processedDataUrl);
+                const recognizedText = data.text || '';
+                const structured = structureText(recognizedText);
                 fullText += `\n--- Page ${i} ---\n${structured}\n`;
+
+                const wordsInPage = structured.split(/\s+/).filter(Boolean).length;
+                totalWords += wordsInPage;
+
+                // Embed OCR text layer onto pdf-lib page
+                if (i <= pdfDoc.getPageCount()) {
+                    const pdfPage = pdfDoc.getPage(i - 1);
+                    const { width: pageWidth, height: pageHeight } = pdfPage.getSize();
+                    const scaleX = pageWidth / canvas.width;
+                    const scaleY = pageHeight / canvas.height;
+
+                    if (data.lines && data.lines.length > 0) {
+                        for (const line of data.lines) {
+                            if (!line.text || !line.text.trim() || !line.bbox) continue;
+                            const cleanLineText = line.text.replace(/[\r\n]+/g, ' ').trim();
+                            if (!cleanLineText) continue;
+
+                            const lineX = Math.max(0, line.bbox.x0 * scaleX);
+                            const lineH = Math.max(6, (line.bbox.y1 - line.bbox.y0) * scaleY * 0.85);
+                            const lineY = Math.max(0, pageHeight - (line.bbox.y1 * scaleY));
+
+                            try {
+                                pdfPage.drawText(cleanLineText, {
+                                    x: lineX,
+                                    y: lineY,
+                                    size: lineH,
+                                    font: helveticaFont,
+                                    color: rgb(0, 0, 0),
+                                    opacity: 0.0, // Invisible selectable & searchable text layer
+                                });
+                            } catch {
+                                const asciiSafe = cleanLineText.replace(/[^\x20-\x7E]/g, ' ');
+                                if (asciiSafe.trim()) {
+                                    try {
+                                        pdfPage.drawText(asciiSafe, {
+                                            x: lineX,
+                                            y: lineY,
+                                            size: lineH,
+                                            font: helveticaFont,
+                                            color: rgb(0, 0, 0),
+                                            opacity: 0.0,
+                                        });
+                                    } catch {
+                                        // Ignore line
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
+
+        onProgress?.(95);
+        const pdfBytes = await pdfDoc.save();
+        return {
+            pdfBytes,
+            fullText: fullText.trim(),
+            pageCount: numPages,
+            wordCount: totalWords
+        };
     } finally {
         await worker.terminate();
         pdf.destroy();
     }
+}
 
-    return fullText;
+/**
+ * Performs OCR on a PDF file and returns searchable PDF result.
+ */
+export async function ocrPdf(
+    file: File,
+    onProgress?: (pct: number) => void
+): Promise<OcrResult> {
+    return ocrPdfToSearchablePdf(file, onProgress);
 }
 
 /**
@@ -53,10 +136,7 @@ export async function ocrImage(imageSource: string | Blob): Promise<string> {
     const worker = await Tesseract.createWorker('eng');
 
     try {
-        // If it's an image, we still want to enhance it if possible
-        // For now, Tesseract is good, but OCR improves 2-3x with thresholding
         const { data: { text } } = await worker.recognize(imageSource);
-
         const structured = structureText(text);
         return structured;
     } finally {
