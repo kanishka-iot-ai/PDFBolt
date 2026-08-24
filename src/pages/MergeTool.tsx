@@ -6,6 +6,7 @@ import { NotifySystem } from '../types';
 import ProgressBar from '../components/ProgressBar';
 import { validateFiles, ALLOWED_MIME_TYPES, MAX_FILE_SIZE } from '../utils/fileValidation';
 import { useActiveWork } from '../context/ActiveWorkContext';
+import PDFThumbnail from '../components/PDFThumbnail';
 
 const MergeTool: React.FC<{ darkMode: boolean; notify: NotifySystem }> = ({ darkMode, notify }) => {
   const { setHasActiveWork } = useActiveWork();
@@ -160,8 +161,8 @@ const MergeTool: React.FC<{ darkMode: boolean; notify: NotifySystem }> = ({ dark
                       darkMode ? 'bg-slate-900/60 border-slate-700/60' : 'bg-slate-50 border-slate-200 shadow-sm'
                     }`}>
                       <div className="flex items-center gap-3.5 overflow-hidden">
-                        <div className="bg-yellow-500/10 p-2.5 rounded-xl shrink-0 text-yellow-600 dark:text-yellow-400">
-                          <FileText size={20} />
+                        <div className="w-12 h-16 rounded-lg overflow-hidden bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shrink-0 shadow-sm flex items-center justify-center">
+                          <PDFThumbnail file={f} className="w-full h-full object-contain" alt={f.name} />
                         </div>
                         <div className="truncate">
                           <span className="font-bold text-xs sm:text-sm block truncate" title={f.name}>{f.name}</span>

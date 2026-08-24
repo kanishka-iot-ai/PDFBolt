@@ -4,6 +4,7 @@ import { ShieldCheck, Clock, UserX, HelpCircle, CheckCircle, ArrowRight, BookOpe
 import { TOOLS, GUIDES, getIcon } from '../constants';
 import { Link, useLocation } from 'react-router-dom';
 import AdSlot from './AdSlot';
+import { useActiveWork } from '../context/ActiveWorkContext';
 
 interface SEOLandingPageProps {
   toolId: string;
@@ -14,6 +15,7 @@ interface SEOLandingPageProps {
 const SEOLandingPage: React.FC<SEOLandingPageProps> = ({ toolId, darkMode, children }) => {
   const tool = TOOLS.find(t => t.id === toolId);
   const location = useLocation();
+  const { hasActiveWork } = useActiveWork();
 
   if (!tool) return <>{children}</>;
 
@@ -96,10 +98,84 @@ const SEOLandingPage: React.FC<SEOLandingPageProps> = ({ toolId, darkMode, child
     .map(id => TOOLS.find(t => t.id === id))
     .filter(Boolean);
 
-  const relatedGuidesList = (tool.relatedGuides || [])
-    .map(slug => GUIDES.find(g => g.slug === slug))
-    .filter(Boolean);
+  // When files are actively loaded, render the focused single-viewport interactive workspace
+  if (hasActiveWork) {
+    return (
+      <div className="animate-fadeIn w-full lg:min-h-[calc(100vh-64px)] lg:max-h-[calc(100vh-64px)] lg:overflow-hidden flex flex-col justify-between">
+        <Helmet>
+          <title>{tool.seoTitle || `${tool.title} – Free & Private Online Tool | PDFBolt`}</title>
+          <meta name="description" content={tool.description} />
+          <link rel="canonical" href={canonicalUrl} />
+          <meta property="og:title" content={tool.seoTitle || tool.title} />
+          <meta property="og:description" content={tool.description} />
+          <meta property="og:url" content={canonicalUrl} />
+          <script type="application/ld+json">{JSON.stringify(softwareSchema)}</script>
+          <script type="application/ld+json">{JSON.stringify(breadcrumbSchema)}</script>
+          {howToSchema && <script type="application/ld+json">{JSON.stringify(howToSchema)}</script>}
+          {faqSchema && <script type="application/ld+json">{JSON.stringify(faqSchema)}</script>}
+        </Helmet>
 
+        {/* Minimal Tool Workspace Top Bar */}
+        <div className={`px-6 py-2 border-b flex items-center justify-between shrink-0 ${
+          darkMode ? 'border-slate-800 bg-slate-900/60' : 'border-slate-100 bg-slate-50'
+        }`}>
+          <div className="flex items-center gap-2 text-xs font-bold text-slate-500">
+            <Link to="/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Home</Link>
+            <span>/</span>
+            <Link to="/tools" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">PDF Tools</Link>
+            <span>/</span>
+            <span className="text-yellow-700 dark:text-yellow-400 font-extrabold">{tool.title}</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+              <ShieldCheck size={13} /> In-Browser Local
+            </span>
+          </div>
+        </div>
+
+        {/* Preserved Ad Banner at Top of Workspace */}
+        <div className="max-w-5xl mx-auto px-4 w-full py-0.5 shrink-0">
+          <AdSlot placement="TOOL_CONTENT_BOTTOM" />
+        </div>
+
+        {/* The 2-Column Working Tool Area */}
+        <div className="flex-grow flex items-center justify-center p-2 sm:p-4 overflow-y-auto lg:overflow-visible">
+          <div className="w-full">
+            {children}
+          </div>
+        </div>
+
+        {/* Suggestive Tools Bottom Bar (Sleek, Non-Scrolling) */}
+        {relatedToolsList.length > 0 && (
+          <div className={`border-t px-6 py-2 shrink-0 ${darkMode ? 'border-slate-800 bg-slate-900/40' : 'border-slate-100 bg-white'}`}>
+            <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
+              <span className="text-[11px] font-black uppercase tracking-wider text-slate-400 shrink-0 hidden sm:inline">
+                Suggested Tools:
+              </span>
+              <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5">
+                {relatedToolsList.map(rt => rt && (
+                  <Link
+                    key={rt.id}
+                    to={rt.canonicalPath || rt.path}
+                    className={`px-3 py-1 rounded-xl border text-xs font-bold transition-all shrink-0 flex items-center gap-1.5 ${
+                      darkMode ? 'bg-slate-800 border-slate-700 hover:border-yellow-500/50 text-slate-200' : 'bg-slate-50 border-slate-200 hover:border-yellow-500/50 text-slate-700'
+                    }`}
+                  >
+                    <div className="text-yellow-600 dark:text-yellow-400 shrink-0">
+                      {React.cloneElement(getIcon(rt.icon) as React.ReactElement, { className: 'w-3.5 h-3.5' })}
+                    </div>
+                    <span>{rt.title}</span>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // Default Landing / Dropzone View (When no file uploaded yet)
   return (
     <div className="animate-fadeIn">
       <Helmet>

@@ -17,6 +17,7 @@ import { validateFiles, validateOutputIntegrity, ALLOWED_MIME_TYPES, MAX_FILE_SI
 import { apiClient } from '../services/apiClient';
 import AdSlot from '../components/AdSlot';
 import { useActiveWork } from '../context/ActiveWorkContext';
+import PDFThumbnail from '../components/PDFThumbnail';
 
 const formatBytes = (bytes?: number) => {
   if (!bytes || bytes === 0) return '0 B';
@@ -617,32 +618,36 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
 
                 {/* Stage Canvas Area */}
                 <div className="py-8 flex flex-col items-center justify-center flex-grow">
-                  {/* Single Document Card */}
+                  {/* Single Document Card (With Real Visual Page 1 Thumbnail) */}
                   {file && !isImageTool && mode !== 'compare' && (
                     <div className="relative group">
-                      <div className={`w-52 sm:w-60 h-68 sm:h-76 rounded-2xl border-2 shadow-2xl flex flex-col items-center justify-between p-6 transition-all duration-300 group-hover:scale-[1.02] ${
-                        darkMode ? 'bg-slate-900 border-slate-700' : 'bg-slate-50 border-slate-200'
+                      <div className={`w-52 sm:w-64 h-72 sm:h-84 rounded-2xl border-2 shadow-2xl flex flex-col items-center justify-between p-3.5 transition-all duration-300 group-hover:scale-[1.02] ${
+                        darkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-200'
                       }`}>
-                        <div className="p-4 rounded-2xl bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 mt-2">
-                          <FileText size={52} />
+                        {/* Real Visual First-Page Thumbnail */}
+                        <div className="w-full h-48 sm:h-60 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 flex items-center justify-center border border-slate-200/60 dark:border-slate-700/50 shadow-inner">
+                          <PDFThumbnail file={file} className="w-full h-full object-contain" alt={file.name} />
                         </div>
-                        <div className="w-full text-center overflow-hidden">
-                          <p className={`font-black text-sm truncate max-w-full ${darkMode ? 'text-white' : 'text-slate-900'}`} title={file.name}>
+
+                        <div className="w-full text-center overflow-hidden pt-2">
+                          <p className={`font-black text-xs sm:text-sm truncate max-w-full ${darkMode ? 'text-white' : 'text-slate-900'}`} title={file.name}>
                             {file.name}
                           </p>
-                          <p className="text-[11px] font-bold text-slate-400 mt-1">
-                            {formatBytes(file.size)}
-                          </p>
+                          <div className="flex items-center justify-center gap-2 mt-1">
+                            <span className="text-[10px] font-bold text-slate-400">
+                              {formatBytes(file.size)}
+                            </span>
+                            <span className="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded bg-yellow-500/15 text-yellow-700 dark:text-yellow-400">
+                              {file.name.split('.').pop()?.toUpperCase() || 'PDF'}
+                            </span>
+                          </div>
                         </div>
-                        <span className="text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full bg-yellow-500/10 text-yellow-700 dark:text-yellow-400">
-                          {file.name.split('.').pop()?.toUpperCase() || 'PDF'}
-                        </span>
                       </div>
                       {!processing && (
                         <button
                           onClick={clearSelection}
                           aria-label="Remove file"
-                          className="absolute -top-3 -right-3 w-8 h-8 rounded-full bg-red-600 text-white shadow-lg flex items-center justify-center hover:bg-red-700 transition-colors cursor-pointer"
+                          className="absolute -top-3 -right-3 w-8 h-8 rounded-full bg-red-600 text-white shadow-lg flex items-center justify-center hover:bg-red-700 transition-colors cursor-pointer z-10"
                         >
                           <X size={16} />
                         </button>
@@ -679,16 +684,18 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
                   {mode === 'compare' && (
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 w-full max-w-lg">
                       {/* Document 1 */}
-                      <div className={`p-5 rounded-2xl border-2 relative ${
+                      <div className={`p-4 rounded-2xl border-2 relative ${
                         multiFiles[0] ? (darkMode ? 'bg-slate-900 border-slate-700' : 'bg-slate-50 border-slate-200') : 'border-dashed border-slate-300 dark:border-slate-700'
                       }`}>
                         <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-2">Original Document (File 1)</span>
                         {multiFiles[0] ? (
                           <div className="flex items-center gap-3">
-                            <FileText size={28} className="text-yellow-500 shrink-0" />
+                            <div className="w-14 h-18 rounded-lg overflow-hidden bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shrink-0 shadow-sm flex items-center justify-center">
+                              <PDFThumbnail file={multiFiles[0]} className="w-full h-full object-contain" alt={multiFiles[0].name} />
+                            </div>
                             <div className="overflow-hidden">
-                              <p className="font-bold text-xs truncate">{multiFiles[0].name}</p>
-                              <p className="text-[10px] text-slate-400">{formatBytes(multiFiles[0].size)}</p>
+                              <p className="font-bold text-xs truncate" title={multiFiles[0].name}>{multiFiles[0].name}</p>
+                              <p className="text-[10px] text-slate-400 mt-0.5">{formatBytes(multiFiles[0].size)}</p>
                             </div>
                           </div>
                         ) : (
@@ -697,16 +704,18 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
                       </div>
 
                       {/* Document 2 */}
-                      <div className={`p-5 rounded-2xl border-2 relative ${
+                      <div className={`p-4 rounded-2xl border-2 relative ${
                         multiFiles[1] ? (darkMode ? 'bg-slate-900 border-slate-700' : 'bg-slate-50 border-slate-200') : 'border-dashed border-blue-300 dark:border-blue-700/60'
                       }`}>
                         <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-2">Modified Document (File 2)</span>
                         {multiFiles[1] ? (
                           <div className="flex items-center gap-3">
-                            <FileText size={28} className="text-blue-500 shrink-0" />
+                            <div className="w-14 h-18 rounded-lg overflow-hidden bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shrink-0 shadow-sm flex items-center justify-center">
+                              <PDFThumbnail file={multiFiles[1]} className="w-full h-full object-contain" alt={multiFiles[1].name} />
+                            </div>
                             <div className="overflow-hidden">
-                              <p className="font-bold text-xs truncate">{multiFiles[1].name}</p>
-                              <p className="text-[10px] text-slate-400">{formatBytes(multiFiles[1].size)}</p>
+                              <p className="font-bold text-xs truncate" title={multiFiles[1].name}>{multiFiles[1].name}</p>
+                              <p className="text-[10px] text-slate-400 mt-0.5">{formatBytes(multiFiles[1].size)}</p>
                             </div>
                           </div>
                         ) : (

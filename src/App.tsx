@@ -9,7 +9,7 @@ import { TOOLS } from './constants';
 import ErrorBoundary from './components/ErrorBoundary';
 import AdSenseScript from './components/AdSenseScript';
 import CookieConsent from './components/CookieConsent';
-import { ActiveWorkProvider } from './context/ActiveWorkContext';
+import { ActiveWorkProvider, useActiveWork } from './context/ActiveWorkContext';
 
 // Eagerly import Home to prevent CLS from Suspense fallback displacement
 import Home from './pages/Home';
@@ -127,6 +127,133 @@ const SEOManager: React.FC = () => {
   return null;
 };
 
+interface MainLayoutProps {
+  darkMode: boolean;
+  setDarkMode: React.Dispatch<React.SetStateAction<boolean>>;
+  soundEnabled: boolean;
+  setSoundEnabled: React.Dispatch<React.SetStateAction<boolean>>;
+  notify: NotifySystem;
+}
+
+const MainLayout: React.FC<MainLayoutProps> = ({ darkMode, setDarkMode, soundEnabled, setSoundEnabled, notify }) => {
+  const { hasActiveWork } = useActiveWork();
+
+  return (
+    <div className={`min-h-screen flex flex-col transition-colors duration-300 font-sans ${darkMode ? 'dark bg-slate-900 text-white' : 'bg-white text-slate-900'}`}>
+      <Navbar
+        darkMode={darkMode}
+        toggleDarkMode={() => setDarkMode(!darkMode)}
+        soundEnabled={soundEnabled}
+        toggleSound={() => setSoundEnabled(!soundEnabled)}
+      />
+      <main className="flex-grow">
+        <Suspense fallback={<PageLoader />}>
+          <Routes>
+            {/* Home & Hubs */}
+            <Route path="/" element={<Home darkMode={darkMode} />} />
+            <Route path="/tools" element={<HubPage darkMode={darkMode} />} />
+            <Route path="/pdf-tools" element={<HubPage darkMode={darkMode} />} />
+
+            {/* Persona Workflows */}
+            <Route path="/student-pdf-tools" element={<WorkflowPage workflowSlug="student-pdf-tools" darkMode={darkMode} />} />
+            <Route path="/business-pdf-tools" element={<WorkflowPage workflowSlug="business-pdf-tools" darkMode={darkMode} />} />
+            <Route path="/developer-pdf-tools" element={<WorkflowPage workflowSlug="developer-pdf-tools" darkMode={darkMode} />} />
+
+            {/* How-To Guides Knowledge Base */}
+            <Route path="/guides" element={<GuidesHub darkMode={darkMode} />} />
+            <Route path="/guides/:slug" element={<GuideDetailPage darkMode={darkMode} />} />
+
+            {/* PDF Format Encyclopedia */}
+            <Route path="/encyclopedia" element={<EncyclopediaHub darkMode={darkMode} />} />
+            <Route path="/encyclopedia/:slug" element={<EncyclopediaDetailPage darkMode={darkMode} />} />
+
+            {/* Comparisons & Calculators & Test Files */}
+            <Route path="/compare/online-pdf-tools" element={<ComparisonPage darkMode={darkMode} />} />
+            <Route path="/tools/pdf-size-calculator" element={<CalculatorPage darkMode={darkMode} />} />
+            <Route path="/test-files" element={<TestFilesPage darkMode={darkMode} />} />
+
+            {/* Canonical Tool Routes (Wrapped in Rich SEOLandingPage) */}
+            <Route path="/merge-pdf" element={<SEOLandingPage toolId="merge" darkMode={darkMode}><MergeTool darkMode={darkMode} notify={notify} /></SEOLandingPage>} />
+            <Route path="/split-pdf" element={<SEOLandingPage toolId="split" darkMode={darkMode}><SimpleTool title="Split PDF" mode="split" darkMode={darkMode} notify={notify} /></SEOLandingPage>} />
+            <Route path="/compress-pdf" element={<SEOLandingPage toolId="compress" darkMode={darkMode}><CompressTool darkMode={darkMode} notify={notify} /></SEOLandingPage>} />
+            <Route path="/pdf-to-word" element={<SEOLandingPage toolId="pdf-to-word" darkMode={darkMode}><SimpleTool title="PDF to Word" mode="pdf2word" darkMode={darkMode} notify={notify} /></SEOLandingPage>} />
+            <Route path="/pdf-to-ppt" element={<SEOLandingPage toolId="pdf-to-ppt" darkMode={darkMode}><SimpleTool title="PDF to PPT" mode="pdf2ppt" darkMode={darkMode} notify={notify} /></SEOLandingPage>} />
+            <Route path="/pdf-to-excel" element={<SEOLandingPage toolId="pdf-to-excel" darkMode={darkMode}><SimpleTool title="PDF to Excel" mode="pdf2excel" darkMode={darkMode} notify={notify} /></SEOLandingPage>} />
+            <Route path="/pdf-to-jpg" element={<SEOLandingPage toolId="pdf-to-jpg" darkMode={darkMode}><SimpleTool title="PDF to JPG" mode="pdf2jpg" darkMode={darkMode} notify={notify} /></SEOLandingPage>} />
+            <Route path="/word-to-pdf" element={<SEOLandingPage toolId="word-to-pdf" darkMode={darkMode}><SimpleTool title="Word to PDF" mode="word2pdf" darkMode={darkMode} notify={notify} /></SEOLandingPage>} />
+            <Route path="/excel-to-pdf" element={<SEOLandingPage toolId="excel-to-pdf" darkMode={darkMode}><SimpleTool title="Excel to PDF" mode="excel2pdf" darkMode={darkMode} notify={notify} /></SEOLandingPage>} />
+            <Route path="/ppt-to-pdf" element={<SEOLandingPage toolId="ppt-to-pdf" darkMode={darkMode}><SimpleTool title="PPT to PDF" mode="ppt2pdf" darkMode={darkMode} notify={notify} /></SEOLandingPage>} />
+            <Route path="/jpg-to-pdf" element={<SEOLandingPage toolId="jpg-to-pdf" darkMode={darkMode}><SimpleTool title="JPG to PDF" mode="jpg2pdf" darkMode={darkMode} notify={notify} /></SEOLandingPage>} />
+            <Route path="/html-to-pdf" element={<SEOLandingPage toolId="html-to-pdf" darkMode={darkMode}><SimpleTool title="HTML to PDF" mode="html2pdf" darkMode={darkMode} notify={notify} /></SEOLandingPage>} />
+            <Route path="/edit-pdf" element={<SEOLandingPage toolId="edit" darkMode={darkMode}><EditTool darkMode={darkMode} notify={notify} /></SEOLandingPage>} />
+            <Route path="/protect-pdf" element={<SEOLandingPage toolId="protect" darkMode={darkMode}><SimpleTool title="Protect PDF" mode="protect" darkMode={darkMode} notify={notify} /></SEOLandingPage>} />
+            <Route path="/unlock-pdf" element={<SEOLandingPage toolId="unlock" darkMode={darkMode}><SimpleTool title="Unlock PDF" mode="unlock" darkMode={darkMode} notify={notify} /></SEOLandingPage>} />
+            <Route path="/sign-pdf" element={<SEOLandingPage toolId="sign" darkMode={darkMode}><SimpleTool title="Sign PDF" mode="sign" darkMode={darkMode} notify={notify} /></SEOLandingPage>} />
+            <Route path="/redact-pdf" element={<SEOLandingPage toolId="redact" darkMode={darkMode}><RedactTool darkMode={darkMode} notify={notify} /></SEOLandingPage>} />
+            <Route path="/ocr-pdf" element={<SEOLandingPage toolId="ocr" darkMode={darkMode}><SimpleTool title="OCR PDF" mode="ocr" darkMode={darkMode} notify={notify} /></SEOLandingPage>} />
+            <Route path="/scan-to-pdf" element={<SEOLandingPage toolId="scan-to-pdf" darkMode={darkMode}><ScanTool darkMode={darkMode} notify={notify} /></SEOLandingPage>} />
+            <Route path="/scan-handwriting-to-pdf" element={<SEOLandingPage toolId="scan-handwriting" darkMode={darkMode}><HandwritingTool darkMode={darkMode} notify={notify} /></SEOLandingPage>} />
+            <Route path="/rotate-pdf" element={<SEOLandingPage toolId="rotate" darkMode={darkMode}><SimpleTool title="Rotate PDF" mode="rotate" darkMode={darkMode} notify={notify} /></SEOLandingPage>} />
+            <Route path="/organize-pdf" element={<SEOLandingPage toolId="organize" darkMode={darkMode}><SimpleTool title="Organize PDF" mode="organize" darkMode={darkMode} notify={notify} /></SEOLandingPage>} />
+            <Route path="/add-page-numbers-to-pdf" element={<SEOLandingPage toolId="page-numbers" darkMode={darkMode}><SimpleTool title="Add Page Numbers" mode="numbers" darkMode={darkMode} notify={notify} /></SEOLandingPage>} />
+            <Route path="/watermark-pdf" element={<SEOLandingPage toolId="watermark" darkMode={darkMode}><SimpleTool title="Watermark PDF" mode="watermark" darkMode={darkMode} notify={notify} /></SEOLandingPage>} />
+            <Route path="/delete-pdf-pages" element={<SEOLandingPage toolId="delete-pages" darkMode={darkMode}><SimpleTool title="Delete Pages" mode="delete-pages" darkMode={darkMode} notify={notify} /></SEOLandingPage>} />
+            <Route path="/compare-pdf" element={<SEOLandingPage toolId="compare" darkMode={darkMode}><SimpleTool title="Compare PDF" mode="compare" darkMode={darkMode} notify={notify} /></SEOLandingPage>} />
+            <Route path="/repair-pdf" element={<SEOLandingPage toolId="repair" darkMode={darkMode}><SimpleTool title="Repair PDF" mode="repair" darkMode={darkMode} notify={notify} /></SEOLandingPage>} />
+            <Route path="/pdf-to-qr-code" element={<SEOLandingPage toolId="pdf-to-qr" darkMode={darkMode}><QRTool darkMode={darkMode} notify={notify} /></SEOLandingPage>} />
+            <Route path="/analyze-pdf" element={<AnalyzerPage darkMode={darkMode} notify={notify} />} />
+            <Route path="/pdf-builder" element={<Home darkMode={darkMode} />} />
+
+            {/* Clean Canonical Redirects for Short Aliases & Secondary Search Queries */}
+            <Route path="/pdf-to-images" element={<Navigate to="/pdf-to-jpg" replace />} />
+            <Route path="/pdf-editor" element={<Navigate to="/edit-pdf" replace />} />
+            <Route path="/reorder-pages" element={<Navigate to="/organize-pdf" replace />} />
+            <Route path="/extract-pages" element={<Navigate to="/split-pdf" replace />} />
+            <Route path="/extract-pdf-pages" element={<Navigate to="/split-pdf" replace />} />
+            <Route path="/add-page-numbers" element={<Navigate to="/add-page-numbers-to-pdf" replace />} />
+            <Route path="/qr-pdf-share" element={<Navigate to="/pdf-to-qr-code" replace />} />
+            <Route path="/pdf-analyzer" element={<Navigate to="/analyze-pdf" replace />} />
+            <Route path="/analyze" element={<Navigate to="/analyze-pdf" replace />} />
+            <Route path="/tools/pdf-analyzer" element={<Navigate to="/analyze-pdf" replace />} />
+            <Route path="/merge" element={<Navigate to="/merge-pdf" replace />} />
+            <Route path="/split" element={<Navigate to="/split-pdf" replace />} />
+            <Route path="/compress" element={<Navigate to="/compress-pdf" replace />} />
+            <Route path="/pdf-to-qr" element={<Navigate to="/pdf-to-qr-code" replace />} />
+            <Route path="/organize" element={<Navigate to="/organize-pdf" replace />} />
+            <Route path="/edit" element={<Navigate to="/edit-pdf" replace />} />
+            <Route path="/page-numbers" element={<Navigate to="/add-page-numbers-to-pdf" replace />} />
+            <Route path="/rotate" element={<Navigate to="/rotate-pdf" replace />} />
+            <Route path="/watermark" element={<Navigate to="/watermark-pdf" replace />} />
+            <Route path="/delete-pages" element={<Navigate to="/delete-pdf-pages" replace />} />
+            <Route path="/protect" element={<Navigate to="/protect-pdf" replace />} />
+            <Route path="/unlock" element={<Navigate to="/unlock-pdf" replace />} />
+            <Route path="/sign" element={<Navigate to="/sign-pdf" replace />} />
+            <Route path="/redact" element={<Navigate to="/redact-pdf" replace />} />
+            <Route path="/repair" element={<Navigate to="/repair-pdf" replace />} />
+            <Route path="/ocr" element={<Navigate to="/ocr-pdf" replace />} />
+            <Route path="/scan-pdf" element={<Navigate to="/scan-to-pdf" replace />} />
+            <Route path="/scan-handwriting" element={<Navigate to="/scan-handwriting-to-pdf" replace />} />
+            <Route path="/compare" element={<Navigate to="/compare-pdf" replace />} />
+
+            {/* Static Support Pages */}
+            <Route path="/privacy" element={<PrivacyPage darkMode={darkMode} />} />
+            <Route path="/terms" element={<TermsPage darkMode={darkMode} />} />
+            <Route path="/about" element={<AboutPage darkMode={darkMode} />} />
+            <Route path="/contact" element={<ContactPage darkMode={darkMode} />} />
+            <Route path="/tutorials" element={<TutorialsPage darkMode={darkMode} />} />
+            <Route path="/qr-success" element={<QRSuccess darkMode={darkMode} />} />
+            <Route path="/s/:shareId" element={<QRSuccess darkMode={darkMode} />} />
+
+            {/* 404 Catch-All */}
+            <Route path="*" element={<NotFoundPage />} />
+          </Routes>
+        </Suspense>
+      </main>
+      {!hasActiveWork && <Footer darkMode={darkMode} />}
+    </div>
+  );
+};
+
 const App: React.FC = () => {
   const [darkMode, setDarkMode] = useState(() => localStorage.getItem('theme') === 'dark');
   const [soundEnabled, setSoundEnabled] = useState(() => localStorage.getItem('sound') !== 'false');
@@ -153,119 +280,13 @@ const App: React.FC = () => {
         <Router>
           <ActiveWorkProvider>
             <SEOManager />
-          <div className={`min-h-screen flex flex-col transition-colors duration-300 font-sans ${darkMode ? 'dark bg-slate-900 text-white' : 'bg-white text-slate-900'}`}>
-            <Navbar
+            <MainLayout
               darkMode={darkMode}
-              toggleDarkMode={() => setDarkMode(!darkMode)}
+              setDarkMode={setDarkMode}
               soundEnabled={soundEnabled}
-              toggleSound={() => setSoundEnabled(!soundEnabled)}
+              setSoundEnabled={setSoundEnabled}
+              notify={notify}
             />
-            <main className="flex-grow">
-              <Suspense fallback={<PageLoader />}>
-                <Routes>
-                  {/* Home & Hubs */}
-                  <Route path="/" element={<Home darkMode={darkMode} />} />
-                  <Route path="/tools" element={<HubPage darkMode={darkMode} />} />
-                  <Route path="/pdf-tools" element={<HubPage darkMode={darkMode} />} />
-
-                  {/* Persona Workflows */}
-                  <Route path="/student-pdf-tools" element={<WorkflowPage workflowSlug="student-pdf-tools" darkMode={darkMode} />} />
-                  <Route path="/business-pdf-tools" element={<WorkflowPage workflowSlug="business-pdf-tools" darkMode={darkMode} />} />
-                  <Route path="/developer-pdf-tools" element={<WorkflowPage workflowSlug="developer-pdf-tools" darkMode={darkMode} />} />
-
-                  {/* How-To Guides Knowledge Base */}
-                  <Route path="/guides" element={<GuidesHub darkMode={darkMode} />} />
-                  <Route path="/guides/:slug" element={<GuideDetailPage darkMode={darkMode} />} />
-
-                  {/* PDF Format Encyclopedia */}
-                  <Route path="/encyclopedia" element={<EncyclopediaHub darkMode={darkMode} />} />
-                  <Route path="/encyclopedia/:slug" element={<EncyclopediaDetailPage darkMode={darkMode} />} />
-
-                  {/* Comparisons & Calculators & Test Files */}
-                  <Route path="/compare/online-pdf-tools" element={<ComparisonPage darkMode={darkMode} />} />
-                  <Route path="/tools/pdf-size-calculator" element={<CalculatorPage darkMode={darkMode} />} />
-                  <Route path="/test-files" element={<TestFilesPage darkMode={darkMode} />} />
-
-                  {/* Canonical Tool Routes (Wrapped in Rich SEOLandingPage) */}
-                  <Route path="/merge-pdf" element={<SEOLandingPage toolId="merge" darkMode={darkMode}><MergeTool darkMode={darkMode} notify={notify} /></SEOLandingPage>} />
-                  <Route path="/split-pdf" element={<SEOLandingPage toolId="split" darkMode={darkMode}><SimpleTool title="Split PDF" mode="split" darkMode={darkMode} notify={notify} /></SEOLandingPage>} />
-                  <Route path="/compress-pdf" element={<SEOLandingPage toolId="compress" darkMode={darkMode}><CompressTool darkMode={darkMode} notify={notify} /></SEOLandingPage>} />
-                  <Route path="/pdf-to-word" element={<SEOLandingPage toolId="pdf-to-word" darkMode={darkMode}><SimpleTool title="PDF to Word" mode="pdf2word" darkMode={darkMode} notify={notify} /></SEOLandingPage>} />
-                  <Route path="/pdf-to-ppt" element={<SEOLandingPage toolId="pdf-to-ppt" darkMode={darkMode}><SimpleTool title="PDF to PPT" mode="pdf2ppt" darkMode={darkMode} notify={notify} /></SEOLandingPage>} />
-                  <Route path="/pdf-to-excel" element={<SEOLandingPage toolId="pdf-to-excel" darkMode={darkMode}><SimpleTool title="PDF to Excel" mode="pdf2excel" darkMode={darkMode} notify={notify} /></SEOLandingPage>} />
-                  <Route path="/pdf-to-jpg" element={<SEOLandingPage toolId="pdf-to-jpg" darkMode={darkMode}><SimpleTool title="PDF to JPG" mode="pdf2jpg" darkMode={darkMode} notify={notify} /></SEOLandingPage>} />
-                  <Route path="/word-to-pdf" element={<SEOLandingPage toolId="word-to-pdf" darkMode={darkMode}><SimpleTool title="Word to PDF" mode="word2pdf" darkMode={darkMode} notify={notify} /></SEOLandingPage>} />
-                  <Route path="/excel-to-pdf" element={<SEOLandingPage toolId="excel-to-pdf" darkMode={darkMode}><SimpleTool title="Excel to PDF" mode="excel2pdf" darkMode={darkMode} notify={notify} /></SEOLandingPage>} />
-                  <Route path="/ppt-to-pdf" element={<SEOLandingPage toolId="ppt-to-pdf" darkMode={darkMode}><SimpleTool title="PPT to PDF" mode="ppt2pdf" darkMode={darkMode} notify={notify} /></SEOLandingPage>} />
-                  <Route path="/jpg-to-pdf" element={<SEOLandingPage toolId="jpg-to-pdf" darkMode={darkMode}><SimpleTool title="JPG to PDF" mode="jpg2pdf" darkMode={darkMode} notify={notify} /></SEOLandingPage>} />
-                  <Route path="/html-to-pdf" element={<SEOLandingPage toolId="html-to-pdf" darkMode={darkMode}><SimpleTool title="HTML to PDF" mode="html2pdf" darkMode={darkMode} notify={notify} /></SEOLandingPage>} />
-                  <Route path="/edit-pdf" element={<SEOLandingPage toolId="edit" darkMode={darkMode}><EditTool darkMode={darkMode} notify={notify} /></SEOLandingPage>} />
-                  <Route path="/protect-pdf" element={<SEOLandingPage toolId="protect" darkMode={darkMode}><SimpleTool title="Protect PDF" mode="protect" darkMode={darkMode} notify={notify} /></SEOLandingPage>} />
-                  <Route path="/unlock-pdf" element={<SEOLandingPage toolId="unlock" darkMode={darkMode}><SimpleTool title="Unlock PDF" mode="unlock" darkMode={darkMode} notify={notify} /></SEOLandingPage>} />
-                  <Route path="/sign-pdf" element={<SEOLandingPage toolId="sign" darkMode={darkMode}><SimpleTool title="Sign PDF" mode="sign" darkMode={darkMode} notify={notify} /></SEOLandingPage>} />
-                  <Route path="/redact-pdf" element={<SEOLandingPage toolId="redact" darkMode={darkMode}><RedactTool darkMode={darkMode} notify={notify} /></SEOLandingPage>} />
-                  <Route path="/ocr-pdf" element={<SEOLandingPage toolId="ocr" darkMode={darkMode}><SimpleTool title="OCR PDF" mode="ocr" darkMode={darkMode} notify={notify} /></SEOLandingPage>} />
-                  <Route path="/scan-to-pdf" element={<SEOLandingPage toolId="scan-to-pdf" darkMode={darkMode}><ScanTool darkMode={darkMode} notify={notify} /></SEOLandingPage>} />
-                  <Route path="/scan-handwriting-to-pdf" element={<SEOLandingPage toolId="scan-handwriting" darkMode={darkMode}><HandwritingTool darkMode={darkMode} notify={notify} /></SEOLandingPage>} />
-                  <Route path="/rotate-pdf" element={<SEOLandingPage toolId="rotate" darkMode={darkMode}><SimpleTool title="Rotate PDF" mode="rotate" darkMode={darkMode} notify={notify} /></SEOLandingPage>} />
-                  <Route path="/organize-pdf" element={<SEOLandingPage toolId="organize" darkMode={darkMode}><SimpleTool title="Organize PDF" mode="organize" darkMode={darkMode} notify={notify} /></SEOLandingPage>} />
-                  <Route path="/add-page-numbers-to-pdf" element={<SEOLandingPage toolId="page-numbers" darkMode={darkMode}><SimpleTool title="Add Page Numbers" mode="numbers" darkMode={darkMode} notify={notify} /></SEOLandingPage>} />
-                  <Route path="/watermark-pdf" element={<SEOLandingPage toolId="watermark" darkMode={darkMode}><SimpleTool title="Watermark PDF" mode="watermark" darkMode={darkMode} notify={notify} /></SEOLandingPage>} />
-                  <Route path="/delete-pdf-pages" element={<SEOLandingPage toolId="delete-pages" darkMode={darkMode}><SimpleTool title="Delete Pages" mode="delete-pages" darkMode={darkMode} notify={notify} /></SEOLandingPage>} />
-                  <Route path="/compare-pdf" element={<SEOLandingPage toolId="compare" darkMode={darkMode}><SimpleTool title="Compare PDF" mode="compare" darkMode={darkMode} notify={notify} /></SEOLandingPage>} />
-                  <Route path="/repair-pdf" element={<SEOLandingPage toolId="repair" darkMode={darkMode}><SimpleTool title="Repair PDF" mode="repair" darkMode={darkMode} notify={notify} /></SEOLandingPage>} />
-                  <Route path="/pdf-to-qr-code" element={<SEOLandingPage toolId="pdf-to-qr" darkMode={darkMode}><QRTool darkMode={darkMode} notify={notify} /></SEOLandingPage>} />
-                  <Route path="/analyze-pdf" element={<AnalyzerPage darkMode={darkMode} notify={notify} />} />
-                  <Route path="/pdf-builder" element={<Home darkMode={darkMode} />} />
-
-                  {/* Clean Canonical Redirects for Short Aliases & Secondary Search Queries */}
-                  <Route path="/pdf-to-images" element={<Navigate to="/pdf-to-jpg" replace />} />
-                  <Route path="/pdf-editor" element={<Navigate to="/edit-pdf" replace />} />
-                  <Route path="/reorder-pages" element={<Navigate to="/organize-pdf" replace />} />
-                  <Route path="/extract-pages" element={<Navigate to="/split-pdf" replace />} />
-                  <Route path="/extract-pdf-pages" element={<Navigate to="/split-pdf" replace />} />
-                  <Route path="/add-page-numbers" element={<Navigate to="/add-page-numbers-to-pdf" replace />} />
-                  <Route path="/qr-pdf-share" element={<Navigate to="/pdf-to-qr-code" replace />} />
-                  <Route path="/pdf-analyzer" element={<Navigate to="/analyze-pdf" replace />} />
-                  <Route path="/analyze" element={<Navigate to="/analyze-pdf" replace />} />
-                  <Route path="/tools/pdf-analyzer" element={<Navigate to="/analyze-pdf" replace />} />
-                  <Route path="/merge" element={<Navigate to="/merge-pdf" replace />} />
-                  <Route path="/split" element={<Navigate to="/split-pdf" replace />} />
-                  <Route path="/compress" element={<Navigate to="/compress-pdf" replace />} />
-                  <Route path="/pdf-to-qr" element={<Navigate to="/pdf-to-qr-code" replace />} />
-                  <Route path="/organize" element={<Navigate to="/organize-pdf" replace />} />
-                  <Route path="/edit" element={<Navigate to="/edit-pdf" replace />} />
-                  <Route path="/page-numbers" element={<Navigate to="/add-page-numbers-to-pdf" replace />} />
-                  <Route path="/rotate" element={<Navigate to="/rotate-pdf" replace />} />
-                  <Route path="/watermark" element={<Navigate to="/watermark-pdf" replace />} />
-                  <Route path="/delete-pages" element={<Navigate to="/delete-pdf-pages" replace />} />
-                  <Route path="/protect" element={<Navigate to="/protect-pdf" replace />} />
-                  <Route path="/unlock" element={<Navigate to="/unlock-pdf" replace />} />
-                  <Route path="/sign" element={<Navigate to="/sign-pdf" replace />} />
-                  <Route path="/redact" element={<Navigate to="/redact-pdf" replace />} />
-                  <Route path="/repair" element={<Navigate to="/repair-pdf" replace />} />
-                  <Route path="/ocr" element={<Navigate to="/ocr-pdf" replace />} />
-                  <Route path="/scan-pdf" element={<Navigate to="/scan-to-pdf" replace />} />
-                  <Route path="/scan-handwriting" element={<Navigate to="/scan-handwriting-to-pdf" replace />} />
-                  <Route path="/compare" element={<Navigate to="/compare-pdf" replace />} />
-
-                  {/* Static Support Pages */}
-                  <Route path="/privacy" element={<PrivacyPage darkMode={darkMode} />} />
-                  <Route path="/terms" element={<TermsPage darkMode={darkMode} />} />
-                  <Route path="/about" element={<AboutPage darkMode={darkMode} />} />
-                  <Route path="/contact" element={<ContactPage darkMode={darkMode} />} />
-                  <Route path="/tutorials" element={<TutorialsPage darkMode={darkMode} />} />
-                  <Route path="/qr-success" element={<QRSuccess darkMode={darkMode} />} />
-                  <Route path="/s/:shareId" element={<QRSuccess darkMode={darkMode} />} />
-
-                  {/* 404 Catch-All */}
-                  <Route path="*" element={<NotFoundPage />} />
-                </Routes>
-              </Suspense>
-            </main>
-            <Footer darkMode={darkMode} />
-          </div>
-
             <AdSenseScript />
             <CookieConsent darkMode={darkMode} />
           </ActiveWorkProvider>
