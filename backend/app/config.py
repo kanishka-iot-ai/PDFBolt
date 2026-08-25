@@ -43,6 +43,9 @@ class Settings(BaseSettings):
     MAX_PAGE_LIMIT: int = 1000
     MAX_EXECUTION_TIMEOUT_SECONDS: int = 120
     RATE_LIMIT_PER_MINUTE: int = 60
+    JOB_FAST_PATH_TARGET_SECONDS: float = 3.0
+    JOB_FAST_PATH_MAX_INPUT_BYTES: int = 5 * 1024 * 1024
+    JOB_MAX_CONCURRENT_WORKERS: int = max(2, (os.cpu_count() or 2))
 
     # Storage & Temporary Document Retention Policy
     STORAGE_BACKEND: str = "local"  # 'local', 'azure', or 'gcs'

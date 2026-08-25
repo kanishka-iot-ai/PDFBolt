@@ -117,6 +117,7 @@ class JobService:
 
     def __init__(self):
         self.jobs: Dict[str, Job] = {}
+        self._worker_semaphore = asyncio.Semaphore(settings.JOB_MAX_CONCURRENT_WORKERS)
 
     def get_job(self, job_id: str) -> Optional[Job]:
         return self.jobs.get(job_id)
@@ -175,9 +176,10 @@ class JobService:
             job.input_size = total_in_bytes
             job.page_count_in = first_page_count
 
-            # Step 11: Execute processor in non-blocking worker thread
+            # Step 11: Execute processor in bounded non-blocking worker thread
             processor = processor_cls(job_id=job_id, work_dir=work_dir, settings=options)
-            result: JobResult = await asyncio.to_thread(processor.run, input_paths, options)
+            async with self._worker_semaphore:
+                result: JobResult = await asyncio.to_thread(processor.run, input_paths, options)
 
             # Step 15 & 16: Record output metadata
             job.status = JobStatus.COMPLETED
@@ -189,6 +191,10 @@ class JobService:
             saved_bytes = max(0, total_in_bytes - (job.output_size or 0))
             reduction_pct = round((saved_bytes / total_in_bytes) * 100, 2) if total_in_bytes > 0 else 0.0
 
+            fast_path_eligible = (
+                len(input_paths) == 1
+                and total_in_bytes <= settings.JOB_FAST_PATH_MAX_INPUT_BYTES
+            )
             job.metrics = {
                 "original_size_bytes": total_in_bytes,
                 "output_size_bytes": job.output_size,
@@ -196,7 +202,10 @@ class JobService:
                 "reduction_percent": reduction_pct,
                 "duration_s": result.duration_s,
                 "is_reduced": (job.output_size or 0) < total_in_bytes,
-                "quality_status": "passed"
+                "quality_status": "passed",
+                "performance_target_s": settings.JOB_FAST_PATH_TARGET_SECONDS,
+                "fast_path_eligible": fast_path_eligible,
+                "fast_path_sla_met": (result.duration_s <= settings.JOB_FAST_PATH_TARGET_SECONDS) if fast_path_eligible else None
             }
 
             return job
