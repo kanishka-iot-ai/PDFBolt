@@ -41,6 +41,7 @@ from backend.app.processors.ocr import OcrProcessor
 from backend.app.processors.analyzer import AnalyzerProcessor
 from backend.app.processors.handwriting import HandwritingProcessor
 from backend.app.processors.compare import CompareProcessor
+from backend.app.processors.word_to_pdf import WordToPdfProcessor
 
 PROCESSOR_REGISTRY: Dict[str, Type[BaseProcessor]] = {
     "merge_pdf": MergeProcessor,
@@ -107,6 +108,10 @@ PROCESSOR_REGISTRY: Dict[str, Type[BaseProcessor]] = {
     "handwriting": HandwritingProcessor,
     "scan-handwriting": HandwritingProcessor,
     "scan_handwriting": HandwritingProcessor,
+    "word-to-pdf": WordToPdfProcessor,
+    "word_to_pdf": WordToPdfProcessor,
+    "docx-to-pdf": WordToPdfProcessor,
+    "docx_to_pdf": WordToPdfProcessor,
 }
 
 
