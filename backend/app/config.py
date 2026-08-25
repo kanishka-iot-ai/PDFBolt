@@ -1,6 +1,6 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from pydantic import field_validator
-from typing import List, Union
+from pydantic import field_validator, SecretStr
+from typing import List, Union, Optional
 import json
 import os
 
@@ -10,7 +10,7 @@ class Settings(BaseSettings):
     APP_VERSION: str = "1.0.0"
     APP_ENV: str = "development"
     DEBUG: bool = True
-    API_ADMIN_KEY: str = ""
+    API_ADMIN_KEY: Optional[SecretStr] = None
     PORT: int = 8000
     HOST: str = "0.0.0.0"
 
@@ -46,8 +46,8 @@ class Settings(BaseSettings):
 
     # Storage & Temporary Document Retention Policy
     STORAGE_BACKEND: str = "local"  # 'local', 'azure', or 'gcs'
-    LOCAL_STORAGE_DIR: str = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "storage"))
-    
+    LOCAL_STORAGE_DIR: str = os.getenv("LOCAL_STORAGE_DIR", "/var/lib/pdfbolt/storage")
+
     # Azure Blob Storage Configuration
     AZURE_STORAGE_CONNECTION_STRING: str = ""
     AZURE_STORAGE_ACCOUNT_NAME: str = ""
@@ -58,7 +58,7 @@ class Settings(BaseSettings):
     GCS_PROJECT_ID: str = ""
     GCS_BUCKET_NAME: str = "pdfbolt-documents"
     GCS_REGION: str = "us-central1"
-    
+
     # Google Cloud Pub/Sub Queue Configuration
     PUBSUB_TOPIC_JOBS: str = "pdfbolt-jobs"
     PUBSUB_SUBSCRIPTION_JOBS: str = "pdfbolt-jobs-sub"
@@ -72,7 +72,7 @@ class Settings(BaseSettings):
 
     # AI Handwriting & Vision Settings
     AI_PROVIDER: str = "local"  # 'local', 'gemini', 'openai', 'anthropic', 'fallback'
-    AI_API_KEY: str = ""
+    AI_API_KEY: Optional[SecretStr] = None
     AI_API_ENDPOINT: str = ""
     AI_MODEL: str = "gemini-1.5-flash"
 
@@ -82,6 +82,36 @@ class Settings(BaseSettings):
         extra="ignore"
     )
 
+    @field_validator("LOCAL_STORAGE_DIR", mode="before")
+    @classmethod
+    def ensure_abs_path(cls, v):
+        p = os.path.abspath(v)
+        try:
+            os.makedirs(p, exist_ok=True)
+            # restrictive permissions where appropriate
+            try:
+                os.chmod(p, 0o700)
+            except Exception:
+                pass
+        except Exception:
+            pass
+        return p
+
+    def validate_production_secrets(self):
+        missing = []
+        if self.APP_ENV == "production":
+            if not self.API_ADMIN_KEY:
+                missing.append("API_ADMIN_KEY")
+            if self.STORAGE_BACKEND == "gcs":
+                if not self.GCS_BUCKET_NAME:
+                    missing.append("GCS_BUCKET_NAME")
+        if missing:
+            raise RuntimeError(f"Missing required configuration in production: {', '.join(missing)}")
+
 
 settings = Settings()
-os.makedirs(settings.LOCAL_STORAGE_DIR, exist_ok=True)
+# Ensure storage dir exists
+try:
+    os.makedirs(settings.LOCAL_STORAGE_DIR, exist_ok=True)
+except Exception:
+    pass
