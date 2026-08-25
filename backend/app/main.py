@@ -76,9 +76,12 @@ async def security_and_timing_middleware(request: Request, call_next):
 app.add_exception_handler(PDFProcessingException, pdf_exception_handler)
 app.add_exception_handler(Exception, generic_exception_handler)
 
+from backend.app.api.v1.convert import router as direct_convert_router
+
 # Include Routers
 app.include_router(root_health_router)
 app.include_router(api_v1_router)
+app.include_router(direct_convert_router)
 
 
 @app.get("/")

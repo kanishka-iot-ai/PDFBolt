@@ -1,4 +1,15 @@
 services:
+  # Headless LibreOffice conversion engine
+  gotenberg:
+    image: gotenberg/gotenberg:8
+    container_name: gotenberg-engine
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    networks:
+      - pdfbolt-net
+
+  # FastAPI Backend Service
   api:
     build:
       context: .
@@ -12,14 +23,23 @@ services:
       - STORAGE_BACKEND=local
       - QUEUE_BACKEND=local
       - TEMP_DIR=/tmp/pdfbolt
+      - GOTENBERG_URL=http://gotenberg:3000
     volumes:
       - pdfbolt-storage:/tmp/pdfbolt
+    depends_on:
+      - gotenberg
+    networks:
+      - pdfbolt-net
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 30s
       timeout: 10s
       retries: 3
+
+networks:
+  pdfbolt-net:
+    driver: bridge
 
 volumes:
   pdfbolt-storage:
