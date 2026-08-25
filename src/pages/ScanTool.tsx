@@ -3,7 +3,7 @@ import {
     Camera, RefreshCw, FileText, Download, X, Scan as ScanIcon, Flashlight,
     CheckCircle2, ChevronLeft, ChevronRight, Plus, Trash2, Zap, ZapOff,
     Grid, Settings, Sliders, Image as ImageIcon, FileUp, RotateCw, Copy, Check,
-    Sparkles, ArrowLeft, ZoomIn, Eye, Layers, Move
+    Sparkles, ArrowLeft, ZoomIn, Eye, Layers, Move, Smartphone, Sparkle
 } from 'lucide-react';
 import { soundEngine } from '../utils/sounds';
 import { useActiveWork } from '../context/ActiveWorkContext';
@@ -12,6 +12,7 @@ import {
     DocumentCorners, Point, detectDocumentOpenCV, smoothCorners, getCornerDelta,
     extractDocumentPerspective, applyScanFilter, ScanFilterType
 } from '../services/documentDetector';
+import { launchNativeDocumentScan, isNativeScannerBridgeAvailable } from '../services/nativeScannerBridge';
 
 interface ScanToolProps {
     darkMode: boolean;
@@ -36,7 +37,6 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
     // Camera & Canvas references
     const videoRef = useRef<HTMLVideoElement>(null);
     const overlayCanvasRef = useRef<HTMLCanvasElement>(null);
-    const processingCanvasRef = useRef<HTMLCanvasElement>(null);
     const videoTrackRef = useRef<MediaStreamTrack | null>(null);
     const animFrameRef = useRef<number | null>(null);
 
@@ -98,12 +98,13 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
         loadOpenCV().catch(err => console.warn('[PDFBolt] OpenCV lazy-load warning:', err));
     }, []);
 
-    // File input references for Import and Import Files
+    // File input references
+    const nativeCameraInputRef = useRef<HTMLInputElement>(null);
     const imageInputRef = useRef<HTMLInputElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     // -------------------------------------------------------------
-    // Real-Time Detection Loop
+    // Real-Time Detection Loop (Optimized without Viewport Cropping)
     // -------------------------------------------------------------
     const runDetection = useCallback(() => {
         if (!videoRef.current || !overlayCanvasRef.current || !isCameraActive) {
@@ -120,40 +121,39 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
             return;
         }
 
-        const width = video.videoWidth;
-        const height = video.videoHeight;
+        const videoW = video.videoWidth;
+        const videoH = video.videoHeight;
 
-        if (canvas.width !== width || canvas.height !== height) {
-            canvas.width = width;
-            canvas.height = height;
+        // Ensure canvas internal resolution matches raw video feed for pixel-perfect coordinates
+        if (canvas.width !== videoW || canvas.height !== videoH) {
+            canvas.width = videoW;
+            canvas.height = videoH;
         }
 
-        ctx.clearRect(0, 0, width, height);
+        ctx.clearRect(0, 0, videoW, videoH);
 
         // Draw 3x3 Grid if enabled
         if (showGrid) {
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
-            ctx.lineWidth = 1;
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
+            ctx.lineWidth = 2;
             ctx.beginPath();
-            // Verticals
-            ctx.moveTo(width / 3, 0); ctx.lineTo(width / 3, height);
-            ctx.moveTo((width * 2) / 3, 0); ctx.lineTo((width * 2) / 3, height);
-            // Horizontals
-            ctx.moveTo(0, height / 3); ctx.lineTo(width, height / 3);
-            ctx.moveTo(0, (height * 2) / 3); ctx.lineTo(width, (height * 2) / 3);
+            ctx.moveTo(videoW / 3, 0); ctx.lineTo(videoW / 3, videoH);
+            ctx.moveTo((videoW * 2) / 3, 0); ctx.lineTo((videoW * 2) / 3, videoH);
+            ctx.moveTo(0, videoH / 3); ctx.lineTo(videoW, videoH / 3);
+            ctx.moveTo(0, (videoH * 2) / 3); ctx.lineTo(videoW, (videoH * 2) / 3);
             ctx.stroke();
         }
 
         // Draw ID Card Guide Overlay if in ID card mode
         if (currentMode === 'idcard') {
-            const cardW = width * 0.75;
-            const cardH = cardW * 0.63; // Standard credit / ID card aspect ratio
-            const cardX = (width - cardW) / 2;
-            const cardY = (height - cardH) / 2;
+            const cardW = videoW * 0.78;
+            const cardH = cardW * 0.63; // Standard ID-1 card aspect ratio
+            const cardX = (videoW - cardW) / 2;
+            const cardY = (videoH - cardH) / 2;
 
-            ctx.strokeStyle = 'rgba(0, 230, 118, 0.85)';
+            ctx.strokeStyle = '#00e676';
             ctx.lineWidth = 4;
-            ctx.setLineDash([16, 8]);
+            ctx.setLineDash([18, 10]);
             ctx.strokeRect(cardX, cardY, cardW, cardH);
             ctx.setLineDash([]);
 
@@ -167,7 +167,7 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
 
         // Run Document Detection if AutoScan is active
         if (isAutoScan) {
-            const result = detectDocumentOpenCV(video, width, height);
+            const result = detectDocumentOpenCV(video, videoW, videoH);
 
             if (result.found && result.corners) {
                 // Smooth corners across frames for stable, fluid rendering
@@ -422,7 +422,52 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
     };
 
     // -------------------------------------------------------------
-    // Gallery & File System Import
+    // Native Mobile Scanner Launch (Google ML Kit / Apple VisionKit)
+    // -------------------------------------------------------------
+    const handleNativeScanClick = () => {
+        launchNativeDocumentScan(
+            nativeCameraInputRef.current,
+            (images) => {
+                // Batch add scanned pages from native flow
+                images.forEach((imgUrl, i) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        const ctx = canvas.getContext('2d');
+                        if (ctx) ctx.drawImage(img, 0, 0);
+
+                        const corners: DocumentCorners = {
+                            topLeft: { x: 0, y: 0 },
+                            topRight: { x: img.width, y: 0 },
+                            bottomRight: { x: img.width, y: img.height },
+                            bottomLeft: { x: 0, y: img.height },
+                        };
+
+                        const newPage: ScannedPage = {
+                            id: `native_${Date.now()}_${i}_${Math.random().toString(36).substr(2, 4)}`,
+                            originalImage: imgUrl,
+                            processedImage: imgUrl,
+                            corners,
+                            filter: 'none',
+                            rotation: 0,
+                        };
+
+                        setPages(prev => [...prev, newPage]);
+                    };
+                    img.src = imgUrl;
+                });
+                if (notify && notify.success) notify.success("Native document scan imported!");
+            },
+            (err) => {
+                if (notify && notify.error) notify.error(err);
+            }
+        );
+    };
+
+    // -------------------------------------------------------------
+    // Gallery & File System Import Handlers
     // -------------------------------------------------------------
     const handleImportImages = (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = e.target.files;
@@ -443,7 +488,7 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
                     if (!ctx) return;
                     ctx.drawImage(img, 0, 0);
 
-                    // Try auto-detecting document on the imported photo
+                    // Auto-detect document on the imported photo
                     const result = detectDocumentOpenCV(canvas, img.width, img.height);
                     let corners: DocumentCorners;
                     if (result.found && result.corners) {
@@ -480,7 +525,6 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
             reader.readAsDataURL(file);
         });
 
-        // Reset file input
         if (e.target) e.target.value = '';
     };
 
@@ -506,7 +550,7 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
     };
 
     // -------------------------------------------------------------
-    // Interactive 4-Corner Manual Crop Editor
+    // Interactive 4-Corner Manual Crop Editor with Loupe
     // -------------------------------------------------------------
     const openCornerEditor = (page: ScannedPage) => {
         setEditingPageId(page.id);
@@ -525,8 +569,8 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
 
         const img = new Image();
         img.onload = () => {
-            const containerWidth = canvas.parentElement?.clientWidth || 600;
-            const containerHeight = Math.min(window.innerHeight * 0.6, 500);
+            const containerWidth = canvas.parentElement?.clientWidth || 500;
+            const containerHeight = Math.min(window.innerHeight * 0.55, 450);
 
             const scale = Math.min(containerWidth / img.width, containerHeight / img.height);
             const drawW = img.width * scale;
@@ -550,8 +594,8 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
             const cBR = { x: manualCorners.bottomRight.x * scale, y: manualCorners.bottomRight.y * scale };
             const cBL = { x: manualCorners.bottomLeft.x * scale, y: manualCorners.bottomLeft.y * scale };
 
-            // Draw Dim Mask outside quad
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.45)';
+            // Dim mask outside quad
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
             ctx.fillRect(0, 0, drawW, drawH);
 
             // Cutout & highlight quad
@@ -607,7 +651,7 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
         }
     }, [cropModalOpen, drawCropCanvas]);
 
-    // Handle touch/mouse dragging on crop canvas
+    // Touch/mouse dragging on crop canvas
     const handleCropPointerDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
         if (!cropCanvasRef.current || !manualCorners) return;
         const rect = cropCanvasRef.current.getBoundingClientRect();
@@ -618,7 +662,7 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
         const cornersList: (keyof DocumentCorners)[] = ['topLeft', 'topRight', 'bottomRight', 'bottomLeft'];
 
         let closestCorner: keyof DocumentCorners | null = null;
-        let minDist = 40; // 40px touch grab radius
+        let minDist = 45; // 45px touch radius
 
         cornersList.forEach(k => {
             const pt = manualCorners[k];
@@ -810,9 +854,20 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
     ];
 
     return (
-        <div className={`min-h-[85vh] flex flex-col items-center justify-start ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+        <div className={`min-h-[85vh] w-full flex flex-col items-center justify-start ${darkMode ? 'text-white' : 'text-slate-900'}`}>
 
-            {/* Hidden file inputs for gallery & document imports */}
+            {/* Native Mobile Camera Input (Google Play ML Kit & iOS Camera Intent) */}
+            <input
+                ref={nativeCameraInputRef}
+                type="file"
+                accept="image/*"
+                capture="environment"
+                multiple
+                className="hidden"
+                onChange={handleImportImages}
+            />
+
+            {/* Photo Gallery & File System Inputs */}
             <input
                 ref={imageInputRef}
                 type="file"
@@ -834,16 +889,16 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
             {/* INITIAL LANDING STATE */}
             {/* ------------------------------------------------------------- */}
             {!isCameraActive && pages.length === 0 && (
-                <div className="flex flex-col items-center justify-center p-6 text-center max-w-lg animate-fadeIn mt-8">
-                    <div className={`w-24 h-24 mx-auto rounded-3xl flex items-center justify-center mb-6 shadow-2xl ${darkMode ? 'bg-gradient-to-tr from-slate-900 to-slate-800 border border-slate-700/60' : 'bg-gradient-to-tr from-blue-50 to-white border border-slate-200'}`}>
-                        <Camera size={44} className="text-emerald-500" />
+                <div className="flex flex-col items-center justify-center p-4 sm:p-6 text-center max-w-lg animate-fadeIn mt-4 sm:mt-8 w-full">
+                    <div className={`w-20 h-20 sm:w-24 sm:h-24 mx-auto rounded-3xl flex items-center justify-center mb-5 shadow-2xl ${darkMode ? 'bg-gradient-to-tr from-slate-900 to-slate-800 border border-slate-700/60' : 'bg-gradient-to-tr from-emerald-50 to-white border border-slate-200'}`}>
+                        <Camera size={40} className="text-emerald-500" />
                     </div>
 
-                    <h1 className="text-3xl font-black tracking-tight mb-3">
+                    <h1 className="text-2xl sm:text-3xl font-black tracking-tight mb-2 sm:mb-3">
                         AI Document Scanner
                     </h1>
-                    <p className="mb-8 text-sm text-slate-500 dark:text-slate-400 font-medium leading-relaxed">
-                        Real-time automatic edge detection, perspective warping, shadow removal, and instant PDF compilation.
+                    <p className="mb-6 sm:mb-8 text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-medium leading-relaxed px-2">
+                        Real-time automatic edge detection, perspective warping, shadow removal, and instant PDF export.
                     </p>
 
                     {cameraError && (
@@ -852,31 +907,41 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
                         </div>
                     )}
 
-                    <div className="flex flex-col gap-3.5 w-full">
+                    <div className="flex flex-col gap-3 w-full">
+                        {/* Option 1: Live AI Scanner */}
                         <button
                             onClick={startCamera}
-                            className="w-full py-5 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white rounded-2xl font-black text-lg shadow-xl shadow-emerald-500/25 transition-all hover:scale-[1.02] flex items-center justify-center gap-3 active:scale-95"
+                            className="w-full py-4 sm:py-5 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white rounded-2xl font-black text-base sm:text-lg shadow-xl shadow-emerald-500/25 transition-all hover:scale-[1.02] flex items-center justify-center gap-3 active:scale-95"
                         >
-                            <Camera size={22} /> Launch Camera Scanner
+                            <Camera size={22} /> Launch Live AI Scanner
                         </button>
 
-                        <div className="grid grid-cols-2 gap-3">
+                        {/* Option 2: Native Device Scanner (Google ML Kit / Apple VisionKit flow) */}
+                        <button
+                            onClick={handleNativeScanClick}
+                            className="w-full py-3.5 px-4 rounded-2xl border-2 border-emerald-500/30 bg-emerald-500/5 hover:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all active:scale-95"
+                        >
+                            <Smartphone size={18} /> Native Camera / ML Kit Scanner
+                        </button>
+
+                        {/* Option 3: Gallery & Files */}
+                        <div className="grid grid-cols-2 gap-3 mt-1">
                             <button
                                 onClick={() => imageInputRef.current?.click()}
-                                className="py-3.5 px-4 rounded-xl border-2 border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 font-bold text-xs flex items-center justify-center gap-2 transition-all"
+                                className="py-3 px-3 rounded-xl border-2 border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 font-bold text-xs flex items-center justify-center gap-2 transition-all"
                             >
                                 <ImageIcon size={16} className="text-emerald-500" /> Import Photos
                             </button>
                             <button
                                 onClick={() => fileInputRef.current?.click()}
-                                className="py-3.5 px-4 rounded-xl border-2 border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 font-bold text-xs flex items-center justify-center gap-2 transition-all"
+                                className="py-3 px-3 rounded-xl border-2 border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 font-bold text-xs flex items-center justify-center gap-2 transition-all"
                             >
                                 <FileUp size={16} className="text-emerald-500" /> Import Files
                             </button>
                         </div>
                     </div>
 
-                    <div className="mt-8 flex items-center gap-2 text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
+                    <div className="mt-8 flex items-center gap-2 text-[10px] sm:text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
                         <Sparkles size={14} className="text-emerald-500" />
                         <span>Client-Side Computer Vision Engine</span>
                     </div>
@@ -884,25 +949,25 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
             )}
 
             {/* ------------------------------------------------------------- */}
-            {/* FULLSCREEN CAMERA VIEWFINDER (Exact Match with Reference Image) */}
+            {/* FULLSCREEN CAMERA VIEWFINDER (Mobile Optimized & Safe Insets) */}
             {/* ------------------------------------------------------------- */}
             {isCameraActive && (
-                <div className="fixed inset-0 z-[100] bg-black flex flex-col select-none overflow-hidden">
+                <div className="fixed inset-0 w-full h-[100dvh] max-h-[100dvh] z-[100] bg-black flex flex-col justify-between select-none overflow-hidden touch-none">
 
                     {/* Camera Flash Animation */}
                     {capturedFlash && (
                         <div className="absolute inset-0 bg-white z-50 animate-fadeOut pointer-events-none" />
                     )}
 
-                    {/* 1. TOP NAVIGATION & CONTROLS HEADER */}
-                    <div className="relative z-30 w-full px-5 py-4 flex items-center justify-between bg-gradient-to-b from-black/80 via-black/40 to-transparent">
+                    {/* 1. TOP NAVIGATION HEADER (With Safe-Area-Inset) */}
+                    <div className="relative z-30 w-full px-4 pt-[max(0.75rem,env(safe-area-inset-top))] pb-2 flex items-center justify-between bg-gradient-to-b from-black/90 via-black/50 to-transparent">
                         {/* Flashlight Button */}
                         <button
                             onClick={toggleTorch}
                             aria-label="Toggle Flash"
-                            className="p-2.5 rounded-full text-white/90 hover:text-white bg-black/40 backdrop-blur-md border border-white/10 active:scale-90 transition-all"
+                            className="p-2.5 rounded-full text-white/90 hover:text-white bg-black/50 backdrop-blur-md border border-white/10 active:scale-90 transition-all"
                         >
-                            {isTorchOn ? <Zap className="text-yellow-400 fill-current" size={20} /> : <ZapOff size={20} />}
+                            {isTorchOn ? <Zap className="text-yellow-400 fill-current" size={18} /> : <ZapOff size={18} />}
                         </button>
 
                         {/* Mode Indicator: Auto vs Manual */}
@@ -915,12 +980,12 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
                         </button>
 
                         {/* Color Filter Quick Selector */}
-                        <div className="flex items-center gap-1.5 bg-black/40 backdrop-blur-md border border-white/10 px-2 py-1 rounded-full">
+                        <div className="flex items-center gap-1 bg-black/50 backdrop-blur-md border border-white/10 px-2 py-1 rounded-full">
                             {(['none', 'magic', 'bw'] as ScanFilterType[]).map((f) => (
                                 <button
                                     key={f}
                                     onClick={() => setActiveFilter(f)}
-                                    className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider transition-all ${activeFilter === f ? 'bg-emerald-500 text-white' : 'text-white/60 hover:text-white'}`}
+                                    className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider transition-all ${activeFilter === f ? 'bg-emerald-500 text-white' : 'text-white/60 hover:text-white'}`}
                                 >
                                     {f === 'none' ? 'Orig' : f === 'magic' ? 'Magic' : 'B&W'}
                                 </button>
@@ -931,60 +996,60 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
                         <button
                             onClick={() => setShowGrid(!showGrid)}
                             aria-label="Toggle Framing Grid"
-                            className={`p-2.5 rounded-full backdrop-blur-md border border-white/10 active:scale-90 transition-all ${showGrid ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40' : 'bg-black/40 text-white/90'}`}
+                            className={`p-2.5 rounded-full backdrop-blur-md border border-white/10 active:scale-90 transition-all ${showGrid ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40' : 'bg-black/50 text-white/90'}`}
                         >
-                            <Grid size={20} />
+                            <Grid size={18} />
                         </button>
 
                         {/* Settings Button */}
                         <button
                             onClick={() => setSettingsOpen(!settingsOpen)}
                             aria-label="Scanner Settings"
-                            className="p-2.5 rounded-full text-white/90 hover:text-white bg-black/40 backdrop-blur-md border border-white/10 active:scale-90 transition-all"
+                            className="p-2.5 rounded-full text-white/90 hover:text-white bg-black/50 backdrop-blur-md border border-white/10 active:scale-90 transition-all"
                         >
-                            <Settings size={20} />
+                            <Settings size={18} />
                         </button>
                     </div>
 
-                    {/* 2. VIEWFINDER VIDEO & OVERLAY CANVAS LAYER */}
-                    <div className="relative flex-1 w-full h-full bg-black overflow-hidden flex items-center justify-center">
+                    {/* 2. VIEWFINDER VIDEO & OVERLAY CANVAS LAYER (Non-Cropped) */}
+                    <div className="relative flex-1 w-full h-full min-h-0 bg-black overflow-hidden flex items-center justify-center">
                         <video
                             ref={videoRef}
                             autoPlay
                             playsInline
                             muted
-                            className="absolute inset-0 w-full h-full object-cover"
+                            className="absolute inset-0 w-full h-full object-contain"
                         />
 
                         {/* Real-Time Green Document Contour Detection Overlay */}
                         <canvas
                             ref={overlayCanvasRef}
-                            className="absolute inset-0 w-full h-full object-cover pointer-events-none z-10"
+                            className="absolute inset-0 w-full h-full object-contain pointer-events-none z-10"
                         />
 
                         {/* 3. CENTER GUIDANCE CAPSULE / PILL BANNER (Exact Match from Image) */}
-                        <div className="absolute inset-0 pointer-events-none flex flex-col items-center justify-center z-20">
-                            <div className="bg-black/75 backdrop-blur-xl border border-white/15 px-5 py-2.5 rounded-full shadow-2xl flex items-center gap-3 text-white max-w-[90%] pointer-events-auto transform transition-all duration-300 animate-fadeIn">
+                        <div className="absolute inset-x-0 top-12 sm:top-16 pointer-events-none flex flex-col items-center justify-center z-20 px-4">
+                            <div className="bg-black/80 backdrop-blur-xl border border-white/15 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full shadow-2xl flex items-center gap-2.5 sm:gap-3 text-white max-w-full pointer-events-auto transform transition-all duration-300 animate-fadeIn">
                                 {/* Left Document Scan Frame Icon */}
-                                <div className="p-1 rounded-md bg-white/10 text-emerald-400">
-                                    <ScanIcon size={18} />
+                                <div className="p-1 rounded-md bg-white/10 text-emerald-400 shrink-0">
+                                    <ScanIcon size={16} />
                                 </div>
 
                                 {/* Status Guidance Text */}
-                                <span className="text-xs font-semibold tracking-wide select-none">
+                                <span className="text-[11px] sm:text-xs font-semibold tracking-wide select-none text-center truncate">
                                     {statusMessage}
                                 </span>
 
                                 {/* Auto-Capture Progress Ring */}
                                 {steadyProgress > 0 && isAutoScan && (
-                                    <div className="w-4 h-4 rounded-full border-2 border-emerald-400/30 border-t-emerald-400 animate-spin" />
+                                    <div className="w-3.5 h-3.5 rounded-full border-2 border-emerald-400/30 border-t-emerald-400 animate-spin shrink-0" />
                                 )}
                             </div>
                         </div>
 
                         {/* Settings Drawer Overlay */}
                         {settingsOpen && (
-                            <div className="absolute top-4 right-4 z-40 bg-black/90 backdrop-blur-2xl border border-white/15 rounded-2xl p-4 text-white w-64 shadow-2xl space-y-4 animate-fadeIn">
+                            <div className="absolute top-2 right-4 z-40 bg-black/95 backdrop-blur-2xl border border-white/15 rounded-2xl p-4 text-white w-64 shadow-2xl space-y-4 animate-fadeIn">
                                 <div className="flex items-center justify-between border-b border-white/10 pb-2">
                                     <h4 className="text-xs font-black uppercase tracking-wider">Scanner Options</h4>
                                     <button onClick={() => setSettingsOpen(false)} className="text-white/60 hover:text-white">
@@ -1031,15 +1096,15 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
                     </div>
 
                     {/* 4. BOTTOM MODE SELECTOR CAROUSEL */}
-                    <div className="relative z-30 w-full bg-gradient-to-t from-black via-black/95 to-transparent pt-3 pb-2 px-4">
-                        <div className="flex items-center justify-center gap-6 overflow-x-auto no-scrollbar max-w-md mx-auto py-1">
+                    <div className="relative z-30 w-full bg-gradient-to-t from-black via-black/95 to-transparent pt-2 pb-1 px-4">
+                        <div className="flex items-center justify-center gap-5 sm:gap-6 overflow-x-auto no-scrollbar max-w-md mx-auto py-1">
                             {MODES.map((mode) => {
                                 const isSelected = currentMode === mode.id;
                                 return (
                                     <button
                                         key={mode.id}
                                         onClick={() => setCurrentMode(mode.id)}
-                                        className={`relative pb-1.5 text-xs font-black uppercase tracking-wider transition-all whitespace-nowrap active:scale-90 ${isSelected ? 'text-emerald-400 font-extrabold' : 'text-white/40 hover:text-white/80'}`}
+                                        className={`relative pb-1 text-xs font-black uppercase tracking-wider transition-all whitespace-nowrap active:scale-90 ${isSelected ? 'text-emerald-400 font-extrabold' : 'text-white/40 hover:text-white/80'}`}
                                     >
                                         <span>{mode.label}</span>
                                         {isSelected && (
@@ -1051,27 +1116,26 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
                         </div>
                     </div>
 
-                    {/* 5. BOTTOM CAPTURE & ACTION BAR */}
-                    <div className="relative z-30 w-full bg-black/95 px-6 pt-2 pb-10 flex items-center justify-between border-t border-white/10 max-w-lg mx-auto">
+                    {/* 5. BOTTOM CAPTURE & ACTION BAR (With Safe-Area-Inset-Bottom) */}
+                    <div className="relative z-30 w-full bg-black/95 px-5 pt-2 pb-[max(1.25rem,env(safe-area-inset-bottom))] flex items-center justify-between border-t border-white/10 max-w-lg mx-auto">
                         {/* Left: Close Button */}
                         <button
                             onClick={stopCamera}
                             aria-label="Close Camera"
-                            className="p-3.5 text-white/80 hover:text-white bg-white/10 hover:bg-white/20 rounded-full backdrop-blur-md active:scale-90 transition-all"
+                            className="p-3 text-white/80 hover:text-white bg-white/10 hover:bg-white/20 rounded-full backdrop-blur-md active:scale-90 transition-all"
                         >
-                            <X size={24} />
+                            <X size={22} />
                         </button>
 
                         {/* Center: Large Shutter Button */}
                         <div className="relative flex items-center justify-center">
-                            {/* Animated Outer Ring when doc is steady */}
                             <button
                                 onClick={handleCapture}
                                 disabled={isProcessing}
                                 aria-label="Capture Scan"
-                                className={`group relative w-20 h-20 rounded-full border-4 flex items-center justify-center active:scale-90 transition-all duration-200 ${isSteady ? 'border-emerald-400 shadow-[0_0_25px_rgba(0,230,118,0.6)] scale-105' : 'border-white/80 shadow-[0_0_15px_rgba(255,255,255,0.2)]'}`}
+                                className={`group relative w-18 h-18 sm:w-20 sm:h-20 rounded-full border-4 flex items-center justify-center active:scale-90 transition-all duration-200 ${isSteady ? 'border-emerald-400 shadow-[0_0_25px_rgba(0,230,118,0.6)] scale-105' : 'border-white/80 shadow-[0_0_15px_rgba(255,255,255,0.2)]'}`}
                             >
-                                <div className={`w-16 h-16 rounded-full transition-all duration-200 ${isProcessing ? 'scale-75 opacity-50' : 'group-hover:scale-95'} ${isSteady ? 'bg-emerald-400' : 'bg-white'}`} />
+                                <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-full transition-all duration-200 ${isProcessing ? 'scale-75 opacity-50' : 'group-hover:scale-95'} ${isSteady ? 'bg-emerald-400' : 'bg-white'}`} />
                                 {isProcessing && (
                                     <div className="absolute inset-0 border-4 border-emerald-400 border-t-transparent rounded-full animate-spin" />
                                 )}
@@ -1079,37 +1143,37 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
                         </div>
 
                         {/* Right: Import & Import Files Buttons */}
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2 sm:gap-3">
                             <button
                                 onClick={() => imageInputRef.current?.click()}
-                                className="flex flex-col items-center gap-1 text-white/80 hover:text-white active:scale-90 transition-all"
+                                className="flex flex-col items-center gap-0.5 text-white/80 hover:text-white active:scale-90 transition-all"
                             >
-                                <div className="p-2.5 rounded-xl bg-white/10 hover:bg-white/20">
-                                    <ImageIcon size={20} />
+                                <div className="p-2 sm:p-2.5 rounded-xl bg-white/10 hover:bg-white/20">
+                                    <ImageIcon size={18} />
                                 </div>
-                                <span className="text-[9px] font-bold uppercase tracking-wider">Import</span>
+                                <span className="text-[8px] sm:text-[9px] font-bold uppercase tracking-wider">Import</span>
                             </button>
 
                             <button
                                 onClick={() => fileInputRef.current?.click()}
-                                className="flex flex-col items-center gap-1 text-white/80 hover:text-white active:scale-90 transition-all"
+                                className="flex flex-col items-center gap-0.5 text-white/80 hover:text-white active:scale-90 transition-all"
                             >
-                                <div className="p-2.5 rounded-xl bg-white/10 hover:bg-white/20">
-                                    <FileUp size={20} />
+                                <div className="p-2 sm:p-2.5 rounded-xl bg-white/10 hover:bg-white/20">
+                                    <FileUp size={18} />
                                 </div>
-                                <span className="text-[9px] font-bold uppercase tracking-wider">Import Files</span>
+                                <span className="text-[8px] sm:text-[9px] font-bold uppercase tracking-wider">Files</span>
                             </button>
 
                             {/* Captured Count Badge */}
                             {pages.length > 0 && (
                                 <button
                                     onClick={stopCamera}
-                                    className="relative flex flex-col items-center gap-1 text-emerald-400 font-bold active:scale-90 ml-1"
+                                    className="relative flex flex-col items-center gap-0.5 text-emerald-400 font-bold active:scale-90 ml-0.5"
                                 >
-                                    <div className="w-10 h-10 rounded-xl bg-emerald-500/20 border-2 border-emerald-400 flex items-center justify-center">
-                                        <span className="text-sm font-black text-white">{pages.length}</span>
+                                    <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-emerald-500/20 border-2 border-emerald-400 flex items-center justify-center">
+                                        <span className="text-xs sm:text-sm font-black text-white">{pages.length}</span>
                                     </div>
-                                    <span className="text-[9px] font-black uppercase tracking-wider">Done</span>
+                                    <span className="text-[8px] sm:text-[9px] font-black uppercase tracking-wider">Done</span>
                                 </button>
                             )}
                         </div>
@@ -1124,10 +1188,10 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
                 <div className="w-full max-w-6xl animate-fadeIn p-4 sm:p-6 lg:p-8 space-y-6">
 
                     {/* Top Action Bar */}
-                    <div className="flex flex-col md:flex-row items-center justify-between gap-4 bg-white dark:bg-slate-800/80 backdrop-blur-xl p-6 rounded-3xl border border-slate-200/80 dark:border-slate-700/80 shadow-2xl">
+                    <div className="flex flex-col md:flex-row items-center justify-between gap-4 bg-white dark:bg-slate-800/80 backdrop-blur-xl p-5 sm:p-6 rounded-3xl border border-slate-200/80 dark:border-slate-700/80 shadow-2xl">
                         <div>
                             <div className="flex items-center gap-2 mb-1">
-                                <h2 className="text-2xl font-black tracking-tight">Scanned Document</h2>
+                                <h2 className="text-xl sm:text-2xl font-black tracking-tight">Scanned Document</h2>
                                 <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-black uppercase tracking-wider">
                                     {pages.length} {pages.length === 1 ? 'Page' : 'Pages'}
                                 </span>
@@ -1140,9 +1204,16 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
                         <div className="flex flex-wrap items-center gap-2.5 w-full md:w-auto">
                             <button
                                 onClick={startCamera}
-                                className="flex-1 sm:flex-none px-5 py-3 rounded-xl border-2 border-slate-200 dark:border-slate-700 font-bold hover:bg-slate-50 dark:hover:bg-slate-700/60 transition-all flex items-center justify-center gap-2 text-xs active:scale-95"
+                                className="flex-1 sm:flex-none px-4 sm:px-5 py-3 rounded-xl border-2 border-slate-200 dark:border-slate-700 font-bold hover:bg-slate-50 dark:hover:bg-slate-700/60 transition-all flex items-center justify-center gap-2 text-xs active:scale-95"
                             >
                                 <Plus size={16} className="text-emerald-500" /> Add Page
+                            </button>
+
+                            <button
+                                onClick={handleNativeScanClick}
+                                className="px-3.5 py-3 rounded-xl border-2 border-emerald-500/30 bg-emerald-500/5 hover:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold transition-all flex items-center justify-center gap-1.5 text-xs active:scale-95"
+                            >
+                                <Smartphone size={14} /> Native Scan
                             </button>
 
                             <button
@@ -1151,7 +1222,7 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
                                         setPages([]);
                                     }
                                 }}
-                                className="px-4 py-3 rounded-xl border-2 border-slate-200 dark:border-slate-700 font-bold hover:bg-red-50 hover:border-red-200 dark:hover:bg-red-900/20 text-slate-600 dark:text-slate-300 hover:text-red-600 transition-all flex items-center justify-center gap-2 text-xs"
+                                className="px-3.5 py-3 rounded-xl border-2 border-slate-200 dark:border-slate-700 font-bold hover:bg-red-50 hover:border-red-200 dark:hover:bg-red-900/20 text-slate-600 dark:text-slate-300 hover:text-red-600 transition-all flex items-center justify-center gap-1.5 text-xs"
                             >
                                 <RefreshCw size={14} /> Clear
                             </button>
@@ -1159,7 +1230,7 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
                             <button
                                 onClick={saveAsPdf}
                                 disabled={isPdfGenerating}
-                                className="flex-1 sm:flex-none px-7 py-3.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl font-black text-xs shadow-lg shadow-emerald-500/25 transition-all flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50"
+                                className="flex-1 sm:flex-none px-6 sm:px-7 py-3.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl font-black text-xs shadow-lg shadow-emerald-500/25 transition-all flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50"
                             >
                                 {isPdfGenerating ? (
                                     <>
@@ -1178,7 +1249,7 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
 
                     {/* OCR Text Result Drawer (if available in To Text mode) */}
                     {ocrTextResult && (
-                        <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-xl space-y-3">
+                        <div className="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-xl space-y-3">
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
                                     <Sparkles size={16} className="text-emerald-500" />
@@ -1295,12 +1366,12 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
             {/* INTERACTIVE 4-CORNER FINE-TUNING MODAL WITH LOUPE */}
             {/* ------------------------------------------------------------- */}
             {cropModalOpen && (
-                <div className="fixed inset-0 z-[120] bg-black/90 backdrop-blur-md flex items-center justify-center p-4">
-                    <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 max-w-2xl w-full text-white shadow-2xl flex flex-col space-y-4 animate-scaleUp">
+                <div className="fixed inset-0 z-[120] bg-black/90 backdrop-blur-md flex items-center justify-center p-3 sm:p-4">
+                    <div className="bg-slate-900 border border-slate-800 rounded-3xl p-4 sm:p-6 max-w-2xl w-full text-white shadow-2xl flex flex-col space-y-3 sm:space-y-4 animate-scaleUp max-h-[95dvh] overflow-y-auto">
                         <div className="flex items-center justify-between border-b border-slate-800 pb-3">
                             <div className="flex items-center gap-2">
                                 <Sliders className="text-emerald-400" size={20} />
-                                <h3 className="text-base font-black tracking-tight">Fine-Tune 4 Corners</h3>
+                                <h3 className="text-sm sm:text-base font-black tracking-tight">Fine-Tune 4 Corners</h3>
                             </div>
                             <button
                                 onClick={() => setCropModalOpen(false)}
@@ -1329,13 +1400,13 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
                         <div className="flex items-center justify-end gap-3 pt-2">
                             <button
                                 onClick={() => setCropModalOpen(false)}
-                                className="px-5 py-2.5 rounded-xl border border-slate-700 font-bold text-xs text-slate-300 hover:bg-slate-800 transition-colors"
+                                className="px-4 sm:px-5 py-2.5 rounded-xl border border-slate-700 font-bold text-xs text-slate-300 hover:bg-slate-800 transition-colors"
                             >
                                 Cancel
                             </button>
                             <button
                                 onClick={saveManualCrop}
-                                className="px-6 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-black text-xs shadow-lg shadow-emerald-500/25 transition-all flex items-center gap-2"
+                                className="px-5 sm:px-6 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-black text-xs shadow-lg shadow-emerald-500/25 transition-all flex items-center gap-2"
                             >
                                 <Check size={16} /> Apply Perspective Warp
                             </button>
