@@ -428,6 +428,23 @@ class PdfToWordProcessor(BaseProcessor):
             f"has_text: {analysis['has_text_layer']}, images: {analysis['total_images']}, tables: {analysis['total_tables']}"
         )
 
+        # OCR Preprocessing: if document lacks a text layer or explicit OCR requested, run ocrmypdf if available
+        ocr_requested = bool(opts.get("force_ocr") or opts.get("ocr"))
+        if (not analysis.get("has_text_layer", False) or analysis.get("ocr_pages", 0) > 0 or ocr_requested) and 'ocrmypdf' in globals():
+            try:
+                ocr_pdf = self.temp_dir / f"{self.job_id}_ocr.pdf"
+                logger.info(f"Running OCR preprocessing for job {self.job_id} -> {ocr_pdf}")
+                # Use deskew and optimize for better OCR quality
+                ocrmypdf.ocr(str(input_pdf), str(ocr_pdf), deskew=True, optimize=1)
+                input_pdf = ocr_pdf
+                # Re-run analysis on OCRed pdf to update conversion path
+                analysis = self._analyze_document(input_pdf)
+                logger.info(f"Post-OCR analysis: has_text={analysis.get('has_text_layer')}, ocr_pages={analysis.get('ocr_pages')}")
+            except Exception as e:
+                logger.warning(f"OCR preprocessing failed for job {self.job_id}: {e}")
+                # proceed without OCR — fallbacks will handle visual preservation
+
+
         converted = False
         strategy_used = "none"
 
