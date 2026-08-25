@@ -119,7 +119,9 @@ class ApiClient {
     const jobId = jobData.job_id;
 
     // Fetch output artifact
-    const dlResponse = await fetch(resolveApiUrl(jobData.download_url, `/jobs/${jobId}/download`));
+    const dlResponse = await fetch(resolveApiUrl(jobData.download_url, `/jobs/${jobId}/download`), {
+      signal: AbortSignal.timeout(10000)
+    });
     if (!dlResponse.ok) {
       throw new Error("Failed to download output artifact from backend storage.");
     }
@@ -191,7 +193,9 @@ class ApiClient {
     const jobData = await response.json();
     const jobId = jobData.job_id;
 
-    const dlResponse = await fetch(resolveApiUrl(jobData.download_url, `/jobs/${jobId}/download`));
+    const dlResponse = await fetch(resolveApiUrl(jobData.download_url, `/jobs/${jobId}/download`), {
+      signal: AbortSignal.timeout(10000)
+    });
     if (!dlResponse.ok) {
       throw new Error("Failed to retrieve comparison report.");
     }
@@ -231,7 +235,9 @@ class ApiClient {
     const jobData = await response.json();
     const jobId = jobData.job_id;
 
-    const dlResponse = await fetch(resolveApiUrl(jobData.download_url, `/jobs/${jobId}/download`));
+    const dlResponse = await fetch(resolveApiUrl(jobData.download_url, `/jobs/${jobId}/download`), {
+      signal: AbortSignal.timeout(10000)
+    });
     if (!dlResponse.ok) {
       throw new Error("Failed to retrieve merged document.");
     }

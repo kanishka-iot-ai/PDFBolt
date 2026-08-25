@@ -5,7 +5,7 @@ export class AIService {
   private ai: GoogleGenAI | null = null;
 
   constructor() {
-    const apiKey = import.meta.env.GEMINI_API_KEY;
+    const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
     if (!apiKey) {
       console.warn('Gemini API key not found in environment variables. AI features will be disabled.');
     } else {

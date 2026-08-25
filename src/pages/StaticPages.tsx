@@ -40,7 +40,7 @@ export const ContactPage: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
 
     const SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID || 'service_lrshcpf';
     const TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID || 'template_ykqay24';
-    const PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY || 'JE-e7n6wYODP3qdSW';
+    const PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY || '';
 
     try {
       if (form.current) {
