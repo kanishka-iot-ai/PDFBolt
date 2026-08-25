@@ -36,6 +36,7 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
     // OKEN Scanner Features
     const [isTorchOn, setIsTorchOn] = useState(false);
     const [isSteady, setIsSteady] = useState(false);
+    const [detectionHint, setDetectionHint] = useState('Place document in frame');
     const steadyCountRef = useRef(0);
     const lastCornersRef = useRef<any>(null);
     const [isAutoCapturing, setIsAutoCapturing] = useState(false);
@@ -63,6 +64,41 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
         }
     }, []);
 
+
+    const getQuadArea = (corners: any): number => {
+        if (!corners) return 0;
+        const points = [corners.topLeft, corners.topRight, corners.bottomRight, corners.bottomLeft];
+        let area = 0;
+        for (let i = 0; i < points.length; i++) {
+            const p1 = points[i];
+            const p2 = points[(i + 1) % points.length];
+            area += (p1.x * p2.y) - (p2.x * p1.y);
+        }
+        return Math.abs(area) / 2;
+    };
+
+    const getEdgeLength = (a: any, b: any): number => {
+        const dx = a.x - b.x;
+        const dy = a.y - b.y;
+        return Math.sqrt(dx * dx + dy * dy);
+    };
+
+    const isDetectionUsable = (corners: any, canvasWidth: number, canvasHeight: number): boolean => {
+        if (!corners) return false;
+        const area = getQuadArea(corners);
+        const frameArea = canvasWidth * canvasHeight;
+        if (frameArea <= 0) return false;
+        const areaRatio = area / frameArea;
+        if (areaRatio < 0.12 || areaRatio > 0.98) return false;
+
+        const top = getEdgeLength(corners.topLeft, corners.topRight);
+        const bottom = getEdgeLength(corners.bottomLeft, corners.bottomRight);
+        const left = getEdgeLength(corners.topLeft, corners.bottomLeft);
+        const right = getEdgeLength(corners.topRight, corners.bottomRight);
+        const horizontalSkew = Math.min(top, bottom) / Math.max(top, bottom);
+        const verticalSkew = Math.min(left, right) / Math.max(left, right);
+        return horizontalSkew > 0.45 && verticalSkew > 0.45;
+    };
 
     // Detection Loop - Professional Area Detection Logic
     const detectionLoop = useCallback(() => {
@@ -99,29 +135,39 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
 
                 if (contour) {
                     const corners = scannerRef.current.getCornerPoints(contour);
+                    if (!isDetectionUsable(corners, canvas.width, canvas.height)) {
+                        steadyCountRef.current = 0;
+                        setIsSteady(false);
+                        setDetectionHint('Move closer and keep full page visible');
+                        requestRef.current = requestAnimationFrame(detectionLoop);
+                        return;
+                    }
 
                     // 3. Area Stability & Snapping Logic
                     if (lastCornersRef.current) {
                         const dist = Math.abs(corners.topLeft.x - lastCornersRef.current.topLeft.x) +
                             Math.abs(corners.topLeft.y - lastCornersRef.current.topLeft.y);
 
-                        if (dist < 8) { // OKEN-level precision tolerance
+                        if (dist < 14) {
                             steadyCountRef.current++;
                         } else {
                             steadyCountRef.current = 0;
                             setIsSteady(false);
                         }
 
-                        if (steadyCountRef.current > 25) {
+                        if (steadyCountRef.current > 14) {
                             setIsSteady(true);
+                            setDetectionHint('Area locked');
+                        } else {
+                            setDetectionHint('Hold still for auto capture');
                         }
                     }
                     lastCornersRef.current = corners;
 
                     // 4. Draw the GORGEOUS BORDER (Professional Feedback)
                     ctx.shadowBlur = 20;
-                    ctx.shadowColor = steadyCountRef.current > 25 ? '#22c55e' : '#3b82f6';
-                    ctx.strokeStyle = steadyCountRef.current > 25 ? '#22c55e' : '#3b82f6';
+                    ctx.shadowColor = steadyCountRef.current > 14 ? '#22c55e' : '#3b82f6';
+                    ctx.strokeStyle = steadyCountRef.current > 14 ? '#22c55e' : '#3b82f6';
                     ctx.lineWidth = 12;
                     ctx.lineJoin = 'round';
                     ctx.beginPath();
@@ -134,12 +180,12 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
                     ctx.shadowBlur = 0; // Reset
 
                     // 5. Fill with semi-transparent premium overlay
-                    ctx.fillStyle = steadyCountRef.current > 25 ? 'rgba(34, 197, 94, 0.3)' : 'rgba(59, 130, 246, 0.2)';
+                    ctx.fillStyle = steadyCountRef.current > 14 ? 'rgba(34, 197, 94, 0.3)' : 'rgba(59, 130, 246, 0.2)';
                     ctx.fill();
 
                     // 6. Pulse effect on corners for target locking
                     const pulseSize = Math.sin(Date.now() / 200) * 5 + 15;
-                    ctx.fillStyle = steadyCountRef.current > 25 ? '#22c55e' : '#3b82f6';
+                    ctx.fillStyle = steadyCountRef.current > 14 ? '#22c55e' : '#3b82f6';
                     [corners.topLeft, corners.topRight, corners.bottomRight, corners.bottomLeft].forEach(p => {
                         ctx.beginPath();
                         ctx.arc(p.x, p.y, pulseSize, 0, Math.PI * 2);
@@ -150,7 +196,7 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
                     });
 
                     // 7. Auto capture trigger when steady
-                    if (steadyCountRef.current === 50 && !isAutoCapturing) {
+                    if (steadyCountRef.current === 24 && !isAutoCapturing) {
                         setIsAutoCapturing(true);
                         setTimeout(() => {
                             captureImage();
@@ -161,6 +207,7 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
                 } else {
                     steadyCountRef.current = 0;
                     setIsSteady(false);
+                    setDetectionHint('Try to scan manually if edge not detected');
                 }
             } catch (e) { }
         }
@@ -278,6 +325,7 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
                 return;
             } catch (e) {
                 console.warn("Auto-extract failed", e);
+                if (notify && notify.error) notify.error("Auto detect missed page. Captured full frame instead.");
             }
         }
 
@@ -425,7 +473,7 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
                                 <div className="flex flex-col items-center mb-8 gap-4">
                                     {isAutoScan && !isLibLoading && !isSteady && (
                                         <div className="text-white bg-blue-600/90 px-5 py-2.5 rounded-2xl text-[11px] font-black animate-pulse backdrop-blur-md border border-white/20 uppercase tracking-widest shadow-2xl">
-                                            Place document in frame
+                                            {detectionHint}
                                         </div>
                                     )}
 
