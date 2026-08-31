@@ -156,15 +156,87 @@ class PdfToWordProcessor(BaseProcessor):
             "pages": pages_meta
         }
 
+    def _post_process_docx(self, docx_path: Path) -> None:
+        """
+        Post-processing formatting pass:
+        1. Enables different first page header/footer (removes repeated header from cover page).
+        2. Normalizes academic and standard section headings with bold styling and clean spacing.
+        3. Sets clean paragraph line spacing (1.15) and space after (4pt).
+        4. Unlinks headers on subsequent sections to isolate certificates and full-page scans.
+        """
+        try:
+            doc = Document(str(docx_path))
+            if not doc.sections:
+                return
+
+            # 1. Enable Different First Page to remove header from cover page
+            first_section = doc.sections[0]
+            first_section.different_first_page_header_footer = True
+            first_page_hdr = first_section.first_page_header
+            for p in first_page_hdr.paragraphs:
+                p.text = ""
+
+            # 2. Section Headers that should use consistent Academic / Professional Styles
+            headings_to_format = [
+                "ACKNOWLEDGEMENT", "ACKNOWLEDGMENTS", "EXECUTIVE SUMMARY", "ABSTRACT",
+                "INDEX", "TABLE OF CONTENTS", "CONTENTS", "INTRODUCTION",
+                "SOCIAL INTERNSHIP EXPERIENCES", "PROBLEM STATEMENT",
+                "METHODOLOGY", "LITERATURE REVIEW", "REFLECTIONS ON LEARNING",
+                "RESULTS", "DISCUSSION", "CONCLUSION", "REFERENCES", "ANNEXURES", "APPENDIX"
+            ]
+
+            for p in doc.paragraphs:
+                raw_text = p.text.strip().replace(" :-", "").replace(":-", "").strip()
+                if not raw_text:
+                    continue
+
+                upper_text = raw_text.upper()
+                # Format Main Headings
+                if any(upper_text.startswith(h) for h in headings_to_format):
+                    p.text = raw_text
+                    try:
+                        p.style = "Heading 1"
+                    except Exception:
+                        pass
+                    p.paragraph_format.space_before = Pt(12)
+                    p.paragraph_format.space_after = Pt(6)
+                    for run in p.runs:
+                        run.bold = True
+                        run.font.size = Pt(14)
+                        run.font.color.rgb = RGBColor(0, 0, 0)
+                else:
+                    # Format Body Text line-spacing
+                    p.paragraph_format.line_spacing = 1.15
+                    p.paragraph_format.space_after = Pt(4)
+
+            # 3. Clean and isolate Certificates and Full-Page Scans across sections
+            for i, section in enumerate(doc.sections):
+                if i > 0:
+                    header = section.header
+                    header.is_linked_to_previous = False
+
+            doc.save(str(docx_path))
+            logger.info(f"Successfully post-processed and cleaned DOCX: {docx_path.name}")
+        except Exception as e:
+            logger.warning(f"DOCX post-processing notice: {e}")
+
     def _convert_pdf2docx_tier1(self, input_pdf: Path, output_docx: Path) -> bool:
-        """Tier 1: High-fidelity layout-preserving native converter."""
+        """Tier 1: High-fidelity layout-preserving native converter with clean formatting rules."""
         if not HAS_PDF2DOCX:
             return False
         try:
             cv = Converter(str(input_pdf))
-            cv.convert(str(output_docx), start=0, end=None)
+            custom_kwargs = {
+                "parse_header": False,       # Disables auto-generating repeated header blocks
+                "parse_footer": False,       # Disables auto-generating footer blocks
+                "max_border_width": 2.0,     # Clean table borders for Index / structural tables
+            }
+            cv.convert(str(output_docx), start=0, end=None, **custom_kwargs)
             cv.close()
-            return output_docx.exists() and output_docx.stat().st_size > 500
+            if output_docx.exists() and output_docx.stat().st_size > 500:
+                self._post_process_docx(output_docx)
+                return True
+            return False
         except Exception as e:
             logger.debug(f"pdf2docx primary conversion attempt notice: {e}")
             return False
@@ -335,7 +407,10 @@ class PdfToWordProcessor(BaseProcessor):
 
             doc_pdf.close()
             doc_word.save(str(output_docx))
-            return output_docx.exists() and output_docx.stat().st_size > 500
+            if output_docx.exists() and output_docx.stat().st_size > 500:
+                self._post_process_docx(output_docx)
+                return True
+            return False
         except Exception as e:
             logger.warning(f"PyMuPDF structured layout tier error: {e}")
             return False
