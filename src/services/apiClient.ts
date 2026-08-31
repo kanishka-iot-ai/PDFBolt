@@ -119,8 +119,9 @@ class ApiClient {
     const jobId = jobData.job_id;
 
     // Fetch output artifact
-    const dlResponse = await fetch(resolveApiUrl(jobData.download_url, `/jobs/${jobId}/download`), {
-      signal: AbortSignal.timeout(10000)
+    const downloadUrl = resolveApiUrl(jobData.download_url, `/jobs/${jobId}/download`);
+    const dlResponse = await fetch(downloadUrl, {
+      signal: AbortSignal.timeout(30000)
     });
     if (!dlResponse.ok) {
       throw new Error("Failed to download output artifact from backend storage.");
@@ -159,6 +160,7 @@ class ApiClient {
     const response = await fetch(`${this.baseUrl}/redact/scan`, {
       method: 'POST',
       body: formData,
+      signal: AbortSignal.timeout(20000)
     });
 
     if (!response.ok) {
@@ -183,6 +185,7 @@ class ApiClient {
     const response = await fetch(`${this.baseUrl}/jobs`, {
       method: 'POST',
       body: formData,
+      signal: AbortSignal.timeout(45000)
     });
 
     if (!response.ok) {
@@ -193,8 +196,9 @@ class ApiClient {
     const jobData = await response.json();
     const jobId = jobData.job_id;
 
-    const dlResponse = await fetch(resolveApiUrl(jobData.download_url, `/jobs/${jobId}/download`), {
-      signal: AbortSignal.timeout(10000)
+    const downloadUrl = resolveApiUrl(jobData.download_url, `/jobs/${jobId}/download`);
+    const dlResponse = await fetch(downloadUrl, {
+      signal: AbortSignal.timeout(30000)
     });
     if (!dlResponse.ok) {
       throw new Error("Failed to retrieve comparison report.");
@@ -225,6 +229,7 @@ class ApiClient {
     const response = await fetch(`${this.baseUrl}/jobs`, {
       method: 'POST',
       body: formData,
+      signal: AbortSignal.timeout(45000)
     });
 
     if (!response.ok) {
@@ -235,8 +240,9 @@ class ApiClient {
     const jobData = await response.json();
     const jobId = jobData.job_id;
 
-    const dlResponse = await fetch(resolveApiUrl(jobData.download_url, `/jobs/${jobId}/download`), {
-      signal: AbortSignal.timeout(10000)
+    const downloadUrl = resolveApiUrl(jobData.download_url, `/jobs/${jobId}/download`);
+    const dlResponse = await fetch(downloadUrl, {
+      signal: AbortSignal.timeout(30000)
     });
     if (!dlResponse.ok) {
       throw new Error("Failed to retrieve merged document.");

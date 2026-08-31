@@ -29,6 +29,12 @@ try:
 except ImportError:
     HAS_TESSERACT = False
 
+try:
+    import ocrmypdf
+    HAS_OCRMYPDF = True
+except ImportError:
+    HAS_OCRMYPDF = False
+
 from PIL import Image
 from docx import Document
 from docx.shared import Inches, Pt, RGBColor
@@ -430,16 +436,17 @@ class PdfToWordProcessor(BaseProcessor):
 
         # OCR Preprocessing: if document lacks a text layer or explicit OCR requested, run ocrmypdf if available
         ocr_requested = bool(opts.get("force_ocr") or opts.get("ocr"))
-        if (not analysis.get("has_text_layer", False) or analysis.get("ocr_pages", 0) > 0 or ocr_requested) and 'ocrmypdf' in globals():
+        if (not analysis.get("has_text_layer", False) or analysis.get("ocr_pages", 0) > 0 or ocr_requested) and HAS_OCRMYPDF:
             try:
                 ocr_pdf = self.temp_dir / f"{self.job_id}_ocr.pdf"
                 logger.info(f"Running OCR preprocessing for job {self.job_id} -> {ocr_pdf}")
                 # Use deskew and optimize for better OCR quality
                 ocrmypdf.ocr(str(input_pdf), str(ocr_pdf), deskew=True, optimize=1)
-                input_pdf = ocr_pdf
-                # Re-run analysis on OCRed pdf to update conversion path
-                analysis = self._analyze_document(input_pdf)
-                logger.info(f"Post-OCR analysis: has_text={analysis.get('has_text_layer')}, ocr_pages={analysis.get('ocr_pages')}")
+                if ocr_pdf.exists() and ocr_pdf.stat().st_size > 100:
+                    input_pdf = ocr_pdf
+                    # Re-run analysis on OCRed pdf to update conversion path
+                    analysis = self._analyze_document(input_pdf)
+                    logger.info(f"Post-OCR analysis: has_text={analysis.get('has_text_layer')}, ocr_pages={analysis.get('ocr_pages')}")
             except Exception as e:
                 logger.warning(f"OCR preprocessing failed for job {self.job_id}: {e}")
                 # proceed without OCR — fallbacks will handle visual preservation
