@@ -282,17 +282,31 @@ async function runOCR(page: any): Promise<string> {
 
 
 /**
- * PDF → Word (.docx) — Universal Engine v4
+ * PDF → Word (.docx) — Universal Engine v5 (Document Reconstruction Pipeline)
  *
- * Delegates to pdfToWordEngine.ts which handles:
- *  • Native text / Scanned (OCR) / Mixed / Image-only PDFs
- *  • Multi-column layouts (N columns)   • Tables (borderless detection)
- *  • Heading H1/H2/H3                  • Bullet + numbered lists
- *  • Embedded images                   • Hyperlinks
- *  • Superscript / Subscript           • Correct page sizes
- *  • Header/footer zone stripping      • Document metadata
+ * Delegates to pdfToWordEngine.ts which implements:
+ *  Stage 1  │ PDF classification (text / scanned / mixed / image-only)
+ *  Stage 2  │ Text extraction with color, bold, italic, underline, spacing
+ *  Stage 3  │ OCR with canvas preprocessing (grayscale → Otsu threshold → Tesseract)
+ *  Stage 4  │ XY-Cut reading order + multi-line paragraph reconstruction
+ *  Stage 5  │ Cross-page header/footer repeated-content detection + stripping
+ *  Stage 6  │ Bordered table detection (canvas Sobel edge analysis → cell grid)
+ *  Stage 7  │ Borderless table detection (X-gap column alignment clustering)
+ *  Stage 8  │ 5-level heading classification (size ratio + ALL CAPS + bold weight)
+ *  Stage 9  │ DOCX generation (named styles, font color, underline, page margins)
+ *  Stage 10 │ Quality scoring report
  */
 export async function pdfToWord(file: File): Promise<Uint8Array> {
+  const { universalPdfToWord } = await import('./pdfToWordEngine');
+  const result = await universalPdfToWord(file);
+  return result.bytes;
+}
+
+/**
+ * PDF → Word with full quality report.
+ * Use this when you need to display conversion quality metrics to the user.
+ */
+export async function pdfToWordWithQuality(file: File) {
   const { universalPdfToWord } = await import('./pdfToWordEngine');
   return universalPdfToWord(file);
 }
