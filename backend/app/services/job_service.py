@@ -171,12 +171,18 @@ class JobService:
         first_page_count = None
 
         try:
-            # Steps 1 to 10: Receive, save, validate magic bytes, permissions, and structure
-            for uf in uploads:
+        # Steps 1 to 10: Receive, save, validate magic bytes, permissions, and structure
+            # Save all uploaded files concurrently for maximum ingestion speed
+            async def _save_one(uf: UploadFile) -> tuple:
                 file_id = str(uuid.uuid4())
                 ext = Path(uf.filename or "file.pdf").suffix.lower() or ".pdf"
                 dest_path = input_dir / f"{file_id}{ext}"
                 meta = await file_service.save_upload(uf, dest_path)
+                return dest_path, meta
+
+            save_results = await asyncio.gather(*[_save_one(uf) for uf in uploads])
+
+            for dest_path, meta in save_results:
                 input_paths.append(dest_path)
                 total_in_bytes += meta.size_bytes
                 if first_page_count is None and meta.page_count:
@@ -184,6 +190,7 @@ class JobService:
 
             job.input_size = total_in_bytes
             job.page_count_in = first_page_count
+
 
             # Step 11: Execute processor in bounded non-blocking worker thread
             processor = processor_cls(job_id=job_id, work_dir=work_dir, settings=options)

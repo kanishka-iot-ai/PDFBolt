@@ -59,63 +59,66 @@ class CompressProcessor(BaseProcessor):
         try:
             doc = pymupdf.open(str(input_path))
             processed_xrefs = set()
+            all_xrefs: list = []
 
+            # Collect all unique image xrefs first
             for page in doc:
                 try:
                     image_list = page.get_images(full=True)
                 except Exception:
                     continue
-
                 for img_info in image_list:
                     xref = img_info[0]
-                    if xref in processed_xrefs:
-                        continue
-                    processed_xrefs.add(xref)
+                    if xref not in processed_xrefs:
+                        processed_xrefs.add(xref)
+                        all_xrefs.append(xref)
 
-                    try:
-                        base_image = doc.extract_image(xref)
-                        if not base_image:
-                            continue
-                        
-                        orig_bytes = base_image.get("image")
-                        if not orig_bytes or len(orig_bytes) < 8192:  # Skip tiny icons/masks
-                            continue
+            # Process all images in parallel using ThreadPoolExecutor
+            import concurrent.futures
 
-                        pil_img = Image.open(io.BytesIO(orig_bytes))
-                        w, h = pil_img.size
+            def _process_xref(xref: int):
+                """Compress a single image xref. Returns (xref, bytes) or None."""
+                try:
+                    base_image = doc.extract_image(xref)
+                    if not base_image:
+                        return None
+                    orig_bytes = base_image.get("image")
+                    if not orig_bytes or len(orig_bytes) < 8192:
+                        return None
+                    pil_img = Image.open(io.BytesIO(orig_bytes))
+                    w, h = pil_img.size
+                    if w > max_dim or h > max_dim:
+                        ratio = min(max_dim / w, max_dim / h)
+                        new_size = (max(1, int(w * ratio)), max(1, int(h * ratio)))
+                        pil_img = pil_img.resize(new_size, Image.Resampling.LANCZOS)
+                    if pil_img.mode in ("RGBA", "LA", "P"):
+                        background = Image.new("RGB", pil_img.size, (255, 255, 255))
+                        if pil_img.mode == "P":
+                            pil_img = pil_img.convert("RGBA")
+                        background.paste(pil_img, mask=pil_img.split()[-1] if len(pil_img.split()) > 3 else None)
+                        pil_img = background
+                    elif pil_img.mode not in ("RGB", "L"):
+                        pil_img = pil_img.convert("RGB")
+                    out_bio = io.BytesIO()
+                    pil_img.save(out_bio, format="JPEG", quality=jpeg_quality, optimize=True, progressive=True)
+                    compressed = out_bio.getvalue()
+                    if len(compressed) < len(orig_bytes):
+                        return (xref, compressed)
+                    return None
+                except Exception as img_err:
+                    logger.debug(f"PyMuPDF image xref {xref} skipped: {img_err}")
+                    return None
 
-                        # Smart proportional downsampling with Lanczos anti-aliasing filter
-                        if w > max_dim or h > max_dim:
-                            ratio = min(max_dim / w, max_dim / h)
-                            new_size = (max(1, int(w * ratio)), max(1, int(h * ratio)))
-                            pil_img = pil_img.resize(new_size, Image.Resampling.LANCZOS)
+            # Use CPU-bound thread pool; cap at 8 workers to avoid GIL contention
+            max_workers = min(8, max(1, len(all_xrefs)))
+            with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as pool:
+                results = list(pool.map(_process_xref, all_xrefs))
 
-                        # Convert non-RGB modes safely for optimal JPEG encoding
-                        if pil_img.mode in ("RGBA", "LA", "P"):
-                            background = Image.new("RGB", pil_img.size, (255, 255, 255))
-                            if pil_img.mode == "P":
-                                pil_img = pil_img.convert("RGBA")
-                            background.paste(pil_img, mask=pil_img.split()[-1] if len(pil_img.split()) > 3 else None)
-                            pil_img = background
-                        elif pil_img.mode not in ("RGB", "L"):
-                            pil_img = pil_img.convert("RGB")
-
-                        out_bio = io.BytesIO()
-                        pil_img.save(
-                            out_bio,
-                            format="JPEG",
-                            quality=jpeg_quality,
-                            optimize=True,
-                            progressive=True
-                        )
-                        compressed_img_bytes = out_bio.getvalue()
-
-                        # Invariant: Only update stream if size is genuinely reduced
-                        if len(compressed_img_bytes) < len(orig_bytes):
-                            doc.update_image(xref, compressed_img_bytes)
-                    except Exception as img_err:
-                        logger.debug(f"PyMuPDF image xref {xref} skipped: {img_err}")
-                        continue
+            # Apply compressed images back to the document (must be done on main thread)
+            for res in results:
+                if res is not None:
+                    xref, compressed_bytes = res
+                    doc.update_image(xref, compressed_bytes)
 
             # Save with maximum lossless object stream deflation and garbage collection
             doc.save(
@@ -131,6 +134,7 @@ class CompressProcessor(BaseProcessor):
         except Exception as e:
             logger.warning(f"PyMuPDF compression error: {e}")
             return False
+
 
     def _compress_ghostscript(self, input_path: Path, output_path: Path, level: str) -> bool:
         gs_bin = self._find_ghostscript()

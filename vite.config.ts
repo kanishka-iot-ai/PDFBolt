@@ -39,10 +39,14 @@ export default defineConfig(({ mode }) => {
     build: {
       target: 'es2022',
       minify: 'terser',
+      cssCodeSplit: true,
+      assetsInlineLimit: 4096,
+      reportCompressedSize: false,
       terserOptions: {
         compress: {
           drop_console: true,
           drop_debugger: true,
+          passes: 2,
         },
       },
       modulePreload: {
@@ -73,9 +77,6 @@ export default defineConfig(({ mode }) => {
       },
       chunkSizeWarningLimit: 1000,
       sourcemap: false,
-
-
-
     },
     test: {
       globals: true,

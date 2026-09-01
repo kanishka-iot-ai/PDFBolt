@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { ToolMetadata } from '../types';
 import { getIcon } from '../constants';
 import { ArrowRight, Star } from 'lucide-react';
 
-const getCategoryStyles = (category: string, darkMode: boolean) => {
+// Stable pure functions — defined outside component so they never re-allocate on render
+const getCategoryStyles = (category: string, darkMode: boolean): string => {
   if (darkMode) {
     switch (category) {
       case 'edit': return 'hover:border-red-500/40 hover:bg-slate-900/90';
@@ -28,7 +29,7 @@ const getCategoryStyles = (category: string, darkMode: boolean) => {
   }
 };
 
-const getIconStyles = (category: string) => {
+const getIconStyles = (category: string): string => {
   switch (category) {
     case 'edit': return 'text-red-500 bg-red-500/10 border-red-500/20';
     case 'convert-to': return 'text-blue-500 bg-blue-500/10 border-blue-500/20';
@@ -38,6 +39,16 @@ const getIconStyles = (category: string) => {
     case 'extra': return 'text-yellow-500 bg-yellow-500/10 border-yellow-500/20';
     default: return 'text-yellow-500 bg-yellow-500/10 border-yellow-500/20';
   }
+};
+
+// Route → lazy chunk map for hover prefetching
+const PREFETCH_MAP: Record<string, () => Promise<unknown>> = {
+  '/merge-pdf':    () => import('../pages/MergeTool'),
+  '/compress-pdf': () => import('../pages/CompressTool'),
+  '/edit-pdf':     () => import('../pages/EditTool'),
+  '/redact-pdf':   () => import('../pages/RedactTool'),
+  '/scan-handwriting-to-pdf': () => import('../pages/HandwritingTool'),
+  '/analyze-pdf':  () => import('../pages/AnalyzerPage'),
 };
 
 interface ToolCardProps {
@@ -52,11 +63,19 @@ const ToolCard: React.FC<ToolCardProps> = ({ tool, darkMode, compact = false }) 
   const categoryStyle = getCategoryStyles(tool.category, darkMode);
   const iconStyle = getIconStyles(tool.category);
 
+  // Prefetch the route chunk on hover — navigation feels instant on click
+  const handlePrefetch = useCallback(() => {
+    const prefetch = PREFETCH_MAP[targetPath];
+    if (prefetch) prefetch().catch(() => {/* silently ignore network errors */});
+  }, [targetPath]);
+
   return (
     <Link
       to={targetPath}
       aria-label={`Open ${tool.title} tool: ${tool.description}`}
-      className="block h-full group outline-none focus-visible:ring-2 focus-visible:ring-yellow-500 focus-visible:ring-offset-2 rounded-2xl transition-transform duration-200 hover:-translate-y-1"
+      onMouseEnter={handlePrefetch}
+      onFocus={handlePrefetch}
+      className="tool-card-link block h-full group outline-none focus-visible:ring-2 focus-visible:ring-yellow-500 focus-visible:ring-offset-2 rounded-2xl transition-transform duration-200 hover:-translate-y-1"
     >
       <div
         className={`h-full p-4 sm:p-5 md:p-6 flex flex-col justify-between rounded-2xl border transition-all duration-200 ${categoryStyle} ${
@@ -121,4 +140,5 @@ const ToolCard: React.FC<ToolCardProps> = ({ tool, darkMode, compact = false }) 
   );
 };
 
-export default ToolCard;
+// React.memo: prevents re-render when parent re-renders but props are unchanged
+export default React.memo(ToolCard);

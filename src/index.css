@@ -164,3 +164,34 @@
 .pdf-card:hover::after {
   left: 150%;
 }
+
+/* =====================================================
+   RENDERING PERFORMANCE UTILITIES
+   ===================================================== */
+
+/* Tool grid: skip layout/paint for off-screen rows */
+.tool-grid-container {
+  content-visibility: auto;
+  contain-intrinsic-size: 0 1200px;
+}
+
+/* Promote animated cards to their own compositor layer */
+.pdf-card,
+.tool-card-link {
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+/* Reduce motion for users who prefer it — also speeds up painting */
+@media (prefers-reduced-motion: reduce) {
+  .animate-fadeIn,
+  .animate-slideUp,
+  .animate-slideDown,
+  .animate-scaleIn,
+  .animate-fadeSlide,
+  .animate-spin,
+  .pdf-icon {
+    animation: none !important;
+    transition: none !important;
+  }
+}

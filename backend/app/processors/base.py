@@ -36,7 +36,11 @@ class BaseProcessor(ABC):
         self.job_id = str(job_id or uuid.uuid4())
         self._is_temp_work_dir = False
         if work_dir is None:
-            self.work_dir = Path(tempfile.mkdtemp(prefix="pdfbolt_proc_"))
+            # Use RAM-disk on Linux (/dev/shm) for zero-disk-I/O intermediate files.
+            # Falls back to default temp dir on Windows and macOS.
+            import os as _os
+            _ram_dir = "/dev/shm" if _os.path.isdir("/dev/shm") else None
+            self.work_dir = Path(tempfile.mkdtemp(prefix="pdfbolt_proc_", dir=_ram_dir))
             self._is_temp_work_dir = True
         else:
             self.work_dir = Path(work_dir)
@@ -47,8 +51,10 @@ class BaseProcessor(ABC):
         self.output_dir = self.work_dir / "output"
         self.temp_dir = self.work_dir / "temp"
 
-        for d in [self.input_dir, self.output_dir, self.temp_dir]:
+        # Create all subdirectories in one pass
+        for d in (self.input_dir, self.output_dir, self.temp_dir):
             d.mkdir(parents=True, exist_ok=True)
+
 
     def run(self, input_files: List[Path], options: Optional[Dict[str, Any]] = None) -> JobResult:
         """
