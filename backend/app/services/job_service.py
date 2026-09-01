@@ -42,6 +42,7 @@ from backend.app.processors.analyzer import AnalyzerProcessor
 from backend.app.processors.handwriting import HandwritingProcessor
 from backend.app.processors.compare import CompareProcessor
 from backend.app.processors.word_to_pdf import WordToPdfProcessor
+from backend.app.processors.excel_to_pdf import ExcelToPdfProcessor
 from backend.app.processors.html_to_pdf import HtmlToPdfProcessor
 
 PROCESSOR_REGISTRY: Dict[str, Type[BaseProcessor]] = {
@@ -113,6 +114,13 @@ PROCESSOR_REGISTRY: Dict[str, Type[BaseProcessor]] = {
     "word_to_pdf": WordToPdfProcessor,
     "docx-to-pdf": WordToPdfProcessor,
     "docx_to_pdf": WordToPdfProcessor,
+    "excel-to-pdf": ExcelToPdfProcessor,
+    "excel_to_pdf": ExcelToPdfProcessor,
+    "xlsx-to-pdf": ExcelToPdfProcessor,
+    "xlsx_to_pdf": ExcelToPdfProcessor,
+    "xls-to-pdf": ExcelToPdfProcessor,
+    "xls_to_pdf": ExcelToPdfProcessor,
+    "excel2pdf": ExcelToPdfProcessor,
     "html-to-pdf": HtmlToPdfProcessor,
     "html_to_pdf": HtmlToPdfProcessor,
     "html2pdf": HtmlToPdfProcessor,

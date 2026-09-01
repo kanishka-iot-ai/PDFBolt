@@ -207,3 +207,68 @@ async def convert_pdf_to_word(background_tasks: BackgroundTasks, file: UploadFil
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"PDF to Word conversion error: {str(e)}"
         )
+
+
+# ---------------------------------------------------------------------------
+# 3. EXCEL TO PDF (Headless LibreOffice Calc Conversion)
+# ---------------------------------------------------------------------------
+@router.post("/excel-to-pdf", summary="Convert XLSX/XLS/ODS/CSV to PDF with exact table layouts")
+async def convert_excel_to_pdf(file: UploadFile = File(...)):
+    filename = file.filename or "spreadsheet.xlsx"
+    ext = Path(filename).suffix.lower()
+
+    if ext not in [".xlsx", ".xls", ".ods", ".csv"]:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid file format. Uploaded file must be an Excel spreadsheet (.xlsx, .xls, .ods, .csv)."
+        )
+
+    file_bytes = await file.read()
+    output_filename = f"{Path(filename).stem}.pdf"
+
+    # Local Headless LibreOffice Conversion
+    temp_dir = tempfile.mkdtemp(prefix="libreoffice_excel_conv_")
+    input_path = os.path.join(temp_dir, filename)
+    output_path = os.path.join(temp_dir, output_filename)
+
+    with open(input_path, "wb") as f:
+        f.write(file_bytes)
+
+    try:
+        import subprocess
+        # Search for soffice / libreoffice binary
+        soffice_bin = shutil.which("soffice") or shutil.which("libreoffice") or "libreoffice"
+        cmd = [
+            soffice_bin,
+            "--headless",
+            "--convert-to",
+            "pdf",
+            input_path,
+            "--outdir",
+            temp_dir
+        ]
+        subprocess.run(cmd, check=True, timeout=120, capture_output=True)
+
+        if not os.path.exists(output_path) or os.path.getsize(output_path) == 0:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Excel to PDF conversion produced no output."
+            )
+
+        with open(output_path, "rb") as f:
+            pdf_data = f.read()
+
+        return Response(
+            content=pdf_data,
+            media_type="application/pdf",
+            headers={"Content-Disposition": f'attachment; filename="{output_filename}"'}
+        )
+    except Exception as e:
+        logger.error(f"Local LibreOffice Excel conversion error: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Excel to PDF conversion failed: {str(e)}"
+        )
+    finally:
+        cleanup_temp_dir(temp_dir)
+

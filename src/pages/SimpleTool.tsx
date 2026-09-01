@@ -369,7 +369,21 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
         });
       }
       else if (mode === 'word2pdf' && file) b = await wordToPdf(file);
-      else if (mode === 'excel2pdf' && file) b = await excelToPdf(file);
+      else if (mode === 'excel2pdf' && file) {
+        const isBackendUp = await apiClient.checkBackend();
+        if (isBackendUp) {
+          try {
+            const res = await apiClient.submitJob('excel-to-pdf', file);
+            const arrayBuf = await res.outputBlob.arrayBuffer();
+            b = new Uint8Array(arrayBuf);
+          } catch (backendErr) {
+            console.warn("Backend excel-to-pdf failed, falling back to local engine:", backendErr);
+            b = await excelToPdf(file);
+          }
+        } else {
+          b = await excelToPdf(file);
+        }
+      }
       else if (mode === 'html2pdf' && file) {
         const isBackendUp = await apiClient.checkBackend();
         if (isBackendUp) {
