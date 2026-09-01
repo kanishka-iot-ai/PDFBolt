@@ -1,4 +1,7 @@
-# robots.txt for PDFBolt (https://pdfbolt.in)
+# Google AdSense Crawler
+User-agent: Mediapartners-Google
+Allow: /
+
 User-agent: *
 Allow: /
 Allow: /tools
@@ -8,6 +11,11 @@ Allow: /student-pdf-tools
 Allow: /business-pdf-tools
 Allow: /developer-pdf-tools
 Allow: /compare/
+Allow: /about
+Allow: /privacy
+Allow: /terms
+Allow: /contact
+
 
 # Private API endpoints, temporary processing jobs, and internal shares
 Disallow: /api/
