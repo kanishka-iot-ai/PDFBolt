@@ -4,7 +4,6 @@ import {
   Moon, Sun, FileText, Menu, X, Volume2, VolumeX, ChevronDown,
   ArrowRight, Sparkles, Calculator, Home, AlertTriangle, Heart
 } from 'lucide-react';
-import PaymentModal from './PaymentModal';
 import { TOOLS, getIcon } from '../constants';
 import { useActiveWork } from '../context/ActiveWorkContext';
 
@@ -17,7 +16,6 @@ interface NavbarProps {
 
 const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled, toggleSound }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [showPayment, setShowPayment] = useState(false);
   const [isToolsOpen, setIsToolsOpen] = useState(false);
   const [showLeaveModal, setShowLeaveModal] = useState(false);
   const [pendingNavPath, setPendingNavPath] = useState<string | null>(null);
@@ -260,15 +258,6 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
             <NavLink to="/encyclopedia">Encyclopedia</NavLink>
             <NavLink to="/student-pdf-tools">Workflows</NavLink>
 
-            {/* Support Button */}
-            <button
-              type="button"
-              onClick={() => setShowPayment(true)}
-              className="px-4 py-1.5 bg-yellow-500 text-slate-950 text-xs font-black uppercase tracking-widest rounded-full hover:bg-yellow-400 shadow-md transition-all flex items-center gap-2"
-            >
-              Donate
-            </button>
-
             <div className="h-4 w-px bg-slate-200 dark:bg-slate-700"></div>
             
             <div className="flex items-center gap-1">
@@ -415,28 +404,17 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
               🧮 Size Calculator
             </Link>
 
-            {/* Mobile Actions: Sound & Donate */}
+            {/* Mobile Actions: Sound Toggle */}
             <div className="pt-4 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between gap-4">
               <button
                 type="button"
                 onClick={toggleSound}
-                className={`flex items-center gap-2 text-xs font-bold px-4 py-2.5 rounded-xl border ${
+                className={`w-full flex items-center justify-center gap-2 text-xs font-bold px-4 py-3 rounded-xl border ${
                   darkMode ? 'bg-slate-800 border-slate-700 text-slate-300' : 'bg-slate-100 border-slate-200 text-slate-700'
                 }`}
               >
                 {soundEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
-                <span>{soundEnabled ? 'Sound On' : 'Sound Off'}</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  setIsOpen(false);
-                  setShowPayment(true);
-                }}
-                className="flex-1 flex items-center justify-center gap-1.5 px-4 py-2.5 bg-yellow-500 text-slate-950 font-black text-xs uppercase tracking-wider rounded-xl shadow-md"
-              >
-                <Heart size={14} className="fill-current" /> Donate
+                <span>{soundEnabled ? 'Sound Enabled' : 'Sound Muted'}</span>
               </button>
             </div>
           </div>
@@ -486,12 +464,6 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
           </div>
         </div>
       )}
-
-      <PaymentModal
-        isOpen={showPayment}
-        onClose={() => setShowPayment(false)}
-        darkMode={darkMode}
-      />
     </>
   );
 };

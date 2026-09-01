@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ShieldCheck, Lock, CheckCircle, Heart, Headphones, AlertTriangle } from 'lucide-react';
-import PaymentModal from './PaymentModal';
+import { ShieldCheck, Lock, CheckCircle, Headphones, AlertTriangle } from 'lucide-react';
 
 const Footer: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
-  const [showPayment, setShowPayment] = useState(false);
   const [showWipeModal, setShowWipeModal] = useState(false);
   const [isWiping, setIsWiping] = useState(false);
 
@@ -104,7 +102,7 @@ const Footer: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
         {/* Company & Support */}
         <div>
           <p className={`font-black uppercase text-xs tracking-widest mb-4 ${darkMode ? 'text-slate-200' : 'text-slate-900'}`}>Support & Legal</p>
-          <ul className="space-y-2.5 text-xs font-semibold mb-6">
+          <ul className="space-y-2.5 text-xs font-semibold">
             <li><Link to="/about" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">About PDFBolt</Link></li>
             <li><Link to="/contact" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors flex items-center gap-1.5"><Headphones size={13} /> Contact & Support</Link></li>
             <li><Link to="/privacy" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors flex items-center gap-1.5"><ShieldCheck size={13} className="text-emerald-500" /> Privacy Policy</Link></li>
@@ -112,14 +110,6 @@ const Footer: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
             <li><Link to="/offline-mode" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors flex items-center gap-1.5"><CheckCircle size={13} className="text-green-500" /> Offline PWA</Link></li>
             <li><Link to="/cookies" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Cookie Preferences</Link></li>
           </ul>
-
-          <button 
-            type="button"
-            onClick={() => setShowPayment(true)}
-            className="w-full py-3 rounded-2xl bg-yellow-500 hover:bg-yellow-400 text-slate-950 font-black text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-lg shadow-yellow-500/20 mb-4 cursor-pointer"
-          >
-            <Heart size={14} className="fill-current" /> Support PDFBolt
-          </button>
         </div>
 
       </div>
@@ -142,12 +132,6 @@ const Footer: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
           <p className="text-[10px] font-bold uppercase tracking-widest text-slate-600 dark:text-slate-400">© {new Date().getFullYear()} PDFBolt. All rights reserved.</p>
         </div>
       </div>
-
-      <PaymentModal
-        isOpen={showPayment}
-        onClose={() => setShowPayment(false)}
-        darkMode={darkMode}
-      />
 
       {/* Custom Wipe Data Modal */}
       {showWipeModal && (
