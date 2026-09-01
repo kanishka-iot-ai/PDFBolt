@@ -49,7 +49,14 @@ async def security_and_timing_middleware(request: Request, call_next):
     client_ip = request.client.host if request.client else "127.0.0.1"
 
     # Rate limiting check for processing routes
-    rate_limited_prefixes = ("/api/v1/jobs", "/api/v1/analyze", "/api/v1/qr-shares")
+    rate_limited_prefixes = (
+        "/api/v1/jobs",
+        "/api/v1/analyze",
+        "/api/v1/qr-shares",
+        "/api/v1/convert",
+        "/convert",
+        "/api/v1/handwriting",
+    )
     if request.url.path.startswith(rate_limited_prefixes):
         if not rate_limiter.check_rate_limit(client_ip):
             return JSONResponse(

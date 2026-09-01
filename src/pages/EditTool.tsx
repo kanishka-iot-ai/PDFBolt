@@ -445,6 +445,7 @@ const EditTool: React.FC<EditToolProps> = ({ darkMode, notify }) => {
 
             notify?.success?.();
         } catch {
+            notify?.error?.();
             setErrorMsg('Failed to save edited PDF. Please check your added elements and try again.');
         } finally {
             setLoading(false);

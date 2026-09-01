@@ -13,6 +13,7 @@ from backend.app.models.handwriting import (
     TranscriptionEnhanceRequest,
     TranscriptionEnhanceResponse,
     HandwritingGenerateDocumentRequest,
+    PageRecognitionResult,
     ConfidenceLevel,
     ExportFormat
 )

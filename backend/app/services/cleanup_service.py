@@ -192,6 +192,10 @@ class CleanupService:
         """Immediately removes any partial files or artifacts from failed jobs."""
         self.delete_job_files(job_id)
 
+    def handle_job_cancellation(self, job_id: str, job_manager_instance: Any = None):
+        """Immediately removes any partial files or artifacts from cancelled jobs."""
+        self.delete_job_files(job_id)
+
 
 cleanup_service = CleanupService()
 
