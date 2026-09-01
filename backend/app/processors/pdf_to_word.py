@@ -20,7 +20,10 @@ class PdfToWordProcessor(BaseProcessor):
     input_formats = [".pdf"]
     output_format = ".docx"
 
-    def process(self, input_files: Any, options: Any = None) -> Path:
+    def process(self, input_files: Any, options: Any = None) -> Any:
+        if isinstance(input_files, (bytes, bytearray)):
+            return self.process_bytes(input_files, str(options or "doc.pdf"))
+
         if not input_files:
             raise PDFBoltError("NO_FILES_PROVIDED", "No input PDF provided for conversion.")
 
