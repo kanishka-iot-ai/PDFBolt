@@ -188,7 +188,18 @@ class WordToPdfProcessor(BaseProcessor):
             except Exception as e:
                 logger.warning(f"LibreOffice Word conversion failed, trying fallback: {e}")
 
-        # Fallback to native python generator if LibreOffice not available or failed
+        # Try docx2pdf if libreoffice is not found or fails
+        if not converted:
+            try:
+                from docx2pdf import convert as docx2pdf_convert
+                docx2pdf_convert(str(input_path), str(output_pdf))
+                if output_pdf.exists() and output_pdf.stat().st_size > 0:
+                    converted = True
+                    logger.info(f"docx2pdf conversion successful! Saved as '{output_pdf}'")
+            except Exception as e:
+                logger.debug(f"docx2pdf conversion skipped/failed: {e}")
+
+        # Fallback to native python generator if LibreOffice and docx2pdf are unavailable
         if not converted:
             converted = self._convert_python_native(input_path, output_pdf)
 
