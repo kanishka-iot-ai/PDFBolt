@@ -13,23 +13,44 @@ export async function wordToPdf(file: File): Promise<Uint8Array> {
   const arrayBuffer = await file.arrayBuffer();
   const { value: html } = await mammoth.convertToHtml({ arrayBuffer });
 
-  // Create a Hidden Container for Rendering
+  // Create a Hidden Container for High-Fidelity Rendering
   const container = document.createElement('div');
   container.style.position = 'fixed';
   container.style.top = '0';
   container.style.left = '0';
   container.style.visibility = 'hidden';
   container.style.zIndex = '-9999';
-  container.style.width = '794px'; // A4 width at 96 DPI approx
+  container.style.width = '800px';
   container.style.backgroundColor = 'white';
-  container.style.padding = '40px';
-  container.style.color = 'black';
+  container.style.padding = '48px';
+  container.style.color = '#1e293b';
+  container.style.fontFamily = 'Calibri, Arial, sans-serif';
+  container.style.fontSize = '14px';
+  container.style.lineHeight = '1.6';
   container.innerHTML = html;
+
+  // Add clean table & heading styles
+  const styleTag = document.createElement('style');
+  styleTag.innerHTML = `
+    table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+    td, th { border: 1px solid #cbd5e1; padding: 8px 12px; font-size: 13px; }
+    th { background-color: #f1f5f9; font-weight: 600; }
+    h1 { font-size: 24px; color: #0f172a; margin: 20px 0 12px; font-weight: 700; }
+    h2 { font-size: 18px; color: #0f172a; margin: 16px 0 10px; font-weight: 600; }
+    p { margin: 8px 0; }
+    img { max-width: 100%; height: auto; }
+  `;
+  container.appendChild(styleTag);
   document.body.appendChild(container);
 
   try {
-    const canvas = await html2canvas(container, { scale: 2 } as any);
-    const imgData = canvas.toDataURL('image/png');
+    const canvas = await html2canvas(container, {
+      scale: 3,
+      useCORS: true,
+      logging: false,
+      backgroundColor: '#ffffff'
+    } as any);
+    const imgData = canvas.toDataURL('image/jpeg', 0.95);
 
     const pdf = new jsPDF('p', 'mm', 'a4');
     const pdfWidth = 210;
