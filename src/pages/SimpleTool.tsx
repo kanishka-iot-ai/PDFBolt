@@ -368,7 +368,21 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
           margin: imgMargin
         });
       }
-      else if (mode === 'word2pdf' && file) b = await wordToPdf(file);
+      else if (mode === 'word2pdf' && file) {
+        const isBackendUp = await apiClient.checkBackend();
+        if (isBackendUp) {
+          try {
+            const res = await apiClient.submitJob('word-to-pdf', file);
+            const arrayBuf = await res.outputBlob.arrayBuffer();
+            b = new Uint8Array(arrayBuf);
+          } catch (backendErr) {
+            console.warn("Backend word-to-pdf failed, falling back to local engine:", backendErr);
+            b = await wordToPdf(file);
+          }
+        } else {
+          b = await wordToPdf(file);
+        }
+      }
       else if (mode === 'excel2pdf' && file) {
         const isBackendUp = await apiClient.checkBackend();
         if (isBackendUp) {
