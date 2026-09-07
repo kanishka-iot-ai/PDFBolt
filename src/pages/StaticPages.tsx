@@ -833,3 +833,189 @@ export const TermsPage: React.FC<{ darkMode: boolean }> = ({ darkMode }) => (
     </div>
   </PageLayout>
 );
+
+
+/* ========================================================================
+   5. COOKIES & CONSENT PREFERENCES PAGE
+   ======================================================================== */
+export const CookiesPage: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
+  const [cookiePref, setCookiePref] = useState(() => {
+    return localStorage.getItem('pdfbolt_cookie_consent') || 'accepted';
+  });
+  const [savedNotice, setSavedNotice] = useState(false);
+
+  const handleSavePref = (pref: string) => {
+    setCookiePref(pref);
+    localStorage.setItem('pdfbolt_cookie_consent', pref);
+    setSavedNotice(true);
+    setTimeout(() => setSavedNotice(false), 3000);
+  };
+
+  return (
+    <PageLayout
+      title="Cookie Policy & Privacy Preferences"
+      subtitle="Transparency and control over how cookies, local storage, and advertising identifiers are used on PDFBolt."
+      lastUpdated="September 7, 2026"
+      badge="User Privacy & Consent"
+      badgeIcon={<Cookie size={14} />}
+      darkMode={darkMode}
+    >
+      <div className={`space-y-10 text-slate-700 dark:text-slate-300 leading-relaxed font-normal`}>
+        
+        {/* Interactive Preference Card */}
+        <div className={`p-6 sm:p-8 rounded-2xl border ${darkMode ? 'bg-slate-900/90 border-slate-800' : 'bg-white border-slate-200 shadow-sm'}`}>
+          <div className="flex items-center gap-3 mb-4">
+            <Cookie className="text-yellow-600 dark:text-yellow-400" size={24} />
+            <h2 className={`text-xl font-bold ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+              Your Current Consent Status
+            </h2>
+          </div>
+          <p className="text-sm sm:text-base mb-6 text-slate-600 dark:text-slate-300">
+            PDFBolt executes PDF conversions <strong className="text-slate-900 dark:text-white">100% locally in your browser memory</strong>. We never store or transmit your document contents. Below you can adjust how cookies and advertising tags operate during your visit.
+          </p>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+            <div 
+              onClick={() => handleSavePref('accepted')}
+              className={`p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                cookiePref === 'accepted' 
+                  ? 'border-yellow-500 bg-yellow-500/10' 
+                  : darkMode ? 'border-slate-800 hover:border-slate-700 bg-slate-950' : 'border-slate-200 hover:border-slate-300 bg-slate-50'
+              }`}
+            >
+              <div className="flex items-center justify-between mb-2">
+                <span className="font-bold text-slate-900 dark:text-white">Allow All Cookies</span>
+                {cookiePref === 'accepted' && <CheckCircle2 size={18} className="text-yellow-600 dark:text-yellow-400" />}
+              </div>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Enables relevant Google AdSense advertisements, Google Analytics aggregate metrics, and UI preferences.
+              </p>
+            </div>
+
+            <div 
+              onClick={() => handleSavePref('essential')}
+              className={`p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                cookiePref === 'essential' 
+                  ? 'border-yellow-500 bg-yellow-500/10' 
+                  : darkMode ? 'border-slate-800 hover:border-slate-700 bg-slate-950' : 'border-slate-200 hover:border-slate-300 bg-slate-50'
+              }`}
+            >
+              <div className="flex items-center justify-between mb-2">
+                <span className="font-bold text-slate-900 dark:text-white">Essential Only</span>
+                {cookiePref === 'essential' && <CheckCircle2 size={18} className="text-yellow-600 dark:text-yellow-400" />}
+              </div>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Blocks tracking and requests Non-Personalized Ads (NPA) from Google AdSense. Only theme & UI state stored.
+              </p>
+            </div>
+          </div>
+
+          {savedNotice && (
+            <div className="p-3 bg-emerald-500/15 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300 rounded-lg text-sm flex items-center gap-2">
+              <CheckCircle2 size={16} />
+              <span>Your cookie preference has been saved successfully!</span>
+            </div>
+          )}
+        </div>
+
+        {/* Section 1 - What Are Cookies */}
+        <section className="space-y-3">
+          <h2 className={`text-2xl font-black tracking-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+            1. What Are Cookies?
+          </h2>
+          <p className="text-sm sm:text-base">
+            Cookies are small text files placed on your device by websites you visit. They are widely used to make websites work efficiently, remember your visual preferences (like Dark Mode), and provide reporting information to site operators and accredited advertising networks.
+          </p>
+        </section>
+
+        {/* Section 2 - Categories of Cookies Used */}
+        <section className="space-y-4">
+          <h2 className={`text-2xl font-black tracking-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+            2. Categories of Cookies Used on PDFBolt
+          </h2>
+          
+          <div className="space-y-4">
+            <div className={`p-4 rounded-xl border ${darkMode ? 'bg-slate-900/50 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
+              <h3 className={`font-bold text-base mb-1 ${darkMode ? 'text-white' : 'text-slate-900'}`}>A. Strictly Necessary & Essential Storage</h3>
+              <p className="text-sm text-slate-600 dark:text-slate-400">
+                These items are required for the website to function securely. They remember your dark mode toggle preference, active tool tabs, and your cookie consent choice. They do not store any personal identifiable information or file data.
+              </p>
+            </div>
+
+            <div className={`p-4 rounded-xl border ${darkMode ? 'bg-slate-900/50 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
+              <h3 className={`font-bold text-base mb-1 ${darkMode ? 'text-white' : 'text-slate-900'}`}>B. Google AdSense & Advertising Cookies (DoubleClick DART)</h3>
+              <p className="text-sm text-slate-600 dark:text-slate-400">
+                Google, as a third-party vendor, uses cookies to serve advertisements on PDFBolt. Google’s use of advertising cookies enables it and its partners to serve ads based on your visit to PDFBolt and other sites across the Internet. You may opt out of personalized advertising at any time by visiting <a href="https://adssettings.google.com" target="_blank" rel="noopener noreferrer" className="font-bold text-yellow-700 dark:text-yellow-400 underline">Google Ads Settings</a>.
+              </p>
+            </div>
+
+            <div className={`p-4 rounded-xl border ${darkMode ? 'bg-slate-900/50 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
+              <h3 className={`font-bold text-base mb-1 ${darkMode ? 'text-white' : 'text-slate-900'}`}>C. Analytics Cookies (Google Analytics 4)</h3>
+              <p className="text-sm text-slate-600 dark:text-slate-400">
+                We use Google Analytics 4 with IP anonymization enabled to collect aggregate, anonymous statistics about page views, browser types, and general device usage to optimize platform rendering speed and tool reliability.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Section 3 - Third-Party Opt-Out Links */}
+        <section className="space-y-3">
+          <h2 className={`text-2xl font-black tracking-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+            3. Third-Party Cookie Opt-Out Channels
+          </h2>
+          <p className="text-sm sm:text-base">
+            In addition to our on-page consent manager, you can opt out of interest-based advertising across third-party networks using the following industry portals:
+          </p>
+          <ul className="list-disc pl-6 space-y-2 text-sm sm:text-base">
+            <li>
+              <strong>Google Ads Settings:</strong>{' '}
+              <a href="https://adssettings.google.com" target="_blank" rel="noopener noreferrer" className="font-bold text-yellow-700 dark:text-yellow-400 underline inline-flex items-center gap-1">
+                adssettings.google.com <ExternalLink size={12} />
+              </a>
+            </li>
+            <li>
+              <strong>Network Advertising Initiative (NAI):</strong>{' '}
+              <a href="https://optout.networkadvertising.org" target="_blank" rel="noopener noreferrer" className="font-bold text-yellow-700 dark:text-yellow-400 underline inline-flex items-center gap-1">
+                optout.networkadvertising.org <ExternalLink size={12} />
+              </a>
+            </li>
+            <li>
+              <strong>Digital Advertising Alliance (DAA / AboutAds):</strong>{' '}
+              <a href="https://optout.aboutads.info" target="_blank" rel="noopener noreferrer" className="font-bold text-yellow-700 dark:text-yellow-400 underline inline-flex items-center gap-1">
+                optout.aboutads.info <ExternalLink size={12} />
+              </a>
+            </li>
+            <li>
+              <strong>European Interactive Digital Advertising Alliance (EDAA):</strong>{' '}
+              <a href="https://www.youronlinechoices.eu" target="_blank" rel="noopener noreferrer" className="font-bold text-yellow-700 dark:text-yellow-400 underline inline-flex items-center gap-1">
+                youronlinechoices.eu <ExternalLink size={12} />
+              </a>
+            </li>
+          </ul>
+        </section>
+
+        {/* Section 4 - Browser Settings */}
+        <section className="space-y-3">
+          <h2 className={`text-2xl font-black tracking-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+            4. Managing Cookies in Your Web Browser
+          </h2>
+          <p className="text-sm sm:text-base">
+            Most web browsers allow you to control cookie settings through their preferences. You can configure your browser to reject all third-party cookies, clear cookies upon browser close, or notify you when a cookie is placed. Note that disabling essential cookies may impact certain interface preferences like Dark Mode persistence.
+          </p>
+        </section>
+
+        {/* Section 5 - Questions */}
+        <section className="space-y-3">
+          <h2 className={`text-2xl font-black tracking-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+            5. Contact Us Regarding Privacy & Cookies
+          </h2>
+          <p className="text-sm sm:text-base">
+            If you have questions about our cookie policy or data protection measures, please email our Data Protection team at{' '}
+            <a href="mailto:support@pdfbolt.in" className="font-bold text-yellow-700 dark:text-yellow-400 underline">support@pdfbolt.in</a>.
+          </p>
+        </section>
+
+      </div>
+    </PageLayout>
+  );
+};
