@@ -107,7 +107,7 @@ const Footer: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
             <li><Link to="/contact" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors flex items-center gap-1.5"><Headphones size={13} /> Contact & Support</Link></li>
             <li><Link to="/privacy" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors flex items-center gap-1.5"><ShieldCheck size={13} className="text-emerald-500" /> Privacy Policy</Link></li>
             <li><Link to="/terms" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Terms of Service</Link></li>
-            <li><Link to="/offline-mode" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors flex items-center gap-1.5"><CheckCircle size={13} className="text-green-500" /> Offline PWA</Link></li>
+            <li><Link to="/offline-mode" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors flex items-center gap-1.5"><CheckCircle size={13} className="text-green-500" /> Offline Mode</Link></li>
             <li><Link to="/cookies" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Cookie Preferences</Link></li>
           </ul>
         </div>

@@ -1516,10 +1516,10 @@ CANONICAL_HUBS_AND_PAGES = [
     },
     {
         "path": "offline-mode",
-        "title": "Offline PDF Tools & Progressive Web App (PWA) | PDFBolt",
-        "description": "Learn how to use PDFBolt 100% offline without an internet connection using our Progressive Web App (PWA) and client-side WebAssembly.",
-        "h1": "Offline PDF Processing & Progressive Web App",
-        "subtitle": "Work with complete privacy and zero connectivity. Convert, merge, split, and edit PDFs directly on your device.",
+        "title": "Offline PDF Tools & Local In-Browser Processing | PDFBolt",
+        "description": "Learn how PDFBolt operates 100% locally in your browser using WebAssembly for private, offline document processing with zero server uploads.",
+        "h1": "Offline PDF Processing & Local WebAssembly Engine",
+        "subtitle": "Work with complete privacy and zero connectivity. Convert, merge, split, and edit PDFs directly inside your browser memory.",
         "is_static": True
     }
 ]
@@ -2021,20 +2021,16 @@ def generate_prerendered_pages():
             static_extra_content = """
             <div style="margin: 32px 0;">
               <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
-                <h2 style="font-size: 1.25rem; font-weight: 700; color: #0f172a; margin-top: 0;">1. Progressive Web App (PWA) Offline Engine</h2>
-                <p style="color: #334155;">PDFBolt is engineered as a full Progressive Web App (PWA). Once loaded or installed to your home screen or desktop, the service worker caches all WebAssembly binaries and UI components so you can work completely offline.</p>
+                <h2 style="font-size: 1.25rem; font-weight: 700; color: #0f172a; margin-top: 0;">1. Client-Side WebAssembly Architecture</h2>
+                <p style="color: #334155;">PDFBolt packages modern, compiled WebAssembly binaries directly to your web browser. All document manipulation runs on your local machine with zero dependency on remote cloud servers.</p>
               </div>
               <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
                 <h2 style="font-size: 1.25rem; font-weight: 700; color: #0f172a; margin-top: 0;">2. 100% In-Browser Local Processing</h2>
-                <p style="color: #334155;">All core operations — including merging, splitting, compressing, locking, unlocking, signing, redacting, rotating, page deletion, OCR, and JPG/PDF conversions — execute inside your browser's WebAssembly sandbox. No internet connection is required after the initial load.</p>
+                <p style="color: #334155;">All core operations — including merging, splitting, compressing, locking, unlocking, signing, redacting, rotating, page deletion, OCR, and JPG/PDF conversions — execute inside your browser's memory sandbox. No internet connection is required after the page is loaded.</p>
               </div>
               <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
-                <h2 style="font-size: 1.25rem; font-weight: 700; color: #0f172a; margin-top: 0;">3. How to Install PDFBolt</h2>
-                <ul style="color: #334155; padding-left: 20px;">
-                  <li><strong>Chrome / Edge (Desktop):</strong> Click the install icon in the address bar or open the browser menu and select "Install PDFBolt".</li>
-                  <li><strong>Safari (iOS / iPadOS):</strong> Tap the Share button at the bottom of the screen, scroll down, and tap "Add to Home Screen".</li>
-                  <li><strong>Chrome (Android):</strong> Tap the 3-dot menu icon in the top right corner and select "Install app" or "Add to Home screen".</li>
-                </ul>
+                <h2 style="font-size: 1.25rem; font-weight: 700; color: #0f172a; margin-top: 0;">3. Zero Server Retention & Maximum Privacy</h2>
+                <p style="color: #334155;">Because your files never leave your device, your private data is fully protected from data breaches, third-party inspection, or network interception.</p>
               </div>
             </div>
             """
