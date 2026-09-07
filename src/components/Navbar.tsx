@@ -116,8 +116,9 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
               alt="PDFBolt" 
               width="124"
               height="100"
-              fetchPriority="high"
+              loading="eager"
               decoding="async"
+              {...({ fetchPriority: "high" } as any)}
               className="h-9 md:h-10 w-auto object-contain transition-transform duration-300 group-hover:scale-105" 
             />
           </Link>

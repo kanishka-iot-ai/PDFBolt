@@ -45,6 +45,7 @@ const TermsPage = lazy(() => import('./pages/StaticPages').then(m => ({ default:
 const AboutPage = lazy(() => import('./pages/StaticPages').then(m => ({ default: m.AboutPage })));
 const ContactPage = lazy(() => import('./pages/StaticPages').then(m => ({ default: m.ContactPage })));
 const CookiesPage = lazy(() => import('./pages/StaticPages').then(m => ({ default: m.CookiesPage })));
+const OfflineModePage = lazy(() => import('./pages/StaticPages').then(m => ({ default: m.OfflineModePage })));
 
 // Loading Fallback
 const PageLoader = () => (
@@ -246,6 +247,8 @@ const MainLayout: React.FC<MainLayoutProps> = ({ darkMode, setDarkMode, soundEna
             <Route path="/about" element={<AboutPage darkMode={darkMode} />} />
             <Route path="/contact" element={<ContactPage darkMode={darkMode} />} />
             <Route path="/cookies" element={<CookiesPage darkMode={darkMode} />} />
+            <Route path="/offline-mode" element={<OfflineModePage darkMode={darkMode} />} />
+            <Route path="/offline" element={<Navigate to="/offline-mode" replace />} />
             <Route path="/tutorials" element={<TutorialsPage darkMode={darkMode} />} />
             <Route path="/qr-success" element={<QRSuccess darkMode={darkMode} />} />
             <Route path="/s/:shareId" element={<QRSuccess darkMode={darkMode} />} />

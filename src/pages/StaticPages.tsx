@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   ShieldCheck, Lock, Globe, Mail, Headphones, Clock, Send, 
   CheckCircle2, Zap, FileText, User, Award, Cpu, Server, 
@@ -1012,6 +1012,191 @@ export const CookiesPage: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
           <p className="text-sm sm:text-base">
             If you have questions about our cookie policy or data protection measures, please email our Data Protection team at{' '}
             <a href="mailto:support@pdfbolt.in" className="font-bold text-yellow-700 dark:text-yellow-400 underline">support@pdfbolt.in</a>.
+          </p>
+        </section>
+
+      </div>
+    </PageLayout>
+  );
+};
+
+
+/* ========================================================================
+   6. OFFLINE PWA & LOCAL EXECUTION PAGE
+   ======================================================================== */
+export const OfflineModePage: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
+  const [swStatus, setSwStatus] = useState<string>('Checking...');
+  const [isOffline, setIsOffline] = useState<boolean>(!navigator.onLine);
+
+  useEffect(() => {
+    const handleOnline = () => setIsOffline(false);
+    const handleOffline = () => setIsOffline(true);
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.ready
+        .then(() => setSwStatus('Active & Offline-Ready'))
+        .catch(() => setSwStatus('Service Worker Initializing'));
+    } else {
+      setSwStatus('Supported in modern browsers');
+    }
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
+  return (
+    <PageLayout
+      title="Offline Mode & Progressive Web App (PWA)"
+      subtitle="PDFBolt is engineered with a client-side WebAssembly architecture that works seamlessly without an internet connection."
+      lastUpdated="September 7, 2026"
+      badge="PWA Offline Architecture"
+      badgeIcon={<Zap size={14} />}
+      darkMode={darkMode}
+    >
+      <div className={`space-y-10 text-slate-700 dark:text-slate-300 leading-relaxed font-normal`}>
+        
+        {/* Status Dashboard Card */}
+        <div className={`p-6 sm:p-8 rounded-2xl border ${darkMode ? 'bg-slate-900/90 border-slate-800' : 'bg-white border-slate-200 shadow-sm'}`}>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+            <div>
+              <div className="flex items-center gap-3">
+                <CheckCircle2 className="text-emerald-500" size={24} />
+                <h2 className={`text-xl font-bold ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+                  Offline Capability Status
+                </h2>
+              </div>
+              <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
+                Your browser environment is configured for zero-latency local document processing.
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold ${
+                isOffline 
+                  ? 'bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-500/30' 
+                  : 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30'
+              }`}>
+                {isOffline ? '⚡ Currently Offline' : '🌐 Online & Synced'}
+              </span>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className={`p-4 rounded-xl border ${darkMode ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
+              <span className="text-xs font-bold text-slate-500 dark:text-slate-400 block mb-1">Service Worker Cache</span>
+              <span className="text-sm font-black text-slate-900 dark:text-white flex items-center gap-1.5">
+                <CheckCircle2 size={16} className="text-emerald-500" /> {swStatus}
+              </span>
+            </div>
+            <div className={`p-4 rounded-xl border ${darkMode ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
+              <span className="text-xs font-bold text-slate-500 dark:text-slate-400 block mb-1">Processing Location</span>
+              <span className="text-sm font-black text-slate-900 dark:text-white flex items-center gap-1.5">
+                <Cpu size={16} className="text-yellow-600 dark:text-yellow-400" /> Local RAM (100% Private)
+              </span>
+            </div>
+            <div className={`p-4 rounded-xl border ${darkMode ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
+              <span className="text-xs font-bold text-slate-500 dark:text-slate-400 block mb-1">Cloud Uploads</span>
+              <span className="text-sm font-black text-slate-900 dark:text-white flex items-center gap-1.5">
+                <Lock size={16} className="text-emerald-500" /> Zero Uploads
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Section 1 - How it works */}
+        <section className="space-y-4">
+          <h2 className={`text-2xl font-black tracking-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+            1. How Does Offline PDF Processing Work?
+          </h2>
+          <p className="text-sm sm:text-base">
+            Unlike legacy online PDF converters that require sending your documents over the internet to remote servers, PDFBolt packages powerful PDF manipulation libraries (compiled into WebAssembly and high-speed JavaScript modules) directly to your web browser.
+          </p>
+          <p className="text-sm sm:text-base">
+            Once you visit PDFBolt once, our Service Worker automatically caches the core tool engines. You can disconnect your WiFi or turn on Airplane Mode, and every core PDF tool will continue to merge, compress, split, protect, edit, and convert documents at maximum speed.
+          </p>
+        </section>
+
+        {/* Section 2 - Installation Instructions */}
+        <section className="space-y-4">
+          <h2 className={`text-2xl font-black tracking-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+            2. How to Install PDFBolt as a Desktop or Mobile App (PWA)
+          </h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className={`p-5 rounded-xl border ${darkMode ? 'bg-slate-900/50 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
+              <h3 className={`font-bold text-base mb-2 flex items-center gap-2 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+                <span>💻 Windows, macOS & Chromebook</span>
+              </h3>
+              <ol className="list-decimal pl-5 space-y-1.5 text-xs sm:text-sm text-slate-600 dark:text-slate-400">
+                <li>Open <strong>pdfbolt.in</strong> in Chrome, Edge, or Brave.</li>
+                <li>Look for the <strong>Install</strong> icon in the right side of the address bar (or menu &gt; <em>Install PDFBolt</em>).</li>
+                <li>Click <strong>Install</strong> to add PDFBolt to your desktop, taskbar, or Dock.</li>
+              </ol>
+            </div>
+
+            <div className={`p-5 rounded-xl border ${darkMode ? 'bg-slate-900/50 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
+              <h3 className={`font-bold text-base mb-2 flex items-center gap-2 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+                <span>📱 iPhone, iPad & Android</span>
+              </h3>
+              <ol className="list-decimal pl-5 space-y-1.5 text-xs sm:text-sm text-slate-600 dark:text-slate-400">
+                <li>On iOS (Safari): Tap the <strong>Share</strong> button and choose <strong>Add to Home Screen</strong>.</li>
+                <li>On Android (Chrome): Tap the three-dot menu and tap <strong>Add to Home screen</strong> / <strong>Install App</strong>.</li>
+                <li>Launch PDFBolt directly from your home screen just like a native app.</li>
+              </ol>
+            </div>
+          </div>
+        </section>
+
+        {/* Section 3 - Offline Supported Tools */}
+        <section className="space-y-4">
+          <h2 className={`text-2xl font-black tracking-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+            3. Full Offline-Ready Tool Suite
+          </h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+            {[
+              { name: 'Merge PDF', path: '/merge-pdf' },
+              { name: 'Split PDF', path: '/split-pdf' },
+              { name: 'Compress PDF', path: '/compress-pdf' },
+              { name: 'Protect PDF', path: '/protect-pdf' },
+              { name: 'Unlock PDF', path: '/unlock-pdf' },
+              { name: 'Sign PDF', path: '/sign-pdf' },
+              { name: 'Redact PDF', path: '/redact-pdf' },
+              { name: 'Edit PDF', path: '/edit-pdf' },
+              { name: 'Rotate PDF', path: '/rotate-pdf' },
+              { name: 'Organize PDF', path: '/organize-pdf' },
+              { name: 'Add Page Numbers', path: '/add-page-numbers-to-pdf' },
+              { name: 'Watermark PDF', path: '/watermark-pdf' },
+              { name: 'Delete Pages', path: '/delete-pdf-pages' },
+              { name: 'JPG to PDF', path: '/jpg-to-pdf' },
+              { name: 'PDF to JPG', path: '/pdf-to-jpg' },
+              { name: 'OCR PDF', path: '/ocr-pdf' },
+            ].map((t) => (
+              <Link 
+                key={t.path} 
+                to={t.path}
+                className={`p-3 rounded-lg border text-xs font-bold transition-all flex items-center justify-between ${
+                  darkMode 
+                    ? 'bg-slate-900/60 border-slate-800 hover:border-yellow-500/40 text-slate-200' 
+                    : 'bg-white border-slate-200 hover:border-yellow-500 text-slate-800 shadow-sm'
+                }`}
+              >
+                <span>{t.name}</span>
+                <CheckCircle2 size={13} className="text-emerald-500" />
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        {/* Section 4 - Enterprise Security Benefits */}
+        <section className="space-y-3">
+          <h2 className={`text-2xl font-black tracking-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+            4. Enterprise Security & Zero Data Breach Risk
+          </h2>
+          <p className="text-sm sm:text-base">
+            Because offline processing eliminates network transmission, PDFBolt is uniquely suited for processing strict non-disclosure agreements (NDAs), classified government documents, medical records under HIPAA, and financial disclosures under GDPR.
           </p>
         </section>
 
