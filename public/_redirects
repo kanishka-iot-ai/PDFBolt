@@ -28,6 +28,3 @@
 /scan-handwriting       /scan-handwriting-to-pdf    301!
 /compare                /compare-pdf                301!
 /pdf-to-images          /pdf-to-jpg                 301!
-
-# SPA Client-Side Routing Fallback
-/*                      /index.html                 200
