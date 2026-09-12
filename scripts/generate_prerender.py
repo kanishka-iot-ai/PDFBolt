@@ -1529,9 +1529,9 @@ CANONICAL_HUBS_AND_PAGES = [
 # =========================================================================
 
 def build_full_platform_directory():
-    tools_links = "".join([f'<li><a href="/{t["path"]}" style="color: #b45309; text-decoration: underline;">{t["h1"]}</a></li>' for t in CANONICAL_TOOLS])
-    guides_links = "".join([f'<li><a href="/guides/{g["slug"]}" style="color: #b45309; text-decoration: underline;">{g["title"]}</a></li>' for g in CANONICAL_GUIDES])
-    encyc_links = "".join([f'<li><a href="/encyclopedia/{e["slug"]}" style="color: #b45309; text-decoration: underline;">{e["title"]}</a></li>' for e in CANONICAL_ENCYCLOPEDIA])
+    tools_links = "".join([f'<li><a href="/{t["path"]}/" style="color: #b45309; text-decoration: underline;">{t["h1"]}</a></li>' for t in CANONICAL_TOOLS])
+    guides_links = "".join([f'<li><a href="/guides/{g["slug"]}/" style="color: #b45309; text-decoration: underline;">{g["title"]}</a></li>' for g in CANONICAL_GUIDES])
+    encyc_links = "".join([f'<li><a href="/encyclopedia/{e["slug"]}/" style="color: #b45309; text-decoration: underline;">{e["title"]}</a></li>' for e in CANONICAL_ENCYCLOPEDIA])
     
     return f"""
     <div style="border-top: 2px solid #e2e8f0; padding-top: 32px; margin-top: 40px;">
@@ -1546,27 +1546,27 @@ def build_full_platform_directory():
         <div>
           <h3 style="font-size: 1rem; font-weight: 700; color: #1e293b; margin-bottom: 10px;">How-To Guides (12+)</h3>
           <ul style="padding-left: 18px; margin: 0; font-size: 0.875rem; line-height: 1.8;">
-            <li><a href="/guides" style="color: #b45309; font-weight: bold; text-decoration: underline;">All Guides Hub</a></li>
+            <li><a href="/guides/" style="color: #b45309; font-weight: bold; text-decoration: underline;">All Guides Hub</a></li>
             {guides_links}
           </ul>
         </div>
         <div>
           <h3 style="font-size: 1rem; font-weight: 700; color: #1e293b; margin-bottom: 10px;">Encyclopedia & Hubs</h3>
           <ul style="padding-left: 18px; margin: 0; font-size: 0.875rem; line-height: 1.8;">
-            <li><a href="/encyclopedia" style="color: #b45309; font-weight: bold; text-decoration: underline;">Encyclopedia Hub</a></li>
+            <li><a href="/encyclopedia/" style="color: #b45309; font-weight: bold; text-decoration: underline;">Encyclopedia Hub</a></li>
             {encyc_links}
-            <li><a href="/student-pdf-tools" style="color: #b45309; text-decoration: underline;">Student PDF Hub</a></li>
-            <li><a href="/business-pdf-tools" style="color: #b45309; text-decoration: underline;">Business & Legal Hub</a></li>
-            <li><a href="/developer-pdf-tools" style="color: #b45309; text-decoration: underline;">Developer Architecture</a></li>
-            <li><a href="/compare/online-pdf-tools" style="color: #b45309; text-decoration: underline;">PDF Tools Comparison</a></li>
-            <li><a href="/tools/pdf-size-calculator" style="color: #b45309; text-decoration: underline;">PDF Size Calculator</a></li>
-            <li><a href="/test-files" style="color: #b45309; text-decoration: underline;">Sample PDF Test Files</a></li>
-            <li><a href="/offline-mode" style="color: #b45309; text-decoration: underline;">Offline Mode (PWA)</a></li>
-            <li><a href="/cookies" style="color: #b45309; text-decoration: underline;">Cookie Preferences</a></li>
-            <li><a href="/privacy" style="color: #b45309; text-decoration: underline;">Privacy Policy</a></li>
-            <li><a href="/terms" style="color: #b45309; text-decoration: underline;">Terms of Service</a></li>
-            <li><a href="/about" style="color: #b45309; text-decoration: underline;">About PDFBolt</a></li>
-            <li><a href="/contact" style="color: #b45309; text-decoration: underline;">Contact Support</a></li>
+            <li><a href="/student-pdf-tools/" style="color: #b45309; text-decoration: underline;">Student PDF Hub</a></li>
+            <li><a href="/business-pdf-tools/" style="color: #b45309; text-decoration: underline;">Business & Legal Hub</a></li>
+            <li><a href="/developer-pdf-tools/" style="color: #b45309; text-decoration: underline;">Developer Architecture</a></li>
+            <li><a href="/compare/online-pdf-tools/" style="color: #b45309; text-decoration: underline;">PDF Tools Comparison</a></li>
+            <li><a href="/tools/pdf-size-calculator/" style="color: #b45309; text-decoration: underline;">PDF Size Calculator</a></li>
+            <li><a href="/test-files/" style="color: #b45309; text-decoration: underline;">Sample PDF Test Files</a></li>
+            <li><a href="/offline-mode/" style="color: #b45309; text-decoration: underline;">Offline Mode (PWA)</a></li>
+            <li><a href="/cookies/" style="color: #b45309; text-decoration: underline;">Cookie Preferences</a></li>
+            <li><a href="/privacy/" style="color: #b45309; text-decoration: underline;">Privacy Policy</a></li>
+            <li><a href="/terms/" style="color: #b45309; text-decoration: underline;">Terms of Service</a></li>
+            <li><a href="/about/" style="color: #b45309; text-decoration: underline;">About PDFBolt</a></li>
+            <li><a href="/contact/" style="color: #b45309; text-decoration: underline;">Contact Support</a></li>
           </ul>
         </div>
       </div>
@@ -1591,7 +1591,7 @@ def generate_prerendered_pages():
         description = tool["description"]
         h1 = tool["h1"]
         subtitle = tool.get("subtitle", description)
-        canonical_url = f"{CANONICAL_DOMAIN}/{path}"
+        canonical_url = f"{CANONICAL_DOMAIN}/{path}/"
 
         features_li = "".join([f"<li style='margin-bottom: 8px;'>{f}</li>" for f in tool.get("features", [])])
         steps_ol = "".join([f"<li style='margin-bottom: 12px;'><strong>{s['name']}:</strong> {s['text']}</li>" for s in tool.get("how_to", [])])
@@ -1729,7 +1729,7 @@ def generate_prerendered_pages():
         title = guide.get("metaTitle", f"{guide['title']} | PDFBolt Guide")
         description = guide["metaDescription"]
         h1 = guide["title"]
-        canonical_url = f"{CANONICAL_DOMAIN}/{path}"
+        canonical_url = f"{CANONICAL_DOMAIN}/{path}/"
 
         steps_ol = "".join([f"<li style='margin-bottom: 12px;'><strong>{s['name']}:</strong> {s['text']}</li>" for s in guide.get("steps", [])])
         
@@ -1774,7 +1774,7 @@ def generate_prerendered_pages():
         <div style="max-width: 900px; margin: 0 auto; padding: 32px 20px; font-family: system-ui, -apple-system, sans-serif; line-height: 1.7; color: #1e293b;">
           <nav aria-label="Breadcrumb" style="margin-bottom: 24px; font-size: 0.875rem; color: #64748b;">
             <a href="/" style="color: #b45309; text-decoration: none;">Home</a> &gt; 
-            <a href="/guides" style="color: #b45309; text-decoration: none;">Guides</a> &gt; 
+            <a href="/guides/" style="color: #b45309; text-decoration: none;">Guides</a> &gt; 
             <span style="color: #0f172a; font-weight: 600;">{h1}</span>
           </nav>
 
@@ -1861,7 +1861,7 @@ def generate_prerendered_pages():
         title = article.get("metaTitle", f"{article['title']} | PDFBolt Encyclopedia")
         description = article["metaDescription"]
         h1 = article["title"]
-        canonical_url = f"{CANONICAL_DOMAIN}/{path}"
+        canonical_url = f"{CANONICAL_DOMAIN}/{path}/"
 
         takeaways_li = "".join([f"<li style='margin-bottom: 8px;'>{t}</li>" for t in article.get("key_takeaways", [])])
         
@@ -1881,7 +1881,7 @@ def generate_prerendered_pages():
         <div style="max-width: 900px; margin: 0 auto; padding: 32px 20px; font-family: system-ui, -apple-system, sans-serif; line-height: 1.7; color: #1e293b;">
           <nav aria-label="Breadcrumb" style="margin-bottom: 24px; font-size: 0.875rem; color: #64748b;">
             <a href="/" style="color: #b45309; text-decoration: none;">Home</a> &gt; 
-            <a href="/encyclopedia" style="color: #b45309; text-decoration: none;">Encyclopedia</a> &gt; 
+            <a href="/encyclopedia/" style="color: #b45309; text-decoration: none;">Encyclopedia</a> &gt; 
             <span style="color: #0f172a; font-weight: 600;">{h1}</span>
           </nav>
 
@@ -1942,7 +1942,7 @@ def generate_prerendered_pages():
         description = page["description"]
         h1 = page["h1"]
         subtitle = page.get("subtitle", description)
-        canonical_url = f"{CANONICAL_DOMAIN}/{path}"
+        canonical_url = f"{CANONICAL_DOMAIN}/{path}/"
 
         hub_content = ""
         if page.get("is_hub"):
@@ -2181,7 +2181,7 @@ def generate_prerendered_pages():
             <h2 style="font-size: 1.6rem; font-weight: 900; color: #0f172a; margin: 0 0 6px 0;">Practical PDF Guides & Tutorials</h2>
             <p style="margin: 0; color: #475569; font-size: 0.95rem;">Step-by-step tutorials to help you master PDF workflows with zero hassle.</p>
           </div>
-          <a href="/guides" style="font-weight: 700; font-size: 0.9rem; color: #b45309; text-decoration: underline;">View All 13+ Guides &rarr;</a>
+          <a href="/guides/" style="font-weight: 700; font-size: 0.9rem; color: #b45309; text-decoration: underline;">View All 13+ Guides &rarr;</a>
         </div>
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
           {featured_guides_html}
