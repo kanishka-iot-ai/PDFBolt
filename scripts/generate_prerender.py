@@ -2068,12 +2068,243 @@ def generate_prerendered_pages():
         write_page(base_template, path, title, description, canonical_url, body_content, json_ld_schemas)
         generated_count += 1
 
+    # Category 5: Homepage (Root Index)
+    home_title = "Free Online PDF Tools – 100% Private, Fast & In-Browser | PDFBolt"
+    home_desc = "Use 25+ free online PDF tools to merge, compress, split, convert, edit and protect PDFs. 100% private in-browser WebAssembly processing with zero server uploads."
+    home_canonical = f"{CANONICAL_DOMAIN}/"
+
+    # Categorized Tools HTML for Homepage
+    def build_tool_card(t):
+        return f'''
+        <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between; transition: all 0.2s ease;">
+          <div>
+            <h3 style="font-size: 1.15rem; font-weight: 800; color: #0f172a; margin: 0 0 8px 0;">
+              <a href="/{t['path']}" style="color: #0f172a; text-decoration: none;">{t['h1']}</a>
+            </h3>
+            <p style="margin: 0 0 12px 0; color: #475569; font-size: 0.9rem; line-height: 1.5;">{t['description']}</p>
+          </div>
+          <a href="/{t['path']}" style="display: inline-flex; align-items: center; gap: 4px; font-weight: 700; font-size: 0.85rem; color: #b45309; text-decoration: none;">
+            Open Tool &rarr;
+          </a>
+        </div>
+        '''
+
+    tools_grid_html = "".join([build_tool_card(t) for t in CANONICAL_TOOLS])
+
+    featured_guides_html = "".join([f'''
+    <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between;">
+      <div>
+        <span style="font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: #b45309; background: #fef3c7; padding: 2px 8px; border-radius: 4px;">In-Depth Guide</span>
+        <h3 style="font-size: 1.1rem; font-weight: 800; color: #0f172a; margin: 12px 0 8px 0;">
+          <a href="/guides/{g['slug']}" style="color: #0f172a; text-decoration: none;">{g['title']}</a>
+        </h3>
+        <p style="margin: 0; color: #475569; font-size: 0.875rem; line-height: 1.5;">{g['summary']}</p>
+      </div>
+      <a href="/guides/{g['slug']}" style="margin-top: 14px; font-weight: 700; font-size: 0.85rem; color: #b45309; text-decoration: underline;">Read Full Tutorial &rarr;</a>
+    </div>
+    ''' for g in CANONICAL_GUIDES[:6]])
+
+    home_body_content = f'''
+    <div style="max-width: 1100px; margin: 0 auto; padding: 32px 20px; font-family: system-ui, -apple-system, sans-serif; line-height: 1.65; color: #1e293b;">
+      
+      <!-- Hero Section -->
+      <header style="text-align: center; margin-bottom: 48px; padding-bottom: 32px; border-bottom: 1px solid #e2e8f0;">
+        <div style="display: inline-block; padding: 4px 14px; background: #fef3c7; color: #92400e; font-size: 0.75rem; font-weight: 800; border-radius: 9999px; text-transform: uppercase; margin-bottom: 16px; border: 1px solid #fde68a;">
+          ★ Professional PDF Toolkit
+        </div>
+        <h1 style="font-size: 2.85rem; font-weight: 900; color: #0f172a; margin: 0 0 16px 0; line-height: 1.18; letter-spacing: -0.02em;">
+          Free Online PDF Tools for Every Task
+        </h1>
+        <p style="font-size: 1.25rem; color: #475569; margin: 0 auto; max-width: 820px; line-height: 1.6;">
+          Merge, compress, split, convert, edit, and protect PDF files directly inside your web browser. 100% private, client-side WebAssembly execution with zero server uploads and zero tracking.
+        </p>
+
+        <!-- Trust Badges -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-top: 36px; text-align: left;">
+          <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 18px;">
+            <div style="font-weight: 800; font-size: 1rem; color: #0f172a; margin-bottom: 4px;">🔒 100% In-Browser Privacy</div>
+            <p style="margin: 0; font-size: 0.85rem; color: #475569;">All PDF manipulations execute inside your device RAM using WebAssembly. Files never touch any remote server.</p>
+          </div>
+          <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 18px;">
+            <div style="font-weight: 800; font-size: 1rem; color: #0f172a; margin-bottom: 4px;">⚡ Instant Zero-Upload Speed</div>
+            <p style="margin: 0; font-size: 0.85rem; color: #475569;">Skip heavy file upload and download wait times. Process gigabyte-scale documents with local CPU acceleration.</p>
+          </div>
+          <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 18px;">
+            <div style="font-weight: 800; font-size: 1rem; color: #0f172a; margin-bottom: 4px;">✨ Free & Unlimited Usage</div>
+            <p style="margin: 0; font-size: 0.85rem; color: #475569;">No subscriptions, no mandatory user accounts, no watermarks, and no artificial daily document caps.</p>
+          </div>
+        </div>
+      </header>
+
+      <!-- Complete Tools Directory Grid -->
+      <section style="margin-bottom: 48px;">
+        <div style="display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 24px; border-bottom: 2px solid #0f172a; padding-bottom: 12px;">
+          <div>
+            <h2 style="font-size: 1.75rem; font-weight: 900; color: #0f172a; margin: 0 0 6px 0;">All Core PDF Tools (25+)</h2>
+            <p style="margin: 0; color: #475569; font-size: 0.95rem;">Select any PDF utility below to begin processing documents locally with absolute privacy.</p>
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px;">
+          {tools_grid_html}
+        </div>
+      </section>
+
+      <!-- Why PDFBolt Architecture -->
+      <section style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; padding: 32px; margin-bottom: 48px;">
+        <h2 style="font-size: 1.6rem; font-weight: 900; color: #0f172a; margin: 0 0 16px 0;">Why PDFBolt's Client-Side Architecture Is Superior</h2>
+        <p style="font-size: 1rem; color: #334155; line-height: 1.7; margin-bottom: 16px;">
+          Traditional online PDF conversion portals force users to transmit confidential business records, sensitive tax filings, medical reports, and legal agreements to third-party cloud servers. This exposes your documents to cloud storage vulnerabilities, data breach risks, third-party inspection, and ISP network eavesdropping.
+        </p>
+        <p style="font-size: 1rem; color: #334155; line-height: 1.7; margin-bottom: 16px;">
+          PDFBolt pioneers a privacy-first paradigm. By compiling industry-standard document engines (including pdf-lib, PDF.js, and Tesseract OCR) into optimized WebAssembly and JavaScript binaries, your browser itself becomes the processing supercomputer.
+        </p>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-top: 24px;">
+          <div style="border-left: 3px solid #b45309; padding-left: 14px;">
+            <h3 style="font-size: 1.05rem; font-weight: 800; color: #0f172a; margin: 0 0 6px 0;">GDPR & CCPA Compliant</h3>
+            <p style="margin: 0; font-size: 0.875rem; color: #475569;">PDFBolt achieves true data minimization: since no document data reaches our servers, data subject privacy is mathematically guaranteed.</p>
+          </div>
+          <div style="border-left: 3px solid #b45309; padding-left: 14px;">
+            <h3 style="font-size: 1.05rem; font-weight: 800; color: #0f172a; margin: 0 0 6px 0;">Offline Capability</h3>
+            <p style="margin: 0; font-size: 0.875rem; color: #475569;">Once loaded, core tools operate with zero internet connectivity. Work securely on flights, trains, or in remote environments.</p>
+          </div>
+          <div style="border-left: 3px solid #b45309; padding-left: 14px;">
+            <h3 style="font-size: 1.05rem; font-weight: 800; color: #0f172a; margin: 0 0 6px 0;">Zero File Retention</h3>
+            <p style="margin: 0; font-size: 0.875rem; color: #475569;">When you close or refresh your browser tab, your document is instantaneously discarded from RAM with zero residual footprint.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Featured In-Depth Practical Guides -->
+      <section style="margin-bottom: 48px;">
+        <div style="display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 24px;">
+          <div>
+            <h2 style="font-size: 1.6rem; font-weight: 900; color: #0f172a; margin: 0 0 6px 0;">Practical PDF Guides & Tutorials</h2>
+            <p style="margin: 0; color: #475569; font-size: 0.95rem;">Step-by-step tutorials to help you master PDF workflows with zero hassle.</p>
+          </div>
+          <a href="/guides" style="font-weight: 700; font-size: 0.9rem; color: #b45309; text-decoration: underline;">View All 13+ Guides &rarr;</a>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+          {featured_guides_html}
+        </div>
+      </section>
+
+      <!-- Frequently Asked Questions -->
+      <section style="margin-bottom: 48px;">
+        <h2 style="font-size: 1.6rem; font-weight: 900; color: #0f172a; margin: 0 0 20px 0;">Frequently Asked Questions</h2>
+        <div style="display: flex; flex-direction: column; gap: 14px;">
+          <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 20px;">
+            <h3 style="font-size: 1.1rem; font-weight: 800; color: #0f172a; margin: 0 0 8px 0;">Are my documents uploaded to any server?</h3>
+            <p style="margin: 0; color: #334155; font-size: 0.95rem; line-height: 1.6;">No. PDFBolt operates entirely in your browser using client-side WebAssembly. Your files are stitched, converted, or compressed in your device RAM and are never transmitted across the network.</p>
+          </div>
+          <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 20px;">
+            <h3 style="font-size: 1.1rem; font-weight: 800; color: #0f172a; margin: 0 0 8px 0;">Is PDFBolt completely free to use?</h3>
+            <p style="margin: 0; color: #334155; font-size: 0.95rem; line-height: 1.6;">Yes! All tools on PDFBolt are 100% free with no file size limits, daily usage quotas, hidden subscriptions, or watermark additions.</p>
+          </div>
+          <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 20px;">
+            <h3 style="font-size: 1.1rem; font-weight: 800; color: #0f172a; margin: 0 0 8px 0;">What formats can I convert to and from PDF?</h3>
+            <p style="margin: 0; color: #334155; font-size: 0.95rem; line-height: 1.6;">PDFBolt supports Microsoft Word (.docx), Excel (.xlsx), PowerPoint (.pptx), images (.jpg, .png), HTML files, scanned receipts, and handwritten notes.</p>
+          </div>
+          <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 20px;">
+            <h3 style="font-size: 1.1rem; font-weight: 800; color: #0f172a; margin: 0 0 8px 0;">Can I use PDFBolt for confidential business or medical documents?</h3>
+            <p style="margin: 0; color: #334155; font-size: 0.95rem; line-height: 1.6;">Absolutely. Because zero bytes leave your device, PDFBolt inherently complies with strict confidentiality agreements (NDAs), HIPAA guidelines, and GDPR regulations.</p>
+          </div>
+        </div>
+      </section>
+
+      {full_directory_html}
+    </div>
+    '''
+
+    home_json_ld = [
+        {
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            "name": "PDFBolt",
+            "url": CANONICAL_DOMAIN,
+            "description": home_desc,
+            "potentialAction": {
+                "@type": "SearchAction",
+                "target": f"{CANONICAL_DOMAIN}/?q={{search_term_string}}",
+                "query-input": "required name=search_term_string"
+            }
+        },
+        {
+            "@context": "https://schema.org",
+            "@type": "WebApplication",
+            "name": "PDFBolt Free Online PDF Tools",
+            "url": CANONICAL_DOMAIN,
+            "applicationCategory": "UtilitiesApplication",
+            "operatingSystem": "All",
+            "browserRequirements": "Requires JavaScript and HTML5",
+            "offers": {
+                "@type": "Offer",
+                "price": "0",
+                "priceCurrency": "USD"
+            }
+        },
+        {
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [
+                {
+                    "@type": "Question",
+                    "name": "Are my documents uploaded to any server?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "No. PDFBolt operates entirely in your browser using client-side WebAssembly. Your files are stitched, converted, or compressed in your device RAM and are never transmitted across the network."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Is PDFBolt completely free to use?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Yes! All tools on PDFBolt are 100% free with no file size limits, daily usage quotas, hidden subscriptions, or watermark additions."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "What formats can I convert to and from PDF?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "PDFBolt supports Microsoft Word (.docx), Excel (.xlsx), PowerPoint (.pptx), images (.jpg, .png), HTML files, scanned receipts, and handwritten notes."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Can I use PDFBolt for confidential business or medical documents?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Absolutely. Because zero bytes leave your device, PDFBolt inherently complies with strict confidentiality agreements (NDAs), HIPAA guidelines, and GDPR regulations."
+                    }
+                }
+            ]
+        },
+        {
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            "name": "PDFBolt",
+            "url": CANONICAL_DOMAIN,
+            "logo": f"{CANONICAL_DOMAIN}/pdfbolt-logo.webp"
+        }
+    ]
+
+    write_page(base_template, "", home_title, home_desc, home_canonical, home_body_content, home_json_ld)
+    generated_count += 1
+
     print(f"Successfully generated {generated_count} rich prerendered canonical pages in {DIST_DIR}!")
 
 def write_page(base_template, path, title, description, canonical_url, body_content, json_ld_schemas):
-    target_dir = os.path.join(DIST_DIR, path)
-    os.makedirs(target_dir, exist_ok=True)
-    target_file = os.path.join(target_dir, "index.html")
+    # Determine target directory and file
+    if not path or path == "":
+        target_file = os.path.join(DIST_DIR, "index.html")
+        flat_file = None
+    else:
+        target_dir = os.path.join(DIST_DIR, path)
+        os.makedirs(target_dir, exist_ok=True)
+        target_file = os.path.join(target_dir, "index.html")
+        flat_file = os.path.join(DIST_DIR, f"{path}.html")
+        os.makedirs(os.path.dirname(flat_file), exist_ok=True)
 
     # JSON-LD Schema Blocks
     schema_tags = "\n  ".join([f'<script type="application/ld+json">\n{json.dumps(s, indent=2)}\n</script>' for s in json_ld_schemas])
@@ -2108,8 +2339,20 @@ def write_page(base_template, path, title, description, canonical_url, body_cont
         flags=re.DOTALL
     )
 
+    # Write target directory index.html
     with open(target_file, "w", encoding="utf-8") as out:
         out.write(html)
+
+    # Also write flat .html file for CDNs (like Cloudflare Pages) matching extensionless URLs
+    if flat_file:
+        with open(flat_file, "w", encoding="utf-8") as out:
+            out.write(html)
+
+    # Also generate 404.html fallback for SPA router
+    fallback_404 = os.path.join(DIST_DIR, "404.html")
+    if not os.path.exists(fallback_404):
+        with open(fallback_404, "w", encoding="utf-8") as out:
+            out.write(base_template)
 
 if __name__ == "__main__":
     generate_prerendered_pages()
