@@ -1,28 +1,67 @@
-# Google AdSense Crawler
+# Google AdSense Crawler (Must always be fully allowed)
 User-agent: Mediapartners-Google
 Allow: /
 
+# Googlebot Search Engine
+User-agent: Googlebot
+Allow: /
+
+# General Search Engines
 User-agent: *
 Allow: /
-Allow: /tools
+Allow: /tools/
 Allow: /guides/
 Allow: /encyclopedia/
-Allow: /student-pdf-tools
-Allow: /business-pdf-tools
-Allow: /developer-pdf-tools
+Allow: /student-pdf-tools/
+Allow: /business-pdf-tools/
+Allow: /developer-pdf-tools/
 Allow: /compare/
-Allow: /about
-Allow: /privacy
-Allow: /terms
-Allow: /contact
+Allow: /about/
+Allow: /privacy/
+Allow: /terms/
+Allow: /contact/
 
+# Block Unwanted Aggressive AI Scrapers & Data Harvesters
+User-agent: GPTBot
+Disallow: /
+
+User-agent: ChatGPT-User
+Disallow: /
+
+User-agent: CCBot
+Disallow: /
+
+User-agent: anthropic-ai
+Disallow: /
+
+User-agent: Claude-Web
+Disallow: /
+
+User-agent: Bytespider
+Disallow: /
+
+User-agent: cohere-ai
+Disallow: /
+
+User-agent: Diffbot
+Disallow: /
+
+User-agent: PerplexityBot
+Disallow: /
+
+User-agent: Omgilibot
+Disallow: /
+
+User-agent: FacebookBot
+Disallow: /
 
 # Private API endpoints, temporary processing jobs, and internal shares
+User-agent: *
 Disallow: /api/
 Disallow: /jobs/
 Disallow: /storage/
 Disallow: /qr-success
-Disallow: /test-files
+Disallow: /test-files/
 
 # Sitemaps
 Sitemap: https://pdfbolt.in/sitemap.xml

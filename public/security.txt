@@ -1,0 +1,7 @@
+Contact: mailto:support@pdfbolt.in
+Contact: https://pdfbolt.in/contact/
+Expires: 2027-12-31T23:59:59.000Z
+Preferred-Languages: en
+Canonical: https://pdfbolt.in/.well-known/security.txt
+Policy: https://pdfbolt.in/privacy/
+Acknowledgments: https://pdfbolt.in/about/

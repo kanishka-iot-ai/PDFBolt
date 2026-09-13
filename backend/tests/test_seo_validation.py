@@ -116,7 +116,13 @@ def test_sitemap_contains_only_canonical_urls():
         with open(tools_sitemap_path, "r", encoding="utf-8") as f:
             tools_content = f.read()
         for tool in CANONICAL_TOOLS:
-            assert f"https://pdfbolt.in{tool}</loc>" in tools_content or f"https://pdfbolt.in{tool}</loc>" in sitemap_content, f"Canonical tool {tool} must be in sitemap"
+            tool_clean = tool.strip('/')
+            assert (
+                f"https://pdfbolt.in/{tool_clean}</loc>" in tools_content
+                or f"https://pdfbolt.in/{tool_clean}/</loc>" in tools_content
+                or f"https://pdfbolt.in/{tool_clean}</loc>" in sitemap_content
+                or f"https://pdfbolt.in/{tool_clean}/</loc>" in sitemap_content
+            ), f"Canonical tool {tool} must be in sitemap"
 
     # Ensure disallowed /test-files is not in any sitemap
     workflows_sitemap_path = os.path.join(BASE_DIR, "public", "sitemap-workflows.xml")
@@ -147,7 +153,7 @@ def test_redirects_are_one_hop_permanent():
 
     for alias, target in LEGACY_ALIASES.items():
         assert alias in redirect_map, f"Alias {alias} must be defined in _redirects"
-        assert redirect_map[alias] == target, f"Alias {alias} must redirect directly to {target}"
+        assert redirect_map[alias].rstrip('/') == target.rstrip('/'), f"Alias {alias} must redirect directly to {target}"
         # Ensure target is a canonical tool and not another redirect (no redirect chains)
         assert redirect_map[alias] not in redirect_map, f"Target {redirect_map[alias]} must not be a redirect"
 

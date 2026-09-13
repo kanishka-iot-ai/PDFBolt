@@ -118,7 +118,7 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
               height="100"
               loading="eager"
               decoding="async"
-              {...({ fetchPriority: "high" } as any)}
+              {...({ fetchpriority: "high" } as any)}
               className="h-9 md:h-10 w-auto object-contain transition-transform duration-300 group-hover:scale-105" 
             />
           </Link>
