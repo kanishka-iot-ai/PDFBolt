@@ -29,6 +29,8 @@
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
   <link rel="manifest" href="/manifest.json">
+  <!-- Preload LCP image — browser fetches this in parallel with HTML parsing -->
+  <link rel="preload" as="image" href="/pdfbolt-logo.webp" fetchpriority="high">
 
   <meta name="theme-color" content="#eab308">
   <link rel="canonical" data-rh="true" href="https://pdfbolt.in/" />
@@ -63,12 +65,14 @@
   <meta property="og:title" data-rh="true" content="Free Online PDF Tools – Merge, Compress, Convert & Edit PDFs | PDFBolt">
   <meta property="og:description" data-rh="true"
     content="Use free online PDF tools to merge, compress, split, convert, edit and protect PDF files. Fast, private and easy-to-use PDF tools with PDFBolt.">
-  <meta property="og:image" content="https://pdfbolt.in/pdfbolt-logo-transparent.png">
+  <meta property="og:image" content="https://pdfbolt.in/pdfbolt-og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
   <meta property="og:url" data-rh="true" content="https://pdfbolt.in/">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" data-rh="true" content="Free Online PDF Tools – Merge, Compress, Convert & Edit PDFs | PDFBolt">
   <meta name="twitter:description" data-rh="true" content="Use free online PDF tools to merge, compress, split, convert, edit and protect PDF files. Fast, private and easy-to-use PDF tools with PDFBolt.">
-  <meta name="twitter:image" content="https://pdfbolt.in/pdfbolt-logo-transparent.png">
+  <meta name="twitter:image" content="https://pdfbolt.in/pdfbolt-og-image.png">
 
   <style>
 

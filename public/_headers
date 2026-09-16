@@ -3,4 +3,51 @@
   X-Content-Type-Options: nosniff
   X-Frame-Options: SAMEORIGIN
   Referrer-Policy: strict-origin-when-cross-origin
-  Permissions-Policy: camera=(self), microphone=(), geolocation=()
+  Permissions-Policy: camera=(self), microphone=(), geolocation=(self)
+
+# Images — cache for 1 year (immutable; Cloudflare deploys new hashed filenames on change)
+/*.png
+  Cache-Control: public, max-age=31536000, immutable
+
+/*.webp
+  Cache-Control: public, max-age=31536000, immutable
+
+/*.ico
+  Cache-Control: public, max-age=31536000, immutable
+
+/*.svg
+  Cache-Control: public, max-age=31536000, immutable
+
+/*.jpg
+  Cache-Control: public, max-age=31536000, immutable
+
+/*.jpeg
+  Cache-Control: public, max-age=31536000, immutable
+
+# Fonts — cache for 1 year
+/*.woff2
+  Cache-Control: public, max-age=31536000, immutable
+
+/*.woff
+  Cache-Control: public, max-age=31536000, immutable
+
+# JS/CSS bundles (Vite adds content hashes — safe to cache long-term)
+/assets/*.js
+  Cache-Control: public, max-age=31536000, immutable
+
+/assets/*.css
+  Cache-Control: public, max-age=31536000, immutable
+
+# Service worker — must revalidate so updates are picked up immediately
+/service-worker.js
+  Cache-Control: no-cache, no-store, must-revalidate
+
+# HTML and sitemaps — revalidate on every visit
+/*.html
+  Cache-Control: no-cache
+
+/sitemap*.xml
+  Cache-Control: public, max-age=3600
+
+/manifest.json
+  Cache-Control: public, max-age=86400
