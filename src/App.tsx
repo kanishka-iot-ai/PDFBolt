@@ -71,6 +71,20 @@ const NotFoundPage = () => (
   </div>
 );
 
+// Pre-built O(1) lookup map — replaces O(N) TOOLS.find() on every route change
+const TOOLS_BY_PATH = new Map(
+  TOOLS.flatMap(t => [
+    [t.canonicalPath, t],
+    [t.path, t],
+    ...(t.seoPath ? [[t.seoPath, t]] : []),
+  ] as [string, typeof t][])
+);
+
+// Pre-built Set for O(1) isToolPage check
+const TOOL_PATH_SET = new Set(
+  TOOLS.flatMap(t => [t.path, t.canonicalPath, ...(t.seoPath ? [t.seoPath] : [])])
+);
+
 const SEOManager: React.FC = () => {
   const location = useLocation();
 
@@ -79,8 +93,8 @@ const SEOManager: React.FC = () => {
     let title = "Free Online PDF Tools – Merge, Compress, Convert & Edit PDFs | PDFBolt";
     let description = "Use free online PDF tools to merge, compress, split, convert, edit and protect PDF files. Fast, private and easy-to-use PDF tools with PDFBolt.";
 
-    // Match Tool Pages
-    const tool = TOOLS.find(t => t.canonicalPath === location.pathname || t.path === location.pathname || t.seoPath === location.pathname);
+    // O(1) Map lookup — was O(N) TOOLS.find()
+    const tool = TOOLS_BY_PATH.get(location.pathname);
     if (tool) {
       title = `${tool.seoTitle || `${tool.title} Online`} | PDFBolt`;
       description = tool.description;
@@ -129,6 +143,7 @@ const SEOManager: React.FC = () => {
   return null;
 };
 
+
 interface MainLayoutProps {
   darkMode: boolean;
   setDarkMode: React.Dispatch<React.SetStateAction<boolean>>;
@@ -141,8 +156,9 @@ const MainLayout: React.FC<MainLayoutProps> = ({ darkMode, setDarkMode, soundEna
   const { hasActiveWork } = useActiveWork();
   const location = useLocation();
 
+  // O(1) Set lookup — was O(N) TOOLS.some()
   const isToolPage = location.pathname.startsWith('/tool/') ||
-    TOOLS.some(t => t.path === location.pathname || t.canonicalPath === location.pathname);
+    TOOL_PATH_SET.has(location.pathname);
 
   return (
     <div className={`min-h-screen flex flex-col transition-colors duration-300 font-sans ${darkMode ? 'dark bg-slate-900 text-white' : 'bg-white text-slate-900'}`}>

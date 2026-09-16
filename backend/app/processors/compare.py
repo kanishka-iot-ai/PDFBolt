@@ -41,19 +41,28 @@ class CompareProcessor(BaseProcessor):
             lines_a = [l.strip() for l in text_a.splitlines() if l.strip()]
             lines_b = [l.strip() for l in text_b.splitlines() if l.strip()]
 
-            # Compute similarity score
-            matcher = difflib.SequenceMatcher(None, text_a, text_b)
-            similarity_pct = round(matcher.ratio() * 100, 1)
+            # Early-exit O(1) identity check — skips O(N*M) diff entirely for identical docs
+            if text_a == text_b:
+                similarity_pct = 100.0
+                diff_lines: list = []
+                additions = 0
+                deletions = 0
+            else:
+                # Line-level ratio: much faster than char-level (lists of lines vs raw strings)
+                # O(L_a * L_b) where L_a, L_b are LINE counts, not CHARACTER counts
+                matcher = difflib.SequenceMatcher(None, lines_a, lines_b, autojunk=True)
+                similarity_pct = round(matcher.ratio() * 100, 1)
 
-            diff_lines = list(difflib.unified_diff(
-                lines_a, lines_b,
-                fromfile=f"Doc A: {file_a_path.name}",
-                tofile=f"Doc B: {file_b_path.name}",
-                lineterm=""
-            ))
+                diff_lines = list(difflib.unified_diff(
+                    lines_a, lines_b,
+                    fromfile=f"Doc A: {file_a_path.name}",
+                    tofile=f"Doc B: {file_b_path.name}",
+                    lineterm=""
+                ))
 
-            additions = len([d for d in diff_lines if d.startswith("+") and not d.startswith("+++")])
-            deletions = len([d for d in diff_lines if d.startswith("-") and not d.startswith("---")])
+                additions = len([d for d in diff_lines if d.startswith("+") and not d.startswith("+++")])
+                deletions = len([d for d in diff_lines if d.startswith("-") and not d.startswith("---")])
+
 
             # Generate Clean Comparison Report Document
             report = pymupdf.open()

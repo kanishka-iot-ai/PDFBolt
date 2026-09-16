@@ -219,16 +219,17 @@ class RedactProcessor(BaseProcessor):
                 if f.get("value"):
                     terms_to_redact.append(f["value"])
 
-        # Apply term-based redactions
-        for term in terms_to_redact:
-            t_clean = str(term).strip()
-            if not t_clean or len(t_clean) < 2:
-                continue
-            targeted_strings.append(t_clean)
+        # Apply term-based redactions — pages-first loop: each page loaded once,
+        # all T terms searched against it in one pass → O(P × T) with O(1) cache reuse
+        if terms_to_redact:
+            clean_terms = [str(t).strip() for t in terms_to_redact if str(t).strip() and len(str(t).strip()) >= 2]
+            targeted_strings.extend(clean_terms)
             for page in doc:
-                rects = page.search_for(t_clean)
-                for r in rects:
-                    page.add_redact_annot(r, fill=(0, 0, 0))
+                for t_clean in clean_terms:
+                    rects = page.search_for(t_clean)
+                    for r in rects:
+                        page.add_redact_annot(r, fill=(0, 0, 0))
+
 
         # Apply region-based redactions [{page: 1, x1, y1, x2, y2}]
         for r in raw_regions:

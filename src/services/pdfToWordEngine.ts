@@ -473,12 +473,17 @@ function groupItemsIntoLines(sortedItems: TItem[]): Line[] {
       currentTop = (currentTop * (currentGroup.length - 1) + item.top) / currentGroup.length;
       currentH = Math.max(currentH, item.height);
     } else {
-      // Finalize current line
+      // Finalize current line — O(N) reduce avoids O(N) spread array copies
       currentGroup.sort((a, b) => a.left - b.left);
       const lineLeft = currentGroup[0].left;
-      const lineRight = Math.max(...currentGroup.map(it => it.left + it.width));
-      const lineTop = Math.min(...currentGroup.map(it => it.top));
-      const lineBottom = Math.max(...currentGroup.map(it => it.top + it.height));
+      let lineRight = -Infinity;
+      let lineTop = Infinity;
+      let lineBottom = -Infinity;
+      for (const it of currentGroup) {
+        if (it.left + it.width > lineRight) lineRight = it.left + it.width;
+        if (it.top < lineTop) lineTop = it.top;
+        if (it.top + it.height > lineBottom) lineBottom = it.top + it.height;
+      }
       const lineText = joinLineItems(currentGroup);
 
       lines.push({
@@ -497,12 +502,17 @@ function groupItemsIntoLines(sortedItems: TItem[]): Line[] {
     }
   }
 
-  // Final line
+  // Final line — same O(N) reduce pattern
   currentGroup.sort((a, b) => a.left - b.left);
   const lineLeft = currentGroup[0].left;
-  const lineRight = Math.max(...currentGroup.map(it => it.left + it.width));
-  const lineTop = Math.min(...currentGroup.map(it => it.top));
-  const lineBottom = Math.max(...currentGroup.map(it => it.top + it.height));
+  let lineRight = -Infinity;
+  let lineTop = Infinity;
+  let lineBottom = -Infinity;
+  for (const it of currentGroup) {
+    if (it.left + it.width > lineRight) lineRight = it.left + it.width;
+    if (it.top < lineTop) lineTop = it.top;
+    if (it.top + it.height > lineBottom) lineBottom = it.top + it.height;
+  }
   const lineText = joinLineItems(currentGroup);
 
   lines.push({
@@ -521,7 +531,8 @@ function groupItemsIntoLines(sortedItems: TItem[]): Line[] {
 /** Join line items with smart space handling based on bounding box gaps */
 function joinLineItems(items: TItem[]): string {
   if (!items.length) return '';
-  let out = items[0].text;
+  // O(N) accumulator — avoids O(N²) string reallocations from repeated +=
+  const parts: string[] = [items[0].text];
 
   for (let i = 1; i < items.length; i++) {
     const prev = items[i - 1];
@@ -529,13 +540,13 @@ function joinLineItems(items: TItem[]): string {
     const gap = curr.left - (prev.left + prev.width);
 
     // If gap between words is larger than 25% of character height, insert a space
-    if (gap > prev.height * 0.22 && !out.endsWith(' ') && !curr.text.startsWith(' ')) {
-      out += ' ';
+    if (gap > prev.height * 0.22 && !parts[parts.length - 1].endsWith(' ') && !curr.text.startsWith(' ')) {
+      parts.push(' ');
     }
-    out += curr.text;
+    parts.push(curr.text);
   }
 
-  return out;
+  return parts.join('');
 }
 
 /** Detect if lines form a structured multi-column table */

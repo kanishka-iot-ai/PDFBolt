@@ -20,15 +20,15 @@ class MergeProcessor(BaseProcessor):
 
         for idx, file_path in enumerate(input_files):
             try:
+                # Pre-check for encryption before appending
                 reader = PdfReader(str(file_path), strict=False)
                 if reader.is_encrypted:
                     raise PDFBoltError("PASSWORD_REQUIRED", f"Document #{idx+1} is password-protected and cannot be merged without unlocking.")
-                
-                page_count = len(reader.pages)
-                total_expected_pages += page_count
+                total_expected_pages += len(reader.pages)
 
-                for page in reader.pages:
-                    writer.add_page(page)
+                # writer.append() manages page object pointers efficiently — avoids caching
+                # all page objects in RAM simultaneously (was O(P × S) space, now ~O(P))
+                writer.append(str(file_path))
 
             except PDFBoltError:
                 raise
@@ -36,8 +36,8 @@ class MergeProcessor(BaseProcessor):
                 raise PDFBoltError("INVALID_PDF", f"Failed to read input PDF #{idx+1} ({file_path.name}): {e}")
 
         output_path = self.output_dir / f"{self.job_id}.pdf"
-        with open(output_path, "wb") as f:
-            writer.write(f)
+        writer.write(str(output_path))
+        writer.close()
 
         # Invariant Verification
         actual_pages = validate_pdf_output(output_path)
@@ -46,6 +46,7 @@ class MergeProcessor(BaseProcessor):
             raise OutputValidationError(f"Merge invariant failed: expected {total_expected_pages} pages, but generated {actual_pages} pages.")
 
         return output_path
+
 
     # Backward compatibility method for byte-oriented legacy tests
     def process_multiple(self, files_data: List[tuple[bytes, str]]) -> tuple[bytes, str, Dict[str, Any]]:

@@ -82,11 +82,12 @@ export async function analyzePdfDocument(file: File): Promise<DocumentAnalysis> 
     const arrayBuffer = await file.arrayBuffer();
     const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
 
-    let fullText = "";
     let totalWords = 0;
     let totalImages = 0;
     let estimatedTables = 0;
     const pageSummaries: { pageNumber: number; wordCount: number; preview: string }[] = [];
+    // O(N) accumulator: avoids O(N²) string reallocations from += in a loop
+    const pageTexts: string[] = [];
 
     try {
         for (let i = 1; i <= pdf.numPages; i++) {
@@ -107,7 +108,8 @@ export async function analyzePdfDocument(file: File): Promise<DocumentAnalysis> 
 
             const words = pageText.split(/\s+/).filter(Boolean);
             totalWords += words.length;
-            fullText += pageText + "\n\n";
+            // Collect in array — joined O(N) at the end instead of O(N²) incrementally
+            pageTexts.push(pageText);
 
             // Table detection heuristic: look for vertical alignment patterns
             const items = textContent.items as any[];
@@ -127,6 +129,10 @@ export async function analyzePdfDocument(file: File): Promise<DocumentAnalysis> 
     } finally {
         pdf.destroy();
     }
+
+    // O(N) single join — was O(N²) from repeated string concatenation
+    const fullText = pageTexts.join('\n\n');
+
 
     const topics = extractTopTopics(fullText);
     const readTime = Math.max(1, Math.ceil(totalWords / 200));
