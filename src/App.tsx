@@ -71,18 +71,25 @@ const NotFoundPage = () => (
   </div>
 );
 
-// Pre-built O(1) lookup map — replaces O(N) TOOLS.find() on every route change
-const TOOLS_BY_PATH = new Map(
-  TOOLS.flatMap(t => [
-    [t.canonicalPath, t],
-    [t.path, t],
-    ...(t.seoPath ? [[t.seoPath, t]] : []),
-  ] as [string, typeof t][])
+// Pre-built O(1) lookup map — replaces O(N) TOOLS.find() on every route change.
+// Indexes BOTH the bare path and the trailing-slash variant so lookup works regardless
+// of whether the browser URL currently has or lacks a trailing slash.
+const TOOLS_BY_PATH = new Map<string, (typeof TOOLS)[number]>(
+  TOOLS.flatMap(t => {
+    const paths = [t.canonicalPath, t.path, ...(t.seoPath ? [t.seoPath] : [])].filter(Boolean) as string[];
+    return paths.flatMap(p => [
+      [p, t] as [string, typeof t],
+      [p.endsWith('/') ? p : p + '/', t] as [string, typeof t],  // trailing-slash variant
+    ]);
+  })
 );
 
-// Pre-built Set for O(1) isToolPage check
+// Pre-built Set for O(1) isToolPage check — also covers trailing-slash variants
 const TOOL_PATH_SET = new Set(
-  TOOLS.flatMap(t => [t.path, t.canonicalPath, ...(t.seoPath ? [t.seoPath] : [])])
+  TOOLS.flatMap(t => {
+    const paths = [t.path, t.canonicalPath, ...(t.seoPath ? [t.seoPath] : [])].filter(Boolean);
+    return paths.flatMap(p => [p, p.endsWith('/') ? p : p + '/']);
+  })
 );
 
 const SEOManager: React.FC = () => {
@@ -93,30 +100,35 @@ const SEOManager: React.FC = () => {
     let title = "Free Online PDF Tools – Merge, Compress, Convert & Edit PDFs | PDFBolt";
     let description = "Use free online PDF tools to merge, compress, split, convert, edit and protect PDF files. Fast, private and easy-to-use PDF tools with PDFBolt.";
 
-    // O(1) Map lookup — was O(N) TOOLS.find()
-    const tool = TOOLS_BY_PATH.get(location.pathname);
+    // Normalise: strip trailing slash for comparison (except homepage)
+    // The _redirects sends /merge-pdf → /merge-pdf/, so pathname will usually have the slash.
+    const pathname = location.pathname;
+    const pathNorm = pathname !== '/' && pathname.endsWith('/') ? pathname.slice(0, -1) : pathname;
+
+    // O(1) Map lookup — checks both bare and slash variant
+    const tool = TOOLS_BY_PATH.get(pathname) ?? TOOLS_BY_PATH.get(pathNorm);
     if (tool) {
       title = `${tool.seoTitle || `${tool.title} Online`} | PDFBolt`;
       description = tool.description;
-    } else if (location.pathname === '/tools' || location.pathname === '/pdf-tools') {
+    } else if (pathNorm === '/tools' || pathNorm === '/pdf-tools') {
       title = "All 25+ Online PDF Tools (Free & Unlimited) | PDFBolt Directory";
       description = "Browse our full suite of 25+ browser-based PDF tools. Fast, free, and private conversion, editing, and compression tools.";
-    } else if (location.pathname === '/guides') {
+    } else if (pathNorm === '/guides') {
       title = "Free PDF Guides, Tutorials & Document Processing Knowledge Base | PDFBolt";
       description = "Comprehensive step-by-step guides on converting, compressing, merging, redacting, signing, and editing PDF files online with 100% privacy.";
-    } else if (location.pathname === '/encyclopedia') {
+    } else if (pathNorm === '/encyclopedia') {
       title = "PDF Format Encyclopedia & Technical Standards | PDFBolt";
       description = "Technical explainers on PDF specifications (ISO 32000), PDF/A digital preservation standards, OCR neural networks, and vector graphics.";
-    } else if (location.pathname === '/compare/online-pdf-tools') {
+    } else if (pathNorm === '/compare/online-pdf-tools') {
       title = "Online PDF Tools Comparison (2026) – Client-Side Privacy vs Cloud | PDFBolt";
       description = "Compare client-side WebAssembly document processing vs cloud server upload converters and desktop Adobe Acrobat.";
-    } else if (location.pathname === '/tools/pdf-size-calculator') {
+    } else if (pathNorm === '/tools/pdf-size-calculator') {
       title = "Interactive PDF Size & Compression Calculator | PDFBolt";
       description = "Calculate and estimate how much file size you can save when compressing PDF documents based on page count, image DPI, and content type.";
-    } else if (location.pathname === '/test-files') {
+    } else if (pathNorm === '/test-files') {
       title = "Download Free Sample PDF Test Files | PDFBolt Playground";
       description = "Download free sample PDF files for testing: multi-page documents, tables, scanned receipts, and slides ready for testing PDF conversion and editing tools.";
-    } else if (location.pathname === '/contact') {
+    } else if (pathNorm === '/contact') {
       title = "Contact Customer Care | PDFBolt";
     }
 
@@ -127,8 +139,20 @@ const SEOManager: React.FC = () => {
       metaDesc.setAttribute('content', description);
     }
 
-    const canonicalPath = location.pathname === '/' ? '' : location.pathname;
+    // Canonical MUST match prerendered pages and sitemaps — both use trailing slashes.
+    // Without the slash, Google's WRS (JavaScript renderer) sees a different canonical than
+    // the static HTML, triggering "Alternate page with proper canonical tag" in Search Console.
+    const rawPath = location.pathname;
+    let canonicalPath: string;
+    if (rawPath === '/') {
+      canonicalPath = '';                                          // homepage: https://pdfbolt.in/
+    } else if (rawPath.endsWith('/')) {
+      canonicalPath = rawPath;                                    // already has trailing slash
+    } else {
+      canonicalPath = rawPath + '/';                              // add trailing slash
+    }
     const canonicalUrl = `${baseUrl}${canonicalPath}`;
+
     let canonicalLink = document.querySelector('link[rel="canonical"]') as HTMLLinkElement;
     if (!canonicalLink) {
       canonicalLink = document.createElement('link');
