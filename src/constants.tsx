@@ -866,7 +866,7 @@ export const GUIDES: Guide[] = [
   {
     slug: 'how-to-convert-pdf-to-word',
     title: 'How to Convert PDF to Word (DOCX) Without Losing Formatting',
-    metaTitle: 'How to Convert PDF to Word for Free (Step-by-Step Guide)',
+    metaTitle: 'How to Convert PDF to Word (DOCX) for Free',
     metaDescription: 'Learn how to convert any PDF to an editable Microsoft Word (.docx) file for free in your browser with zero formatting loss or software installation.',
     category: 'convert',
     readTime: '4 min read',
@@ -904,7 +904,7 @@ export const GUIDES: Guide[] = [
   {
     slug: 'how-to-compress-a-pdf',
     title: 'How to Compress a PDF to Reduce File Size Below 10MB or 2MB',
-    metaTitle: 'How to Compress a PDF Online (Fast & Free Size Reduction)',
+    metaTitle: 'How to Compress a PDF to Reduce File Size Online',
     metaDescription: 'Step-by-step guide on how to shrink large PDF files for email attachments and portal submissions without making text blurry.',
     category: 'manage',
     readTime: '3 min read',
@@ -939,7 +939,7 @@ export const GUIDES: Guide[] = [
   {
     slug: 'how-to-merge-pdf-files',
     title: 'How to Merge Multiple PDF Files into One Document for Free',
-    metaTitle: 'How to Combine Multiple PDFs into One File (Free & Private)',
+    metaTitle: 'How to Merge Multiple PDF Files into One Online',
     metaDescription: 'Learn how to combine and arrange multiple PDF documents into a single organized file in seconds directly on your device.',
     category: 'manage',
     readTime: '3 min read',
@@ -971,7 +971,7 @@ export const GUIDES: Guide[] = [
   {
     slug: 'how-to-convert-pdf-to-ppt',
     title: 'How to Convert PDF Presentations to Editable PowerPoint (PPTX)',
-    metaTitle: 'Convert PDF to PowerPoint Online – Free PPTX Converter Guide',
+    metaTitle: 'Convert PDF to PowerPoint Online (PPTX Guide)',
     metaDescription: 'Detailed walkthrough on turning PDF slide handouts and presentation exports back into editable PowerPoint (.pptx) decks.',
     category: 'convert',
     readTime: '4 min read',
@@ -1033,7 +1033,7 @@ export const GUIDES: Guide[] = [
   {
     slug: 'how-to-redact-a-pdf',
     title: 'How to Permanently Redact and Black Out Sensitive Data in PDF',
-    metaTitle: 'How to Redact a PDF File Permanently (Protect Confidential Data)',
+    metaTitle: 'How to Redact a PDF File Permanently & Privately',
     metaDescription: 'Learn how true PDF redaction permanently destroys private text, SSNs, and numbers so they can never be recovered.',
     category: 'security',
     readTime: '5 min read',
@@ -1065,7 +1065,7 @@ export const GUIDES: Guide[] = [
   {
     slug: 'how-to-protect-a-pdf',
     title: 'How to Password Protect and Encrypt PDF Files with AES Security',
-    metaTitle: 'How to Password Protect a PDF Online (100% Free & Secure)',
+    metaTitle: 'How to Password Protect & Encrypt a PDF File',
     metaDescription: 'Protect confidential PDF files with 128/256-bit AES encryption and prevent unauthorized copying, printing, or editing.',
     category: 'security',
     readTime: '3 min read',
@@ -1096,7 +1096,7 @@ export const GUIDES: Guide[] = [
   {
     slug: 'how-to-split-a-pdf',
     title: 'How to Split PDF Pages and Extract Specific Page Ranges',
-    metaTitle: 'How to Split a PDF into Multiple Files Online (Free Guide)',
+    metaTitle: 'How to Split a PDF into Separate Pages Online',
     metaDescription: 'Learn how to extract individual pages or custom page ranges from large PDF documents in seconds.',
     category: 'manage',
     readTime: '3 min read',
@@ -1127,7 +1127,7 @@ export const GUIDES: Guide[] = [
   {
     slug: 'how-to-edit-a-pdf',
     title: 'How to Edit a PDF Online for Free: Add Text, Draw & Annotate',
-    metaTitle: 'How to Edit a PDF Document Online Free Without Adobe Acrobat',
+    metaTitle: 'How to Edit a PDF Online Free Without Acrobat',
     metaDescription: 'Add text notes, highlights, custom drawings, and images to any PDF document in your web browser.',
     category: 'edit',
     readTime: '4 min read',
@@ -1256,7 +1256,7 @@ export const GUIDES: Guide[] = [
 export const ENCYCLOPEDIA: EncyclopediaArticle[] = [
   {
     slug: 'what-is-pdf',
-    title: 'What is a PDF? The Complete Guide to Portable Document Format',
+    title: 'What is a PDF? Complete Portable Document Format Guide',
     metaTitle: 'What is a PDF? Definition, History & How PDFs Work',
     metaDescription: 'Everything you need to know about the Portable Document Format (PDF): history, architecture, vector graphics, and font embedding.',
     category: 'standards',
@@ -1283,7 +1283,7 @@ export const ENCYCLOPEDIA: EncyclopediaArticle[] = [
   {
     slug: 'pdf-vs-pdfa',
     title: 'PDF vs PDF/A: Key Differences for Long-Term Archiving',
-    metaTitle: 'PDF vs PDF/A: Differences, Standards (1a, 2b, 3) & Compliance',
+    metaTitle: 'PDF vs PDF/A: Key Differences & Compliance Guide',
     metaDescription: 'Understand the critical differences between standard PDF and PDF/A for legal, historical, and enterprise archiving compliance.',
     category: 'standards',
     readTime: '6 min read',
@@ -1345,7 +1345,7 @@ export const ENCYCLOPEDIA: EncyclopediaArticle[] = [
   {
     slug: 'searchable-pdf-vs-scanned-pdf',
     title: 'Searchable PDF vs Scanned PDF: Why Text Layers Matter',
-    metaTitle: 'Searchable PDF vs Scanned PDF: Text Layers & Searchability',
+    metaTitle: 'Searchable PDF vs Scanned PDF: Text Layers Guide',
     metaDescription: 'Learn the difference between flat scanned PDF images and dual-layer searchable PDFs containing hidden text layers.',
     category: 'technology',
     readTime: '4 min read',
@@ -1370,7 +1370,7 @@ export const ENCYCLOPEDIA: EncyclopediaArticle[] = [
   {
     slug: 'vector-vs-raster-pdf',
     title: 'Vector PDF vs Raster PDF: Why Some PDFs Pixelate When Zoomed',
-    metaTitle: 'Vector PDF vs Raster PDF: Differences, Zoom Quality & File Size',
+    metaTitle: 'Vector PDF vs Raster PDF: Differences & Clarity',
     metaDescription: 'Understand why vector PDFs maintain infinite sharpness while raster PDFs become blurry when zooming in.',
     category: 'technology',
     readTime: '4 min read',

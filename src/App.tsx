@@ -111,7 +111,7 @@ const SEOManager: React.FC = () => {
       title = `${tool.seoTitle || `${tool.title} Online`} | PDFBolt`;
       description = tool.description;
     } else if (pathNorm === '/tools' || pathNorm === '/pdf-tools') {
-      title = "All 25+ Online PDF Tools (Free & Unlimited) | PDFBolt Directory";
+      title = "All 25+ Free Online PDF Tools | PDFBolt Directory";
       description = "Browse our full suite of 25+ browser-based PDF tools. Fast, free, and private conversion, editing, and compression tools.";
     } else if (pathNorm === '/guides') {
       title = "Free PDF Guides, Tutorials & Document Processing Knowledge Base | PDFBolt";
@@ -120,7 +120,7 @@ const SEOManager: React.FC = () => {
       title = "PDF Format Encyclopedia & Technical Standards | PDFBolt";
       description = "Technical explainers on PDF specifications (ISO 32000), PDF/A digital preservation standards, OCR neural networks, and vector graphics.";
     } else if (pathNorm === '/compare/online-pdf-tools') {
-      title = "Online PDF Tools Comparison (2026) – Client-Side Privacy vs Cloud | PDFBolt";
+      title = "Online PDF Tools Comparison: Client vs Cloud | PDFBolt";
       description = "Compare client-side WebAssembly document processing vs cloud server upload converters and desktop Adobe Acrobat.";
     } else if (pathNorm === '/tools/pdf-size-calculator') {
       title = "Interactive PDF Size & Compression Calculator | PDFBolt";

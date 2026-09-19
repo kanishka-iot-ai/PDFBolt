@@ -14,7 +14,7 @@ CANONICAL_DOMAIN = "https://pdfbolt.in"
 CANONICAL_TOOLS = [
     {
         "path": "merge-pdf",
-        "title": "Merge PDF Online Free – Combine Multiple PDF Files | PDFBolt",
+        "title": "Merge PDF Online Free – Combine Multiple PDFs | PDFBolt",
         "description": "Combine multiple PDF files into one single document in seconds. 100% private in-browser processing with zero server uploads.",
         "h1": "Merge PDF Files Online",
         "subtitle": "Combine, stitch, and reorder multiple PDF documents into one single file with zero server uploads.",
@@ -299,7 +299,7 @@ CANONICAL_TOOLS = [
     },
     {
         "path": "ppt-to-pdf",
-        "title": "Convert PowerPoint to PDF Online Free (.pptx to .pdf) | PDFBolt",
+        "title": "Convert PPT to PDF Online Free (.pptx to .pdf) | PDFBolt",
         "description": "Convert PowerPoint presentations (.pptx) to PDF format with slide-by-slide layout preservation.",
         "h1": "Convert PowerPoint Slides (.pptx) to PDF",
         "subtitle": "Convert PowerPoint presentations (.pptx) into standardized PDF slide decks ready for printing and sharing.",
@@ -423,7 +423,7 @@ CANONICAL_TOOLS = [
     },
     {
         "path": "protect-pdf",
-        "title": "Protect PDF Online Free – Add Password & Encryption | PDFBolt",
+        "title": "Protect PDF Online Free – Encrypt & Lock PDF | PDFBolt",
         "description": "Encrypt and password-protect your PDF files using AES-128 and AES-256 standard encryption algorithms locally.",
         "h1": "Password Protect & Encrypt PDF Files",
         "subtitle": "Lock confidential PDF files with strong AES-128 or AES-256 encryption and custom permission controls.",
@@ -454,7 +454,7 @@ CANONICAL_TOOLS = [
     },
     {
         "path": "unlock-pdf",
-        "title": "Unlock PDF Online Free – Remove Password & Permissions | PDFBolt",
+        "title": "Unlock PDF Online Free – Remove Password Instantly | PDFBolt",
         "description": "Remove password protection and printing/copying restrictions from encrypted PDF files in your browser.",
         "h1": "Unlock Password Protected PDF Files",
         "subtitle": "Remove password prompts and printing restrictions from encrypted PDF documents you own.",
@@ -516,7 +516,7 @@ CANONICAL_TOOLS = [
     },
     {
         "path": "redact-pdf",
-        "title": "Redact PDF Online Free – Permanently Remove Sensitive Text | PDFBolt",
+        "title": "Redact PDF Online Free – Black Out Sensitive Text | PDFBolt",
         "description": "Permanently blackout and rasterize sensitive text, SSNs, and confidential information from PDF documents.",
         "h1": "Permanently Redact Sensitive Data from PDF",
         "subtitle": "Irreversibly black out confidential text, social security numbers, and financial details with true raster redaction.",
@@ -547,7 +547,7 @@ CANONICAL_TOOLS = [
     },
     {
         "path": "ocr-pdf",
-        "title": "OCR PDF Online Free – Extract Text from Scanned PDFs | PDFBolt",
+        "title": "OCR PDF Online Free – Convert Scans to Text | PDFBolt",
         "description": "Convert scanned PDF documents and images into selectable, searchable, and editable text using neural network OCR in your browser.",
         "h1": "Optical Character Recognition (OCR) for PDF",
         "subtitle": "Turn scanned document photos and non-selectable PDFs into searchable text with neural OCR.",
@@ -640,7 +640,7 @@ CANONICAL_TOOLS = [
     },
     {
         "path": "rotate-pdf",
-        "title": "Rotate PDF Pages Online Free – Permanent Orientation Fix | PDFBolt",
+        "title": "Rotate PDF Pages Online Free – Permanent Fix | PDFBolt",
         "description": "Rotate upside-down or sideways PDF pages by 90, 180, or 270 degrees. Save orientation changes permanently.",
         "h1": "Rotate PDF Pages Permanently Online",
         "subtitle": "Fix sideways and upside-down PDF pages by rotating 90°, 180°, or 270° clockwise or counter-clockwise.",
@@ -671,7 +671,7 @@ CANONICAL_TOOLS = [
     },
     {
         "path": "organize-pdf",
-        "title": "Organize PDF Pages Online Free – Reorder & Rearrange | PDFBolt",
+        "title": "Organize PDF Pages Online Free – Reorder Pages | PDFBolt",
         "description": "Rearrange, reorder, delete, and organize pages inside any multi-page PDF document with visual drag-and-drop.",
         "h1": "Organize & Reorder PDF Pages Online",
         "subtitle": "Rearrange, delete, duplicate, and sort pages in multi-page PDF files with intuitive visual drag-and-drop.",
@@ -733,7 +733,7 @@ CANONICAL_TOOLS = [
     },
     {
         "path": "watermark-pdf",
-        "title": "Watermark PDF Online Free – Add Text or Image Stamp | PDFBolt",
+        "title": "Watermark PDF Online Free – Add Stamp or Text | PDFBolt",
         "description": "Add custom text watermarks or company logo image stamps to all pages of your PDF document. Control opacity, angle, and position.",
         "h1": "Add Text & Image Watermark to PDF",
         "subtitle": "Stamp 'CONFIDENTIAL', 'DRAFT', or company logo watermarks across PDF pages with custom opacity and rotation.",
@@ -764,7 +764,7 @@ CANONICAL_TOOLS = [
     },
     {
         "path": "delete-pdf-pages",
-        "title": "Delete PDF Pages Online Free – Remove Unwanted Pages | PDFBolt",
+        "title": "Delete PDF Pages Online Free – Remove Pages | PDFBolt",
         "description": "Remove unwanted, blank, or duplicate pages from any PDF file and download a clean document immediately.",
         "h1": "Delete & Remove Pages from PDF Online",
         "subtitle": "Select and eliminate unwanted blank pages, cover sheets, or confidential sections from PDF documents.",
@@ -826,7 +826,7 @@ CANONICAL_TOOLS = [
     },
     {
         "path": "repair-pdf",
-        "title": "Repair PDF Online Free – Fix Damaged or Corrupted PDFs | PDFBolt",
+        "title": "Repair PDF Online Free – Fix Corrupted PDF Files | PDFBolt",
         "description": "Recover and repair corrupt, damaged, or unreadable PDF files by standardizing cross-reference tables and font descriptors.",
         "h1": "Repair Damaged & Corrupted PDF Files",
         "subtitle": "Recover corrupted, broken, or unreadable PDF files by rebuilding damaged XRef tables and object streams.",
@@ -957,7 +957,7 @@ CANONICAL_GUIDES = [
     {
         "slug": "how-to-convert-pdf-to-word",
         "title": "How to Convert PDF to Word (DOCX) Without Losing Formatting",
-        "metaTitle": "How to Convert PDF to Word for Free (Step-by-Step Guide) | PDFBolt",
+        "metaTitle": "How to Convert PDF to Word (DOCX) for Free | PDFBolt",
         "metaDescription": "Learn how to convert any PDF to an editable Microsoft Word (.docx) file for free in your browser with zero formatting loss or software installation.",
         "summary": "Converting a PDF into an editable Microsoft Word document allows you to update contracts, tweak resumes, and repurpose document text without tedious retyping.",
         "quick_answer": "To convert a PDF to Word: 1. Go to PDFBolt PDF to Word. 2. Drag & drop your PDF file into the uploader. 3. Click 'Convert to Word'. 4. Download your editable .docx file and open in Word or Google Docs.",
@@ -989,7 +989,7 @@ CANONICAL_GUIDES = [
     {
         "slug": "how-to-compress-a-pdf",
         "title": "How to Compress a PDF to Reduce File Size Below 10MB or 2MB",
-        "metaTitle": "How to Compress a PDF Online (Fast & Free Size Reduction) | PDFBolt",
+        "metaTitle": "How to Compress a PDF to Reduce File Size Online | PDFBolt",
         "metaDescription": "Step-by-step guide on how to shrink large PDF files for email attachments and portal submissions without making text blurry.",
         "summary": "Email providers and government portals often reject files larger than 10MB or 2MB. Learn how intelligent PDF compression removes redundant metadata while keeping vector text sharp.",
         "quick_answer": "To compress a PDF: 1. Open PDFBolt PDF Compressor. 2. Upload your file. 3. Select compression mode (Smart or Maximum). 4. Click 'Compress PDF' and download your optimized, lightweight file.",
@@ -1018,7 +1018,7 @@ CANONICAL_GUIDES = [
     {
         "slug": "how-to-merge-pdf-files",
         "title": "How to Merge Multiple PDF Files into One Document for Free",
-        "metaTitle": "How to Combine Multiple PDFs into One File (Free & Private) | PDFBolt",
+        "metaTitle": "How to Merge Multiple PDF Files into One Online | PDFBolt",
         "metaDescription": "Learn how to combine and arrange multiple PDF documents into a single organized file in seconds directly on your device.",
         "summary": "Combining various receipts, reports, or contracts into a single unified PDF simplifies distribution and ensures all pages stay in sequential order.",
         "quick_answer": "To merge PDF files: 1. Go to PDFBolt Merge PDF. 2. Upload 2 or more files. 3. Drag files to reorder pages. 4. Click 'Merge PDF' to stitch them together and download.",
@@ -1044,7 +1044,7 @@ CANONICAL_GUIDES = [
     {
         "slug": "how-to-convert-pdf-to-ppt",
         "title": "How to Convert PDF Presentations to Editable PowerPoint (PPTX)",
-        "metaTitle": "Convert PDF to PowerPoint Online – Free PPTX Converter Guide | PDFBolt",
+        "metaTitle": "Convert PDF to PowerPoint Online (PPTX Guide) | PDFBolt",
         "metaDescription": "Detailed walkthrough on turning PDF slide handouts and presentation exports back into editable PowerPoint (.pptx) decks.",
         "summary": "Reclaim editable slides from static PDF presentations with 1:1 page-to-slide mapping.",
         "quick_answer": "To convert PDF to PPT: 1. Upload your PDF slides to PDFBolt PDF to PPT. 2. Click 'Convert to PPTX'. 3. Download the presentation and open in PowerPoint or Google Slides.",
@@ -1094,7 +1094,7 @@ CANONICAL_GUIDES = [
     {
         "slug": "how-to-redact-a-pdf",
         "title": "How to Permanently Redact and Black Out Sensitive Data in PDF",
-        "metaTitle": "How to Redact a PDF File Permanently (Protect Confidential Data) | PDFBolt",
+        "metaTitle": "How to Redact a PDF File Permanently & Privately | PDFBolt",
         "metaDescription": "Learn how true PDF redaction permanently destroys private text, SSNs, and numbers so they can never be recovered.",
         "summary": "Drawing black boxes over text in a normal PDF editor does NOT remove the underlying text layer. Discover how true raster redaction ensures complete privacy.",
         "quick_answer": "To redact a PDF: 1. Open PDFBolt Redact Tool. 2. Drag black boxes over sensitive information. 3. Click 'Apply Redactions'. The file is flattened into a raster PDF with underlying text permanently destroyed.",
@@ -1120,7 +1120,7 @@ CANONICAL_GUIDES = [
     {
         "slug": "how-to-protect-a-pdf",
         "title": "How to Password Protect and Encrypt PDF Files with AES Security",
-        "metaTitle": "How to Password Protect a PDF Online (100% Free & Secure) | PDFBolt",
+        "metaTitle": "How to Password Protect & Encrypt a PDF File | PDFBolt",
         "metaDescription": "Protect confidential PDF files with 128/256-bit AES encryption and prevent unauthorized copying, printing, or editing.",
         "summary": "Encrypt confidential agreements, bank records, and medical files with strong passwords before sharing.",
         "quick_answer": "To password protect a PDF: 1. Upload your file to PDFBolt Protect PDF. 2. Type your secret password. 3. Click 'Protect PDF' to encrypt the document with AES encryption.",
@@ -1145,7 +1145,7 @@ CANONICAL_GUIDES = [
     {
         "slug": "how-to-split-a-pdf",
         "title": "How to Split PDF Pages and Extract Specific Page Ranges",
-        "metaTitle": "How to Split a PDF into Multiple Files Online (Free Guide) | PDFBolt",
+        "metaTitle": "How to Split a PDF into Separate Pages Online | PDFBolt",
         "metaDescription": "Learn how to extract individual pages or custom page ranges from large PDF documents in seconds.",
         "summary": "Extract specific pages or break a multi-page PDF into separate files easily.",
         "quick_answer": "To split a PDF: 1. Upload your PDF. 2. Enter target page numbers or ranges (e.g. 1-3, 5). 3. Click 'Split PDF' and download your extracted document.",
@@ -1170,7 +1170,7 @@ CANONICAL_GUIDES = [
     {
         "slug": "how-to-edit-a-pdf",
         "title": "How to Edit a PDF Online for Free: Add Text, Draw & Annotate",
-        "metaTitle": "How to Edit a PDF Document Online Free Without Adobe Acrobat | PDFBolt",
+        "metaTitle": "How to Edit a PDF Online Free Without Acrobat | PDFBolt",
         "metaDescription": "Add text notes, highlights, custom drawings, and images to any PDF document in your web browser.",
         "summary": "Annotate, type text, and highlight important clauses directly on your PDF pages.",
         "quick_answer": "To edit a PDF: 1. Upload your document to PDFBolt PDF Editor. 2. Use Text, Draw, or Image tools to add annotations. 3. Click 'Save PDF' to download your updated file.",
@@ -1195,7 +1195,7 @@ CANONICAL_GUIDES = [
     {
         "slug": "how-to-sign-a-pdf",
         "title": "How to Sign a PDF Document Online with Digital Signatures",
-        "metaTitle": "How to Sign a PDF Online (Draw, Type, or Upload Signature) | PDFBolt",
+        "metaTitle": "How to Sign a PDF Online (Digital Signatures) | PDFBolt",
         "metaDescription": "Create legally binding electronic signatures and sign PDF contracts, NDAs, and forms in your browser.",
         "summary": "Add professional digital signatures to contracts and agreements without printing and scanning paper.",
         "quick_answer": "To sign a PDF: 1. Open PDFBolt Sign PDF. 2. Draw or type your signature. 3. Stamp your signature onto the document and click 'Download Signed PDF'.",
@@ -1220,7 +1220,7 @@ CANONICAL_GUIDES = [
     {
         "slug": "how-to-ocr-a-pdf",
         "title": "How to OCR a PDF to Make Scanned Documents Searchable & Selectable",
-        "metaTitle": "How to OCR a PDF Online (Convert Scanned PDF to Searchable Text) | PDFBolt",
+        "metaTitle": "How to OCR a PDF: Convert Scans to Text Online | PDFBolt",
         "metaDescription": "Run optical character recognition on scanned paper documents and receipts to extract selectable, searchable text layers.",
         "summary": "Scanned documents and photos of receipts are flat image files where text cannot be selected or searched with Ctrl+F. Discover how OCR extracts machine-readable text layers.",
         "quick_answer": "To OCR a PDF: 1. Open PDFBolt OCR Tool. 2. Upload your scanned document. 3. Click 'Run OCR'. 4. Download a searchable PDF or copy extracted text.",
@@ -1277,8 +1277,8 @@ CANONICAL_GUIDES = [
 CANONICAL_ENCYCLOPEDIA = [
     {
         "slug": "what-is-pdf",
-        "title": "What is a PDF? The Complete Guide to Portable Document Format",
-        "metaTitle": "What is a PDF? Complete Guide to ISO 32000 Architecture | PDFBolt",
+        "title": "What is a PDF? Complete Portable Document Format Guide",
+        "metaTitle": "What is a PDF? Guide to the ISO 32000 Format | PDFBolt",
         "metaDescription": "Explore the history of PostScript, Camelot, and how Adobe transformed PDF into the global ISO 32000 open standard.",
         "summary": "PDF (Portable Document Format) is a universal file format developed by Adobe in 1993 and standardized as ISO 32000 that preserves document formatting independently of hardware, operating systems, or application software.",
         "key_takeaways": [
@@ -1299,7 +1299,7 @@ CANONICAL_ENCYCLOPEDIA = [
     {
         "slug": "pdf-vs-pdfa",
         "title": "PDF vs PDF/A: Key Differences for Long-Term Archiving",
-        "metaTitle": "PDF vs PDF/A: Differences, Standards (1a, 2b, 3) & Archiving | PDFBolt",
+        "metaTitle": "PDF vs PDF/A: Key Differences & Archiving Guide | PDFBolt",
         "metaDescription": "Understand the critical differences between standard PDF and PDF/A for legal, historical, and enterprise archiving compliance.",
         "summary": "PDF/A is an ISO-standardized version of PDF specifically designed for digital preservation and long-term archiving of electronic documents.",
         "key_takeaways": [
@@ -1320,7 +1320,7 @@ CANONICAL_ENCYCLOPEDIA = [
     {
         "slug": "what-is-ocr",
         "title": "What is OCR? Optical Character Recognition Explained",
-        "metaTitle": "What is OCR? How Optical Character Recognition Works for PDFs | PDFBolt",
+        "metaTitle": "What is OCR? Optical Character Recognition Guide | PDFBolt",
         "metaDescription": "How OCR algorithms convert scanned document images and paper photos into machine-readable, searchable PDF text.",
         "summary": "Optical Character Recognition (OCR) technology analyzes patterns of dark and light pixels in document images to recognize letters, numbers, and punctuation marks.",
         "key_takeaways": [
@@ -1343,7 +1343,7 @@ CANONICAL_ENCYCLOPEDIA = [
     {
         "slug": "searchable-pdf-vs-scanned-pdf",
         "title": "Searchable PDF vs Scanned PDF: Why Text Layers Matter",
-        "metaTitle": "Searchable PDF vs Scanned PDF: Text Layers & Searchability | PDFBolt",
+        "metaTitle": "Searchable PDF vs Scanned PDF: Text Layers Guide | PDFBolt",
         "metaDescription": "Learn the difference between flat scanned PDF images and dual-layer searchable PDFs containing hidden text layers.",
         "summary": "Understanding the difference between raw bitmap scans and dual-layer searchable PDF files is critical for document archiving and data extraction.",
         "key_takeaways": [
@@ -1364,7 +1364,7 @@ CANONICAL_ENCYCLOPEDIA = [
     {
         "slug": "vector-vs-raster-pdf",
         "title": "Vector PDF vs Raster PDF: Why Some PDFs Pixelate When Zoomed",
-        "metaTitle": "Vector PDF vs Raster PDF: Zoom Clarity & File Size Explained | PDFBolt",
+        "metaTitle": "Vector PDF vs Raster PDF: Clarity & Size Guide | PDFBolt",
         "metaDescription": "Understand why vector PDFs remain infinitely sharp when zoomed while raster PDFs become pixelated and blurry.",
         "summary": "Discover how vector bezier curves and font glyph outlines maintain infinite resolution compared to pixel-based raster graphics.",
         "key_takeaways": [
@@ -1390,7 +1390,7 @@ CANONICAL_ENCYCLOPEDIA = [
 CANONICAL_HUBS_AND_PAGES = [
     {
         "path": "tools",
-        "title": "All 25+ Online PDF Tools (Free & Unlimited) | PDFBolt Directory",
+        "title": "All 25+ Free Online PDF Tools | PDFBolt Directory",
         "description": "Browse our full suite of 25+ browser-based PDF tools. Fast, free, and private conversion, editing, and compression tools with zero server uploads.",
         "h1": "All Online PDF Tools",
         "subtitle": "Explore our complete suite of 25+ free, private, client-side PDF utilities with zero upload latency.",
@@ -1426,7 +1426,7 @@ CANONICAL_HUBS_AND_PAGES = [
     },
     {
         "path": "business-pdf-tools",
-        "title": "Enterprise & Business PDF Tools – 100% Confidential | PDFBolt",
+        "title": "Enterprise & Business PDF Tools (Confidential) | PDFBolt",
         "description": "Confidential PDF utilities for business: sign contracts, permanently redact financial data, encrypt invoices, and convert spreadsheets.",
         "h1": "Confidential PDF Toolkit for Business & Legal",
         "subtitle": "Privacy-first PDF utilities for legal teams, accounting departments, and enterprise workflows.",
@@ -1444,7 +1444,7 @@ CANONICAL_HUBS_AND_PAGES = [
     },
     {
         "path": "compare/online-pdf-tools",
-        "title": "Online PDF Tools Comparison (2026) – Client-Side Privacy vs Cloud | PDFBolt",
+        "title": "Online PDF Tools Comparison: Client vs Cloud | PDFBolt",
         "description": "Compare client-side WebAssembly document processing vs cloud server upload converters and desktop Adobe Acrobat.",
         "h1": "Online PDF Tools Comparison (2026)",
         "subtitle": "Benchmarking client-side privacy, upload latency, and security against legacy cloud upload tools.",
@@ -1492,7 +1492,7 @@ CANONICAL_HUBS_AND_PAGES = [
     },
     {
         "path": "about",
-        "title": "About PDFBolt – Privacy-First Document Intelligence | PDFBolt",
+        "title": "About PDFBolt – Privacy-First Document Toolkit | PDFBolt",
         "description": "Learn about PDFBolt's mission to provide lightning-fast, 100% private, browser-based PDF utilities with zero cloud uploads.",
         "h1": "About PDFBolt",
         "subtitle": "Our mission to bring private, client-side document processing to millions worldwide.",
@@ -2069,7 +2069,7 @@ def generate_prerendered_pages():
         generated_count += 1
 
     # Category 5: Homepage (Root Index)
-    home_title = "Free Online PDF Tools – 100% Private, Fast & In-Browser | PDFBolt"
+    home_title = "Free Online PDF Tools – 100% Private & Fast | PDFBolt"
     home_desc = "Use 25+ free online PDF tools to merge, compress, split, convert, edit and protect PDFs. 100% private in-browser WebAssembly processing with zero server uploads."
     home_canonical = f"{CANONICAL_DOMAIN}/"
 
