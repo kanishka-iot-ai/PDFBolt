@@ -1,7 +1,20 @@
+import os
+import time
+import warnings
+
+# Suppress PyMuPDF legacy fitz deprecation warning
+warnings.filterwarnings("ignore", message=".*The 'fitz' API is deprecated.*")
+
+# Ensure Fontconfig cache directory is writable in containerized environments (Render, Docker)
+_cache_dir = os.path.join(os.environ.get("XDG_CACHE_HOME", "/tmp/.cache"), "fontconfig")
+try:
+    os.makedirs(_cache_dir, exist_ok=True)
+except Exception:
+    pass
+
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-import time
 
 from backend.app.config import settings
 from backend.app.core.errors import PDFProcessingException, pdf_exception_handler, generic_exception_handler

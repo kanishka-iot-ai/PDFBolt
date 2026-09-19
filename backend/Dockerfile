@@ -14,16 +14,23 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3-opencv \
     fonts-liberation \
     fonts-dejavu \
+    fontconfig \
     curl \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Non-root user (security requirement)
+# Suppress pip root user warnings during container build
+ENV PIP_ROOT_USER_ACTION=ignore
+ENV PIP_DISABLE_PIP_VERSION_CHECK=1
+
+# Non-root user (security requirement) with writable fontconfig cache
 RUN groupadd -r pdfbolt && \
-    useradd -r -g pdfbolt -u 1001 pdfbolt && \
-    mkdir -p /tmp/pdfbolt && \
-    chown -R pdfbolt:pdfbolt /tmp/pdfbolt && \
-    chown -R pdfbolt:pdfbolt /app
+    useradd -r -g pdfbolt -u 1001 -m -d /home/pdfbolt pdfbolt && \
+    mkdir -p /tmp/pdfbolt /var/cache/fontconfig /home/pdfbolt/.cache/fontconfig && \
+    chown -R pdfbolt:pdfbolt /tmp/pdfbolt /var/cache/fontconfig /home/pdfbolt && \
+    chmod -R 777 /var/cache/fontconfig /tmp/pdfbolt && \
+    chown -R pdfbolt:pdfbolt /app && \
+    fc-cache -fv
 
 COPY requirements.txt requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
@@ -34,6 +41,7 @@ USER pdfbolt
 
 ENV PYTHONUNBUFFERED=1
 ENV TEMP_DIR=/tmp/pdfbolt
+ENV XDG_CACHE_HOME=/home/pdfbolt/.cache
 ENV STORAGE_BACKEND=local
 ENV QUEUE_BACKEND=local
 ENV PORT=8000

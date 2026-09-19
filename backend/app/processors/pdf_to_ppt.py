@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 from typing import Any, Dict
 
-import pymupdf as fitz
+import pymupdf
 from pptx import Presentation
 from pptx.util import Inches, Pt
 
@@ -39,7 +39,7 @@ class PdfToPptProcessor(BaseProcessor):
 
         try:
             logger.info(f"Converting '{input_pdf}' to PPTX with PyMuPDF and python-pptx...")
-            doc = fitz.open(str(input_pdf))
+            doc = pymupdf.open(str(input_pdf))
 
             if doc.page_count == 0:
                 doc.close()
@@ -59,7 +59,7 @@ class PdfToPptProcessor(BaseProcessor):
                 page = doc.load_page(page_num)  # Load page
 
                 # Render page to PNG image at 200 DPI (200 / 72 zoom matrix)
-                pix = page.get_pixmap(matrix=fitz.Matrix(200 / 72, 200 / 72))
+                pix = page.get_pixmap(matrix=pymupdf.Matrix(200 / 72, 200 / 72))
                 img_path = self.temp_dir / f"page_{page_num + 1}.png"
                 pix.save(str(img_path))
 

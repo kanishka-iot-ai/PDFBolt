@@ -5,7 +5,7 @@ import gc
 import tracemalloc
 import pytest
 import pypdf
-import fitz  # PyMuPDF
+import pymupdf as fitz
 from backend.app.processors.compress import CompressProcessor
 from backend.app.processors.merge import MergeProcessor
 from backend.app.processors.split import SplitProcessor
