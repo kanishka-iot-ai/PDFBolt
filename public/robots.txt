@@ -20,6 +20,7 @@ Allow: /about/
 Allow: /privacy/
 Allow: /terms/
 Allow: /contact/
+Allow: /test-files/
 
 # Block Unwanted Aggressive AI Scrapers & Data Harvesters
 User-agent: GPTBot
@@ -61,7 +62,6 @@ Disallow: /api/
 Disallow: /jobs/
 Disallow: /storage/
 Disallow: /qr-success
-Disallow: /test-files/
 
 # Sitemaps
 Sitemap: https://pdfbolt.in/sitemap.xml

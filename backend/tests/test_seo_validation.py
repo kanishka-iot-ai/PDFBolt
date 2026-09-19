@@ -82,13 +82,14 @@ def test_robots_txt_rules():
     # Public allowed
     assert "Allow: /" in content
     assert "Allow: /tools" in content
+    assert "Allow: /test-files/" in content
     
     # Private disallowed
     assert "Disallow: /api/" in content
     assert "Disallow: /jobs/" in content
     assert "Disallow: /storage/" in content
     assert "Disallow: /qr-success" in content
-    assert "Disallow: /test-files" in content
+    assert "Disallow: /test-files" not in content
     
     # No overly broad wildcard query blocking
     assert "Disallow: /*?*" not in content, "Wildcard /*?* should not be present"
@@ -124,12 +125,11 @@ def test_sitemap_contains_only_canonical_urls():
                 or f"https://pdfbolt.in/{tool_clean}/</loc>" in sitemap_content
             ), f"Canonical tool {tool} must be in sitemap"
 
-    # Ensure disallowed /test-files is not in any sitemap
-    workflows_sitemap_path = os.path.join(BASE_DIR, "public", "sitemap-workflows.xml")
-    if os.path.exists(workflows_sitemap_path):
-        with open(workflows_sitemap_path, "r", encoding="utf-8") as f:
-            wf_content = f.read()
-        assert "https://pdfbolt.in/test-files" not in wf_content, "Blocked path /test-files must not be in sitemap"
+    # Ensure public /test-files is in sitemap-tools.xml
+    if os.path.exists(tools_sitemap_path):
+        with open(tools_sitemap_path, "r", encoding="utf-8") as f:
+            tools_content = f.read()
+        assert "https://pdfbolt.in/test-files/" in tools_content, "Public /test-files/ must be in sitemap-tools.xml"
 
 
 def test_redirects_are_one_hop_permanent():
