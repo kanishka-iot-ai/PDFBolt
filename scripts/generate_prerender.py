@@ -2292,7 +2292,10 @@ def generate_prerendered_pages():
     write_page(base_template, "", home_title, home_desc, home_canonical, home_body_content, home_json_ld)
     generated_count += 1
 
+    generate_404_page(base_template)
+
     print(f"Successfully generated {generated_count} rich prerendered canonical pages in {DIST_DIR}!")
+
 
 def write_page(base_template, path, title, description, canonical_url, body_content, json_ld_schemas):
     # Determine target directory and file
@@ -2348,11 +2351,42 @@ def write_page(base_template, path, title, description, canonical_url, body_cont
         with open(flat_file, "w", encoding="utf-8") as out:
             out.write(html)
 
-    # Also generate 404.html fallback for SPA router
+def generate_404_page(base_template):
     fallback_404 = os.path.join(DIST_DIR, "404.html")
-    if not os.path.exists(fallback_404):
-        with open(fallback_404, "w", encoding="utf-8") as out:
-            out.write(base_template)
+    title = "404: Page Not Found – Free Online PDF Tools | PDFBolt"
+    description = "The page you are looking for does not exist. Browse PDFBolt's 25+ free online PDF tools to merge, compress, convert, split, and edit PDF files with 100% privacy."
+    
+    body_content = '''
+    <div style="max-width: 800px; margin: 0 auto; padding: 60px 20px; font-family: system-ui, -apple-system, sans-serif; text-align: center; color: #1e293b;">
+      <div style="font-size: 4.5rem; font-weight: 900; color: #eab308; line-height: 1; margin-bottom: 16px;">404</div>
+      <h1 style="font-size: 2.25rem; font-weight: 900; color: #0f172a; margin: 0 0 16px 0;">Page Not Found</h1>
+      <p style="font-size: 1.15rem; color: #64748b; max-width: 580px; margin: 0 auto 32px auto; line-height: 1.6;">
+        The requested page does not exist or may have been moved. You can return to the homepage or access our most popular free PDF tools below.
+      </p>
+      <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 40px;">
+        <a href="/" style="display: inline-block; padding: 12px 24px; background: #eab308; color: #000; font-weight: 700; border-radius: 8px; text-decoration: none;">Go to Homepage</a>
+        <a href="/tools/" style="display: inline-block; padding: 12px 24px; background: #f1f5f9; color: #0f172a; font-weight: 700; border-radius: 8px; text-decoration: none; border: 1px solid #cbd5e1;">All 25+ PDF Tools</a>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; text-align: left;">
+        <a href="/merge-pdf/" style="padding: 14px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; text-decoration: none; color: #0f172a; font-weight: 600;">Merge PDF &rarr;</a>
+        <a href="/compress-pdf/" style="padding: 14px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; text-decoration: none; color: #0f172a; font-weight: 600;">Compress PDF &rarr;</a>
+        <a href="/split-pdf/" style="padding: 14px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; text-decoration: none; color: #0f172a; font-weight: 600;">Split PDF &rarr;</a>
+        <a href="/pdf-to-word/" style="padding: 14px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; text-decoration: none; color: #0f172a; font-weight: 600;">PDF to Word &rarr;</a>
+      </div>
+    </div>
+    '''
+
+    html = re.sub(r'<title>.*?</title>', f'<title>{title}</title>', base_template)
+    html = re.sub(r'<meta name="description"[^>]*content=".*?"', f'<meta name="description" data-rh="true"\n    content="{description}"', html)
+    html = re.sub(
+        r'<div id="root">.*?</div>\s*<!-- Structured Data for SEO -->',
+        f'<div id="root">\n{body_content}\n  </div>\n\n  <!-- Structured Data for SEO -->',
+        html,
+        flags=re.DOTALL
+    )
+    with open(fallback_404, "w", encoding="utf-8") as out:
+        out.write(html)
 
 if __name__ == "__main__":
     generate_prerendered_pages()
+
