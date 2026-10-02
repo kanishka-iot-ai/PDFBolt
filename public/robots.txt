@@ -22,46 +22,84 @@ Allow: /terms/
 Allow: /contact/
 Allow: /test-files/
 
-# Block Unwanted Aggressive AI Scrapers & Data Harvesters
+# -------------------------------------------------------
+# AI Search Crawlers — ALLOWED (send referral traffic)
+# -------------------------------------------------------
+
+# ChatGPT search / Browse with Bing citations
 User-agent: GPTBot
-Disallow: /
+Allow: /
+Disallow: /api/
+Disallow: /jobs/
+Disallow: /storage/
 
+# ChatGPT real-time browsing
 User-agent: ChatGPT-User
-Disallow: /
+Allow: /
+Disallow: /api/
+Disallow: /jobs/
+Disallow: /storage/
 
+# Perplexity AI search
+User-agent: PerplexityBot
+Allow: /
+Disallow: /api/
+Disallow: /jobs/
+Disallow: /storage/
+
+# Anthropic Claude search citations
+User-agent: anthropic-ai
+Allow: /
+Disallow: /api/
+Disallow: /jobs/
+Disallow: /storage/
+
+User-agent: Claude-Web
+Allow: /
+Disallow: /api/
+Disallow: /jobs/
+Disallow: /storage/
+
+# -------------------------------------------------------
+# Aggressive Scrapers & Data Harvesters — BLOCKED
+# (Training data scrapers that don't send referral traffic)
+# -------------------------------------------------------
+
+# CommonCrawl training data scraper
 User-agent: CCBot
 Disallow: /
 
-User-agent: anthropic-ai
-Disallow: /
-
-User-agent: Claude-Web
-Disallow: /
-
+# ByteDance/TikTok aggressive scraper
 User-agent: Bytespider
 Disallow: /
 
+# Cohere training scraper
 User-agent: cohere-ai
 Disallow: /
 
+# Diffbot commercial data extraction
 User-agent: Diffbot
 Disallow: /
 
-User-agent: PerplexityBot
-Disallow: /
-
+# Omgili aggregator
 User-agent: Omgilibot
 Disallow: /
 
+# Facebook social scraper
 User-agent: FacebookBot
 Disallow: /
 
-# Private API endpoints, temporary processing jobs, and internal shares
+# -------------------------------------------------------
+# Private endpoints blocked for all bots
+# -------------------------------------------------------
 User-agent: *
 Disallow: /api/
 Disallow: /jobs/
 Disallow: /storage/
 Disallow: /qr-success
 
+# -------------------------------------------------------
 # Sitemaps
+# -------------------------------------------------------
 Sitemap: https://pdfbolt.in/sitemap.xml
+Sitemap: https://pdfbolt.in/llms.txt
