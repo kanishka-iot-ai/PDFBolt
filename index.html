@@ -17,59 +17,58 @@
     });
   </script>
 
-  <!-- Google Tag Manager (Deferred to avoid forced reflow) -->
+  <!-- Deferred Analytics (GTM, GA4) & AdSense (Eliminates main-thread blocking for mobile CWV) -->
   <script>
-    window.addEventListener('DOMContentLoaded', function() {
-      (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-      new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-      })(window,document,'script','dataLayer','GTM-N94RP8XG');
-    });
+    (function() {
+      var initialized = false;
+      function initThirdParty() {
+        if (initialized) return;
+        initialized = true;
+
+        ['pointerdown', 'touchstart', 'scroll', 'keydown'].forEach(function(ev) {
+          window.removeEventListener(ev, initThirdParty, { passive: true });
+        });
+
+        // 1. Google Tag Manager
+        (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+        new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+        'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+        })(window,document,'script','dataLayer','GTM-N94RP8XG');
+
+        // 2. Google Analytics 4
+        var ga = document.createElement('script');
+        ga.async = true;
+        ga.src = 'https://www.googletagmanager.com/gtag/js?id=G-2HPCS643PM';
+        document.head.appendChild(ga);
+        gtag('js', new Date());
+        gtag('config', 'G-2HPCS643PM');
+
+        // 3. Google AdSense SDK
+        var ads = document.createElement('script');
+        ads.async = true;
+        ads.crossOrigin = 'anonymous';
+        ads.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9225330373068045';
+        document.head.appendChild(ads);
+      }
+
+      ['pointerdown', 'touchstart', 'scroll', 'keydown'].forEach(function(ev) {
+        window.addEventListener(ev, initThirdParty, { passive: true, once: true });
+      });
+
+      if ('requestIdleCallback' in window) {
+        requestIdleCallback(function() { setTimeout(initThirdParty, 2500); }, { timeout: 4000 });
+      } else {
+        setTimeout(initThirdParty, 3500);
+      }
+    })();
   </script>
-  <!-- End Google Tag Manager -->
 
-  <title>Free Online PDF Tools – Merge, Compress & Edit | PDFBolt</title>
-  <meta id="seo-description" name="description" data-rh="true"
-    content="Use free online PDF tools to merge, compress, split, convert, edit and protect PDF files. 100% private in-browser processing with zero server uploads.">
-  <link rel="icon" type="image/x-icon" href="/favicon.ico">
-  <link rel="icon" type="image/png" sizes="512x512" href="/favicon-512x512.png">
-  <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192x192.png">
-  <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png">
-  <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-  <link rel="manifest" href="/manifest.json">
-  <!-- Preload LCP image — browser fetches this in parallel with HTML parsing -->
-  <link rel="preload" as="image" href="/pdfbolt-logo.webp" fetchpriority="high">
-
-  <meta name="theme-color" content="#eab308">
-  <link rel="canonical" data-rh="true" href="https://pdfbolt.in/" />
-
-  <!-- Bing Webmaster Tools Verification -->
-  <meta name="msvalidate.01" content="6AE93EFE7683B1C8EE89C7C019599E4D" />
-
-  <!-- Google tag (gtag.js) - Google Analytics 4 -->
+  <!-- Preconnect to Google Services for low-latency deferred loading -->
   <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
   <link rel="dns-prefetch" href="https://www.googletagmanager.com">
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-2HPCS643PM"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-
-    gtag('config', 'G-2HPCS643PM');
-  </script>
-
-  <!-- Preconnect to Google Ad Services -->
   <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossorigin>
-  <link rel="preconnect" href="https://fundingchoicesmessages.google.com" crossorigin>
   <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com">
-  <link rel="dns-prefetch" href="https://fundingchoicesmessages.google.com">
-
-  <!-- Google AdSense -->
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9225330373068045" crossorigin="anonymous"></script>
 
 
 

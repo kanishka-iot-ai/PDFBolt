@@ -58,18 +58,38 @@ export default defineConfig(({ mode }) => {
           entryFileNames: 'assets/[name]-[hash].js',
           assetFileNames: 'assets/[name]-[hash].[ext]',
           manualChunks(id) {
-            if (id.includes('node_modules')) {
+            const normalizedId = id.replace(/\\/g, '/');
+            if (normalizedId.includes('/node_modules/')) {
               if (
-                id.includes('react') || 
-                id.includes('react-dom') || 
-                id.includes('react-router') || 
-                id.includes('react-helmet') ||
-                id.includes('scheduler')
+                normalizedId.includes('/react/') || 
+                normalizedId.includes('/react-dom/') || 
+                normalizedId.includes('/react-router/') || 
+                normalizedId.includes('/react-router-dom/') || 
+                normalizedId.includes('/react-helmet-async/') ||
+                normalizedId.includes('/scheduler/')
               ) {
                 return 'vendor-core';
               }
-              if (id.includes('lucide-react')) {
+              if (normalizedId.includes('/lucide-react/')) {
                 return 'vendor-icons';
+              }
+              if (normalizedId.includes('/pdf-lib/') || normalizedId.includes('/pdf-lib-plus-encrypt/')) {
+                return 'vendor-pdflib';
+              }
+              if (normalizedId.includes('/jspdf/')) {
+                return 'vendor-jspdf';
+              }
+              if (normalizedId.includes('/exceljs/')) {
+                return 'vendor-exceljs';
+              }
+              if (normalizedId.includes('/docx/') || normalizedId.includes('/mammoth/')) {
+                return 'vendor-office';
+              }
+              if (normalizedId.includes('/html2canvas/')) {
+                return 'vendor-html2canvas';
+              }
+              if (normalizedId.includes('/tesseract.js/')) {
+                return 'vendor-tesseract';
               }
             }
           },
