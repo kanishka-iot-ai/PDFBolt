@@ -1551,6 +1551,32 @@ def build_full_platform_directory():
           </ul>
         </div>
         <div>
+          <h3 style="font-size: 1rem; font-weight: 700; color: #1e293b; margin-bottom: 10px;">Targeted Size & Exam Portals</h3>
+          <ul style="padding-left: 18px; margin: 0; font-size: 0.875rem; line-height: 1.8;">
+            <li><a href="/compress-pdf-to-20kb/" style="color: #b45309; text-decoration: underline;">Compress PDF to 20KB</a></li>
+            <li><a href="/compress-pdf-to-50kb/" style="color: #b45309; text-decoration: underline;">Compress PDF to 50KB</a></li>
+            <li><a href="/compress-pdf-to-100kb/" style="color: #b45309; text-decoration: underline;">Compress PDF to 100KB</a></li>
+            <li><a href="/compress-pdf-to-200kb/" style="color: #b45309; text-decoration: underline;">Compress PDF to 200KB</a></li>
+            <li><a href="/compress-pdf-to-300kb/" style="color: #b45309; text-decoration: underline;">Compress PDF to 300KB</a></li>
+            <li><a href="/compress-pdf-to-500kb/" style="color: #b45309; text-decoration: underline;">Compress PDF to 500KB</a></li>
+            <li><a href="/compress-pdf-to-1mb/" style="color: #b45309; text-decoration: underline;">Compress PDF to 1MB</a></li>
+            <li><a href="/compress-pdf-to-2mb/" style="color: #b45309; text-decoration: underline;">Compress PDF to 2MB</a></li>
+            <li><a href="/compress-pdf-for-ssc/" style="color: #b45309; text-decoration: underline;">Compress for SSC Exam</a></li>
+            <li><a href="/compress-pdf-for-upsc/" style="color: #b45309; text-decoration: underline;">Compress for UPSC OTR</a></li>
+            <li><a href="/compress-pdf-for-neet/" style="color: #b45309; text-decoration: underline;">Compress for NEET Exam</a></li>
+            <li><a href="/compress-pdf-for-jee/" style="color: #b45309; text-decoration: underline;">Compress for JEE Main</a></li>
+            <li><a href="/compress-pdf-for-ibps/" style="color: #b45309; text-decoration: underline;">Compress for IBPS Bank</a></li>
+            <li><a href="/compress-pdf-for-rrb/" style="color: #b45309; text-decoration: underline;">Compress for RRB Railway</a></li>
+            <li><a href="/pdf-size-reducer-for-government-portal/" style="color: #b45309; text-decoration: underline;">Govt Portal Size Reducer</a></li>
+            <li><a href="/merge-aadhaar-and-pan-card/" style="color: #b45309; text-decoration: underline;">Merge Aadhaar & PAN</a></li>
+            <li><a href="/merge-documents-for-visa-application/" style="color: #b45309; text-decoration: underline;">Merge Visa Documents</a></li>
+            <li><a href="/no-upload-pdf-tools/" style="color: #b45309; text-decoration: underline;">No-Upload Private Tools</a></li>
+            <li><a href="/compare/ilovepdf-alternative/" style="color: #b45309; text-decoration: underline;">iLovePDF Alternative</a></li>
+            <li><a href="/compare/smallpdf-alternative/" style="color: #b45309; text-decoration: underline;">Smallpdf Alternative</a></li>
+            <li><a href="/free-pdf-editor-no-watermark-no-signup/" style="color: #b45309; text-decoration: underline;">Free Editor (No Watermark)</a></li>
+          </ul>
+        </div>
+        <div>
           <h3 style="font-size: 1rem; font-weight: 700; color: #1e293b; margin-bottom: 10px;">Encyclopedia & Hubs</h3>
           <ul style="padding-left: 18px; margin: 0; font-size: 0.875rem; line-height: 1.8;">
             <li><a href="/encyclopedia/" style="color: #b45309; font-weight: bold; text-decoration: underline;">Encyclopedia Hub</a></li>
@@ -1725,7 +1751,15 @@ def generate_prerendered_pages():
         generated_count += 1
 
     # Category 2: Guides
-    for guide in CANONICAL_GUIDES:
+    try:
+        from targeted_pages_data import TARGETED_PAGES, EXTRA_GUIDES
+    except ImportError:
+        import sys
+        sys.path.append(os.path.dirname(__file__))
+        from targeted_pages_data import TARGETED_PAGES, EXTRA_GUIDES
+
+    all_guides = CANONICAL_GUIDES + EXTRA_GUIDES
+    for guide in all_guides:
         path = f"guides/{guide['slug']}"
         title = guide.get("metaTitle", f"{guide['title']} | PDFBolt Guide")
         description = guide["metaDescription"]
@@ -2091,6 +2125,142 @@ def generate_prerendered_pages():
         write_page(base_template, path, title, description, canonical_url, body_content, json_ld_schemas)
         generated_count += 1
 
+    # Category 4B: Targeted High-Intent Landing Pages (Size, Exams, Workflows, Alternatives)
+    for tp in TARGETED_PAGES:
+        path = tp["path"]
+        title = tp["title"]
+        description = tp["description"]
+        h1 = tp["h1"]
+        subtitle = tp.get("subtitle", description)
+        canonical_url = f"{CANONICAL_DOMAIN}/{path}/"
+
+        features_li = "".join([f"<li style='margin-bottom: 8px;'>{f}</li>" for f in tp.get("features", [])])
+        steps_ol = "".join([f"<li style='margin-bottom: 12px;'><strong>{s['name']}:</strong> {s['text']}</li>" for s in tp.get("how_to", [])])
+
+        portal_table_html = ""
+        if "portal_specs" in tp and tp["portal_specs"]:
+            rows_html = "".join([f"""
+            <tr>
+              <td style="padding: 10px; border: 1px solid #e2e8f0; font-weight: bold;">{ps['name']}</td>
+              <td style="padding: 10px; border: 1px solid #e2e8f0; color: #b45309; font-weight: 800;">{ps['size']}</td>
+              <td style="padding: 10px; border: 1px solid #e2e8f0;">{ps['format']}</td>
+              <td style="padding: 10px; border: 1px solid #e2e8f0; font-size: 0.85rem; color: #64748b;">{ps['notes']}</td>
+            </tr>
+            """ for ps in tp["portal_specs"]])
+            portal_table_html = f"""
+            <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; margin-bottom: 32px;">
+              <h2 style="font-size: 1.35rem; font-weight: 800; color: #0f172a; margin: 0 0 16px 0;">Official Portal Document Specifications</h2>
+              <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem;">
+                <thead>
+                  <tr style="background: #f1f5f9;">
+                    <th style="padding: 10px; border: 1px solid #e2e8f0;">Document Type</th>
+                    <th style="padding: 10px; border: 1px solid #e2e8f0;">Mandatory Size</th>
+                    <th style="padding: 10px; border: 1px solid #e2e8f0;">Format</th>
+                    <th style="padding: 10px; border: 1px solid #e2e8f0;">Requirements</th>
+                  </tr>
+                </thead>
+                <tbody>{rows_html}</tbody>
+              </table>
+            </div>
+            """
+
+        faqs_html = ""
+        faq_schema_entities = []
+        for faq in tp.get("faqs", []):
+            faqs_html += f"""
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 18px; margin-bottom: 12px;">
+              <h3 style="font-size: 1.05rem; font-weight: 700; color: #0f172a; margin: 0 0 6px 0;">{faq['q']}</h3>
+              <p style="margin: 0; color: #475569; font-size: 0.95rem;">{faq['a']}</p>
+            </div>
+            """
+            faq_schema_entities.append({
+                "@type": "Question",
+                "name": faq["q"],
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": faq["a"]
+                }
+            })
+
+        related_li = "".join([f'<li style="margin-bottom: 6px;"><a href="/{r[0]}/" style="color: #b45309; text-decoration: underline; font-weight: 600;">{r[1]}</a></li>' for r in tp.get("related", [])])
+
+        body_content = f"""
+        <div style="max-width: 1000px; margin: 0 auto; padding: 32px 20px; font-family: system-ui, -apple-system, sans-serif; line-height: 1.65; color: #1e293b;">
+          <nav aria-label="Breadcrumb" style="margin-bottom: 24px; font-size: 0.875rem; color: #64748b;">
+            <a href="/" style="color: #b45309; text-decoration: none;">Home</a> &gt; 
+            <a href="/tools/" style="color: #b45309; text-decoration: none;">PDF Tools</a> &gt; 
+            <span style="color: #0f172a; font-weight: 600;">{h1}</span>
+          </nav>
+
+          <header style="margin-bottom: 32px; border-bottom: 1px solid #e2e8f0; padding-bottom: 24px;">
+            <div style="display: inline-block; padding: 4px 12px; background: #fef3c7; color: #92400e; font-size: 0.75rem; font-weight: 800; border-radius: 9999px; text-transform: uppercase; margin-bottom: 12px;">{tp.get('target_badge', '100% Private Local Tool')}</div>
+            <h1 style="font-size: 2.5rem; font-weight: 900; color: #0f172a; margin: 0 0 12px 0; line-height: 1.2;">{h1}</h1>
+            <p style="font-size: 1.2rem; color: #475569; margin: 0; max-width: 800px;">{subtitle}</p>
+          </header>
+
+          <div style="background: #fffbeb; border: 1px solid #fef3c7; border-left: 4px solid #f59e0b; border-radius: 12px; padding: 20px; margin-bottom: 32px;">
+            <h2 style="font-size: 1.15rem; font-weight: 700; color: #92400e; margin: 0 0 8px 0;">Quick Summary</h2>
+            <p style="margin: 0; color: #78350f; font-size: 1rem;">{tp.get('quick_answer', description)}</p>
+          </div>
+
+          {portal_table_html}
+
+          <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; margin-bottom: 32px;">
+            <h2 style="font-size: 1.35rem; font-weight: 800; color: #0f172a; margin: 0 0 16px 0;">Key Capabilities & Privacy Features</h2>
+            <ul style="padding-left: 20px; margin: 0; color: #334155;">{features_li}</ul>
+          </div>
+
+          <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; margin-bottom: 32px;">
+            <h2 style="font-size: 1.35rem; font-weight: 800; color: #0f172a; margin: 0 0 16px 0;">Step-by-Step Instructions</h2>
+            <ol style="padding-left: 20px; margin: 0; color: #334155;">{steps_ol}</ol>
+          </div>
+
+          <div style="margin-bottom: 32px;">
+            <h2 style="font-size: 1.35rem; font-weight: 800; color: #0f172a; margin-bottom: 16px;">Frequently Asked Questions</h2>
+            {faqs_html}
+          </div>
+
+          <div style="background: #f1f5f9; border-radius: 12px; padding: 20px; margin-bottom: 32px;">
+            <h3 style="font-size: 1.1rem; font-weight: 700; color: #0f172a; margin: 0 0 12px 0;">Related Tools</h3>
+            <ul style="list-style: none; padding: 0; margin: 0;">{related_li}</ul>
+          </div>
+
+          {full_directory_html}
+        </div>
+        """
+
+        json_ld_schemas = [
+            {
+                "@context": "https://schema.org",
+                "@type": "WebApplication",
+                "name": f"PDFBolt {h1}",
+                "url": canonical_url,
+                "description": description,
+                "applicationCategory": "UtilitiesApplication",
+                "operatingSystem": "Web Browser, Windows, macOS, Linux, iOS, Android",
+                "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}
+            },
+            {
+                "@context": "https://schema.org",
+                "@type": "BreadcrumbList",
+                "itemListElement": [
+                    {"@type": "ListItem", "position": 1, "name": "Home", "item": f"{CANONICAL_DOMAIN}/"},
+                    {"@type": "ListItem", "position": 2, "name": "PDF Tools", "item": f"{CANONICAL_DOMAIN}/tools/"},
+                    {"@type": "ListItem", "position": 3, "name": h1, "item": canonical_url}
+                ]
+            }
+        ]
+
+        if faq_schema_entities:
+            json_ld_schemas.append({
+                "@context": "https://schema.org",
+                "@type": "FAQPage",
+                "mainEntity": faq_schema_entities
+            })
+
+        write_page(base_template, path, title, description, canonical_url, body_content, json_ld_schemas)
+        generated_count += 1
+
     # Category 5: Homepage (Root Index)
     home_title = "Free Online PDF Tools – Merge, Compress & Edit | PDFBolt"
     home_desc = "Use 25+ free online PDF tools to merge, compress, split, convert, edit and protect PDFs. 100% private in-browser WebAssembly processing with zero server uploads."
@@ -2337,10 +2507,10 @@ def write_page(base_template, path, title, description, canonical_url, body_cont
     html = re.sub(r'<title>.*?</title>', f'<title>{title}</title>', base_template)
 
     # Replace Description
-    html = re.sub(r'<meta name="description"[^>]*content=".*?"', f'<meta name="description" data-rh="true"\n    content="{description}"', html)
+    html = re.sub(r'<meta[^>]*name="description"[^>]*>', f'<meta id="seo-description" name="description" data-rh="true"\n    content="{description}">', html)
 
     # Replace Canonical
-    html = re.sub(r'<link rel="canonical"[^>]*>', f'<link rel="canonical" data-rh="true" href="{canonical_url}" />', html)
+    html = re.sub(r'<link[^>]*rel="canonical"[^>]*>', f'<link rel="canonical" data-rh="true" href="{canonical_url}" />', html)
 
     # Replace OpenGraph
     html = re.sub(r'<meta property="og:title"[^>]*>', f'<meta property="og:title" data-rh="true" content="{title}" />', html)

@@ -1247,6 +1247,262 @@ export const GUIDES: Guide[] = [
     ],
     relatedGuides: ['how-to-split-a-pdf', 'how-to-remove-pages-from-pdf'],
     relatedTools: [ToolType.DELETE_PAGES, ToolType.SPLIT, ToolType.ORGANIZE]
+  },
+  {
+    slug: 'is-it-safe-to-upload-pdf-online',
+    title: 'Is It Safe to Upload PDF Files to Online Converters? (2026 Security Guide)',
+    metaTitle: 'Is It Safe to Upload PDF Online? Security Risks Explained',
+    metaDescription: 'Learn the hidden security risks of cloud-based PDF converters and why in-browser WebAssembly processing guarantees 100% document privacy.',
+    category: 'security',
+    readTime: '5 min read',
+    difficulty: 'Beginner',
+    updatedAt: '2026-10-05',
+    toolId: ToolType.REDACT,
+    summary: 'Discover where your documents go when you upload them to online PDF tools, what data retention policies really mean, and how client-side WebAssembly protects your confidential files.',
+    quickAnswer: 'Most traditional online PDF converters transmit your documents across the internet and store them on third-party servers. In contrast, client-side tools like PDFBolt process your PDF entirely in your browser RAM using WebAssembly, meaning zero file bytes leave your device.',
+    steps: [
+      { name: 'Understand Cloud Exposure', text: 'Cloud converters send your PDF to remote servers where files sit temporarily in storage.' },
+      { name: 'Check for In-Browser Processing', text: 'Look for WebAssembly-powered tools that process documents locally in RAM.' },
+      { name: 'Verify in Network Monitor', text: 'Open DevTools (F12) to confirm zero POST uploads occur when processing files.' }
+    ],
+    detailedContent: [
+      {
+        heading: 'The Hidden Risks of Cloud-Based PDF Conversion',
+        paragraphs: [
+          'Whenever you convert a bank statement, medical lab report, or employment agreement on a typical PDF website, your file travels through intermediate routers and lands on an unknown cloud server.',
+          'Even if a service claims to "delete files after 2 hours", your data remains vulnerable to misconfigured cloud buckets, server-side data leaks, and unauthorized access during that retention window.',
+          'PDFBolt solves this fundamentally: by compiling document parsing engines to WebAssembly, the code runs inside your local browser tab. No bytes leave your device.'
+        ]
+      }
+    ],
+    faqs: [
+      { q: 'Can websites read the contents of my PDF?', a: 'Traditional cloud converters can theoretically access your text. PDFBolt runs locally on your machine, so we never see your file contents.' },
+      { q: 'Is client-side processing safe for HIPAA and confidential legal documents?', a: 'Yes! Because files are never transferred to a third party, client-side execution complies naturally with strict non-disclosure and privacy standards.' }
+    ],
+    relatedGuides: ['how-to-redact-a-pdf', 'how-to-protect-a-pdf'],
+    relatedTools: [ToolType.REDACT, ToolType.PROTECT, ToolType.COMPRESS]
+  },
+  {
+    slug: 'reduce-pdf-size-for-email',
+    title: 'How to Reduce PDF File Size for Email Attachments (Gmail, Outlook & Apple Mail)',
+    metaTitle: 'How to Reduce PDF Size for Email (Gmail & Outlook Guide)',
+    metaDescription: 'Step-by-step guide to shrink heavy PDF attachments below 20MB, 10MB, or 1MB for Gmail, Outlook, and corporate mail servers without losing readability.',
+    category: 'manage',
+    readTime: '4 min read',
+    difficulty: 'Beginner',
+    updatedAt: '2026-10-05',
+    toolId: ToolType.COMPRESS,
+    summary: 'Email providers reject attachments larger than 20MB or 25MB. Learn how intelligent PDF compression shrinks files down to under 1MB or 2MB so emails never bounce.',
+    quickAnswer: 'To reduce PDF size for email: 1. Open PDFBolt Compress PDF. 2. Drag & drop your large PDF. 3. Select "Recommended" or "Extreme" compression. 4. Download your email-friendly file under 2MB.',
+    steps: [
+      { name: 'Upload Heavy Document', text: 'Select your portfolio, proposal, or scanned invoice.' },
+      { name: 'Select Email Preset', text: 'Choose Recommended to reduce size while keeping text sharp.' },
+      { name: 'Attach & Send', text: 'Download the lightweight file and attach it directly to your email.' }
+    ],
+    detailedContent: [
+      {
+        heading: 'Email Attachment Limits for Popular Providers',
+        paragraphs: [
+          'Gmail and Google Workspace enforce a strict 25MB attachment ceiling. Microsoft Outlook and corporate Exchange servers often limit incoming files to 10MB or 20MB. When an email bounces, deals stall.',
+          'PDFBolt recompresses high-resolution image streams and purges dead XML metadata, reducing file size by 70% to 90% without degrading readable fonts.'
+        ]
+      }
+    ],
+    faqs: [
+      { q: 'What is the best PDF size for an email attachment?', a: 'Between 500KB and 2MB is ideal. It guarantees delivery across all mobile networks and corporate firewalls.' }
+    ],
+    relatedGuides: ['how-to-compress-a-pdf', 'how-to-compress-pdf-on-mobile'],
+    relatedTools: [ToolType.COMPRESS, ToolType.SPLIT]
+  },
+  {
+    slug: 'how-to-compress-pdf-on-mobile',
+    title: 'How to Compress PDF on iPhone & Android Without Installing Apps',
+    metaTitle: 'Compress PDF on Mobile (iPhone & Android Guide) | PDFBolt',
+    metaDescription: 'Learn how to shrink large PDF files directly in Safari or Chrome on your smartphone in seconds without downloading third-party scanner apps.',
+    category: 'manage',
+    readTime: '3 min read',
+    difficulty: 'Beginner',
+    updatedAt: '2026-10-05',
+    toolId: ToolType.COMPRESS,
+    summary: 'Shrink oversized PDFs on the go directly in Safari on iOS or Chrome on Android without filling your phone memory with sketchy utility apps.',
+    quickAnswer: 'To compress PDF on mobile: 1. Open pdfbolt.in/compress-pdf in your mobile browser. 2. Tap to upload from Files, Photos, or Google Drive. 3. Tap "Compress PDF" and save the smaller document to your phone.',
+    steps: [
+      { name: 'Open in Mobile Browser', text: 'Navigate to PDFBolt on Safari or Chrome.' },
+      { name: 'Pick Document', text: 'Tap the upload zone and select your file from device storage.' },
+      { name: 'Save to Files', text: 'Download the compressed PDF directly to your device downloads folder.' }
+    ],
+    detailedContent: [
+      {
+        heading: 'Why You Don’t Need a Dedicated Scanner App',
+        paragraphs: [
+          'Most mobile "PDF scanner" apps in the App Store and Google Play are filled with intrusive ads, subscriptions, and invasive telemetry tracking.',
+          'PDFBolt is fully responsive and executes WebAssembly locally on mobile chipsets, delivering desktop-class compression right inside your mobile browser.'
+        ]
+      }
+    ],
+    faqs: [
+      { q: 'Does this work on both iPhone and Android?', a: 'Yes! Compatible with iOS 14+ (Safari) and Android (Chrome, Firefox, Brave).' }
+    ],
+    relatedGuides: ['how-to-compress-a-pdf', 'reduce-pdf-size-for-email'],
+    relatedTools: [ToolType.COMPRESS, ToolType.MERGE]
+  },
+  {
+    slug: 'how-to-remove-password-from-pdf',
+    title: 'How to Remove Password from PDF Without Paying for Acrobat',
+    metaTitle: 'Remove PDF Password Free Online (Unlock PDF Guide) | PDFBolt',
+    metaDescription: 'Easily remove passwords from encrypted PDF files online for free. Unlock print, copy, and edit restrictions permanently without paid software.',
+    category: 'security',
+    readTime: '3 min read',
+    difficulty: 'Beginner',
+    updatedAt: '2026-10-05',
+    toolId: ToolType.UNLOCK,
+    summary: 'Tired of typing a password every time you open your bank statement or e-Aadhaar? Learn how to permanently remove passwords from files you own.',
+    quickAnswer: 'To remove a password from PDF: 1. Open PDFBolt Unlock PDF. 2. Upload your locked file. 3. Enter the valid document password once. 4. Click "Unlock PDF" to download a permanently decrypted file.',
+    steps: [
+      { name: 'Upload Locked PDF', text: 'Select your password-protected PDF document.' },
+      { name: 'Enter Current Password', text: 'Type your authorized password.' },
+      { name: 'Download Unlocked File', text: 'Save your unlocked PDF. It will now open freely without password prompts.' }
+    ],
+    detailedContent: [
+      {
+        heading: 'The Difference Between User Passwords and Permissions Passwords',
+        paragraphs: [
+          'User (Open) passwords prevent unauthorized people from viewing the document. Owner (Permissions) passwords allow viewing but disable printing, copying text, or editing pages.',
+          'PDFBolt can permanently decrypt the file once the correct key is provided, generating a clean ISO-standard PDF that can be uploaded to government portals without password errors.'
+        ]
+      }
+    ],
+    faqs: [
+      { q: 'Can I unlock a PDF if I don’t know the password?', a: 'No. For legal and security reasons, PDFBolt does not perform illegal brute-force decryption. You must supply the authorized password.' }
+    ],
+    relatedGuides: ['how-to-protect-a-pdf', 'how-to-redact-a-pdf'],
+    relatedTools: [ToolType.UNLOCK, ToolType.PROTECT]
+  },
+  {
+    slug: 'how-to-edit-a-scanned-pdf',
+    title: 'How to Edit a Scanned PDF & Make Text Searchable with OCR',
+    metaTitle: 'How to Edit a Scanned PDF & Make It Searchable Online',
+    metaDescription: 'Turn scanned paper documents and photo receipts into selectable, searchable, and editable text using in-browser Optical Character Recognition (OCR).',
+    category: 'convert',
+    readTime: '4 min read',
+    difficulty: 'Intermediate',
+    updatedAt: '2026-10-05',
+    toolId: ToolType.OCR,
+    summary: 'Scanned PDFs are essentially collections of static images where you cannot search, select, or copy text. Discover how OCR extracts text layers for easy editing.',
+    quickAnswer: 'To edit a scanned PDF: 1. Open PDFBolt OCR PDF. 2. Upload your scanned document. 3. The OCR engine recognizes letterforms and builds a searchable text layer. 4. Download your searchable PDF or export to Word (.docx).',
+    steps: [
+      { name: 'Upload Scanned Document', text: 'Select the scanned paper or photo PDF.' },
+      { name: 'Run Optical Character Recognition', text: 'Our neural OCR analyzes letterforms across pages.' },
+      { name: 'Edit & Copy Text', text: 'Download a searchable PDF or convert to Word to edit paragraphs.' }
+    ],
+    detailedContent: [
+      {
+        heading: 'Why Scanned PDFs Cannot Be Edited Directly',
+        paragraphs: [
+          'When you scan a paper document, your scanner takes a photograph and saves it inside a PDF container. To make the text selectable or editable in Word, an OCR engine must recognize glyphs, font sizes, and paragraph margins.'
+        ]
+      }
+    ],
+    faqs: [
+      { q: 'Does OCR work on handwritten notes?', a: 'For handwriting, use our specialized "Scan Handwriting to PDF" tool, which uses optimized neural models for cursive script.' }
+    ],
+    relatedGuides: ['how-to-ocr-a-pdf', 'how-to-convert-pdf-to-word'],
+    relatedTools: [ToolType.OCR, ToolType.PDF_TO_WORD, ToolType.SCAN_HANDWRITING]
+  },
+  {
+    slug: 'how-to-sign-a-pdf-without-printing',
+    title: 'How to Sign a PDF Document Online Without Printing or Scanning',
+    metaTitle: 'Sign a PDF Online Free (No Printing Required) | PDFBolt',
+    metaDescription: 'Add legally binding digital signatures, initials, and dates to contracts and agreements directly in your browser on phone or desktop.',
+    category: 'security',
+    readTime: '3 min read',
+    difficulty: 'Beginner',
+    updatedAt: '2026-10-05',
+    toolId: ToolType.SIGN,
+    summary: 'Never print, physically sign, and scan a contract again. Draw your signature or upload an image and stamp it anywhere on your PDF in seconds.',
+    quickAnswer: 'To sign a PDF online: 1. Go to PDFBolt Sign PDF. 2. Upload your agreement or form. 3. Draw your signature with your mouse or finger, or type your name. 4. Position your signature on the page and click "Sign PDF".',
+    steps: [
+      { name: 'Open Document', text: 'Upload the contract or form requiring your signature.' },
+      { name: 'Draw or Upload Signature', text: 'Use your finger or mouse to draw a smooth signature.' },
+      { name: 'Place & Burn Signature', text: 'Position signature on the signature line and download.' }
+    ],
+    detailedContent: [
+      {
+        heading: 'Are Electronic Signatures Legally Binding?',
+        paragraphs: [
+          'Yes. Under the US ESIGN Act, UETA, European eIDAS regulations, and the Indian Information Technology Act (IT Act 2000), electronic signatures created with the intent to sign are legally recognized for most commercial and personal contracts.'
+        ]
+      }
+    ],
+    faqs: [
+      { q: 'Can I save my signature for future documents?', a: 'Yes! PDFBolt lets you save your signature in your local browser storage for one-click re-use.' }
+    ],
+    relatedGuides: ['how-to-protect-a-pdf', 'how-to-redact-a-pdf'],
+    relatedTools: [ToolType.SIGN, ToolType.EDIT, ToolType.PROTECT]
+  },
+  {
+    slug: 'pdf-compress-kaise-kare',
+    title: 'PDF Compress Kaise Kare: Mobile aur Computer Me PDF Size Kam Karne Ka Tarika',
+    metaTitle: 'PDF Compress Kaise Kare: PDF Size Kam Karne Ka Asan Tarika',
+    metaDescription: 'Janiye mobile aur laptop me PDF ka size kaise kam kare (50KB, 100KB, 200KB). Sarkari exam aur job portal ke liye PDF compress karne ka sabse asan aur free tarika.',
+    category: 'manage',
+    readTime: '3 min read',
+    difficulty: 'Beginner',
+    updatedAt: '2026-10-05',
+    toolId: ToolType.COMPRESS,
+    summary: 'Sarkari naukri, college admission aur exam form me badi PDF files upload nahi hoti. Seekhiye kaise PDFBolt se bina quality kharab kiye PDF ka size kam karein.',
+    quickAnswer: 'PDF compress karne ke liye: 1. PDFBolt Compress PDF par jayein. 2. Apni PDF file ko select ya drop karein. 3. Compression level (Recommended ya Extreme) chunein. 4. "Compress PDF" par click karke choti size wali PDF download karein.',
+    steps: [
+      { name: 'PDF File Upload Karein', text: 'Apne mobile ya laptop se badi PDF file ko chunein.' },
+      { name: 'Compression Setting Select Karein', text: '50KB, 100KB ya 200KB limit ke hisab se setting chunein.' },
+      { name: 'Download Karein', text: 'Compressed PDF ko download karein aur portal par upload karein.' }
+    ],
+    detailedContent: [
+      {
+        heading: 'Sarkari Form Me PDF Size Kam Karna Kyun Zaroori Hai?',
+        paragraphs: [
+          'SSC, UPSC, Railway (RRB) aur NTA NEET jaise exam portals par 50KB se 200KB ki strict limit hoti hai. Agar PDF badi ho toh website error dikhati hai.',
+          'PDFBolt aapke documents ko bina kisi cloud server par bheje, direct aapke mobile browser me compress karta hai, jisse aapka Aadhaar ya marksheet 100% safe rehta hai.'
+        ]
+      }
+    ],
+    faqs: [
+      { q: 'Kya PDF compress karne se text dhundhla ho jayega?', a: 'Nahi! PDFBolt text ko bilkul saaf aur readable rakhta hai.' },
+      { q: 'Kya yeh service free hai?', a: 'Haan, PDFBolt 100% free hai aur isme koi limit ya registration nahi hai.' }
+    ],
+    relatedGuides: ['jpg-ko-pdf-kaise-banaye', 'how-to-compress-a-pdf'],
+    relatedTools: [ToolType.COMPRESS, ToolType.MERGE]
+  },
+  {
+    slug: 'jpg-ko-pdf-kaise-banaye',
+    title: 'JPG Se PDF Kaise Banaye: Photo ko PDF Me Convert Karne Ka Free Tarika',
+    metaTitle: 'JPG Se PDF Kaise Banaye: Photo ko PDF Me Convert Kare Free',
+    metaDescription: 'Mobile se photo ya scanned marksheet ko PDF file me kaise convert kare. Sarkari form, Aadhaar aur exam form ke liye JPG to PDF banane ki poori jankari.',
+    category: 'convert',
+    readTime: '3 min read',
+    difficulty: 'Beginner',
+    updatedAt: '2026-10-05',
+    toolId: ToolType.JPG_TO_PDF,
+    summary: 'Apne mobile se khinchi gayi marksheet ya certificate ki photos ko ek single, clean PDF file me convert karein bina kisi app ko install kiye.',
+    quickAnswer: 'JPG se PDF banane ke liye: 1. PDFBolt JPG to PDF tool kholein. 2. Apni photos ya scanned JPG files upload karein. 3. "Convert to PDF" par click karein aur apni PDF file download karein.',
+    steps: [
+      { name: 'Photos Select Karein', text: 'Gallery ya camera se apni photos chunein.' },
+      { name: 'Sequence Set Karein', text: 'Pages ko aage-piche arrange karein.' },
+      { name: 'PDF Download Karein', text: 'Convert par click karke single PDF file download karein.' }
+    ],
+    detailedContent: [
+      {
+        heading: 'Photo Se PDF Banane Ke Fayde',
+        paragraphs: [
+          'Kai online portals par JPG photos reject ho jati hain aur sirf PDF documents allow hote hain. PDFBolt aapki photos ko standard A4 format PDF me convert kar deta hai.'
+        ]
+      }
+    ],
+    faqs: [
+      { q: 'Kya mai multiple photos ko ek PDF me jod sakta hoon?', a: 'Haan! Aap ek sath 10–20 photos upload karke ek single multi-page PDF bana sakte hain.' }
+    ],
+    relatedGuides: ['pdf-compress-kaise-kare', 'how-to-merge-pdf-files'],
+    relatedTools: [ToolType.JPG_TO_PDF, ToolType.COMPRESS]
   }
 ];
 

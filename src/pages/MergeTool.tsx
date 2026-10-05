@@ -9,7 +9,13 @@ import { useActiveWork } from '../context/ActiveWorkContext';
 import PDFThumbnail from '../components/PDFThumbnail';
 import AdSlot from '../components/AdSlot';
 
-const MergeTool: React.FC<{ darkMode: boolean; notify: NotifySystem }> = ({ darkMode, notify }) => {
+export interface MergeToolProps {
+  darkMode: boolean;
+  notify: NotifySystem;
+  customHint?: string;
+}
+
+const MergeTool: React.FC<MergeToolProps> = ({ darkMode, notify, customHint }) => {
   const { setHasActiveWork } = useActiveWork();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [files, setFiles] = useState<File[]>([]);
@@ -127,7 +133,13 @@ const MergeTool: React.FC<{ darkMode: boolean; notify: NotifySystem }> = ({ dark
       )}
 
       {files.length === 0 ? (
-        <div className="max-w-4xl mx-auto px-4 py-8 space-y-12">
+        <div className="max-w-4xl mx-auto px-4 py-8 space-y-6">
+          {customHint && (
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-amber-500/15 border border-amber-500/30 text-amber-900 dark:text-amber-300 text-xs font-black uppercase tracking-wider shadow-sm">
+              <CheckCircle2 size={15} className="text-amber-600 dark:text-amber-400" />
+              <span>{customHint}</span>
+            </div>
+          )}
           <FileUploader onFilesSelected={handleFiles} darkMode={darkMode} />
         </div>
       ) : !result ? (

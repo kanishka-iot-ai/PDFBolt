@@ -6,10 +6,13 @@ import Footer from './components/Footer';
 import { soundEngine } from './utils/sounds';
 import { NotifySystem } from './types';
 import { TOOLS } from './constants';
+import { ALL_LANDING_PAGES } from './data/landingPages';
 import ErrorBoundary from './components/ErrorBoundary';
 import AdSenseScript from './components/AdSenseScript';
 import CookieConsent from './components/CookieConsent';
 import { ActiveWorkProvider, useActiveWork } from './context/ActiveWorkContext';
+
+const LANDING_PAGES_BY_SLUG = new Map(ALL_LANDING_PAGES.map(p => [p.slug, p]));
 
 // Eagerly import Home to prevent CLS from Suspense fallback displacement
 import Home from './pages/Home';
@@ -38,6 +41,9 @@ const EncyclopediaDetailPage = lazy(() => import('./pages/EncyclopediaDetailPage
 const ComparisonPage = lazy(() => import('./pages/ComparisonPage'));
 const CalculatorPage = lazy(() => import('./pages/CalculatorPage'));
 const TestFilesPage = lazy(() => import('./pages/TestFilesPage'));
+const TargetedCompressPage = lazy(() => import('./pages/TargetedCompressPage'));
+const NoUploadToolsPage = lazy(() => import('./pages/NoUploadToolsPage'));
+const AlternativeLandingPage = lazy(() => import('./pages/AlternativeLandingPage'));
 
 // Static pages
 const PrivacyPage = lazy(() => import('./pages/StaticPages').then(m => ({ default: m.PrivacyPage })));
@@ -107,9 +113,27 @@ const SEOManager: React.FC = () => {
 
     // O(1) Map lookup — checks both bare and slash variant
     const tool = TOOLS_BY_PATH.get(pathname) ?? TOOLS_BY_PATH.get(pathNorm);
+    const cleanSlug = pathNorm.startsWith('/') ? pathNorm.slice(1) : pathNorm;
+    const targetedPage = LANDING_PAGES_BY_SLUG.get(cleanSlug);
+
     if (tool) {
       title = `${tool.seoTitle || `${tool.title} Online`} | PDFBolt`;
       description = tool.description;
+    } else if (targetedPage) {
+      title = `${targetedPage.seoTitle || targetedPage.title}`;
+      description = targetedPage.metaDescription;
+    } else if (pathNorm === '/no-upload-pdf-tools') {
+      title = "No-Upload PDF Tools – 100% Client-Side Private Document Toolkit | PDFBolt";
+      description = "Merge, compress, split, redact, and edit PDF files in your browser with zero file uploads. Powered by WebAssembly for 100% data confidentiality and zero data leaks.";
+    } else if (cleanSlug === 'compare/ilovepdf-alternative') {
+      title = "Best Free iLovePDF Alternative 2026 – No Daily Task Limits | PDFBolt";
+      description = "Looking for a free iLovePDF alternative? PDFBolt provides unlimited free PDF merging, compression, and editing with zero daily task limits and local in-browser privacy.";
+    } else if (cleanSlug === 'compare/smallpdf-alternative') {
+      title = "Best Free Smallpdf Alternative 2026 – Unlimited Daily PDF Tasks | PDFBolt";
+      description = "Tired of Smallpdf's 2-task daily limit? PDFBolt provides unlimited free PDF tools with zero daily limits, no subscription paywalls, and in-browser privacy.";
+    } else if (cleanSlug === 'compare/adobe-acrobat-alternative') {
+      title = "Free Adobe Acrobat Alternative 2026 – Zero Subscription PDF Toolkit | PDFBolt";
+      description = "Cancel your $240/yr Adobe Acrobat subscription. PDFBolt provides free PDF merging, splitting, compression, and editing right in your web browser.";
     } else if (pathNorm === '/tools' || pathNorm === '/pdf-tools') {
       title = "All 25+ Free Online PDF Tools | PDFBolt Directory";
       description = "Browse our full suite of 25+ browser-based PDF tools. Fast, free, and private conversion, editing, and compression tools.";
@@ -249,6 +273,40 @@ const MainLayout: React.FC<MainLayoutProps> = ({ darkMode, setDarkMode, soundEna
             <Route path="/pdf-to-qr-code" element={<SEOLandingPage toolId="pdf-to-qr" darkMode={darkMode}><QRTool darkMode={darkMode} notify={notify} /></SEOLandingPage>} />
             <Route path="/analyze-pdf" element={<AnalyzerPage darkMode={darkMode} notify={notify} />} />
             <Route path="/pdf-builder" element={<Home darkMode={darkMode} />} />
+
+            {/* Targeted Size Compression Routes (Wave 1 & 2) */}
+            <Route path="/compress-pdf-to-20kb" element={<TargetedCompressPage pageSlug="compress-pdf-to-20kb" darkMode={darkMode} notify={notify} />} />
+            <Route path="/compress-pdf-to-50kb" element={<TargetedCompressPage pageSlug="compress-pdf-to-50kb" darkMode={darkMode} notify={notify} />} />
+            <Route path="/compress-pdf-to-100kb" element={<TargetedCompressPage pageSlug="compress-pdf-to-100kb" darkMode={darkMode} notify={notify} />} />
+            <Route path="/compress-pdf-to-200kb" element={<TargetedCompressPage pageSlug="compress-pdf-to-200kb" darkMode={darkMode} notify={notify} />} />
+            <Route path="/compress-pdf-to-300kb" element={<TargetedCompressPage pageSlug="compress-pdf-to-300kb" darkMode={darkMode} notify={notify} />} />
+            <Route path="/compress-pdf-to-500kb" element={<TargetedCompressPage pageSlug="compress-pdf-to-500kb" darkMode={darkMode} notify={notify} />} />
+            <Route path="/compress-pdf-to-1mb" element={<TargetedCompressPage pageSlug="compress-pdf-to-1mb" darkMode={darkMode} notify={notify} />} />
+            <Route path="/compress-pdf-to-2mb" element={<TargetedCompressPage pageSlug="compress-pdf-to-2mb" darkMode={darkMode} notify={notify} />} />
+
+            {/* Indian Exam & Government Document Routes (Wave 1) */}
+            <Route path="/compress-pdf-for-ssc" element={<TargetedCompressPage pageSlug="compress-pdf-for-ssc" darkMode={darkMode} notify={notify} />} />
+            <Route path="/compress-pdf-for-upsc" element={<TargetedCompressPage pageSlug="compress-pdf-for-upsc" darkMode={darkMode} notify={notify} />} />
+            <Route path="/compress-pdf-for-neet" element={<TargetedCompressPage pageSlug="compress-pdf-for-neet" darkMode={darkMode} notify={notify} />} />
+            <Route path="/compress-pdf-for-jee" element={<TargetedCompressPage pageSlug="compress-pdf-for-jee" darkMode={darkMode} notify={notify} />} />
+            <Route path="/compress-pdf-for-ibps" element={<TargetedCompressPage pageSlug="compress-pdf-for-ibps" darkMode={darkMode} notify={notify} />} />
+            <Route path="/compress-pdf-for-rrb" element={<TargetedCompressPage pageSlug="compress-pdf-for-rrb" darkMode={darkMode} notify={notify} />} />
+            <Route path="/pdf-size-reducer-for-government-portal" element={<TargetedCompressPage pageSlug="pdf-size-reducer-for-government-portal" darkMode={darkMode} notify={notify} />} />
+
+            {/* Identity & Specialized Document Merging */}
+            <Route path="/merge-aadhaar-and-pan-card" element={<TargetedCompressPage pageSlug="merge-aadhaar-and-pan-card" darkMode={darkMode} notify={notify} />} />
+            <Route path="/merge-documents-for-visa-application" element={<TargetedCompressPage pageSlug="merge-documents-for-visa-application" darkMode={darkMode} notify={notify} />} />
+            <Route path="/jpg-to-pdf-for-exam" element={<TargetedCompressPage pageSlug="jpg-to-pdf-for-exam" darkMode={darkMode} notify={notify} />} />
+            <Route path="/pdf-to-jpg-for-aadhaar" element={<TargetedCompressPage pageSlug="pdf-to-jpg-for-aadhaar" darkMode={darkMode} notify={notify} />} />
+
+            {/* Privacy & Competitor Alternatives */}
+            <Route path="/no-upload-pdf-tools" element={<NoUploadToolsPage darkMode={darkMode} />} />
+            <Route path="/compare/ilovepdf-alternative" element={<AlternativeLandingPage darkMode={darkMode} defaultCompetitor="ilovepdf-alternative" />} />
+            <Route path="/compare/smallpdf-alternative" element={<AlternativeLandingPage darkMode={darkMode} defaultCompetitor="smallpdf-alternative" />} />
+            <Route path="/compare/adobe-acrobat-alternative" element={<AlternativeLandingPage darkMode={darkMode} defaultCompetitor="adobe-acrobat-alternative" />} />
+            <Route path="/free-pdf-editor-no-watermark-no-signup" element={<TargetedCompressPage pageSlug="free-pdf-editor-no-watermark-no-signup" darkMode={darkMode} notify={notify} />} />
+            <Route path="/ilovepdf-limit-reached-free-alternative" element={<Navigate to="/compare/ilovepdf-alternative" replace />} />
+            <Route path="/smallpdf-daily-limit-alternative" element={<Navigate to="/compare/smallpdf-alternative" replace />} />
 
             {/* Clean Canonical Redirects for Short Aliases & Secondary Search Queries */}
             <Route path="/pdf-to-images" element={<Navigate to="/pdf-to-jpg" replace />} />

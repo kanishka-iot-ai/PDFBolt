@@ -9,7 +9,7 @@ import { ocrPdf, ocrPdfToSearchablePdf } from '../services/ocrService';
 import { pptToPdf, pdfToPpt } from '../services/pptService';
 import { redactPdf, repairPdf } from '../services/sanitizeService';
 import { comparePdfDocuments } from '../services/compareService';
-import { FileText, Download, CheckCircle2, Settings2, Eye, EyeOff, X, Image as ImageIcon, Lock, Zap, ArrowRight, Trash2, Plus, Copy, Check, AlertCircle } from 'lucide-react';
+import { FileText, Download, CheckCircle2, Settings2, Eye, EyeOff, X, Image as ImageIcon, Lock, Zap, ArrowRight, Trash2, Plus, Copy, Check, AlertCircle, Target } from 'lucide-react';
 import { NotifySystem } from '../types';
 
 import ProgressBar from '../components/ProgressBar';
@@ -87,7 +87,16 @@ const getActionLabel = (m: string, t: string) => {
   }
 };
 
-const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; notify: NotifySystem }> = ({ title, mode, darkMode, notify }) => {
+export interface SimpleToolProps {
+  title: string;
+  mode: string;
+  darkMode: boolean;
+  notify: NotifySystem;
+  initialCompressionLevel?: string;
+  targetSizeHint?: string;
+}
+
+const SimpleTool: React.FC<SimpleToolProps> = ({ title, mode, darkMode, notify, initialCompressionLevel, targetSizeHint }) => {
   const { setHasActiveWork } = useActiveWork();
   const [file, setFile] = useState<File | null>(null);
   const [multiFiles, setMultiFiles] = useState<File[]>([]);
@@ -95,7 +104,7 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
   const [result, setResult] = useState<string | { name: string, url: string }[] | null>(null);
   const [resultKind, setResultKind] = useState<ResultKind>('pdf');
   const [showPreview, setShowPreview] = useState(false);
-  const [compressionLevel, setCompressionLevel] = useState('recommended');
+  const [compressionLevel, setCompressionLevel] = useState(initialCompressionLevel || 'recommended');
   const [pageInput, setPageInput] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -700,7 +709,13 @@ const SimpleTool: React.FC<{ title: string; mode: string; darkMode: boolean; not
   return (
     <div className="w-full h-full text-center animate-fadeIn">
       {!file && multiFiles.length === 0 ? (
-        <div className="max-w-4xl mx-auto px-4 py-8 space-y-12">
+        <div className="max-w-4xl mx-auto px-4 py-8 space-y-6">
+          {targetSizeHint && (
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-amber-500/15 border border-amber-500/30 text-amber-900 dark:text-amber-300 text-xs font-black uppercase tracking-wider shadow-sm">
+              <Target size={15} className="text-amber-600 dark:text-amber-400" />
+              <span>Target Upload Spec: {targetSizeHint}</span>
+            </div>
+          )}
           <FileUploader
             multiple={isImageTool || mode === 'compare'}
             accept={getAcceptAttribute(mode, isImageTool)}

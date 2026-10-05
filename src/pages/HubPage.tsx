@@ -181,6 +181,118 @@ const HubPage: React.FC<HubPageProps> = ({ darkMode }) => {
         )}
       </section>
 
+      {/* Popular Target Sizes & Exam Portals */}
+      <section className="max-w-7xl mx-auto px-6 py-8">
+        <div className={`p-8 rounded-3xl border ${darkMode ? 'bg-slate-900/60 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-6">
+            <div>
+              <span className="text-[10px] font-black uppercase tracking-widest text-yellow-700 dark:text-yellow-400 bg-yellow-500/10 px-2.5 py-1 rounded-full">
+                High-Precision Optimization
+              </span>
+              <h2 className={`text-2xl font-black mt-2 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+                Targeted File Sizes & Official Exam Portals
+              </h2>
+              <p className={`text-xs sm:text-sm mt-1 ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+                Meet exact government portal document upload specifications with zero cloud exposure.
+              </p>
+            </div>
+            <Link
+              to="/no-upload-pdf-tools"
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-yellow-700 dark:text-yellow-400 hover:underline"
+            >
+              Learn about No-Upload Privacy <ArrowRight size={14} />
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Column 1: Specific Sizes */}
+            <div className={`p-5 rounded-2xl border ${darkMode ? 'bg-slate-800/40 border-slate-700/60' : 'bg-white border-slate-200 shadow-sm'}`}>
+              <h3 className={`text-sm font-black uppercase tracking-wider mb-3 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+                Exact Size Reducers
+              </h3>
+              <div className="flex flex-wrap gap-2">
+                {[
+                  { label: '20 KB', path: '/compress-pdf-to-20kb' },
+                  { label: '50 KB', path: '/compress-pdf-to-50kb' },
+                  { label: '100 KB', path: '/compress-pdf-to-100kb' },
+                  { label: '200 KB', path: '/compress-pdf-to-200kb' },
+                  { label: '300 KB', path: '/compress-pdf-to-300kb' },
+                  { label: '500 KB', path: '/compress-pdf-to-500kb' },
+                  { label: '1 MB', path: '/compress-pdf-to-1mb' },
+                  { label: '2 MB', path: '/compress-pdf-to-2mb' },
+                ].map(item => (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                      darkMode ? 'bg-slate-700/60 text-slate-200 hover:bg-yellow-500 hover:text-slate-950' : 'bg-slate-100 text-slate-800 hover:bg-yellow-500 hover:text-slate-950'
+                    }`}
+                  >
+                    Compress to {item.label}
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+            {/* Column 2: Exam & Govt Portals */}
+            <div className={`p-5 rounded-2xl border ${darkMode ? 'bg-slate-800/40 border-slate-700/60' : 'bg-white border-slate-200 shadow-sm'}`}>
+              <h3 className={`text-sm font-black uppercase tracking-wider mb-3 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+                Government & Exam Specs
+              </h3>
+              <div className="flex flex-wrap gap-2">
+                {[
+                  { label: 'SSC Portal', path: '/compress-pdf-for-ssc' },
+                  { label: 'UPSC CSE', path: '/compress-pdf-for-upsc' },
+                  { label: 'NEET Exam', path: '/compress-pdf-for-neet' },
+                  { label: 'JEE Main', path: '/compress-pdf-for-jee' },
+                  { label: 'IBPS Bank PO', path: '/compress-pdf-for-ibps' },
+                  { label: 'RRB Railway', path: '/compress-pdf-for-rrb' },
+                  { label: 'Govt Portals', path: '/pdf-size-reducer-for-government-portal' },
+                ].map(item => (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                      darkMode ? 'bg-slate-700/60 text-slate-200 hover:bg-yellow-500 hover:text-slate-950' : 'bg-slate-100 text-slate-800 hover:bg-yellow-500 hover:text-slate-950'
+                    }`}
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+            {/* Column 3: Workflows & Free Alternatives */}
+            <div className={`p-5 rounded-2xl border ${darkMode ? 'bg-slate-800/40 border-slate-700/60' : 'bg-white border-slate-200 shadow-sm'}`}>
+              <h3 className={`text-sm font-black uppercase tracking-wider mb-3 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+                Identity KYC & Alternatives
+              </h3>
+              <div className="flex flex-wrap gap-2">
+                {[
+                  { label: 'Aadhaar + PAN Merge', path: '/merge-aadhaar-and-pan-card' },
+                  { label: 'Visa Documents Merge', path: '/merge-documents-for-visa-application' },
+                  { label: 'JPG to PDF for Exams', path: '/jpg-to-pdf-for-exam' },
+                  { label: 'PDF to JPG for Aadhaar', path: '/pdf-to-jpg-for-aadhaar' },
+                  { label: 'Free Watermark-Free Editor', path: '/free-pdf-editor-no-watermark-no-signup' },
+                  { label: 'iLovePDF Alternative', path: '/compare/ilovepdf-alternative' },
+                  { label: 'Smallpdf Alternative', path: '/compare/smallpdf-alternative' },
+                ].map(item => (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                      darkMode ? 'bg-slate-700/60 text-slate-200 hover:bg-yellow-500 hover:text-slate-950' : 'bg-slate-100 text-slate-800 hover:bg-yellow-500 hover:text-slate-950'
+                    }`}
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Calculators & Utilities Section */}
       <section className="max-w-7xl mx-auto px-6 pt-12">
         <div className={`p-8 rounded-3xl border flex flex-col md:flex-row items-center justify-between gap-6 ${
