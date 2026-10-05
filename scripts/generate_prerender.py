@@ -2539,11 +2539,17 @@ def write_page(base_template, path, title, description, canonical_url, body_cont
     else:
         html = html.replace('<head>', f'<head>\n  <title>{title}</title>', 1)
 
-    # Replace Description
-    html = re.sub(r'<meta[^>]*name="description"[^>]*>', f'<meta id="seo-description" name="description" data-rh="true"\n    content="{description}">', html)
+    # Replace or Inject Description
+    if re.search(r'<meta[^>]*name=[\"\']description[\"\'][^>]*>', html, flags=re.IGNORECASE):
+        html = re.sub(r'<meta[^>]*name=[\"\']description[\"\'][^>]*>', f'<meta id="seo-description" name="description" data-rh="true"\n    content="{description}">', html, flags=re.IGNORECASE)
+    else:
+        html = html.replace('</title>', f'</title>\n  <meta id="seo-description" name="description" data-rh="true"\n    content="{description}">', 1)
 
-    # Replace Canonical
-    html = re.sub(r'<link[^>]*rel="canonical"[^>]*>', f'<link rel="canonical" data-rh="true" href="{canonical_url}" />', html)
+    # Replace or Inject Canonical
+    if re.search(r'<link[^>]*rel=[\"\']canonical[\"\'][^>]*>', html, flags=re.IGNORECASE):
+        html = re.sub(r'<link[^>]*rel=[\"\']canonical[\"\'][^>]*>', f'<link rel="canonical" data-rh="true" href="{canonical_url}" />', html, flags=re.IGNORECASE)
+    else:
+        html = html.replace('</title>', f'</title>\n  <link rel="canonical" data-rh="true" href="{canonical_url}" />', 1)
 
     # Replace OpenGraph
     html = re.sub(r'<meta property="og:title"[^>]*>', f'<meta property="og:title" data-rh="true" content="{title}" />', html)
@@ -2609,7 +2615,10 @@ def generate_404_page(base_template):
     '''
 
     html = re.sub(r'<title>.*?</title>', f'<title>{title}</title>', base_template)
-    html = re.sub(r'<meta name="description"[^>]*content=".*?"', f'<meta name="description" data-rh="true"\n    content="{description}"', html)
+    if re.search(r'<meta[^>]*name=[\"\']description[\"\'][^>]*>', html, flags=re.IGNORECASE):
+        html = re.sub(r'<meta[^>]*name=[\"\']description[\"\'][^>]*>', f'<meta name="description" data-rh="true"\n    content="{description}">', html, flags=re.IGNORECASE)
+    else:
+        html = html.replace('</title>', f'</title>\n  <meta name="description" data-rh="true"\n    content="{description}">', 1)
     html = re.sub(
         r'<div id="root">.*?</div>\s*<!-- Structured Data for SEO -->',
         f'<div id="root">\n{body_content}\n  </div>\n\n  <!-- Structured Data for SEO -->',
