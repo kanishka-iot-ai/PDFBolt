@@ -2524,19 +2524,19 @@ def write_page(base_template, path, title, description, canonical_url, body_cont
     # Append schemas before </head>
     html = html.replace("</head>", f"  {schema_tags}\n</head>")
 
+    # Replace #root contents directly with rich, visible semantic HTML
+    if body_content:
+        root_start = html.find('<div id="root">')
+        if root_start != -1:
+            marker = html.find('Structured Data for SEO', root_start)
+            if marker != -1:
+                root_end = html.rfind('</div>', root_start, marker) + 6
+                html = html[:root_start] + f'<div id="root">\n{body_content}\n  </div>\n\n' + html[root_end:]
+
     # Strip any static body schemas from base template
     html = re.sub(
         r'\s*<!-- Structured Data for SEO -->.*?<!-- End Structured Data for SEO -->\s*',
         '\n',
-        html,
-        flags=re.DOTALL
-    )
-
-    # Replace #root contents directly with rich, visible semantic HTML
-    # We match <div id="root">...</div> and inject the body_content
-    html = re.sub(
-        r'<div id="root">.*?</div>\s*<!-- Structured Data for SEO -->',
-        f'<div id="root">\n{body_content}\n  </div>\n\n  <!-- Structured Data for SEO -->',
         html,
         flags=re.DOTALL
     )
