@@ -97,3 +97,43 @@
 /contact  /contact/  301
 /tutorials  /tutorials/  301
 /offline-mode  /offline-mode/  301
+
+# ========================================================================
+# 3. Targeted Landing Pages & Extra Guides Trailing Slash Redirects
+# ========================================================================
+/compress-pdf-to-20kb  /compress-pdf-to-20kb/  301
+/compress-pdf-to-50kb  /compress-pdf-to-50kb/  301
+/compress-pdf-to-100kb  /compress-pdf-to-100kb/  301
+/compress-pdf-to-200kb  /compress-pdf-to-200kb/  301
+/compress-pdf-to-300kb  /compress-pdf-to-300kb/  301
+/compress-pdf-to-500kb  /compress-pdf-to-500kb/  301
+/compress-pdf-to-1mb  /compress-pdf-to-1mb/  301
+/compress-pdf-to-2mb  /compress-pdf-to-2mb/  301
+/compress-pdf-for-ssc  /compress-pdf-for-ssc/  301
+/compress-pdf-for-upsc  /compress-pdf-for-upsc/  301
+/compress-pdf-for-neet  /compress-pdf-for-neet/  301
+/compress-pdf-for-jee  /compress-pdf-for-jee/  301
+/compress-pdf-for-ibps  /compress-pdf-for-ibps/  301
+/compress-pdf-for-rrb  /compress-pdf-for-rrb/  301
+/pdf-size-reducer-for-government-portal  /pdf-size-reducer-for-government-portal/  301
+/merge-aadhaar-and-pan-card  /merge-aadhaar-and-pan-card/  301
+/merge-documents-for-visa-application  /merge-documents-for-visa-application/  301
+/jpg-to-pdf-for-exam  /jpg-to-pdf-for-exam/  301
+/pdf-to-jpg-for-aadhaar  /pdf-to-jpg-for-aadhaar/  301
+/no-upload-pdf-tools  /no-upload-pdf-tools/  301
+/compare/ilovepdf-alternative  /compare/ilovepdf-alternative/  301
+/compare/smallpdf-alternative  /compare/smallpdf-alternative/  301
+/compare/adobe-acrobat-alternative  /compare/adobe-acrobat-alternative/  301
+/free-pdf-editor-no-watermark-no-signup  /free-pdf-editor-no-watermark-no-signup/  301
+/ilovepdf-limit-reached-free-alternative  /compare/ilovepdf-alternative/  301
+/smallpdf-daily-limit-alternative  /compare/smallpdf-alternative/  301
+
+/guides/is-it-safe-to-upload-pdf-online  /guides/is-it-safe-to-upload-pdf-online/  301
+/guides/reduce-pdf-size-for-email  /guides/reduce-pdf-size-for-email/  301
+/guides/how-to-compress-pdf-on-mobile  /guides/how-to-compress-pdf-on-mobile/  301
+/guides/how-to-remove-password-from-pdf  /guides/how-to-remove-password-from-pdf/  301
+/guides/how-to-edit-a-scanned-pdf  /guides/how-to-edit-a-scanned-pdf/  301
+/guides/how-to-sign-a-pdf-without-printing  /guides/how-to-sign-a-pdf-without-printing/  301
+/guides/pdf-compress-kaise-kare  /guides/pdf-compress-kaise-kare/  301
+/guides/jpg-ko-pdf-kaise-banaye  /guides/jpg-ko-pdf-kaise-banaye/  301
+

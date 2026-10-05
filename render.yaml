@@ -145,6 +145,108 @@ services:
       - type: redirect
         source: /offline-mode
         destination: /offline-mode/
+      - type: redirect
+        source: /compress-pdf-to-20kb
+        destination: /compress-pdf-to-20kb/
+      - type: redirect
+        source: /compress-pdf-to-50kb
+        destination: /compress-pdf-to-50kb/
+      - type: redirect
+        source: /compress-pdf-to-100kb
+        destination: /compress-pdf-to-100kb/
+      - type: redirect
+        source: /compress-pdf-to-200kb
+        destination: /compress-pdf-to-200kb/
+      - type: redirect
+        source: /compress-pdf-to-300kb
+        destination: /compress-pdf-to-300kb/
+      - type: redirect
+        source: /compress-pdf-to-500kb
+        destination: /compress-pdf-to-500kb/
+      - type: redirect
+        source: /compress-pdf-to-1mb
+        destination: /compress-pdf-to-1mb/
+      - type: redirect
+        source: /compress-pdf-to-2mb
+        destination: /compress-pdf-to-2mb/
+      - type: redirect
+        source: /compress-pdf-for-ssc
+        destination: /compress-pdf-for-ssc/
+      - type: redirect
+        source: /compress-pdf-for-upsc
+        destination: /compress-pdf-for-upsc/
+      - type: redirect
+        source: /compress-pdf-for-neet
+        destination: /compress-pdf-for-neet/
+      - type: redirect
+        source: /compress-pdf-for-jee
+        destination: /compress-pdf-for-jee/
+      - type: redirect
+        source: /compress-pdf-for-ibps
+        destination: /compress-pdf-for-ibps/
+      - type: redirect
+        source: /compress-pdf-for-rrb
+        destination: /compress-pdf-for-rrb/
+      - type: redirect
+        source: /pdf-size-reducer-for-government-portal
+        destination: /pdf-size-reducer-for-government-portal/
+      - type: redirect
+        source: /merge-aadhaar-and-pan-card
+        destination: /merge-aadhaar-and-pan-card/
+      - type: redirect
+        source: /merge-documents-for-visa-application
+        destination: /merge-documents-for-visa-application/
+      - type: redirect
+        source: /jpg-to-pdf-for-exam
+        destination: /jpg-to-pdf-for-exam/
+      - type: redirect
+        source: /pdf-to-jpg-for-aadhaar
+        destination: /pdf-to-jpg-for-aadhaar/
+      - type: redirect
+        source: /no-upload-pdf-tools
+        destination: /no-upload-pdf-tools/
+      - type: redirect
+        source: /compare/ilovepdf-alternative
+        destination: /compare/ilovepdf-alternative/
+      - type: redirect
+        source: /compare/smallpdf-alternative
+        destination: /compare/smallpdf-alternative/
+      - type: redirect
+        source: /compare/adobe-acrobat-alternative
+        destination: /compare/adobe-acrobat-alternative/
+      - type: redirect
+        source: /free-pdf-editor-no-watermark-no-signup
+        destination: /free-pdf-editor-no-watermark-no-signup/
+      - type: redirect
+        source: /ilovepdf-limit-reached-free-alternative
+        destination: /compare/ilovepdf-alternative/
+      - type: redirect
+        source: /smallpdf-daily-limit-alternative
+        destination: /compare/smallpdf-alternative/
+      - type: redirect
+        source: /guides/is-it-safe-to-upload-pdf-online
+        destination: /guides/is-it-safe-to-upload-pdf-online/
+      - type: redirect
+        source: /guides/reduce-pdf-size-for-email
+        destination: /guides/reduce-pdf-size-for-email/
+      - type: redirect
+        source: /guides/how-to-compress-pdf-on-mobile
+        destination: /guides/how-to-compress-pdf-on-mobile/
+      - type: redirect
+        source: /guides/how-to-remove-password-from-pdf
+        destination: /guides/how-to-remove-password-from-pdf/
+      - type: redirect
+        source: /guides/how-to-edit-a-scanned-pdf
+        destination: /guides/how-to-edit-a-scanned-pdf/
+      - type: redirect
+        source: /guides/how-to-sign-a-pdf-without-printing
+        destination: /guides/how-to-sign-a-pdf-without-printing/
+      - type: redirect
+        source: /guides/pdf-compress-kaise-kare
+        destination: /guides/pdf-compress-kaise-kare/
+      - type: redirect
+        source: /guides/jpg-ko-pdf-kaise-banaye
+        destination: /guides/jpg-ko-pdf-kaise-banaye/
       # Fallback SPA rewrite for dynamic routes
       - type: rewrite
         source: /*
