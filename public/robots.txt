@@ -102,4 +102,4 @@ Disallow: /qr-success
 # Sitemaps
 # -------------------------------------------------------
 Sitemap: https://pdfbolt.in/sitemap.xml
-Sitemap: https://pdfbolt.in/llms.txt
+

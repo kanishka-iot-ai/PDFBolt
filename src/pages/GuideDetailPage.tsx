@@ -15,7 +15,7 @@ const GuideDetailPage: React.FC<GuideDetailPageProps> = ({ darkMode }) => {
   const tool = guide.toolId ? TOOLS.find(t => t.id === guide.toolId) : null;
 
   const baseUrl = 'https://pdfbolt.in';
-  const canonicalUrl = `${baseUrl}/guides/${guide.slug}`;
+  const canonicalUrl = `${baseUrl}/guides/${guide.slug}/`;
 
   // Article Schema
   const articleSchema = {
@@ -23,6 +23,7 @@ const GuideDetailPage: React.FC<GuideDetailPageProps> = ({ darkMode }) => {
     "@type": "Article",
     "headline": guide.title,
     "description": guide.metaDescription,
+    "image": `${baseUrl}/pdfbolt-og-image.png`,
     "datePublished": guide.updatedAt,
     "dateModified": guide.updatedAt,
     "author": {
@@ -35,7 +36,7 @@ const GuideDetailPage: React.FC<GuideDetailPageProps> = ({ darkMode }) => {
       "name": "PDFBolt",
       "logo": {
         "@type": "ImageObject",
-        "url": `${baseUrl}/pdfbolt-logo-transparent.png`
+        "url": `${baseUrl}/pdfbolt-logo.webp`
       }
     },
     "mainEntityOfPage": canonicalUrl
@@ -74,8 +75,8 @@ const GuideDetailPage: React.FC<GuideDetailPageProps> = ({ darkMode }) => {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     "itemListElement": [
-      { "@type": "ListItem", "position": 1, "name": "Home", "item": baseUrl },
-      { "@type": "ListItem", "position": 2, "name": "Guides", "item": `${baseUrl}/guides` },
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": `${baseUrl}/` },
+      { "@type": "ListItem", "position": 2, "name": "Guides", "item": `${baseUrl}/guides/` },
       { "@type": "ListItem", "position": 3, "name": guide.title, "item": canonicalUrl }
     ]
   };

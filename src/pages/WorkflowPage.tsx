@@ -15,7 +15,7 @@ const WorkflowPage: React.FC<WorkflowPageProps> = ({ workflowSlug, darkMode }) =
   const workflow = WORKFLOWS.find(w => w.slug === slug) || WORKFLOWS[0];
 
   const baseUrl = 'https://pdfbolt.in';
-  const canonicalUrl = `${baseUrl}/${workflow.slug}`;
+  const canonicalUrl = `${baseUrl}/${workflow.slug}/`;
 
   // Structured Data
   const schema = {
@@ -35,8 +35,8 @@ const WorkflowPage: React.FC<WorkflowPageProps> = ({ workflowSlug, darkMode }) =
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     "itemListElement": [
-      { "@type": "ListItem", "position": 1, "name": "Home", "item": baseUrl },
-      { "@type": "ListItem", "position": 2, "name": "Workflows", "item": `${baseUrl}/tools` },
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": `${baseUrl}/` },
+      { "@type": "ListItem", "position": 2, "name": "Workflows", "item": `${baseUrl}/tools/` },
       { "@type": "ListItem", "position": 3, "name": workflow.title, "item": canonicalUrl }
     ]
   };

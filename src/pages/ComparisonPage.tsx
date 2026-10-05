@@ -10,7 +10,7 @@ interface ComparisonPageProps {
 
 const ComparisonPage: React.FC<ComparisonPageProps> = ({ darkMode }) => {
   const baseUrl = 'https://pdfbolt.in';
-  const canonicalUrl = `${baseUrl}/compare/online-pdf-tools`;
+  const canonicalUrl = `${baseUrl}/compare/online-pdf-tools/`;
 
   return (
     <div className="animate-fadeIn pb-24">

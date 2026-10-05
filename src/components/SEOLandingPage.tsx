@@ -31,7 +31,7 @@ const SEOLandingPage: React.FC<SEOLandingPageProps> = ({ tool: toolProp, toolId,
     "url": canonicalUrl,
     "description": tool?.description,
     "applicationCategory": "UtilitiesApplication",
-    "operatingSystem": "Any",
+    "operatingSystem": "Web Browser, Windows, macOS, Linux, iOS, Android",
     "offers": {
       "@type": "Offer",
       "price": "0",

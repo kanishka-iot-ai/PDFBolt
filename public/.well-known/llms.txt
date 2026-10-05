@@ -1,0 +1,70 @@
+# PDFBolt
+> Free online PDF tools — merge, compress, split, convert, and edit PDFs with 100% private in-browser processing. No file uploads. No accounts. No limits.
+
+PDFBolt is a privacy-first PDF utility platform. All processing runs entirely inside the user's browser using WebAssembly (pdf-lib, jsPDF, PDF.js). Files never leave the user's device and are never sent to any server.
+
+## Core PDF Tools
+
+- [Merge PDF](https://pdfbolt.in/merge-pdf/): Combine multiple PDF files into one document. Drag-and-drop reordering, zero size limits, fully local processing.
+- [Split PDF](https://pdfbolt.in/split-pdf/): Extract specific pages or page ranges from any PDF. Custom comma-separated ranges supported (e.g. 1-3, 5, 8-10).
+- [Compress PDF](https://pdfbolt.in/compress-pdf/): Reduce PDF file size by up to 85% while preserving crisp text. Three modes: Lite, Smart, and Max compression.
+- [Organize PDF](https://pdfbolt.in/organize-pdf/): Visually rearrange, rotate, or delete individual pages using a drag-and-drop page thumbnail grid.
+- [Rotate PDF](https://pdfbolt.in/rotate-pdf/): Rotate all or selected pages 90°, 180°, or 270°. Permanent rotation embedded into the file.
+- [Delete PDF Pages](https://pdfbolt.in/delete-pages-from-pdf/): Remove unwanted pages from any PDF without re-uploading or losing quality.
+- [Add Page Numbers](https://pdfbolt.in/add-page-numbers-to-pdf/): Insert customizable page numbers (position, font, format) to any PDF document.
+
+## Convert To PDF
+
+- [Word to PDF](https://pdfbolt.in/word-to-pdf/): Convert DOCX files to PDF format in the browser using Mammoth.js.
+- [Excel to PDF](https://pdfbolt.in/excel-to-pdf/): Convert XLSX spreadsheets to PDF with table layout preservation.
+- [Image to PDF](https://pdfbolt.in/image-to-pdf/): Convert JPG, PNG, WebP, and other image formats into a single PDF document.
+- [HTML to PDF](https://pdfbolt.in/html-to-pdf/): Render HTML content to PDF using html2canvas and jsPDF.
+
+## Convert From PDF
+
+- [PDF to Image](https://pdfbolt.in/pdf-to-image/): Extract each PDF page as a high-resolution JPG or PNG image.
+- [PDF to Word](https://pdfbolt.in/pdf-to-word/): Convert PDF text and layout to an editable DOCX document.
+- [PDF to Text](https://pdfbolt.in/pdf-to-text/): Extract all raw text content from any PDF file.
+
+## Security Tools
+
+- [Protect PDF](https://pdfbolt.in/protect-pdf/): Add 128-bit AES password encryption to any PDF. Owner and user passwords supported.
+- [Unlock PDF](https://pdfbolt.in/unlock-pdf/): Remove password protection from PDFs when you know the password.
+- [Redact PDF](https://pdfbolt.in/redact-pdf/): Permanently black out sensitive text and regions. Not just a visual overlay — content is destroyed.
+- [Watermark PDF](https://pdfbolt.in/watermark-pdf/): Add diagonal text or image watermarks to every page of a PDF.
+
+## Enhance & Edit Tools
+
+- [OCR PDF](https://pdfbolt.in/ocr-pdf/): Make scanned PDFs searchable and selectable using Tesseract.js optical character recognition.
+- [Sign PDF](https://pdfbolt.in/sign-pdf/): Draw, type, or upload a signature and embed it at any position in a PDF.
+- [QR Code Generator](https://pdfbolt.in/qr-code/): Generate QR codes for URLs, contact cards (vCard), Wi-Fi credentials, and plain text. Export as PNG or SVG.
+- [PDF Metadata Editor](https://pdfbolt.in/edit-pdf-metadata/): View and edit the hidden title, author, subject, and keyword fields of any PDF document.
+- [Flatten PDF](https://pdfbolt.in/flatten-pdf/): Merge all interactive form fields and annotations permanently into the document.
+- [Compare PDF](https://pdfbolt.in/compare-pdf/): Visually diff two versions of a PDF document side-by-side to spot every change.
+- [Repair PDF](https://pdfbolt.in/repair-pdf/): Attempt to recover and re-save corrupted or unreadable PDF files.
+- [Grayscale PDF](https://pdfbolt.in/grayscale-pdf/): Convert a color PDF to black-and-white for printing cost savings.
+
+## Use-Case Hubs
+
+- [Student PDF Tools](https://pdfbolt.in/student-pdf-tools/): Curated PDF tools for students — merge lecture notes, compress submissions, extract readings.
+- [Business PDF Tools](https://pdfbolt.in/business-pdf-tools/): Business workflows — protect contracts, sign documents, redact sensitive data, add watermarks.
+- [Developer PDF Tools](https://pdfbolt.in/developer-pdf-tools/): Tools and API context for developers building PDF workflows.
+
+## Guides & Tutorials
+
+- [How to Merge PDF Files](https://pdfbolt.in/guides/how-to-merge-pdf-files/): Step-by-step guide to combining PDFs online for free.
+- [How to Compress a PDF](https://pdfbolt.in/guides/how-to-compress-pdf-without-losing-quality/): Reduce PDF file size without losing quality.
+- [How to Split a PDF](https://pdfbolt.in/guides/how-to-split-a-pdf/): Extract specific pages or chapters from any PDF.
+- [How to Sign a PDF](https://pdfbolt.in/guides/how-to-sign-a-pdf-online-free/): Add a digital or handwritten signature to any PDF.
+- [How to Password Protect a PDF](https://pdfbolt.in/guides/how-to-password-protect-a-pdf/): Encrypt PDFs with a password in seconds.
+- [How to Convert Word to PDF](https://pdfbolt.in/guides/how-to-convert-word-to-pdf/): Convert DOCX files to PDF format.
+
+## Encyclopedia
+
+- [PDF Encyclopedia](https://pdfbolt.in/encyclopedia/): A comprehensive reference covering PDF format internals, standards (PDF/A, PDF/X, PDF 2.0), compression algorithms, encryption schemes, and metadata structure.
+
+## About
+
+- [About PDFBolt](https://pdfbolt.in/about/): Learn about PDFBolt's privacy-first philosophy and in-browser processing architecture.
+- [Privacy Policy](https://pdfbolt.in/privacy/): Full details on data handling — spoiler: we handle none of your file data.
+- [Terms of Service](https://pdfbolt.in/terms/): Usage terms for the PDFBolt platform.

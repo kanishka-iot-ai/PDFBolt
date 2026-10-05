@@ -1684,8 +1684,8 @@ def generate_prerendered_pages():
             "@context": "https://schema.org",
             "@type": "BreadcrumbList",
             "itemListElement": [
-                {"@type": "ListItem", "position": 1, "name": "Home", "item": CANONICAL_DOMAIN},
-                {"@type": "ListItem", "position": 2, "name": "PDF Tools", "item": f"{CANONICAL_DOMAIN}/tools"},
+                {"@type": "ListItem", "position": 1, "name": "Home", "item": f"{CANONICAL_DOMAIN}/"},
+                {"@type": "ListItem", "position": 2, "name": "PDF Tools", "item": f"{CANONICAL_DOMAIN}/tools/"},
                 {"@type": "ListItem", "position": 3, "name": h1, "item": canonical_url}
             ]
         })
@@ -1711,10 +1711,11 @@ def generate_prerendered_pages():
 
         json_ld_schemas.append({
             "@context": "https://schema.org",
-            "@type": "SoftwareApplication",
+            "@type": "WebApplication",
             "name": f"PDFBolt {h1}",
             "applicationCategory": "UtilitiesApplication",
-            "operatingSystem": "Web, Windows, macOS, Linux, iOS, Android",
+            "operatingSystem": "Web Browser, Windows, macOS, Linux, iOS, Android",
+            "browserRequirements": "Requires JavaScript and HTML5",
             "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"},
             "url": canonical_url,
             "description": description
@@ -1819,8 +1820,8 @@ def generate_prerendered_pages():
                 "@context": "https://schema.org",
                 "@type": "BreadcrumbList",
                 "itemListElement": [
-                    {"@type": "ListItem", "position": 1, "name": "Home", "item": CANONICAL_DOMAIN},
-                    {"@type": "ListItem", "position": 2, "name": "Guides", "item": f"{CANONICAL_DOMAIN}/guides"},
+                    {"@type": "ListItem", "position": 1, "name": "Home", "item": f"{CANONICAL_DOMAIN}/"},
+                    {"@type": "ListItem", "position": 2, "name": "Guides", "item": f"{CANONICAL_DOMAIN}/guides/"},
                     {"@type": "ListItem", "position": 3, "name": h1, "item": canonical_url}
                 ]
             },
@@ -1829,8 +1830,19 @@ def generate_prerendered_pages():
                 "@type": "Article",
                 "headline": h1,
                 "description": description,
-                "author": {"@type": "Person", "name": "Kanishka Giri"},
-                "publisher": {"@type": "Organization", "name": "PDFBolt", "url": CANONICAL_DOMAIN},
+                "image": f"{CANONICAL_DOMAIN}/pdfbolt-og-image.png",
+                "datePublished": "2026-01-15T08:00:00+00:00",
+                "dateModified": "2026-10-05T08:00:00+00:00",
+                "author": {"@type": "Person", "name": "Kanishka Giri", "url": f"{CANONICAL_DOMAIN}/about/"},
+                "publisher": {
+                    "@type": "Organization",
+                    "name": "PDFBolt",
+                    "url": f"{CANONICAL_DOMAIN}/",
+                    "logo": {
+                        "@type": "ImageObject",
+                        "url": f"{CANONICAL_DOMAIN}/pdfbolt-logo.webp"
+                    }
+                },
                 "mainEntityOfPage": canonical_url
             },
             {
@@ -1916,8 +1928,8 @@ def generate_prerendered_pages():
                 "@context": "https://schema.org",
                 "@type": "BreadcrumbList",
                 "itemListElement": [
-                    {"@type": "ListItem", "position": 1, "name": "Home", "item": CANONICAL_DOMAIN},
-                    {"@type": "ListItem", "position": 2, "name": "Encyclopedia", "item": f"{CANONICAL_DOMAIN}/encyclopedia"},
+                    {"@type": "ListItem", "position": 1, "name": "Home", "item": f"{CANONICAL_DOMAIN}/"},
+                    {"@type": "ListItem", "position": 2, "name": "Encyclopedia", "item": f"{CANONICAL_DOMAIN}/encyclopedia/"},
                     {"@type": "ListItem", "position": 3, "name": h1, "item": canonical_url}
                 ]
             },
@@ -1926,8 +1938,19 @@ def generate_prerendered_pages():
                 "@type": "TechArticle",
                 "headline": h1,
                 "description": description,
-                "author": {"@type": "Person", "name": "Kanishka Giri"},
-                "publisher": {"@type": "Organization", "name": "PDFBolt", "url": CANONICAL_DOMAIN},
+                "image": f"{CANONICAL_DOMAIN}/pdfbolt-og-image.png",
+                "datePublished": "2026-01-15T08:00:00+00:00",
+                "dateModified": "2026-10-05T08:00:00+00:00",
+                "author": {"@type": "Person", "name": "Kanishka Giri", "url": f"{CANONICAL_DOMAIN}/about/"},
+                "publisher": {
+                    "@type": "Organization",
+                    "name": "PDFBolt",
+                    "url": f"{CANONICAL_DOMAIN}/",
+                    "logo": {
+                        "@type": "ImageObject",
+                        "url": f"{CANONICAL_DOMAIN}/pdfbolt-logo.webp"
+                    }
+                },
                 "mainEntityOfPage": canonical_url
             }
         ]
@@ -2059,7 +2082,7 @@ def generate_prerendered_pages():
                 "@context": "https://schema.org",
                 "@type": "BreadcrumbList",
                 "itemListElement": [
-                    {"@type": "ListItem", "position": 1, "name": "Home", "item": CANONICAL_DOMAIN},
+                    {"@type": "ListItem", "position": 1, "name": "Home", "item": f"{CANONICAL_DOMAIN}/"},
                     {"@type": "ListItem", "position": 2, "name": h1, "item": canonical_url}
                 ]
             }
@@ -2220,21 +2243,16 @@ def generate_prerendered_pages():
             "@context": "https://schema.org",
             "@type": "WebSite",
             "name": "PDFBolt",
-            "url": CANONICAL_DOMAIN,
-            "description": home_desc,
-            "potentialAction": {
-                "@type": "SearchAction",
-                "target": f"{CANONICAL_DOMAIN}/?q={{search_term_string}}",
-                "query-input": "required name=search_term_string"
-            }
+            "url": f"{CANONICAL_DOMAIN}/",
+            "description": home_desc
         },
         {
             "@context": "https://schema.org",
             "@type": "WebApplication",
             "name": "PDFBolt Free Online PDF Tools",
-            "url": CANONICAL_DOMAIN,
+            "url": f"{CANONICAL_DOMAIN}/",
             "applicationCategory": "UtilitiesApplication",
-            "operatingSystem": "All",
+            "operatingSystem": "Web Browser, Windows, macOS, Linux, iOS, Android",
             "browserRequirements": "Requires JavaScript and HTML5",
             "offers": {
                 "@type": "Offer",
@@ -2284,8 +2302,11 @@ def generate_prerendered_pages():
             "@context": "https://schema.org",
             "@type": "Organization",
             "name": "PDFBolt",
-            "url": CANONICAL_DOMAIN,
-            "logo": f"{CANONICAL_DOMAIN}/pdfbolt-logo.webp"
+            "url": f"{CANONICAL_DOMAIN}/",
+            "logo": {
+                "@type": "ImageObject",
+                "url": f"{CANONICAL_DOMAIN}/pdfbolt-logo.webp"
+            }
         }
     ]
 
@@ -2332,6 +2353,14 @@ def write_page(base_template, path, title, description, canonical_url, body_cont
 
     # Append schemas before </head>
     html = html.replace("</head>", f"  {schema_tags}\n</head>")
+
+    # Strip any static body schemas from base template
+    html = re.sub(
+        r'\s*<!-- Structured Data for SEO -->.*?<!-- End Structured Data for SEO -->\s*',
+        '\n',
+        html,
+        flags=re.DOTALL
+    )
 
     # Replace #root contents directly with rich, visible semantic HTML
     # We match <div id="root">...</div> and inject the body_content

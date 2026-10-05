@@ -14,7 +14,7 @@ const EncyclopediaDetailPage: React.FC<EncyclopediaDetailPageProps> = ({ darkMod
   const article = ENCYCLOPEDIA.find(a => a.slug === slug) || ENCYCLOPEDIA[0];
 
   const baseUrl = 'https://pdfbolt.in';
-  const canonicalUrl = `${baseUrl}/encyclopedia/${article.slug}`;
+  const canonicalUrl = `${baseUrl}/encyclopedia/${article.slug}/`;
 
   // TechArticle Schema
   const schema = {
@@ -22,6 +22,7 @@ const EncyclopediaDetailPage: React.FC<EncyclopediaDetailPageProps> = ({ darkMod
     "@type": "TechArticle",
     "headline": article.title,
     "description": article.metaDescription,
+    "image": `${baseUrl}/pdfbolt-og-image.png`,
     "datePublished": article.updatedAt,
     "dateModified": article.updatedAt,
     "author": {
@@ -34,7 +35,7 @@ const EncyclopediaDetailPage: React.FC<EncyclopediaDetailPageProps> = ({ darkMod
       "name": "PDFBolt",
       "logo": {
         "@type": "ImageObject",
-        "url": `${baseUrl}/pdfbolt-logo-transparent.png`
+        "url": `${baseUrl}/pdfbolt-logo.webp`
       }
     },
     "mainEntityOfPage": canonicalUrl
@@ -44,8 +45,8 @@ const EncyclopediaDetailPage: React.FC<EncyclopediaDetailPageProps> = ({ darkMod
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     "itemListElement": [
-      { "@type": "ListItem", "position": 1, "name": "Home", "item": baseUrl },
-      { "@type": "ListItem", "position": 2, "name": "Encyclopedia", "item": `${baseUrl}/encyclopedia` },
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": `${baseUrl}/` },
+      { "@type": "ListItem", "position": 2, "name": "Encyclopedia", "item": `${baseUrl}/encyclopedia/` },
       { "@type": "ListItem", "position": 3, "name": article.title, "item": canonicalUrl }
     ]
   };
