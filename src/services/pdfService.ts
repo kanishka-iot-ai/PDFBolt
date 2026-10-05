@@ -55,11 +55,13 @@ export async function mergeFiles(files: File[]): Promise<Uint8Array> {
   const merged = await PDFDocument.create();
   for (const f of files) {
     try {
-      const pdfBytes = await f.arrayBuffer();
-      const pdf = await PDFDocument.load(pdfBytes);
+      let pdfBytes: ArrayBuffer | null = await f.arrayBuffer();
+      const pdf: any = await PDFDocument.load(pdfBytes);
       const indices = pdf.getPageIndices();
       const copiedPages = await merged.copyPages(pdf, indices);
       copiedPages.forEach(p => merged.addPage(p));
+      // Immediate null dereference for low-RAM mobile V8 heap relief
+      pdfBytes = null;
     } catch (err) {
       console.error(`Error processing ${f.name}:`, err);
       throw new Error(`Failed to load PDF: ${f.name}`);

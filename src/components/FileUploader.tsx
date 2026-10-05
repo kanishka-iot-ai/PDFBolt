@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { Upload, X, AlertTriangle, ShieldCheck, Folder } from 'lucide-react';
+import { Upload, X, AlertTriangle, AlertCircle, ShieldCheck, Folder } from 'lucide-react';
 import { HumanError } from '../utils/fileValidation';
 
 interface FileUploaderProps {
@@ -10,7 +10,9 @@ interface FileUploaderProps {
   darkMode: boolean;
   allowFolder?: boolean;
   error?: HumanError | string | null;
+  warning?: string | null;
   onClearError?: () => void;
+  onClearWarning?: () => void;
 }
 
 const FileUploader: React.FC<FileUploaderProps> = ({
@@ -21,7 +23,9 @@ const FileUploader: React.FC<FileUploaderProps> = ({
   darkMode,
   allowFolder = true,
   error,
-  onClearError
+  warning,
+  onClearError,
+  onClearWarning
 }) => {
   const [isDragging, setIsDragging] = React.useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -154,6 +158,31 @@ const FileUploader: React.FC<FileUploaderProps> = ({
         </div>
       )}
 
+      {/* RAM & Hardware Advisory Banner */}
+      {warning && (
+        <div className="w-full mb-4 p-4 rounded-2xl border border-amber-300 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/40 text-amber-900 dark:text-amber-200 animate-slideDown flex items-start gap-3 text-left">
+          <AlertCircle className="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+          <div className="flex-grow">
+            <h4 className="font-bold text-xs uppercase tracking-wider text-amber-800 dark:text-amber-300">
+              Hardware & Memory Advisory
+            </h4>
+            <p className="text-xs mt-0.5 opacity-90 leading-relaxed">
+              {warning}
+            </p>
+          </div>
+          {onClearWarning && (
+            <button
+              type="button"
+              onClick={onClearWarning}
+              aria-label="Dismiss advisory"
+              className="text-amber-500 hover:text-amber-700 dark:text-amber-400 dark:hover:text-amber-200"
+            >
+              <X size={16} />
+            </button>
+          )}
+        </div>
+      )}
+
       {/* Hidden File Inputs */}
       <input
         type="file"
@@ -194,6 +223,10 @@ const FileUploader: React.FC<FileUploaderProps> = ({
 
         <p className="mt-3 text-xs sm:text-sm font-semibold text-slate-400 dark:text-slate-500">
           or drop {formatBadge} here
+        </p>
+
+        <p className="mt-2 text-[11px] sm:text-xs text-slate-400 dark:text-slate-500 max-w-sm text-center">
+          ⚡ In-browser processing: Recommended &lt;80MB on mobile, &lt;250MB on desktop to preserve device RAM.
         </p>
 
         {allowFolder && multiple && (

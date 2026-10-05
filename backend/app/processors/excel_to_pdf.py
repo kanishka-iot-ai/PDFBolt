@@ -142,9 +142,11 @@ class ExcelToPdfProcessor(BaseProcessor):
 
         if libreoffice_bin:
             # Exact command from specification:
-            # soffice --headless --convert-to pdf "{excel_filename}" --outdir "{output_dir}"
+            # soffice -env:UserInstallation=file://... --headless --convert-to pdf "{excel_filename}" --outdir "{output_dir}"
+            profile_dir = "/tmp/libreoffice_profile" if os.name != 'nt' else str(output_dir / ".lo_profile")
             cmd = [
                 libreoffice_bin,
+                f"-env:UserInstallation=file://{profile_dir}",
                 "--headless",
                 "--convert-to",
                 "pdf",

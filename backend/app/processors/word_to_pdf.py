@@ -158,9 +158,11 @@ class WordToPdfProcessor(BaseProcessor):
         converted = False
 
         if libreoffice_bin:
-            # Exact command: libreoffice --headless --convert-to pdf "{input_filename}" --outdir "{output_dir}"
+            # Exact command: libreoffice -env:UserInstallation=file://... --headless --convert-to pdf "{input_filename}" --outdir "{output_dir}"
+            profile_dir = "/tmp/libreoffice_profile" if os.name != 'nt' else str(output_dir / ".lo_profile")
             cmd = [
                 libreoffice_bin,
+                f"-env:UserInstallation=file://{profile_dir}",
                 "--headless",
                 "--convert-to",
                 "pdf",

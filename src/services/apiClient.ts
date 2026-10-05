@@ -65,12 +65,43 @@ class ApiClient {
   private baseUrl: string = API_BASE_URL;
   private backendAvailable: boolean | null = null;
   private lastHealthCheck: number = 0;
+  private isWarmingUp: boolean = false;
+
+  /**
+   * Anticipatory Warmup for Render Free Tier:
+   * Proactively pings backend health in the background when users land on office conversion tools,
+   * waking up sleeping containers before the user submits their document.
+   */
+  warmupBackend(): void {
+    if (this.isWarmingUp) return;
+    const now = Date.now();
+    if (this.backendAvailable === true && now - this.lastHealthCheck < 60000) return;
+
+    this.isWarmingUp = true;
+    fetch(`${this.baseUrl}/health`, {
+      method: 'GET',
+      headers: { 'Accept': 'application/json' },
+      signal: AbortSignal.timeout(60000) // Render spin-up can take 30-50s
+    })
+      .then(res => {
+        if (res.ok) {
+          this.backendAvailable = true;
+          this.lastHealthCheck = Date.now();
+        }
+      })
+      .catch(() => {
+        // Silent catch for background warmup probe
+      })
+      .finally(() => {
+        this.isWarmingUp = false;
+      });
+  }
 
   /**
    * Checks if the FastAPI backend is online.
    * Caches result for 30 seconds to minimize network overhead.
    */
-  async checkBackend(): Promise<boolean> {
+  async checkBackend(timeoutMs: number = 8000): Promise<boolean> {
     const now = Date.now();
     if (this.backendAvailable !== null && now - this.lastHealthCheck < 30000) {
       return this.backendAvailable;
@@ -80,7 +111,7 @@ class ApiClient {
       const res = await fetch(`${this.baseUrl}/health`, {
         method: 'GET',
         headers: { 'Accept': 'application/json' },
-        signal: AbortSignal.timeout(5000)
+        signal: AbortSignal.timeout(timeoutMs)
       });
       this.backendAvailable = res.ok;
     } catch {
@@ -92,26 +123,56 @@ class ApiClient {
   }
 
   /**
-   * Submits a single file processing job to the backend engine.
+   * Submits a single file processing job to the backend engine with Render cold-start resilience.
    */
   async submitJob(
     operation: string,
     file: File,
-    settings: Record<string, any> = {}
+    settings: Record<string, any> = {},
+    onStatusUpdate?: (status: string) => void
   ): Promise<BackendJobResult> {
     const formData = new FormData();
     formData.append('operation', operation);
     formData.append('settings', JSON.stringify(settings));
     formData.append('file', file);
 
-    const response = await fetch(`${this.baseUrl}/jobs`, {
-      method: 'POST',
-      body: formData,
-    });
+    let response: Response | null = null;
+    let attempts = 0;
+    const maxAttempts = 2;
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      const message = formatHttpError(response.status, errorData.error?.message);
+    while (attempts < maxAttempts) {
+      attempts++;
+      try {
+        if (attempts > 1) {
+          onStatusUpdate?.("Render container is waking up... Retrying request.");
+        }
+        response = await fetch(`${this.baseUrl}/jobs`, {
+          method: 'POST',
+          body: formData,
+          signal: AbortSignal.timeout(90000) // 90s to accommodate Render container spin-up + conversion
+        });
+
+        // Render returns 502/503 for ~5-10s while the container is binding its port
+        if ((response.status === 502 || response.status === 503) && attempts < maxAttempts) {
+          onStatusUpdate?.("Processing server is starting up... Waiting 4s before retrying.");
+          await new Promise(r => setTimeout(r, 4000));
+          continue;
+        }
+        break;
+      } catch (fetchErr: any) {
+        if (attempts < maxAttempts) {
+          onStatusUpdate?.("Re-establishing connection with processing worker...");
+          await new Promise(r => setTimeout(r, 3000));
+          continue;
+        }
+        throw fetchErr;
+      }
+    }
+
+    if (!response || !response.ok) {
+      const status = response ? response.status : 504;
+      const errorData = response ? await response.json().catch(() => ({})) : {};
+      const message = formatHttpError(status, errorData.error?.message);
       throw new Error(message);
     }
 
@@ -121,7 +182,7 @@ class ApiClient {
     // Fetch output artifact
     const downloadUrl = resolveApiUrl(jobData.download_url, `/jobs/${jobId}/download`);
     const dlResponse = await fetch(downloadUrl, {
-      signal: AbortSignal.timeout(30000)
+      signal: AbortSignal.timeout(45000)
     });
     if (!dlResponse.ok) {
       throw new Error("Failed to download output artifact from backend storage.");

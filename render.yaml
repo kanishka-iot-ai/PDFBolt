@@ -316,4 +316,6 @@ services:
         value: "300"
       - key: SIGNED_URL_TTL_SECONDS
         value: "900"
+      - key: RENDER_EXTERNAL_URL
+        value: https://pdfbolt-api.onrender.com
 

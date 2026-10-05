@@ -161,8 +161,9 @@ class PptToPdfProcessor(BaseProcessor):
                     logger.info(f"Converting '{input_path}' to PDF with unoconv: {' '.join(cmd)}")
                     res = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
                 else:
-                    # libreoffice --headless --convert-to pdf "{input_ppt_filename}" --outdir "{output_dir}"
-                    cmd = [conv_bin, "--headless", "--convert-to", "pdf", str(input_path), "--outdir", str(output_dir)]
+                    # libreoffice -env:UserInstallation=file://... --headless --convert-to pdf "{input_ppt_filename}" --outdir "{output_dir}"
+                    profile_dir = "/tmp/libreoffice_profile" if os.name != 'nt' else str(output_dir / ".lo_profile")
+                    cmd = [conv_bin, f"-env:UserInstallation=file://{profile_dir}", "--headless", "--convert-to", "pdf", str(input_path), "--outdir", str(output_dir)]
                     logger.info(f"Converting '{input_path}' to PDF with LibreOffice: {' '.join(cmd)}")
                     res = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
                     generated_pdf = output_dir / f"{input_path.stem}.pdf"

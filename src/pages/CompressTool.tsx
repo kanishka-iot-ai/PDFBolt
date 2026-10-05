@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { inspectPdfForCompression, compressPdfAdvanced, PdfCompressionStats, CompressionResult, CompressionOptions } from '../services/pdfService';
 import FileUploader from '../components/FileUploader';
 import ProgressBar from '../components/ProgressBar';
-import { formatFileSize, validateOutputIntegrity } from '../utils/fileValidation';
+import { formatFileSize, validateOutputIntegrity, validateFile, ALLOWED_MIME_TYPES, MAX_FILE_SIZE } from '../utils/fileValidation';
 import { saveAs } from 'file-saver';
 import { apiClient } from '../services/apiClient';
 import AdSlot from '../components/AdSlot';
@@ -49,6 +49,8 @@ const CompressTool: React.FC<CompressToolProps> = ({ darkMode, notify }) => {
   const [progress, setProgress] = useState(0);
   const [result, setResult] = useState<CompressionResult | null>(null);
   const [showPreviewModal, setShowPreviewModal] = useState(false);
+  const [ramWarning, setRamWarning] = useState<string | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   // Sync active work
   React.useEffect(() => {
@@ -59,6 +61,24 @@ const CompressTool: React.FC<CompressToolProps> = ({ darkMode, notify }) => {
   const handleFilesSelected = async (files: File[]) => {
     if (files.length === 0) return;
     const selectedFile = files[0];
+    setErrorMsg(null);
+    setRamWarning(null);
+
+    const validation = await validateFile(selectedFile, {
+      allowedTypes: ALLOWED_MIME_TYPES.PDF,
+      maxSize: MAX_FILE_SIZE.PDF
+    });
+
+    if (!validation.valid) {
+      setErrorMsg(validation.error || 'Invalid PDF file selected.');
+      notify.error();
+      return;
+    }
+
+    if (validation.warning) {
+      setRamWarning(validation.warning);
+    }
+
     setFile(selectedFile);
     setInspecting(true);
     setStats(null);
@@ -235,6 +255,10 @@ const CompressTool: React.FC<CompressToolProps> = ({ darkMode, notify }) => {
                 accept=".pdf"
                 multiple={false}
                 darkMode={darkMode}
+                warning={ramWarning}
+                onClearWarning={() => setRamWarning(null)}
+                error={errorMsg}
+                onClearError={() => setErrorMsg(null)}
               />
             )}
           </div>

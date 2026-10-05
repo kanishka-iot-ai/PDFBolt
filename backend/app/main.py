@@ -29,14 +29,69 @@ from backend.app.services.cleanup_service import cleanup_service
 from backend.app.services.job_manager import job_manager
 
 
+def _prewarm_engines():
+    """Warms fontconfig cache and LibreOffice engine on Render container startup so the first request is instant."""
+    try:
+        import shutil
+        import subprocess
+        for bin_name in ["libreoffice", "soffice", "libreoffice.exe", "soffice.exe"]:
+            p = shutil.which(bin_name)
+            if p:
+                logger.info(f"Pre-warming LibreOffice engine on Render ({p})...")
+                profile_dir = "/tmp/libreoffice_profile" if os.name != 'nt' else os.path.join(os.environ.get("TEMP", "/tmp"), "lo_profile")
+                os.makedirs(profile_dir, exist_ok=True)
+                subprocess.run(
+                    [p, f"-env:UserInstallation=file://{profile_dir}", "--headless", "--version"],
+                    capture_output=True,
+                    timeout=15
+                )
+                logger.info("LibreOffice pre-warming complete.")
+                break
+    except Exception as e:
+        logger.debug(f"LibreOffice engine pre-warming notice: {e}")
+
+
+async def _render_keepalive_worker():
+    """Optional background keep-alive ping for Render Free Tier to prevent sleep during active usage."""
+    external_url = os.environ.get("RENDER_EXTERNAL_URL") or os.environ.get("BACKEND_KEEP_ALIVE_URL")
+    if not external_url:
+        return
+    url = f"{external_url.rstrip('/')}/health"
+    logger.info(f"Render keep-alive worker started targeting {url}")
+    while True:
+        try:
+            await asyncio.sleep(780)  # 13 minutes (Render free tier sleeps after 15m idle)
+            import urllib.request
+            req = urllib.request.Request(url, headers={"User-Agent": "PDFBolt-Render-KeepAlive/1.0"})
+            with urllib.request.urlopen(req, timeout=10) as resp:
+                logger.debug(f"Render keep-alive ping status: {resp.status}")
+        except asyncio.CancelledError:
+            break
+        except Exception as e:
+            logger.debug(f"Render keep-alive ping notice: {e}")
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup: Launch periodic 15-min and 20-min temporary file auto-cleanup worker
     cleanup_task = asyncio.create_task(cleanup_service.start_periodic_worker(job_manager))
+
+    # Startup: Launch Render keep-alive worker (if configured)
+    keepalive_task = asyncio.create_task(_render_keepalive_worker())
+
+    # Startup: Pre-warm LibreOffice and font caches in background thread
+    try:
+        loop = asyncio.get_running_loop()
+        loop.run_in_executor(None, _prewarm_engines)
+    except Exception as e:
+        logger.debug(f"Could not dispatch engine pre-warm: {e}")
+
     yield
-    # Shutdown: Stop cleanup worker
+
+    # Shutdown: Stop cleanup and keepalive workers
     cleanup_service.stop_worker()
     cleanup_task.cancel()
+    keepalive_task.cancel()
 
 
 app = FastAPI(

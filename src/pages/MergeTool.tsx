@@ -25,6 +25,7 @@ const MergeTool: React.FC<MergeToolProps> = ({ darkMode, notify, customHint }) =
   const [processingStatus, setProcessingStatus] = useState<'processing' | 'complete' | 'error'>('processing');
   const [resultKey, setResultKey] = useState(0);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [ramWarning, setRamWarning] = useState<string | null>(null);
 
   // Sync active work state
   useEffect(() => {
@@ -56,6 +57,12 @@ const MergeTool: React.FC<MergeToolProps> = ({ darkMode, notify, customHint }) =
     if (!validation.valid) {
       setErrorMessage(validation.error || 'Invalid PDF files selected.');
       return;
+    }
+
+    if (validation.warning) {
+      setRamWarning(validation.warning);
+    } else {
+      setRamWarning(null);
     }
 
     setFiles(p => [...p, ...nf]);
@@ -140,7 +147,12 @@ const MergeTool: React.FC<MergeToolProps> = ({ darkMode, notify, customHint }) =
               <span>{customHint}</span>
             </div>
           )}
-          <FileUploader onFilesSelected={handleFiles} darkMode={darkMode} />
+          <FileUploader 
+            onFilesSelected={handleFiles} 
+            darkMode={darkMode}
+            warning={ramWarning}
+            onClearWarning={() => setRamWarning(null)}
+          />
         </div>
       ) : !result ? (
         /* ── 2-COLUMN FULL-SCREEN WORKSPACE ── */
@@ -149,6 +161,20 @@ const MergeTool: React.FC<MergeToolProps> = ({ darkMode, notify, customHint }) =
           {/* LEFT EXPANSIVE CANVAS */}
           <div className="flex-grow flex flex-col justify-between relative bg-[#f4f5f8] dark:bg-slate-900/80 overflow-y-auto p-4 sm:p-6 lg:p-8">
             
+            {/* RAM Advisory Notice */}
+            {ramWarning && (
+              <div className="w-full max-w-4xl mx-auto mb-3 p-3 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800 text-amber-900 dark:text-amber-200 text-xs flex items-center justify-between gap-3 animate-slideDown">
+                <span className="font-medium">⚠️ {ramWarning}</span>
+                <button
+                  type="button"
+                  onClick={() => setRamWarning(null)}
+                  className="text-amber-700 dark:text-amber-300 font-bold text-xs uppercase hover:underline shrink-0"
+                >
+                  Dismiss
+                </button>
+              </div>
+            )}
+
             {/* Top Ad Banner */}
             <div className="w-full max-w-4xl mx-auto flex justify-center shrink-0 mb-2">
               <AdSlot placement="TOOL_CONTENT_BOTTOM" className="w-full flex justify-center" />

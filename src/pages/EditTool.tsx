@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import * as pdfjsLib from 'pdfjs-dist';
 import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
 import FileUploader from '../components/FileUploader';
+import { validateFile, ALLOWED_MIME_TYPES, MAX_FILE_SIZE } from '../utils/fileValidation';
 import { ChevronLeft, ChevronRight, ZoomIn, ZoomOut, Type, Image as ImageIcon, PenTool, Save, Move, Trash2 } from 'lucide-react';
 import { useActiveWork } from '../context/ActiveWorkContext';
 
@@ -49,6 +50,7 @@ const EditTool: React.FC<EditToolProps> = ({ darkMode, notify }) => {
     const [scale, setScale] = useState(1.0);
     const [loading, setLoading] = useState(false);
     const [errorMsg, setErrorMsg] = useState<string | null>(null);
+    const [ramWarning, setRamWarning] = useState<string | null>(null);
 
     // Sync active work
     useEffect(() => {
@@ -89,12 +91,23 @@ const EditTool: React.FC<EditToolProps> = ({ darkMode, notify }) => {
     const handleFilesSelected = async (files: File[]) => {
         if (files.length === 0) return;
         const uploadedFile = files[0];
-        if (uploadedFile.type !== 'application/pdf' && !uploadedFile.name.toLowerCase().endsWith('.pdf')) {
-            setErrorMsg('Please upload a valid PDF file.');
+        setErrorMsg(null);
+        setRamWarning(null);
+
+        const validation = await validateFile(uploadedFile, {
+            allowedTypes: ALLOWED_MIME_TYPES.PDF,
+            maxSize: MAX_FILE_SIZE.PDF
+        });
+
+        if (!validation.valid) {
+            setErrorMsg(validation.error || 'Please upload a valid PDF file.');
             return;
         }
 
-        setErrorMsg(null);
+        if (validation.warning) {
+            setRamWarning(validation.warning);
+        }
+
         setFile(uploadedFile);
         setLoading(true);
         try {
@@ -466,7 +479,16 @@ const EditTool: React.FC<EditToolProps> = ({ darkMode, notify }) => {
                         {errorMsg}
                     </div>
                 )}
-                <FileUploader onFilesSelected={handleFilesSelected} accept=".pdf" maxSizeMB={50} darkMode={darkMode} />
+                <FileUploader 
+                    onFilesSelected={handleFilesSelected} 
+                    accept=".pdf" 
+                    maxSizeMB={250} 
+                    darkMode={darkMode}
+                    warning={ramWarning}
+                    onClearWarning={() => setRamWarning(null)}
+                    error={errorMsg}
+                    onClearError={() => setErrorMsg(null)}
+                />
             </div>
         );
     }

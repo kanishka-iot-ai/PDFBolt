@@ -165,6 +165,14 @@ const SimpleTool: React.FC<SimpleToolProps> = ({ title, mode, darkMode, notify, 
   } | null>(null);
   const [ocrLanguage, setOcrLanguage] = useState<string>('eng');
   const [copiedOcrText, setCopiedOcrText] = useState(false);
+  const [ramWarning, setRamWarning] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Anticipatory Warmup for Render backend when user opens office conversion tools
+    if (['word2pdf', 'excel2pdf', 'html2pdf', 'pdf2word', 'pdf2doc', 'pdf2excel', 'repair', 'ocr'].includes(mode)) {
+      apiClient.warmupBackend();
+    }
+  }, [mode]);
 
   const isImageTool = mode === 'jpg2pdf';
   const needsPassword = ['protect', 'unlock'].includes(mode);
@@ -303,9 +311,9 @@ const SimpleTool: React.FC<SimpleToolProps> = ({ title, mode, darkMode, notify, 
     }
 
     if (validation.warning) {
-      if (!confirm(`${validation.warning}\n\nDo you want to continue?`)) {
-        return;
-      }
+      setRamWarning(validation.warning);
+    } else {
+      setRamWarning(null);
     }
 
     if (isMultiSupported) {
@@ -379,10 +387,11 @@ const SimpleTool: React.FC<SimpleToolProps> = ({ title, mode, darkMode, notify, 
         });
       }
       else if (mode === 'word2pdf' && file) {
-        const isBackendUp = await apiClient.checkBackend();
+        setStatusMessage("Connecting to Word conversion engine...");
+        const isBackendUp = await apiClient.checkBackend(12000);
         if (isBackendUp) {
           try {
-            const res = await apiClient.submitJob('word-to-pdf', file);
+            const res = await apiClient.submitJob('word-to-pdf', file, {}, (msg) => setStatusMessage(msg));
             const arrayBuf = await res.outputBlob.arrayBuffer();
             b = new Uint8Array(arrayBuf);
           } catch (backendErr) {
@@ -394,10 +403,11 @@ const SimpleTool: React.FC<SimpleToolProps> = ({ title, mode, darkMode, notify, 
         }
       }
       else if (mode === 'excel2pdf' && file) {
-        const isBackendUp = await apiClient.checkBackend();
+        setStatusMessage("Connecting to Excel conversion engine...");
+        const isBackendUp = await apiClient.checkBackend(12000);
         if (isBackendUp) {
           try {
-            const res = await apiClient.submitJob('excel-to-pdf', file);
+            const res = await apiClient.submitJob('excel-to-pdf', file, {}, (msg) => setStatusMessage(msg));
             const arrayBuf = await res.outputBlob.arrayBuffer();
             b = new Uint8Array(arrayBuf);
           } catch (backendErr) {
@@ -409,10 +419,10 @@ const SimpleTool: React.FC<SimpleToolProps> = ({ title, mode, darkMode, notify, 
         }
       }
       else if (mode === 'html2pdf' && file) {
-        const isBackendUp = await apiClient.checkBackend();
+        const isBackendUp = await apiClient.checkBackend(10000);
         if (isBackendUp) {
           try {
-            const res = await apiClient.submitJob('html-to-pdf', file);
+            const res = await apiClient.submitJob('html-to-pdf', file, {}, (msg) => setStatusMessage(msg));
             const arrayBuf = await res.outputBlob.arrayBuffer();
             b = new Uint8Array(arrayBuf);
           } catch (backendErr) {
@@ -428,10 +438,11 @@ const SimpleTool: React.FC<SimpleToolProps> = ({ title, mode, darkMode, notify, 
         b = await pdfToJpg(file);
       }
       else if ((mode === 'pdf2word' || mode === 'pdf2doc') && file) {
-        const isBackendUp = await apiClient.checkBackend();
+        setStatusMessage("Connecting to document export engine...");
+        const isBackendUp = await apiClient.checkBackend(12000);
         if (isBackendUp) {
           try {
-            const res = await apiClient.submitJob('pdf-to-word', file);
+            const res = await apiClient.submitJob('pdf-to-word', file, {}, (msg) => setStatusMessage(msg));
             const arrayBuf = await res.outputBlob.arrayBuffer();
             b = new Uint8Array(arrayBuf);
           } catch (backendErr) {
@@ -444,10 +455,11 @@ const SimpleTool: React.FC<SimpleToolProps> = ({ title, mode, darkMode, notify, 
         outputKind = 'docx';
       }
       else if (mode === 'pdf2excel' && file) {
-        const isBackendUp = await apiClient.checkBackend();
+        setStatusMessage("Connecting to spreadsheet export engine...");
+        const isBackendUp = await apiClient.checkBackend(12000);
         if (isBackendUp) {
           try {
-            const res = await apiClient.submitJob('pdf-to-excel', file);
+            const res = await apiClient.submitJob('pdf-to-excel', file, {}, (msg) => setStatusMessage(msg));
             const arrayBuf = await res.outputBlob.arrayBuffer();
             b = new Uint8Array(arrayBuf);
           } catch (backendErr) {
@@ -723,6 +735,8 @@ const SimpleTool: React.FC<SimpleToolProps> = ({ title, mode, darkMode, notify, 
             onFilesSelected={handle}
             darkMode={darkMode}
             allowFolder={mode === 'compress'}
+            warning={ramWarning}
+            onClearWarning={() => setRamWarning(null)}
           />
         </div>
       ) : !result ? (
@@ -732,6 +746,20 @@ const SimpleTool: React.FC<SimpleToolProps> = ({ title, mode, darkMode, notify, 
           {/* LEFT EXPANSIVE CANVAS */}
           <div className="flex-grow flex flex-col justify-between relative bg-[#f4f5f8] dark:bg-slate-900/80 overflow-y-auto p-4 sm:p-6 lg:p-8">
             
+            {/* RAM Advisory Notice in Workspace */}
+            {ramWarning && (
+              <div className="w-full max-w-4xl mx-auto mb-3 p-3 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800 text-amber-900 dark:text-amber-200 text-xs flex items-center justify-between gap-3 animate-slideDown">
+                <span className="font-medium">⚠️ {ramWarning}</span>
+                <button
+                  type="button"
+                  onClick={() => setRamWarning(null)}
+                  className="text-amber-700 dark:text-amber-300 font-bold text-xs uppercase hover:underline shrink-0"
+                >
+                  Dismiss
+                </button>
+              </div>
+            )}
+
             {/* Top Ad Banner */}
             <div className="w-full max-w-4xl mx-auto flex justify-center shrink-0 mb-2">
               <AdSlot placement="TOOL_CONTENT_BOTTOM" className="w-full flex justify-center" />

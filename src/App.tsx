@@ -11,6 +11,7 @@ import ErrorBoundary from './components/ErrorBoundary';
 import AdSenseScript from './components/AdSenseScript';
 import CookieConsent from './components/CookieConsent';
 import { ActiveWorkProvider, useActiveWork } from './context/ActiveWorkContext';
+import { apiClient } from './services/apiClient';
 
 const LANDING_PAGES_BY_SLUG = new Map(ALL_LANDING_PAGES.map(p => [p.slug, p]));
 
@@ -202,11 +203,21 @@ interface MainLayoutProps {
 
 const MainLayout: React.FC<MainLayoutProps> = ({ darkMode, setDarkMode, soundEnabled, setSoundEnabled, notify }) => {
   const { hasActiveWork } = useActiveWork();
-  const location = useLocation();
-
   // O(1) Set lookup — was O(N) TOOLS.some()
   const isToolPage = location.pathname.startsWith('/tool/') ||
     TOOL_PATH_SET.has(location.pathname);
+
+  // Anticipatory Warmup for Render backend containers on office conversion routes
+  useEffect(() => {
+    const officeRoutes = [
+      '/word-to-pdf', '/excel-to-pdf', '/ppt-to-pdf', 
+      '/pdf-to-word', '/pdf-to-excel', '/pdf-to-ppt', 
+      '/ocr-pdf', '/repair-pdf', '/html-to-pdf'
+    ];
+    if (officeRoutes.some(r => location.pathname.startsWith(r))) {
+      apiClient.warmupBackend();
+    }
+  }, [location.pathname]);
 
   return (
     <div className={`min-h-screen flex flex-col transition-colors duration-300 font-sans ${darkMode ? 'dark bg-slate-900 text-white' : 'bg-white text-slate-900'}`}>

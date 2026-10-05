@@ -22,11 +22,56 @@ export const ALLOWED_MIME_TYPES = {
 };
 
 export const MAX_FILE_SIZE = {
-    PDF: 100 * 1024 * 1024, // 100MB for general PDF operations
-    IMAGE: 100 * 1024 * 1024, // 100MB for images
+    PDF: 250 * 1024 * 1024, // 250MB hard limit for in-browser desktop operations
+    IMAGE: 150 * 1024 * 1024, // 150MB for images
     DOCUMENT: 100 * 1024 * 1024, // 100MB for Word/Excel/PPT
     QR: 100 * 1024 * 1024, // 100MB for QR code sharing
+    MASSIVE_FILE_THRESHOLD: 150 * 1024 * 1024, // 150MB advisory threshold
+    MOBILE_RECOMMENDED_LIMIT: 80 * 1024 * 1024, // 80MB recommended mobile threshold
 };
+
+export interface DeviceMemoryProfile {
+    isMobile: boolean;
+    deviceMemoryGB?: number;
+    hardwareConcurrency?: number;
+    isConstrained: boolean;
+    tier: 'constrained' | 'standard' | 'high-performance';
+    maxRecommendedSingleFileMB: number;
+    maxRecommendedBatchMB: number;
+}
+
+/**
+ * Detects client device hardware capability, memory constraints, and mobile environment
+ * to provide intelligent RAM sizing advisories before memory exhaustion occurs.
+ */
+export function getDeviceMemoryProfile(): DeviceMemoryProfile {
+    const isMobile = typeof navigator !== 'undefined' && (
+        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+        (typeof window !== 'undefined' && window.innerWidth <= 768)
+    );
+
+    const nav = typeof navigator !== 'undefined' ? (navigator as any) : {};
+    const deviceMemoryGB = typeof nav.deviceMemory === 'number' ? nav.deviceMemory : undefined;
+    const hardwareConcurrency = typeof nav.hardwareConcurrency === 'number' ? nav.hardwareConcurrency : undefined;
+
+    // Mobile devices or low-RAM systems (<= 4GB) have strict tab memory bounds (~500MB max)
+    const isConstrained = isMobile || (deviceMemoryGB !== undefined && deviceMemoryGB <= 4);
+    const isHigh = !isMobile && (deviceMemoryGB === undefined || deviceMemoryGB >= 8);
+
+    const tier: 'constrained' | 'standard' | 'high-performance' = isConstrained 
+        ? 'constrained' 
+        : isHigh ? 'high-performance' : 'standard';
+
+    return {
+        isMobile,
+        deviceMemoryGB,
+        hardwareConcurrency,
+        isConstrained,
+        tier,
+        maxRecommendedSingleFileMB: isConstrained ? 80 : 250,
+        maxRecommendedBatchMB: isConstrained ? 120 : 500
+    };
+}
 
 export interface HumanError {
     code: string;
@@ -40,6 +85,7 @@ export interface ValidationResult {
     error?: string;
     humanError?: HumanError;
     warning?: string;
+    memoryAdvisory?: string;
 }
 
 /**
@@ -216,7 +262,7 @@ export async function validateFileTypeAndBytes(file: File, allowedMimes: string[
 }
 
 /**
- * Validates file size against limits
+ * Validates file size against limits and checks device RAM suitability
  */
 export function validateFileSize(file: File, maxSizeBytes: number): ValidationResult {
     if (file.size > maxSizeBytes) {
@@ -245,11 +291,33 @@ export function validateFileSize(file: File, maxSizeBytes: number): ValidationRe
         };
     }
 
+    // Dynamic RAM sizing advisory based on detected device capability
+    const profile = getDeviceMemoryProfile();
+    const fileSizeMB = Number((file.size / (1024 * 1024)).toFixed(1));
+
+    if (file.size > MAX_FILE_SIZE.MASSIVE_FILE_THRESHOLD) {
+        const advisory = `Massive Document Advisory (${fileSizeMB}MB): In-browser WebAssembly processing of files over 150MB requires significant temporary memory. If you experience tab stutter or reload on low-memory devices, consider compressing the PDF or using a desktop browser.`;
+        return {
+            valid: true,
+            warning: advisory,
+            memoryAdvisory: advisory
+        };
+    }
+
+    if (profile.isConstrained && file.size > MAX_FILE_SIZE.MOBILE_RECOMMENDED_LIMIT) {
+        const advisory = `Mobile RAM Notice (${fileSizeMB}MB): Mobile browsers enforce strict per-tab memory limits (~500MB). For the smoothest experience on mobile, we recommend files under 80MB or using a desktop browser.`;
+        return {
+            valid: true,
+            warning: advisory,
+            memoryAdvisory: advisory
+        };
+    }
+
     return { valid: true };
 }
 
 /**
- * Comprehensive file validation (MIME + Magic Bytes + Size + Encryption)
+ * Comprehensive file validation (MIME + Magic Bytes + Size + Encryption + RAM advisory)
  */
 export async function validateFile(
     file: File,
@@ -265,11 +333,17 @@ export async function validateFile(
     const byteCheck = await validateFileTypeAndBytes(file, options.allowedTypes);
     if (!byteCheck.valid) return byteCheck;
 
-    return { valid: true, warning: byteCheck.warning };
+    const combinedWarning = [sizeCheck.warning, byteCheck.warning].filter(Boolean).join('\n');
+
+    return {
+        valid: true,
+        warning: combinedWarning || undefined,
+        memoryAdvisory: sizeCheck.memoryAdvisory
+    };
 }
 
 /**
- * Validates multiple files in batch
+ * Validates multiple files in batch with device capability & RAM limits
  */
 export async function validateFiles(
     files: File[],
@@ -302,12 +376,23 @@ export async function validateFiles(
 
     const warnings: string[] = [];
 
+    // Check total batch size against device memory profile
+    const totalBatchBytes = files.reduce((acc, f) => acc + f.size, 0);
+    const totalBatchMB = Number((totalBatchBytes / (1024 * 1024)).toFixed(1));
+    const profile = getDeviceMemoryProfile();
+
+    if (profile.isConstrained && totalBatchBytes > profile.maxRecommendedBatchMB * 1024 * 1024) {
+        warnings.push(
+            `Batch Memory Advisory: Total batch size is ${totalBatchMB}MB across ${files.length} files. Mobile browsers may experience out-of-memory errors with large batches. For stability on mobile, process in smaller batches (under 50MB per batch) or use a desktop browser.`
+        );
+    }
+
     for (const file of files) {
         const result = await validateFile(file, options);
         if (!result.valid) {
             return result;
         }
-        if (result.warning) {
+        if (result.warning && !warnings.includes(result.warning)) {
             warnings.push(result.warning);
         }
     }
