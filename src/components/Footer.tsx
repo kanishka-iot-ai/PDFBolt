@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ShieldCheck, Lock, CheckCircle, Headphones, AlertTriangle } from 'lucide-react';
+import { LanguageSelector } from './LanguageSelector';
 
 const Footer: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
   const [showWipeModal, setShowWipeModal] = useState(false);
@@ -35,7 +36,7 @@ const Footer: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
             />
           </Link>
           <p className="text-xs font-medium leading-relaxed mb-6">
-            Privacy-first browser-based PDF toolkit. 100% client-side WebAssembly execution with zero server file transfers.
+            Privacy-first browser-based PDF toolkit. Local WebAssembly processing and ephemeral zero-retention cloud conversions.
           </p>
           <div className="flex gap-2 items-center flex-wrap">
             <div className={`p-2 rounded-xl flex items-center justify-center ${darkMode ? 'bg-slate-800 text-yellow-500' : 'bg-white shadow-sm text-yellow-600'}`}>
@@ -116,10 +117,11 @@ const Footer: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
 
       <div className="max-w-7xl mx-auto px-6 mt-16 pt-8 border-t border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
         <p className="text-xs font-medium text-slate-600 dark:text-slate-400 text-center sm:text-left">
-          Files are processed entirely within your browser using WebAssembly. No documents are uploaded to external servers.
+          Core PDF utilities process locally in your browser with WebAssembly. Heavy conversions execute via ephemeral zero-retention server workers deleted within 15 minutes.
         </p>
 
-        <div className="flex items-center gap-6">
+        <div className="flex flex-wrap items-center gap-6">
+          <LanguageSelector darkMode={darkMode} dropUp={true} />
           <div className="flex gap-4 text-xs font-semibold">
             <button
               type="button"

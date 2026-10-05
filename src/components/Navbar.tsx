@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { TOOLS, getIcon } from '../constants';
 import { useActiveWork } from '../context/ActiveWorkContext';
+import { LanguageSelector } from './LanguageSelector';
 
 interface NavbarProps {
   darkMode: boolean;
@@ -250,7 +251,7 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
             
             <NavLink to="/analyze-pdf">
               <span className="inline-flex items-center gap-1 text-yellow-700 dark:text-yellow-400 font-extrabold">
-                <Sparkles size={14} /> AI Analyzer
+                <Sparkles size={14} /> PDF Analyzer
               </span>
             </NavLink>
 
@@ -261,7 +262,8 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
 
             <div className="h-4 w-px bg-slate-200 dark:bg-slate-700"></div>
             
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1.5">
+              <LanguageSelector darkMode={darkMode} />
               <button 
                 type="button"
                 onClick={toggleSound} 
@@ -342,7 +344,7 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
               }} 
               className="block font-bold text-sm"
             >
-              ✨ AI PDF Analyzer
+              ✨ PDF Analyzer
             </Link>
             <Link 
               to="/guides" 
@@ -405,8 +407,12 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
               🧮 Size Calculator
             </Link>
 
-            {/* Mobile Actions: Sound Toggle */}
-            <div className="pt-4 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between gap-4">
+            {/* Mobile Actions: Language & Sound Toggle */}
+            <div className="pt-4 border-t border-slate-200 dark:border-slate-800 flex flex-col gap-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-slate-500">Language:</span>
+                <LanguageSelector darkMode={darkMode} />
+              </div>
               <button
                 type="button"
                 onClick={toggleSound}

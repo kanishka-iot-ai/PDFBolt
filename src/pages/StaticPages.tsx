@@ -727,6 +727,42 @@ export const AboutPage: React.FC<{ darkMode: boolean }> = ({ darkMode }) => (
         </p>
       </section>
 
+      {/* Open-Source Software & License Attributions */}
+      <section className="space-y-4">
+        <h2 className={`text-2xl sm:text-3xl font-black tracking-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+          Open-Source Software & License Attributions
+        </h2>
+        <p className="text-sm sm:text-base">
+          PDFBolt is built on the shoulders of giants. We proudly utilize and support open-source software under compliant permissive and copyleft licenses:
+        </p>
+        <div className="grid sm:grid-cols-2 gap-4 text-xs">
+          <div className={`p-4 rounded-xl border ${darkMode ? 'bg-slate-900/60 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
+            <p className="font-bold text-slate-900 dark:text-white">PDF.js (Mozilla Foundation)</p>
+            <p className="text-slate-500 dark:text-slate-400 mt-1">Licensed under Apache-2.0. Used for client-side PDF document parsing, text layer extraction, and canvas rendering.</p>
+          </div>
+          <div className={`p-4 rounded-xl border ${darkMode ? 'bg-slate-900/60 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
+            <p className="font-bold text-slate-900 dark:text-white">pdf-lib (Hopding)</p>
+            <p className="text-slate-500 dark:text-slate-400 mt-1">Licensed under MIT. Powers client-side PDF page manipulation, merging, splitting, rotation, watermarking, and metadata management.</p>
+          </div>
+          <div className={`p-4 rounded-xl border ${darkMode ? 'bg-slate-900/60 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
+            <p className="font-bold text-slate-900 dark:text-white">Tesseract.js</p>
+            <p className="text-slate-500 dark:text-slate-400 mt-1">Licensed under Apache-2.0. Provides in-browser WebAssembly-based optical character recognition for scans and handwriting.</p>
+          </div>
+          <div className={`p-4 rounded-xl border ${darkMode ? 'bg-slate-900/60 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
+            <p className="font-bold text-slate-900 dark:text-white">Mammoth, ExcelJS, docx & jsPDF</p>
+            <p className="text-slate-500 dark:text-slate-400 mt-1">Licensed under BSD-2-Clause and MIT. Powers client-side document conversions, spreadsheets, and PDF generation.</p>
+          </div>
+          <div className={`p-4 rounded-xl border ${darkMode ? 'bg-slate-900/60 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
+            <p className="font-bold text-slate-900 dark:text-white">PyMuPDF / MuPDF (Artifex Software)</p>
+            <p className="text-slate-500 dark:text-slate-400 mt-1">Licensed under AGPL-3.0. Powers high-fidelity backend rasterization and document repair. Source code for our pipeline is public on GitHub.</p>
+          </div>
+          <div className={`p-4 rounded-xl border ${darkMode ? 'bg-slate-900/60 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
+            <p className="font-bold text-slate-900 dark:text-white">LibreOffice (The Document Foundation)</p>
+            <p className="text-slate-500 dark:text-slate-400 mt-1">Licensed under MPL-2.0. Powers headless enterprise-grade office document conversion in isolated container environments.</p>
+          </div>
+        </div>
+      </section>
+
       {/* Contact Callout */}
       <div className={`p-8 rounded-3xl border flex flex-col sm:flex-row items-center justify-between gap-6 ${
         darkMode ? 'bg-slate-900 border-slate-800' : 'bg-yellow-50/60 border-yellow-200'
@@ -823,7 +859,16 @@ export const TermsPage: React.FC<{ darkMode: boolean }> = ({ darkMode }) => (
 
       <section className="space-y-3">
         <h2 className={`text-2xl font-black tracking-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>
-          7. Contact & Inquiries
+          7. Third-Party & Open-Source Licenses
+        </h2>
+        <p className="text-sm sm:text-base">
+          PDFBolt incorporates open-source software libraries licensed under MIT, Apache 2.0, BSD, MPL 2.0, and AGPL 3.0. Individual licenses and copyrights are held by their respective authors. The complete source code and architectural documentation are maintained in public repositories to ensure full compliance with copyleft and attribution terms.
+        </p>
+      </section>
+
+      <section className="space-y-3">
+        <h2 className={`text-2xl font-black tracking-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+          8. Contact & Inquiries
         </h2>
         <p className="text-sm sm:text-base">
           If you have questions regarding these Terms of Service, please contact our team at <a href="mailto:support@pdfbolt.in" className="font-bold text-yellow-700 dark:text-yellow-400 underline">support@pdfbolt.in</a>.
