@@ -1,6 +1,14 @@
 import os
+import sys
 import time
 import warnings
+
+# Alias fitz to pymupdf to prevent PyMuPDF's legacy message_warning on startup from third-party packages (e.g. pdf2docx)
+try:
+    import pymupdf
+    sys.modules["fitz"] = pymupdf
+except Exception:
+    pass
 
 # Suppress PyMuPDF legacy fitz deprecation warning
 warnings.filterwarnings("ignore", message=".*The 'fitz' API is deprecated.*")
