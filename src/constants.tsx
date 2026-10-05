@@ -328,7 +328,7 @@ export const TOOLS: ToolMetadata[] = [
       { title: 'Portfolio & Design Lookbooks', description: 'Stitch high-resolution design mocks and photography into a clean client PDF presentation.' }
     ],
     faqs: [
-      { q: 'How many images can I merge into one PDF?', a: 'There is no limit. You can merge dozens of images in a single batch.' },
+      { q: 'How many images can I merge into one PDF?', a: 'You can merge dozens of images in a single batch, scaling with your browser memory.' },
       { q: 'Can I mix JPG and PNG files in the same PDF?', a: 'Yes, you can upload a mix of JPG, PNG, and WebP images simultaneously.' },
       { q: 'Can I reorder images before generating the PDF?', a: 'Yes, simply drag and drop the image thumbnails to sequence them in your desired order.' }
     ],
@@ -1277,7 +1277,7 @@ export const GUIDES: Guide[] = [
     ],
     faqs: [
       { q: 'Can websites read the contents of my PDF?', a: 'Traditional cloud converters can theoretically access your text. PDFBolt runs locally on your machine, so we never see your file contents.' },
-      { q: 'Is client-side processing safe for HIPAA and confidential legal documents?', a: 'Yes! Because files are never transferred to a third party, client-side execution complies naturally with strict non-disclosure and privacy standards.' }
+      { q: 'Is client-side processing safe for confidential business and legal documents?', a: 'Yes. Because files are never transferred to a third party, client-side execution keeps document data confined to your local machine, assisting with strict non-disclosure and privacy standards.' }
     ],
     relatedGuides: ['how-to-redact-a-pdf', 'how-to-protect-a-pdf'],
     relatedTools: [ToolType.REDACT, ToolType.PROTECT, ToolType.COMPRESS]
@@ -1750,7 +1750,7 @@ export const WORKFLOWS: Workflow[] = [
       }
     ],
     benefits: [
-      { title: 'GDPR & HIPAA Compliance Alignment', description: 'Zero cloud file transfers means zero third-party data processor exposure.' },
+      { title: 'Data Isolation by Design', description: 'In-browser processing ensures your files never traverse third-party networks or cloud data processors.' },
       { title: 'Instant Executive Turnaround', description: 'Process heavy contracts in seconds without waiting for cloud queues.' }
     ],
     faqs: [

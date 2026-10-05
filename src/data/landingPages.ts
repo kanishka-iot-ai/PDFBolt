@@ -169,7 +169,7 @@ export const SIZE_COMPRESSION_PAGES: LandingPageContent[] = [
     steps: [
       { name: 'Select File', text: 'Upload your multi-page PDF transcript or application.' },
       { name: 'Process Document', text: 'Our engine balances vector fidelity and image deflate.' },
-      { name: 'Download PDF', text: 'Save your file, guaranteed to pass 200KB portal filters.' }
+      { name: 'Download PDF', text: 'Save your optimized file, compressed below 200KB for portal submissions.' }
     ],
     sections: [
       {
@@ -268,9 +268,9 @@ export const SIZE_COMPRESSION_PAGES: LandingPageContent[] = [
     quickAnswer: 'To compress PDF to 1MB: 1. Upload your heavy PDF. 2. Select Recommended Compression. 3. Click "Compress PDF" and download your under 1MB file.',
     keyHighlights: [
       'Compresses 20MB+ files down to under 1MB in seconds',
-      'Guarantees instant email delivery without bounced attachments',
+      'Enables fast email delivery without bounced attachments',
       'Preserves full book chapters, slide presentations, and portfolios',
-      'Executed entirely in browser RAM with zero tracking'
+      'Executed entirely in browser RAM with zero document storage or server uploads'
     ],
     steps: [
       { name: 'Upload Heavy PDF', text: 'Select documents up to 100MB.' },
@@ -809,14 +809,14 @@ export const ALTERNATIVE_PAGES: LandingPageContent[] = [
   {
     slug: 'compare/ilovepdf-alternative',
     toolType: 'edit',
-    title: 'Best Free iLovePDF Alternative (No Daily Limits & Private) | PDFBolt',
-    h1: 'Free iLovePDF Alternative (No Limits & Zero Uploads)',
-    subtitle: 'Tired of "Daily limit reached" and slow file uploads? Discover PDFBolt, the free, unlimited, privacy-first alternative to iLovePDF.',
-    seoTitle: 'Best Free iLovePDF Alternative 2026 – No Daily Task Limits | PDFBolt',
-    metaDescription: 'Looking for a free iLovePDF alternative? PDFBolt offers unlimited free PDF merging, compression, and editing with zero daily task limits and local in-browser privacy.',
-    quickAnswer: 'PDFBolt is the top free iLovePDF alternative because it has zero daily task limits, no forced registrations, and executes core PDF tools locally inside your web browser using WebAssembly rather than uploading your private documents to cloud servers.',
+    title: 'Best Free iLovePDF Alternative (Local In-Browser Privacy) | PDFBolt',
+    h1: 'Free iLovePDF Alternative (In-Browser Privacy & Zero Uploads)',
+    subtitle: 'Tired of "Daily limit reached" and slow file uploads? Discover PDFBolt, the free, privacy-first alternative to iLovePDF.',
+    seoTitle: 'Best Free iLovePDF Alternative 2026 – Private & Free | PDFBolt',
+    metaDescription: 'Looking for a free iLovePDF alternative? PDFBolt offers free PDF merging, compression, and editing with local in-browser WebAssembly privacy.',
+    quickAnswer: 'PDFBolt is the top free iLovePDF alternative because it requires no account registrations and executes core PDF tools locally inside your web browser using WebAssembly rather than uploading your private documents to cloud servers.',
     keyHighlights: [
-      'No "Daily Limit Reached": Unlimited free conversions and document edits',
+      'No Forced Paywalls: Free conversions and document edits supported by non-intrusive ads',
       'Privacy-First: Core tools run 100% locally in your browser memory',
       'Zero Account Signup: No emails, passwords, or credit cards required',
       'Instant Processing: No upload queues or slow server wait times'
@@ -824,14 +824,14 @@ export const ALTERNATIVE_PAGES: LandingPageContent[] = [
     steps: [
       { name: 'Choose Your Tool', text: 'Select Merge, Compress, Split, Convert, or Sign.' },
       { name: 'No Account Required', text: 'Drop your files and process immediately without signing up.' },
-      { name: 'Save Without Limits', text: 'Download as many documents as you need all day.' }
+      { name: 'Save Locally', text: 'Download your processed documents with zero server footprint.' }
     ],
     sections: [
       {
-        heading: 'Why Users are Switching from iLovePDF to PDFBolt',
+        heading: 'Why Users Choose PDFBolt Over Traditional Cloud Converters',
         paragraphs: [
-          'iLovePDF is a well-known tool, but free users frequently run into frustrating roadblocks: aggressive daily task caps, timed queues for heavy files, and nagging prompts to purchase monthly subscriptions.',
-          'More importantly, iLovePDF requires transmitting your documents to remote cloud infrastructure. For healthcare workers handling HIPAA records, lawyers reviewing contracts, or students submitting exam documents, PDFBolt provides an enterprise-grade client-side alternative with zero server exposure.'
+          'Many online PDF tools require uploading documents to remote cloud infrastructure. For professionals reviewing contracts or students handling personal coursework, transmitting confidential files introduces privacy concerns.',
+          'PDFBolt solves this by executing document parsing and vector manipulation locally in your browser sandbox. Your files never touch external servers for standard operations, ensuring complete client-side data isolation.'
         ]
       }
     ],

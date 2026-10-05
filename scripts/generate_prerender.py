@@ -21,7 +21,7 @@ CANONICAL_TOOLS = [
         "quick_answer": "To merge PDF files: 1. Drag & drop two or more PDF files into the box. 2. Arrange pages in your desired sequence. 3. Click 'Merge PDF' and download your combined document instantly.",
         "features": [
             "100% Private local processing inside your browser RAM",
-            "Zero file size limits and unlimited document combinations",
+            "High capacity local processing scaling with your device's browser memory (RAM)",
             "Preserves original vector fonts, bookmarks, and image quality",
             "Visual drag-and-drop page reordering and duplicate removal"
         ],
@@ -40,7 +40,7 @@ CANONICAL_TOOLS = [
             }
         ],
         "faqs": [
-            {"q": "Is there a limit on how many PDF files I can merge?", "a": "No! You can merge as many PDF files as your device memory can accommodate, with zero daily limits or paywalls."},
+            {"q": "Is there a limit on how many PDF files I can merge?", "a": "You can merge as many PDF files as your device memory allows. For optimal performance, batches of up to 50 files or 250MB are recommended on desktop."},
             {"q": "Will merging PDFs decrease image or text quality?", "a": "Never. PDFBolt preserves the original vector typography, embedded color profiles, and high-resolution images without lossy compression."},
             {"q": "Are my files uploaded to any server?", "a": "No. PDFBolt executes 100% locally in your web browser. Your confidential files never leave your device."}
         ],
@@ -1688,6 +1688,28 @@ def generate_prerendered_pages():
 
           {sections_html}
 
+          <!-- Limits, Trade-Offs & Troubleshooting (AdSense Publisher Content) -->
+          <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; margin-bottom: 36px;">
+            <h2 style="font-size: 1.4rem; font-weight: 800; color: #0f172a; margin: 0 0 16px 0;">Technical Limitations &amp; Honest Trade-Offs</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 20px;">
+              <div style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 8px; padding: 16px;">
+                <h3 style="font-size: 1.05rem; font-weight: 700; color: #0f172a; margin: 0 0 6px 0;">Device Memory (RAM) Allocation</h3>
+                <p style="margin: 0; color: #475569; font-size: 0.9rem; line-height: 1.6;">Because processing runs client-side inside your browser sandbox, performance scales with available RAM. We recommend files under 100MB on mobile and 250MB on desktop. For multi-gigabyte files, splitting into smaller sections ensures optimal responsiveness.</p>
+              </div>
+              <div style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 8px; padding: 16px;">
+                <h3 style="font-size: 1.05rem; font-weight: 700; color: #0f172a; margin: 0 0 6px 0;">Quality vs. File Size Trade-Offs</h3>
+                <p style="margin: 0; color: #475569; font-size: 0.9rem; line-height: 1.6;">Vector typography, geometric line art, and text layers remain 100% crisp regardless of operations. Raster photography and embedded JPEG scans are resampled proportionally according to the chosen compression preset.</p>
+              </div>
+            </div>
+            
+            <h3 style="font-size: 1.15rem; font-weight: 700; color: #0f172a; margin: 20px 0 10px 0;">Troubleshooting Common Document Issues</h3>
+            <ul style="color: #334155; padding-left: 20px; line-height: 1.7; font-size: 0.95rem; margin: 0;">
+              <li><strong>Password-Protected Files:</strong> If your PDF is locked with user or permissions encryption, use our <a href="/unlock-pdf/" style="color: #b45309; font-weight: 600; text-decoration: underline;">Unlock PDF</a> utility before editing or compressing.</li>
+              <li><strong>Scanned Bitmaps Without Selectable Text:</strong> If text cannot be highlighted with your cursor, run the file through <a href="/ocr-pdf/" style="color: #b45309; font-weight: 600; text-decoration: underline;">OCR PDF</a> first to reconstruct an invisible searchable text layer.</li>
+              <li><strong>Browser Tab Unresponsive:</strong> Close background memory-heavy tabs or use private browsing mode to disable third-party browser extensions that interfere with WebAssembly workers.</li>
+            </ul>
+          </div>
+
           <div style="margin-bottom: 36px;">
             <h2 style="font-size: 1.5rem; font-weight: 800; color: #0f172a; margin: 0 0 16px 0;">Frequently Asked Questions</h2>
             {faqs_html}
@@ -2073,16 +2095,16 @@ def generate_prerendered_pages():
             static_extra_content = """
             <div style="margin: 32px 0;">
               <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
-                <h2 style="font-size: 1.25rem; font-weight: 700; color: #0f172a; margin-top: 0;">1. Strict Zero-Retention Policy</h2>
-                <p style="color: #334155;">PDFBolt operates under a strict client-side WebAssembly architecture. We never upload, inspect, or store your document contents. Your files remain in your local computer memory.</p>
+                <h2 style="font-size: 1.25rem; font-weight: 700; color: #0f172a; margin-top: 0;">1. Strict Zero-Document-Retention Policy</h2>
+                <p style="color: #334155; line-height: 1.7;">PDFBolt operates under a strict client-side WebAssembly architecture. We never upload, inspect, or store your document contents. Your files remain exclusively in your local computer memory.</p>
               </div>
               <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
-                <h2 style="font-size: 1.25rem; font-weight: 700; color: #0f172a; margin-top: 0;">2. Google AdSense & DoubleClick Cookies</h2>
-                <p style="color: #334155;">Google, as a third-party vendor, uses cookies to serve ads on PDFBolt. Google’s use of advertising cookies enables it and its partners to serve ads based on your visit to PDFBolt and other sites across the Internet. You may opt out of personalized advertising at any time by visiting <a href="https://adssettings.google.com" target="_blank" style="color: #b45309; font-weight: bold; text-decoration: underline;">Google Ads Settings</a>.</p>
+                <h2 style="font-size: 1.25rem; font-weight: 700; color: #0f172a; margin-top: 0;">2. Google AdSense &amp; DoubleClick Cookies</h2>
+                <p style="color: #334155; line-height: 1.7;">Google, as a third-party vendor, uses cookies to serve ads on PDFBolt. Google’s use of advertising cookies enables it and its partners to serve ads based on your visit to PDFBolt and other sites across the Internet. You may opt out of personalized advertising at any time by visiting <a href="https://adssettings.google.com" target="_blank" style="color: #b45309; font-weight: bold; text-decoration: underline;">Google Ads Settings</a>.</p>
               </div>
               <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
                 <h2 style="font-size: 1.25rem; font-weight: 700; color: #0f172a; margin-top: 0;">3. Third-Party Opt-Out Channels</h2>
-                <ul style="color: #334155; padding-left: 20px;">
+                <ul style="color: #334155; padding-left: 20px; line-height: 1.7;">
                   <li><strong>Network Advertising Initiative (NAI):</strong> <a href="https://optout.networkadvertising.org" target="_blank" style="color: #b45309;">optout.networkadvertising.org</a></li>
                   <li><strong>Digital Advertising Alliance (DAA):</strong> <a href="https://optout.aboutads.info" target="_blank" style="color: #b45309;">optout.aboutads.info</a></li>
                   <li><strong>European Interactive Digital Advertising Alliance (EDAA):</strong> <a href="https://www.youronlinechoices.eu" target="_blank" style="color: #b45309;">youronlinechoices.eu</a></li>
@@ -2090,16 +2112,82 @@ def generate_prerendered_pages():
               </div>
             </div>
             """
+        elif path == "about":
+            static_extra_content = """
+            <div style="margin: 32px 0;">
+              <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
+                <h2 style="font-size: 1.35rem; font-weight: 800; color: #0f172a; margin-top: 0;">1. Our Mission: Privacy-First Document Utilities</h2>
+                <p style="color: #334155; line-height: 1.7;">PDFBolt was engineered to solve a fundamental security flaw of traditional cloud converters: users were forced to upload confidential business contracts, tax filings, and personal records to unknown remote servers. PDFBolt compiles industry-standard document processors into WebAssembly, allowing all operations to execute 100% locally in your web browser with zero server data retention.</p>
+              </div>
+              <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
+                <h2 style="font-size: 1.35rem; font-weight: 800; color: #0f172a; margin-top: 0;">2. Leadership &amp; Engineering Team</h2>
+                <p style="color: #334155; line-height: 1.7;"><strong>Kanishka Giri</strong> leads technical architecture and systems security at PDFBolt. Specializing in browser sandboxing, WebAssembly runtime performance, and zero-trust document processing, Kanishka oversees the platform's core processing engines and ensures strict adherence to document isolation standards.</p>
+                <p style="color: #334155; line-height: 1.7; margin-top: 8px;">Direct contact: <a href="mailto:support@pdfbolt.in" style="color: #b45309; font-weight: 600; text-decoration: underline;">support@pdfbolt.in</a></p>
+              </div>
+              <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
+                <h2 style="font-size: 1.35rem; font-weight: 800; color: #0f172a; margin-top: 0;">3. Open-Source Attributions &amp; Standards</h2>
+                <p style="color: #334155; line-height: 1.7;">PDFBolt proudly utilizes and supports open-source software under compliant licenses: Mozilla PDF.js (Apache-2.0) for canvas rendering, pdf-lib (MIT) for vector assembly, Tesseract.js (Apache-2.0) for optical character recognition, and jsPDF (MIT) for client-side generation.</p>
+              </div>
+              <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
+                <h2 style="font-size: 1.35rem; font-weight: 800; color: #0f172a; margin-top: 0;">4. Editorial &amp; Testing Standards</h2>
+                <p style="color: #334155; line-height: 1.7;">Every tutorial, workflow, and technical guide in our knowledge base is tested with real sample documents across desktop and mobile browsers. We verify file size benchmarks, DPI fidelity, and vector preservation before publication. Guides are updated regularly to align with modern browser capabilities and PDF specifications.</p>
+              </div>
+            </div>
+            """
         elif path == "privacy":
             static_extra_content = """
             <div style="margin: 32px 0;">
               <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
-                <h2 style="font-size: 1.25rem; font-weight: 700; color: #0f172a; margin-top: 0;">1. Privacy-First Architecture</h2>
-                <p style="color: #334155;">PDFBolt was engineered from the ground up to eliminate the security risks of traditional cloud conversion portals. All document parsing, merging, converting, OCR, and editing execute locally in your web browser.</p>
+                <h2 style="font-size: 1.35rem; font-weight: 800; color: #0f172a; margin-top: 0;">1. Privacy-First, Zero-Permanent-Retention Architecture</h2>
+                <p style="color: #334155; line-height: 1.7;">PDFBolt operates under a strict privacy-first architecture. Client-side tools (Merge, Compress, Split, Protect, Unlock, Rotate, Edit) execute 100% inside your browser's local sandbox memory using WebAssembly. Your files never touch external servers. For complex server conversions, ephemeral processing takes place in temporary RAM and files are automatically purged immediately upon download or after 15 minutes.</p>
               </div>
               <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
-                <h2 style="font-size: 1.25rem; font-weight: 700; color: #0f172a; margin-top: 0;">2. GDPR & CCPA/CPRA Compliance</h2>
-                <p style="color: #334155;">Because no document data is ever stored on our servers, PDFBolt is inherently compliant with GDPR data minimization principles and CCPA privacy protections.</p>
+                <h2 style="font-size: 1.35rem; font-weight: 800; color: #0f172a; margin-top: 0;">2. Google AdSense, Advertising Cookies &amp; DoubleClick DART</h2>
+                <p style="color: #334155; line-height: 1.7;">To keep our PDF utilities 100% free with no subscription paywalls, we display advertisements provided by Google AdSense and certified third-party ad networks. Google uses cookies, including the DoubleClick DART cookie, to serve ads based on your visit to this and other websites on the Internet.</p>
+                <p style="color: #334155; line-height: 1.7; margin-top: 8px;"><strong>Strict Document Decoupling:</strong> Advertisers and Google AdSense have zero access to your document files, file names, or contents. Document processing is completely decoupled from advertising and analytics scripts.</p>
+                <p style="color: #334155; line-height: 1.7; margin-top: 8px;">Users may opt out of personalized advertising by visiting <a href="https://adssettings.google.com" target="_blank" style="color: #b45309; text-decoration: underline; font-weight: 600;">Google Ads Settings</a> or <a href="https://optout.aboutads.info" target="_blank" style="color: #b45309; text-decoration: underline; font-weight: 600;">aboutads.info</a>.</p>
+              </div>
+              <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
+                <h2 style="font-size: 1.35rem; font-weight: 800; color: #0f172a; margin-top: 0;">3. Analytics &amp; Performance Telemetry</h2>
+                <p style="color: #334155; line-height: 1.7;">We use Google Analytics 4 to collect aggregated, anonymous performance metrics (such as page views, device categories, and error rates) to maintain site reliability. Analytics scripts do not record, inspect, or transmit document contents. Google Consent Mode v2 is configured to deny storage by default until user consent is received.</p>
+              </div>
+              <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
+                <h2 style="font-size: 1.35rem; font-weight: 800; color: #0f172a; margin-top: 0;">4. GDPR &amp; CCPA/CPRA Data Subject Rights</h2>
+                <p style="color: #334155; line-height: 1.7;">Under GDPR and CCPA/CPRA, users have the right to access, rectify, or request deletion of personal information. Because PDFBolt does not mandate user accounts, store personal profiles, or retain documents, our data footprint on individual users is minimized to standard anonymous technical logs. Contact our privacy team at <a href="mailto:support@pdfbolt.in" style="color: #b45309; font-weight: 600; text-decoration: underline;">support@pdfbolt.in</a> for inquiries.</p>
+              </div>
+            </div>
+            """
+        elif path == "contact":
+            static_extra_content = """
+            <div style="margin: 32px 0;">
+              <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
+                <h2 style="font-size: 1.35rem; font-weight: 800; color: #0f172a; margin-top: 0;">Official Support &amp; Contact Channels</h2>
+                <p style="color: #334155; line-height: 1.7;">We welcome inquiries, bug reports, feature suggestions, and security disclosures. Our engineering team responds to all inquiries within 24 to 48 business hours.</p>
+                <div style="margin-top: 16px; padding: 16px; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 8px;">
+                  <p style="margin: 0 0 8px 0; font-size: 0.95rem; color: #0f172a;"><strong>Official Support Email:</strong> <a href="mailto:support@pdfbolt.in" style="color: #b45309; font-weight: 700; text-decoration: underline;">support@pdfbolt.in</a></p>
+                  <p style="margin: 0; font-size: 0.95rem; color: #0f172a;"><strong>Lead Systems Engineer:</strong> Kanishka Giri (<a href="mailto:kanishka@pdfbolt.in" style="color: #b45309; font-weight: 700; text-decoration: underline;">kanishka@pdfbolt.in</a>)</p>
+                </div>
+              </div>
+              <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
+                <h2 style="font-size: 1.35rem; font-weight: 800; color: #0f172a; margin-top: 0;">Technical Bug &amp; Feedback Reporting</h2>
+                <p style="color: #334155; line-height: 1.7;">When reporting an issue with a document conversion or compression, please include your operating system, browser version, approximate file size, and the specific tool used. Please do not attach confidential documents without redacting private information first.</p>
+              </div>
+            </div>
+            """
+        elif path == "terms":
+            static_extra_content = """
+            <div style="margin: 32px 0;">
+              <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
+                <h2 style="font-size: 1.35rem; font-weight: 800; color: #0f172a; margin-top: 0;">1. Free &amp; Unlimited Service Access</h2>
+                <p style="color: #334155; line-height: 1.7;">PDFBolt grants you a personal, non-exclusive, worldwide, royalty-free license to use our web-based PDF utilities for personal, educational, non-profit, and commercial workflows without recurring subscription fees.</p>
+              </div>
+              <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
+                <h2 style="font-size: 1.35rem; font-weight: 800; color: #0f172a; margin-top: 0;">2. 100% User Document Ownership</h2>
+                <p style="color: #334155; line-height: 1.7;">You retain complete, exclusive ownership and copyright over all files, text, images, and data processed through PDFBolt. PDFBolt does not claim any intellectual property rights or ownership of your documents.</p>
+              </div>
+              <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
+                <h2 style="font-size: 1.35rem; font-weight: 800; color: #0f172a; margin-top: 0;">3. Prohibited Conduct</h2>
+                <p style="color: #334155; line-height: 1.7;">Users may not use PDFBolt to process malicious software, distributed denial-of-service scripts, infringing copyrighted material without authorization, or illegal content. Automated high-volume scraping of backend endpoints is strictly prohibited.</p>
               </div>
             </div>
             """
@@ -2383,7 +2471,7 @@ def generate_prerendered_pages():
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-top: 24px;">
           <div style="border-left: 3px solid #b45309; padding-left: 14px;">
             <h3 style="font-size: 1.05rem; font-weight: 800; color: #0f172a; margin: 0 0 6px 0;">GDPR & CCPA Compliant</h3>
-            <p style="margin: 0; font-size: 0.875rem; color: #475569;">PDFBolt achieves true data minimization: since no document data reaches our servers, data subject privacy is mathematically guaranteed.</p>
+            <p style="margin: 0; font-size: 0.875rem; color: #475569;">PDFBolt achieves true data minimization: client-side processing keeps your document files strictly inside your local device memory.</p>
           </div>
           <div style="border-left: 3px solid #b45309; padding-left: 14px;">
             <h3 style="font-size: 1.05rem; font-weight: 800; color: #0f172a; margin: 0 0 6px 0;">Offline Capability</h3>
@@ -2428,7 +2516,7 @@ def generate_prerendered_pages():
           </div>
           <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 20px;">
             <h3 style="font-size: 1.1rem; font-weight: 800; color: #0f172a; margin: 0 0 8px 0;">Can I use PDFBolt for confidential business or medical documents?</h3>
-            <p style="margin: 0; color: #334155; font-size: 0.95rem; line-height: 1.6;">Absolutely. Because zero document files are uploaded to our servers, PDFBolt is engineered to support your strict confidentiality agreements (NDAs), HIPAA workflows, and GDPR data isolation requirements.</p>
+            <p style="margin: 0; color: #334155; font-size: 0.95rem; line-height: 1.6;">Yes. Because in-browser tools process documents strictly within your device's local memory sandbox, no files are transmitted across third-party networks, aligning with organizational data isolation and NDA policies.</p>
           </div>
         </div>
       </section>
@@ -2492,7 +2580,7 @@ def generate_prerendered_pages():
                     "name": "Can I use PDFBolt for confidential business or medical documents?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Absolutely. Because zero document files are uploaded to our servers, PDFBolt is engineered to support your strict confidentiality agreements (NDAs), HIPAA workflows, and GDPR data isolation requirements."
+                        "text": "Yes. Because in-browser tools process documents strictly within your device's local memory sandbox, no files are transmitted across third-party networks, aligning with organizational data isolation and NDA policies."
                     }
                 }
             ]

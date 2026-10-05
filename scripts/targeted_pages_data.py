@@ -34,7 +34,7 @@ EXTRA_GUIDES = [
         ],
         "faqs": [
             {"q": "Can websites read the contents of my PDF?", "a": "Traditional cloud converters can theoretically access your text. PDFBolt runs locally on your machine, so we never see your file contents."},
-            {"q": "Is client-side processing safe for HIPAA and confidential legal documents?", "a": "Yes! Because files are never transferred to a third party, client-side execution complies naturally with strict non-disclosure and privacy standards."}
+            {"q": "Is client-side processing safe for confidential business and legal documents?", "a": "Yes. Because files are never transferred to a third party, client-side execution keeps document data confined to your local machine, assisting with strict non-disclosure and privacy standards."}
         ],
         "related_tools": [("redact-pdf", "Redact PDF"), ("protect-pdf", "Protect PDF"), ("compress-pdf", "Compress PDF")]
     },
@@ -313,7 +313,7 @@ TARGETED_PAGES = [
         "how_to": [
             {"name": "Select File", "text": "Upload your multi-page PDF transcript or application."},
             {"name": "Process Document", "text": "Our engine balances vector fidelity and image deflate."},
-            {"name": "Download PDF", "text": "Save your file, guaranteed to pass 200KB portal filters."}
+            {"name": "Download PDF", "text": "Save your file, optimized to pass 200KB portal filters."}
         ],
         "faqs": [
             {"q": "Is 200KB enough for a 10-page document?", "a": "For documents that are primarily text with minimal images, 200KB can easily accommodate 10 to 15 pages."}
@@ -378,9 +378,9 @@ TARGETED_PAGES = [
         "target_badge": "Under 1 MB (Email & Web Ready)",
         "features": [
             "Compresses 20MB+ files down to under 1MB in seconds",
-            "Guarantees instant email delivery without bounced attachments",
+            "Enables fast email delivery without bounced attachments",
             "Preserves full book chapters, slide presentations, and portfolios",
-            "Executed entirely in browser RAM with zero tracking"
+            "Executed entirely in browser RAM with zero document storage or server uploads"
         ],
         "how_to": [
             {"name": "Upload Heavy PDF", "text": "Select documents up to 100MB."},
