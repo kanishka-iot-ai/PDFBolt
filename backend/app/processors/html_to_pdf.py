@@ -3,11 +3,12 @@ import io
 from pathlib import Path
 from typing import Any, Dict, Optional
 
-try:
-    from weasyprint import HTML
-    HAS_WEASYPRINT = True
-except Exception:
-    HAS_WEASYPRINT = False
+def _get_weasyprint_html():
+    try:
+        from weasyprint import HTML
+        return HTML
+    except Exception:
+        return None
 
 import pymupdf
 
@@ -28,13 +29,14 @@ class HtmlToPdfProcessor(BaseProcessor):
     output_format = ".pdf"
 
     def _convert_weasyprint(self, input_path: Path, output_pdf: Path) -> bool:
-        if not HAS_WEASYPRINT:
+        html_cls = _get_weasyprint_html()
+        if not html_cls:
             return False
         try:
             logger.info(f"Converting '{input_path}' to PDF using WeasyPrint...")
             html_text = input_path.read_text(encoding="utf-8", errors="replace")
             # Convert HTML to PDF using WeasyPrint
-            pdf_bytes = HTML(string=html_text, base_url=str(input_path.parent)).write_pdf()
+            pdf_bytes = html_cls(string=html_text, base_url=str(input_path.parent)).write_pdf()
             if pdf_bytes:
                 with open(output_pdf, "wb") as f:
                     f.write(pdf_bytes)

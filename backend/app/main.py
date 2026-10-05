@@ -14,7 +14,7 @@ except Exception:
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, Response
 
 from backend.app.config import settings
 from backend.app.core.errors import PDFProcessingException, pdf_exception_handler, generic_exception_handler
@@ -116,6 +116,10 @@ app.add_middleware(
 async def security_and_timing_middleware(request: Request, call_next):
     client_ip = request.client.host if request.client else "127.0.0.1"
 
+    # Fast-path for Render container port detection probe (HEAD /)
+    if request.method == "HEAD":
+        return Response(status_code=200)
+
     # Rate limiting check for processing routes
     rate_limited_prefixes = (
         "/api/v1/jobs",
@@ -159,14 +163,25 @@ app.include_router(api_v1_router)
 app.include_router(direct_convert_router)
 
 
-@app.get("/")
+@app.api_route("/", methods=["GET", "HEAD"])
 def root():
     return {
+        "status": "healthy",
         "service": settings.APP_NAME,
         "version": settings.APP_VERSION,
         "docs": "/docs",
         "health": "/health"
     }
+
+
+@app.head("/")
+def head_root():
+    return Response(status_code=200)
+
+
+@app.head("/health")
+def head_health():
+    return Response(status_code=200)
 
 
 if __name__ == "__main__":

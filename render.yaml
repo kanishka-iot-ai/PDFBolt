@@ -298,6 +298,8 @@ services:
     healthCheckPath: /health
 
     envVars:
+      - key: PORT
+        value: "10000"
       - key: APP_ENV
         value: production
       - key: DEBUG

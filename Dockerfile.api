@@ -14,7 +14,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libreoffice-impress \
     imagemagick \
     libmagic1 \
-    python3-opencv \
     fonts-liberation \
     fonts-dejavu \
     fontconfig \
@@ -48,9 +47,11 @@ ENV TEMP_DIR=/tmp/pdfbolt
 ENV XDG_CACHE_HOME=/home/pdfbolt/.cache
 ENV STORAGE_BACKEND=local
 ENV QUEUE_BACKEND=local
-EXPOSE 8000
+ENV PYTHONWARNINGS="ignore"
+ENV PORT=10000
+EXPOSE 10000 8000
 
-CMD ["sh", "-c", "uvicorn backend.app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
+CMD ["sh", "-c", "uvicorn backend.app.main:app --host 0.0.0.0 --port ${PORT:-10000}"]
 
 
 
