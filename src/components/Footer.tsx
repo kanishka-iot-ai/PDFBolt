@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ShieldCheck, Lock, CheckCircle, Headphones, AlertTriangle } from 'lucide-react';
-import { LanguageSelector } from './LanguageSelector';
 
 const Footer: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
   const [showWipeModal, setShowWipeModal] = useState(false);
@@ -121,7 +120,6 @@ const Footer: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
         </p>
 
         <div className="flex flex-wrap items-center gap-6">
-          <LanguageSelector darkMode={darkMode} dropUp={true} />
           <div className="flex gap-4 text-xs font-semibold">
             <button
               type="button"
