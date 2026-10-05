@@ -1158,7 +1158,7 @@ export const GUIDES: Guide[] = [
   {
     slug: 'how-to-sign-a-pdf',
     title: 'How to Sign a PDF Document Online with Digital Signatures',
-    metaTitle: 'How to Sign a PDF for Free (Draw or Upload Signature)',
+    metaTitle: 'How to Sign a PDF Online for Free (Draw or Sign)',
     metaDescription: 'Sign contracts, lease agreements, and job offers with handwritten or uploaded signatures online.',
     category: 'security',
     readTime: '3 min read',
@@ -1189,7 +1189,7 @@ export const GUIDES: Guide[] = [
   {
     slug: 'how-to-ocr-a-pdf',
     title: 'How to OCR a PDF to Make Scanned Documents Searchable & Selectable',
-    metaTitle: 'How to OCR Scanned PDFs Online (Optical Character Recognition)',
+    metaTitle: 'How to OCR Scanned PDFs Online (Extract Text)',
     metaDescription: 'Convert scanned image PDFs and photographed documents into selectable, searchable, and copyable text files.',
     category: 'ocr',
     readTime: '4 min read',
@@ -1251,7 +1251,7 @@ export const GUIDES: Guide[] = [
   {
     slug: 'is-it-safe-to-upload-pdf-online',
     title: 'Is It Safe to Upload PDF Files to Online Converters? (2026 Security Guide)',
-    metaTitle: 'Is It Safe to Upload PDF Online? Security Risks Explained',
+    metaTitle: 'Is It Safe to Upload PDFs Online? Security Risks',
     metaDescription: 'Learn the hidden security risks of cloud-based PDF converters and why in-browser WebAssembly processing guarantees 100% document privacy.',
     category: 'security',
     readTime: '5 min read',
@@ -1285,7 +1285,7 @@ export const GUIDES: Guide[] = [
   {
     slug: 'reduce-pdf-size-for-email',
     title: 'How to Reduce PDF File Size for Email Attachments (Gmail, Outlook & Apple Mail)',
-    metaTitle: 'How to Reduce PDF Size for Email (Gmail & Outlook Guide)',
+    metaTitle: 'Reduce PDF File Size for Email (Gmail & Outlook)',
     metaDescription: 'Step-by-step guide to shrink heavy PDF attachments below 20MB, 10MB, or 1MB for Gmail, Outlook, and corporate mail servers without losing readability.',
     category: 'manage',
     readTime: '4 min read',
@@ -1317,7 +1317,7 @@ export const GUIDES: Guide[] = [
   {
     slug: 'how-to-compress-pdf-on-mobile',
     title: 'How to Compress PDF on iPhone & Android Without Installing Apps',
-    metaTitle: 'Compress PDF on Mobile (iPhone & Android Guide) | PDFBolt',
+    metaTitle: 'Compress PDF on Mobile (iPhone & Android Guide)',
     metaDescription: 'Learn how to shrink large PDF files directly in Safari or Chrome on your smartphone in seconds without downloading third-party scanner apps.',
     category: 'manage',
     readTime: '3 min read',
@@ -1349,7 +1349,7 @@ export const GUIDES: Guide[] = [
   {
     slug: 'how-to-remove-password-from-pdf',
     title: 'How to Remove Password from PDF Without Paying for Acrobat',
-    metaTitle: 'Remove PDF Password Free Online (Unlock PDF Guide) | PDFBolt',
+    metaTitle: 'Remove PDF Password Online Free (Unlock PDF)',
     metaDescription: 'Easily remove passwords from encrypted PDF files online for free. Unlock print, copy, and edit restrictions permanently without paid software.',
     category: 'security',
     readTime: '3 min read',
@@ -1381,7 +1381,7 @@ export const GUIDES: Guide[] = [
   {
     slug: 'how-to-edit-a-scanned-pdf',
     title: 'How to Edit a Scanned PDF & Make Text Searchable with OCR',
-    metaTitle: 'How to Edit a Scanned PDF & Make It Searchable Online',
+    metaTitle: 'How to Edit a Scanned PDF & Make It Searchable',
     metaDescription: 'Turn scanned paper documents and photo receipts into selectable, searchable, and editable text using in-browser Optical Character Recognition (OCR).',
     category: 'convert',
     readTime: '4 min read',
@@ -1412,7 +1412,7 @@ export const GUIDES: Guide[] = [
   {
     slug: 'how-to-sign-a-pdf-without-printing',
     title: 'How to Sign a PDF Document Online Without Printing or Scanning',
-    metaTitle: 'Sign a PDF Online Free (No Printing Required) | PDFBolt',
+    metaTitle: 'Sign a PDF Online Free (No Printing Needed)',
     metaDescription: 'Add legally binding digital signatures, initials, and dates to contracts and agreements directly in your browser on phone or desktop.',
     category: 'security',
     readTime: '3 min read',
@@ -1443,7 +1443,7 @@ export const GUIDES: Guide[] = [
   {
     slug: 'pdf-compress-kaise-kare',
     title: 'PDF Compress Kaise Kare: Mobile aur Computer Me PDF Size Kam Karne Ka Tarika',
-    metaTitle: 'PDF Compress Kaise Kare: PDF Size Kam Karne Ka Asan Tarika',
+    metaTitle: 'PDF Compress Kaise Kare: Size Kam Karne Ka Tarika',
     metaDescription: 'Janiye mobile aur laptop me PDF ka size kaise kam kare (50KB, 100KB, 200KB). Sarkari exam aur job portal ke liye PDF compress karne ka sabse asan aur free tarika.',
     category: 'manage',
     readTime: '3 min read',
@@ -1476,7 +1476,7 @@ export const GUIDES: Guide[] = [
   {
     slug: 'jpg-ko-pdf-kaise-banaye',
     title: 'JPG Se PDF Kaise Banaye: Photo ko PDF Me Convert Karne Ka Free Tarika',
-    metaTitle: 'JPG Se PDF Kaise Banaye: Photo ko PDF Me Convert Kare Free',
+    metaTitle: 'JPG Se PDF Kaise Banaye: Photo PDF Me Convert Kare',
     metaDescription: 'Mobile se photo ya scanned marksheet ko PDF file me kaise convert kare. Sarkari form, Aadhaar aur exam form ke liye JPG to PDF banane ki poori jankari.',
     category: 'convert',
     readTime: '3 min read',
@@ -1574,7 +1574,7 @@ export const ENCYCLOPEDIA: EncyclopediaArticle[] = [
   {
     slug: 'what-is-ocr',
     title: 'What is OCR? Optical Character Recognition Explained',
-    metaTitle: 'What is OCR? How Optical Character Recognition Works for PDFs',
+    metaTitle: 'What is OCR? Optical Character Recognition for PDF',
     metaDescription: 'How OCR algorithms convert scanned document images and paper photos into machine-readable, searchable PDF text.',
     category: 'technology',
     readTime: '5 min read',
@@ -1657,7 +1657,7 @@ export const WORKFLOWS: Workflow[] = [
   {
     slug: 'student-pdf-tools',
     title: 'Student & Academic PDF Workflow',
-    metaTitle: 'Student PDF Toolkit – Merge Notes, OCR Lectures & Convert to PPT',
+    metaTitle: 'Student PDF Toolkit – Merge, OCR & Convert Notes',
     metaDescription: 'All-in-one PDF study ecosystem for students: OCR handwritten notes, extract lecture slides, compress assignments, and merge study guides.',
     audience: 'Students & Educators',
     heroBadge: 'Academic Study Hub',
@@ -1710,7 +1710,7 @@ export const WORKFLOWS: Workflow[] = [
   {
     slug: 'business-pdf-tools',
     title: 'Business & Enterprise PDF Workflow',
-    metaTitle: 'Business PDF Solutions – Redact Contracts, Sign & Extract Excel',
+    metaTitle: 'Business PDF Tools – Redact, Sign & Extract Data',
     metaDescription: 'Enterprise-grade PDF workflow: Redact sensitive financial data, sign contracts, extract tabular invoices to Excel, and encrypt files securely.',
     audience: 'Business & Finance',
     heroBadge: 'Business & Legal Hub',
@@ -1762,7 +1762,7 @@ export const WORKFLOWS: Workflow[] = [
   {
     slug: 'developer-pdf-tools',
     title: 'Developer PDF Tools & Client-Side Architecture',
-    metaTitle: 'Developer PDF Tools – Client-Side WASM, PDF-Lib & OCR API Architecture',
+    metaTitle: 'Developer PDF Tools – WASM, PDF-Lib & Client OCR',
     metaDescription: 'Explore PDFBolt client-side architecture: WebAssembly, PDF-Lib, Tesseract OCR, and how to build zero-upload browser document processing.',
     audience: 'Software Developers',
     heroBadge: 'Developer & Architecture Hub',

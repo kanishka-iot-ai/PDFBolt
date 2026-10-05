@@ -9,7 +9,7 @@ EXTRA_GUIDES = [
     {
         "slug": "is-it-safe-to-upload-pdf-online",
         "title": "Is It Safe to Upload PDF Files to Online Converters? (2026 Security Guide)",
-        "metaTitle": "Is It Safe to Upload PDF Online? Security Risks Explained | PDFBolt",
+        "metaTitle": "Is It Safe to Upload PDFs Online? Security Risks | PDFBolt",
         "metaDescription": "Learn the hidden security risks of cloud-based PDF converters and why in-browser WebAssembly processing guarantees 100% document privacy.",
         "summary": "Discover where your documents go when you upload them to online PDF tools, what data retention policies really mean, and how client-side WebAssembly protects your confidential files.",
         "quick_answer": "Most traditional online PDF converters transmit your documents across the internet and store them on third-party servers. In contrast, client-side tools like PDFBolt process your PDF entirely in your browser RAM using WebAssembly, meaning zero file bytes leave your device.",
@@ -41,7 +41,7 @@ EXTRA_GUIDES = [
     {
         "slug": "reduce-pdf-size-for-email",
         "title": "How to Reduce PDF File Size for Email Attachments (Gmail, Outlook & Apple Mail)",
-        "metaTitle": "How to Reduce PDF Size for Email (Gmail & Outlook Guide) | PDFBolt",
+        "metaTitle": "Reduce PDF File Size for Email (Gmail & Outlook) | PDFBolt",
         "metaDescription": "Step-by-step guide to shrink heavy PDF attachments below 20MB, 10MB, or 1MB for Gmail, Outlook, and corporate mail servers without losing readability.",
         "summary": "Email providers reject attachments larger than 20MB or 25MB. Learn how intelligent PDF compression shrinks files down to under 1MB or 2MB so emails never bounce.",
         "quick_answer": "To reduce PDF size for email: 1. Open PDFBolt Compress PDF. 2. Drag & drop your large PDF. 3. Select 'Recommended' or 'Extreme' compression. 4. Download your email-friendly file under 2MB.",
@@ -119,7 +119,7 @@ EXTRA_GUIDES = [
     {
         "slug": "how-to-edit-a-scanned-pdf",
         "title": "How to Edit a Scanned PDF & Make Text Searchable with OCR",
-        "metaTitle": "How to Edit a Scanned PDF & Make It Searchable Online | PDFBolt",
+        "metaTitle": "How to Edit a Scanned PDF & Make It Searchable | PDFBolt",
         "metaDescription": "Turn scanned paper documents and photo receipts into selectable, searchable, and editable text using in-browser Optical Character Recognition (OCR).",
         "summary": "Scanned PDFs are essentially collections of static images where you cannot search, select, or copy text. Discover how OCR extracts text layers for easy editing.",
         "quick_answer": "To edit a scanned PDF: 1. Open PDFBolt OCR PDF. 2. Upload your scanned document. 3. The OCR engine recognizes letterforms and builds a searchable text layer. 4. Download your searchable PDF or export to Word (.docx).",
@@ -169,7 +169,7 @@ EXTRA_GUIDES = [
     {
         "slug": "pdf-compress-kaise-kare",
         "title": "PDF Compress Kaise Kare: Mobile aur Computer Me PDF Size Kam Karne Ka Tarika",
-        "metaTitle": "PDF Compress Kaise Kare: PDF Size Kam Karne Ka Asan Tarika | PDFBolt",
+        "metaTitle": "PDF Compress Kaise Kare: Size Kam Karne Ka Tarika | PDFBolt",
         "metaDescription": "Janiye mobile aur laptop me PDF ka size kaise kam kare (50KB, 100KB, 200KB). Sarkari exam aur job portal ke liye PDF compress karne ka sabse asan aur free tarika.",
         "summary": "Sarkari naukri, college admission aur exam form me badi PDF files upload nahi hoti. Seekhiye kaise PDFBolt se bina quality kharab kiye PDF ka size kam karein.",
         "quick_answer": "PDF compress karne ke liye: 1. PDFBolt Compress PDF par jayein. 2. Apni PDF file ko select ya drop karein. 3. Compression level (Recommended ya Extreme) chunein. 4. 'Compress PDF' par click karke choti size wali PDF download karein.",
@@ -196,7 +196,7 @@ EXTRA_GUIDES = [
     {
         "slug": "jpg-ko-pdf-kaise-banaye",
         "title": "JPG Se PDF Kaise Banaye: Photo ko PDF Me Convert Karne Ka Free Tarika",
-        "metaTitle": "JPG Se PDF Kaise Banaye: Photo ko PDF Me Convert Kare Free | PDFBolt",
+        "metaTitle": "JPG Se PDF Kaise Banaye: Photo PDF Me Convert Kare | PDFBolt",
         "metaDescription": "Mobile se photo ya scanned marksheet ko PDF file me kaise convert kare. Sarkari form, Aadhaar aur exam form ke liye JPG to PDF banane ki poori jankari.",
         "summary": "Apne mobile se khinchi gayi marksheet ya certificate ki photos ko ek single, clean PDF file me convert karein bina kisi app ko install kiye.",
         "quick_answer": "JPG se PDF banane ke liye: 1. PDFBolt JPG to PDF tool kholein. 2. Apni photos ya scanned JPG files upload karein. 3. 'Convert to PDF' par click karein aur apni PDF file download karein.",
@@ -275,7 +275,7 @@ TARGETED_PAGES = [
     {
         "path": "compress-pdf-to-100kb",
         "h1": "Compress PDF to 100KB Online",
-        "title": "Compress PDF to 100KB Online Free – Sharp & Readable | PDFBolt",
+        "title": "Compress PDF to 100KB Online Free – Sharp & Fast | PDFBolt",
         "description": "Compress PDF to 100KB online for free. Shrink marksheets, resumes, and certificates below 100KB without blurry text. 100% private in-browser compression.",
         "subtitle": "Reduce PDF file size to 100KB online for free without losing readability. Ideal for job portals, college admissions, and government forms.",
         "quick_answer": "To compress a PDF to 100KB: 1. Drag & drop your PDF file. 2. The high-compression preset is active. 3. Click 'Compress PDF' and download your clean, portal-compliant file under 100KB.",
@@ -421,7 +421,7 @@ TARGETED_PAGES = [
     {
         "path": "compress-pdf-for-ssc",
         "h1": "Compress PDF for SSC Application",
-        "title": "Compress PDF for SSC CGL, CHSL & MTS Upload (Exact Size) | PDFBolt",
+        "title": "Compress PDF for SSC CGL, CHSL & MTS (Exact Size) | PDFBolt",
         "description": "Compress PDF for SSC online application free. Resize documents, marksheets, and certificates under 50KB or 100KB to meet official SSC portal upload specs.",
         "subtitle": "Resize documents, marksheets, and identity certificates to exact SSC CGL, CHSL, and MTS upload requirements.",
         "quick_answer": "To compress a PDF for SSC: 1. Upload your certificate or document. 2. Extreme compression is pre-configured for SSC portal limits. 3. Click 'Compress PDF' and download your file ready for upload on ssc.gov.in.",
@@ -450,7 +450,7 @@ TARGETED_PAGES = [
     {
         "path": "compress-pdf-for-upsc",
         "h1": "Compress PDF for UPSC Application",
-        "title": "Compress PDF for UPSC OTR & CSE Application (20KB to 300KB) | PDFBolt",
+        "title": "Compress PDF for UPSC CSE & OTR (20KB to 300KB) | PDFBolt",
         "description": "Compress PDF for UPSC online application free. Meet official UPSC OTR, Civil Services, NDA, and CDS document size limits (20KB to 300KB) with zero quality loss.",
         "subtitle": "Optimize identity cards, degree certificates, and category proofs to exact UPSC 20KB–300KB portal standards.",
         "quick_answer": "To compress PDF for UPSC: 1. Drag & drop your PDF document. 2. The UPSC 20KB–300KB preset optimizes your file. 3. Click 'Compress PDF' and download your file for upsconline.nic.in.",
@@ -478,7 +478,7 @@ TARGETED_PAGES = [
     {
         "path": "compress-pdf-for-neet",
         "h1": "Compress PDF for NEET Application",
-        "title": "Compress PDF for NEET UG / PG Application (100KB to 200KB) | PDFBolt",
+        "title": "Compress PDF for NEET Exam (100KB to 200KB) | PDFBolt",
         "description": "Compress PDF for NEET UG application free. Reduce 10th marksheet, category, and PwD certificates to 100KB–200KB for NTA NEET portal upload.",
         "subtitle": "Resize Class 10 marksheets, category certificates, and citizenship documents to NTA NEET 100KB–200KB specs.",
         "quick_answer": "To compress PDF for NEET: 1. Upload your document. 2. Preselected for NTA NEET 100KB–200KB guidelines. 3. Click 'Compress PDF' and download for neet.nta.nic.in.",
@@ -502,7 +502,7 @@ TARGETED_PAGES = [
     {
         "path": "compress-pdf-for-jee",
         "h1": "Compress PDF for JEE Main Application",
-        "title": "Compress PDF for JEE Main & Advanced (50KB to 300KB) | PDFBolt",
+        "title": "Compress PDF for JEE Main (50KB to 300KB) | PDFBolt",
         "description": "Compress PDF for JEE Main application free. Meet official NTA JEE document upload requirements (50KB to 300KB) for certificates and marksheets.",
         "subtitle": "Shrink Class 10/12 certificates and category documents for NTA JEE Main and IIT JEE Advanced portals.",
         "quick_answer": "To compress PDF for JEE Main: 1. Drag & drop your PDF. 2. The JEE Main preset optimizes file size. 3. Click 'Compress PDF' and download for jeemain.nta.nic.in.",
@@ -526,7 +526,7 @@ TARGETED_PAGES = [
     {
         "path": "compress-pdf-for-ibps",
         "h1": "Compress PDF for IBPS Bank Exams",
-        "title": "Compress PDF for IBPS Exam Application (PO, Clerk, SO) | PDFBolt",
+        "title": "Compress PDF for IBPS Bank Exams (PO & Clerk) | PDFBolt",
         "description": "Compress PDF for IBPS online application free. Resize documents, thumb impressions, and handwritten declarations for IBPS PO, Clerk, and RRB banking exams.",
         "subtitle": "Optimize certificates, declarations, and identity proofs to exact IBPS PO, Clerk, and SO upload standards.",
         "quick_answer": "To compress PDF for IBPS: 1. Upload your file. 2. The IBPS Banking preset is active. 3. Click 'Compress PDF' and download for ibps.in.",
@@ -574,7 +574,7 @@ TARGETED_PAGES = [
     {
         "path": "pdf-size-reducer-for-government-portal",
         "h1": "PDF Size Reducer for Government Portals",
-        "title": "PDF Size Reducer for Government Portals Online Free | PDFBolt",
+        "title": "PDF Size Reducer for Government Portals Online | PDFBolt",
         "description": "PDF size reducer for government portals. Shrink marksheets under 200KB, certificates under 500KB, and IDs under 100KB for all central and state government websites.",
         "subtitle": "Universal document reducer for state and central government portals, scholarship portals, and digital service portals.",
         "quick_answer": "To reduce PDF size for government portals: 1. Drag & drop your PDF file. 2. The universal government portal preset activates. 3. Click 'Compress PDF' and download your compliant file.",
@@ -625,7 +625,7 @@ TARGETED_PAGES = [
     {
         "path": "merge-documents-for-visa-application",
         "h1": "Merge Documents for Visa Application",
-        "title": "Merge Documents for Visa Application into One PDF Free | PDFBolt",
+        "title": "Merge Documents for Visa Application into One PDF | PDFBolt",
         "description": "Merge documents for visa application online free. Combine passport bio page, bank statements, itinerary, and travel insurance into one compliant PDF for VFS and embassy upload.",
         "subtitle": "Stitch passport copies, flight tickets, hotel reservations, and bank statements into a single organized PDF for embassy and VFS submissions.",
         "quick_answer": "To merge visa documents: 1. Upload your passport bio page, bank statements, and flight itinerary. 2. Drag document cards to match the embassy's checklist sequence. 3. Click 'Merge PDF' to download your complete visa application bundle.",
@@ -649,7 +649,7 @@ TARGETED_PAGES = [
     {
         "path": "jpg-to-pdf-for-exam",
         "h1": "JPG to PDF for Exam Forms",
-        "title": "JPG to PDF for Exam Form Online Free – Exact Portal Size | PDFBolt",
+        "title": "JPG to PDF for Exam Forms Online – Exact Size | PDFBolt",
         "description": "Convert JPG to PDF for exam forms free online. Turn photos of marksheets, signatures, and certificates into compliant PDF files under 100KB or 200KB.",
         "subtitle": "Convert phone photos of certificates, marksheets, and identity cards into standard, lightweight PDF files for online exam portals.",
         "quick_answer": "To convert JPG to PDF for exam forms: 1. Upload your photo or scanned JPG. 2. Click 'Convert to PDF'. 3. Download your standard PDF file ready for exam portal submission.",
@@ -723,7 +723,7 @@ TARGETED_PAGES = [
     {
         "path": "compare/ilovepdf-alternative",
         "h1": "Free iLovePDF Alternative Without Daily Limits",
-        "title": "Best Free iLovePDF Alternative 2026 – No Daily Task Limits | PDFBolt",
+        "title": "Best Free iLovePDF Alternative (No Daily Limits) | PDFBolt",
         "description": "Looking for a free iLovePDF alternative? PDFBolt offers unlimited free PDF merging, compression, and editing with zero daily task limits and local in-browser privacy.",
         "subtitle": "Tired of 'Daily limit reached' and slow file uploads? Discover PDFBolt, the free, unlimited, privacy-first alternative to iLovePDF.",
         "quick_answer": "PDFBolt is the top free iLovePDF alternative because it has zero daily task limits, no forced registrations, and executes core PDF tools locally inside your web browser using WebAssembly rather than uploading your private documents to cloud servers.",
@@ -748,7 +748,7 @@ TARGETED_PAGES = [
     {
         "path": "compare/smallpdf-alternative",
         "h1": "Free Smallpdf Alternative (No 2-Task Paywall)",
-        "title": "Best Free Smallpdf Alternative 2026 – No 2-Task Paywall | PDFBolt",
+        "title": "Best Free Smallpdf Alternative (No Paywall Limits) | PDFBolt",
         "description": "Tired of Smallpdf daily limits? PDFBolt is a free Smallpdf alternative with unlimited tasks, no 2-file cap, no credit cards, and client-side document processing.",
         "subtitle": "Frustrated by Smallpdf's 2-tasks-per-day limit? PDFBolt provides unlimited free PDF tools with complete in-browser privacy.",
         "quick_answer": "PDFBolt replaces Smallpdf with completely free, unlimited PDF operations. While Smallpdf restricts free users to just 2 document tasks every 24 hours, PDFBolt gives you unlimited conversions, merges, and compressions with zero paywalls.",
@@ -772,7 +772,7 @@ TARGETED_PAGES = [
     {
         "path": "compare/adobe-acrobat-alternative",
         "h1": "Free Adobe Acrobat Alternative Online",
-        "title": "Free Adobe Acrobat Alternative Online – No $20/Month Fee | PDFBolt",
+        "title": "Free Adobe Acrobat Alternative (No Subscription) | PDFBolt",
         "description": "Free Adobe Acrobat alternative online. Merge, compress, edit, redact, and sign PDFs in your browser without paying $19.99/month for Acrobat DC Pro.",
         "subtitle": "Don't want to pay $239/year for basic PDF tools? PDFBolt gives you powerful PDF editing, merging, compression, and signing right in your browser.",
         "quick_answer": "PDFBolt is an instant browser alternative to Adobe Acrobat Pro, offering essential tools (merge, compress, edit, redact, and e-sign) with zero subscription fees, no credit card required, and no heavy software downloads.",

@@ -11,7 +11,8 @@ export interface OcrResult {
  */
 export async function ocrPdfToSearchablePdf(
     file: File,
-    onProgress?: (pct: number) => void
+    onProgress?: (pct: number) => void,
+    language: string = 'eng'
 ): Promise<OcrResult> {
     const pdfjsLib = await import('pdfjs-dist');
     const pdfjsWorker = (await import('pdfjs-dist/build/pdf.worker.min.mjs?url')).default;
@@ -27,7 +28,7 @@ export async function ocrPdfToSearchablePdf(
     let fullText = "";
     let totalWords = 0;
 
-    const worker = await Tesseract.createWorker('eng');
+    const worker = await Tesseract.createWorker(language);
 
     try {
         const numPages = pdf.numPages;

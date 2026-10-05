@@ -1816,7 +1816,14 @@ def generate_prerendered_pages():
           <header style="margin-bottom: 32px; border-bottom: 1px solid #e2e8f0; padding-bottom: 24px;">
             <div style="display: inline-block; padding: 4px 12px; background: #e0f2fe; color: #0369a1; font-size: 0.75rem; font-weight: 800; border-radius: 9999px; text-transform: uppercase; margin-bottom: 12px;">Step-by-Step Tutorial</div>
             <h1 style="font-size: 2.3rem; font-weight: 900; color: #0f172a; margin: 0 0 16px 0; line-height: 1.25;">{h1}</h1>
-            <p style="font-size: 1.15rem; color: #475569; margin: 0;">{guide['summary']}</p>
+            <p style="font-size: 1.15rem; color: #475569; margin: 0 0 16px 0;">{guide['summary']}</p>
+            <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px; font-size: 0.875rem; color: #64748b;">
+              <span style="font-weight: 700; color: #0f172a;">Written by <a href="/about/" style="color: #b45309; text-decoration: underline;">Kanishka Giri</a></span>
+              <span>•</span>
+              <span>Lead Systems &amp; Security Engineer</span>
+              <span>•</span>
+              <span>Updated 2026-10-05</span>
+            </div>
           </header>
 
           <div style="background: #fffbeb; border: 1px solid #fef3c7; border-left: 4px solid #f59e0b; border-radius: 12px; padding: 20px; margin-bottom: 32px;">
@@ -1832,6 +1839,18 @@ def generate_prerendered_pages():
           </div>
 
           {sections_html}
+
+          <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; margin-bottom: 36px; display: flex; gap: 16px; align-items: flex-start;">
+            <div style="width: 48px; height: 48px; border-radius: 50%; background: #0f172a; color: #ffffff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.2rem; flex-shrink: 0;">KG</div>
+            <div>
+              <h3 style="font-size: 1.1rem; font-weight: 800; color: #0f172a; margin: 0 0 4px 0;">About the Author: Kanishka Giri</h3>
+              <p style="font-size: 0.875rem; color: #475569; line-height: 1.6; margin: 0 0 8px 0;">Kanishka Giri is a Systems Software &amp; Privacy Engineer specializing in client-side WebAssembly architectures, document forensics, and zero-trust cryptography. He leads technical standards, browser sandbox security, and core PDF processing engines at PDFBolt.</p>
+              <div style="font-size: 0.8rem; font-weight: 600;">
+                <a href="/about/" style="color: #b45309; text-decoration: underline; margin-right: 12px;">Editorial Standards &amp; Team &rarr;</a>
+                <a href="/privacy/" style="color: #b45309; text-decoration: underline;">Zero-Upload Privacy Guarantee &rarr;</a>
+              </div>
+            </div>
+          </div>
 
           <div style="margin-bottom: 36px;">
             <h2 style="font-size: 1.5rem; font-weight: 800; color: #0f172a; margin: 0 0 16px 0;">Frequently Asked Questions</h2>
@@ -1867,7 +1886,17 @@ def generate_prerendered_pages():
                 "image": f"{CANONICAL_DOMAIN}/pdfbolt-og-image.png",
                 "datePublished": "2026-01-15T08:00:00+00:00",
                 "dateModified": "2026-10-05T08:00:00+00:00",
-                "author": {"@type": "Person", "name": "Kanishka Giri", "url": f"{CANONICAL_DOMAIN}/about/"},
+                "author": {
+                    "@type": "Person",
+                    "name": "Kanishka Giri",
+                    "jobTitle": "Lead Systems & Security Engineer",
+                    "url": f"{CANONICAL_DOMAIN}/about/",
+                    "worksFor": {
+                        "@type": "Organization",
+                        "name": "PDFBolt",
+                        "url": f"{CANONICAL_DOMAIN}/"
+                    }
+                },
                 "publisher": {
                     "@type": "Organization",
                     "name": "PDFBolt",
@@ -2503,8 +2532,12 @@ def write_page(base_template, path, title, description, canonical_url, body_cont
     # JSON-LD Schema Blocks
     schema_tags = "\n  ".join([f'<script type="application/ld+json">\n{json.dumps(s, indent=2)}\n</script>' for s in json_ld_schemas])
 
-    # Replace Title
-    html = re.sub(r'<title>.*?</title>', f'<title>{title}</title>', base_template)
+    # Replace or Inject Title
+    html = base_template
+    if re.search(r'<title>.*?</title>', html, flags=re.IGNORECASE):
+        html = re.sub(r'<title>.*?</title>', f'<title>{title}</title>', html, flags=re.IGNORECASE)
+    else:
+        html = html.replace('<head>', f'<head>\n  <title>{title}</title>', 1)
 
     # Replace Description
     html = re.sub(r'<meta[^>]*name="description"[^>]*>', f'<meta id="seo-description" name="description" data-rh="true"\n    content="{description}">', html)

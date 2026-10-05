@@ -163,6 +163,7 @@ const SimpleTool: React.FC<SimpleToolProps> = ({ title, mode, darkMode, notify, 
     wordCount: number;
     pageCount: number;
   } | null>(null);
+  const [ocrLanguage, setOcrLanguage] = useState<string>('eng');
   const [copiedOcrText, setCopiedOcrText] = useState(false);
 
   const isImageTool = mode === 'jpg2pdf';
@@ -518,7 +519,7 @@ const SimpleTool: React.FC<SimpleToolProps> = ({ title, mode, darkMode, notify, 
         }
 
         if (!searchablePdfBytes) {
-          const ocrRes = await ocrPdfToSearchablePdf(file, (pct) => setProgress(pct));
+          const ocrRes = await ocrPdfToSearchablePdf(file, (pct) => setProgress(pct), ocrLanguage);
           searchablePdfBytes = ocrRes.pdfBytes;
           ocrText = ocrRes.fullText;
           wordCount = ocrRes.wordCount;
@@ -1169,10 +1170,23 @@ const SimpleTool: React.FC<SimpleToolProps> = ({ title, mode, darkMode, notify, 
               {/* OCR PDF Settings */}
               {mode === 'ocr' && (
                 <div className="space-y-3">
-                  <div className="p-4 rounded-xl border-2 border-emerald-500/50 bg-emerald-50/40 dark:bg-emerald-950/20">
-                    <p className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white">OCR Engine</p>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                      Extracts and converts scanned text into searchable, selectable PDF content.
+                  <div className="p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50">
+                    <label className="block text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white mb-2">
+                      OCR Language
+                    </label>
+                    <select
+                      value={ocrLanguage}
+                      onChange={(e) => setOcrLanguage(e.target.value)}
+                      className="w-full text-xs font-semibold p-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-yellow-500 outline-none"
+                    >
+                      <option value="eng">English (Default)</option>
+                      <option value="spa">Spanish (Español)</option>
+                      <option value="fra">French (Français)</option>
+                      <option value="deu">German (Deutsch)</option>
+                      <option value="hin">Hindi (हिन्दी)</option>
+                    </select>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-2">
+                      Client-side neural OCR recognizes printed glyphs in the selected language and embeds a selectable, searchable text layer.
                     </p>
                   </div>
                 </div>

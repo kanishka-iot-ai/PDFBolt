@@ -27,9 +27,15 @@ const GuideDetailPage: React.FC<GuideDetailPageProps> = ({ darkMode }) => {
     "datePublished": guide.updatedAt,
     "dateModified": guide.updatedAt,
     "author": {
-      "@type": "Organization",
-      "name": "PDFBolt Editorial Team",
-      "url": baseUrl
+      "@type": "Person",
+      "name": "Kanishka Giri",
+      "jobTitle": "Lead Systems & Security Engineer",
+      "url": `${baseUrl}/about/`,
+      "worksFor": {
+        "@type": "Organization",
+        "name": "PDFBolt",
+        "url": baseUrl
+      }
     },
     "publisher": {
       "@type": "Organization",
@@ -114,7 +120,7 @@ const GuideDetailPage: React.FC<GuideDetailPageProps> = ({ darkMode }) => {
           <span className="text-yellow-700 dark:text-yellow-400 font-bold truncate max-w-xs">{guide.title}</span>
         </nav>
 
-        <div className="flex items-center gap-3 mb-4">
+        <div className="flex flex-wrap items-center gap-3 mb-4">
           <span className="text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full bg-yellow-500/10 text-yellow-700 dark:text-yellow-400">
             {guide.category}
           </span>
@@ -123,6 +129,9 @@ const GuideDetailPage: React.FC<GuideDetailPageProps> = ({ darkMode }) => {
           </span>
           <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
             Updated on {guide.updatedAt}
+          </span>
+          <span className="text-xs font-semibold text-slate-600 dark:text-slate-300 flex items-center gap-1">
+            Written by <Link to="/about" className="font-bold text-yellow-700 dark:text-yellow-400 hover:underline">Kanishka Giri</Link>
           </span>
         </div>
 
@@ -234,6 +243,36 @@ const GuideDetailPage: React.FC<GuideDetailPageProps> = ({ darkMode }) => {
 
         {/* Non-Intrusive In-Content Sponsored Slot */}
         <AdSlot placement="GUIDE_IN_CONTENT" />
+
+        {/* Author Bio & E-E-A-T Credibility Box */}
+        <section className={`p-6 rounded-2xl border mb-12 flex flex-col sm:flex-row gap-5 items-start ${
+          darkMode ? 'bg-slate-800/40 border-slate-700' : 'bg-slate-50 border-slate-200'
+        }`}>
+          <div className="w-14 h-14 rounded-full bg-gradient-to-br from-amber-500 to-amber-700 text-white font-black text-xl flex items-center justify-center flex-shrink-0 shadow-sm">
+            KG
+          </div>
+          <div>
+            <div className="flex flex-wrap items-center gap-2 mb-1">
+              <h3 className={`font-black text-base ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+                Kanishka Giri
+              </h3>
+              <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300">
+                Lead Systems & Security Engineer
+              </span>
+            </div>
+            <p className={`text-xs leading-relaxed mb-3 ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+              Kanishka Giri specializes in client-side WebAssembly architectures, document forensics, and zero-trust cryptography. He leads technical standards, browser sandbox security, and core PDF processing engines at PDFBolt.
+            </p>
+            <div className="flex items-center gap-4 text-xs font-bold">
+              <Link to="/about" className="text-yellow-700 dark:text-yellow-400 hover:underline">
+                Editorial Standards & Team &rarr;
+              </Link>
+              <Link to="/privacy" className="text-yellow-700 dark:text-yellow-400 hover:underline">
+                Zero-Upload Privacy Guarantee &rarr;
+              </Link>
+            </div>
+          </div>
+        </section>
 
         {/* FAQ Section */}
         {guide.faqs && guide.faqs.length > 0 && (
