@@ -14,7 +14,7 @@ CANONICAL_DOMAIN = "https://pdfbolt.in"
 CANONICAL_TOOLS = [
     {
         "path": "merge-pdf",
-        "title": "Merge PDF Online Free – Combine Multiple PDFs | PDFBolt",
+        "title": "Merge PDF Files Online Free – Private | PDFBolt",
         "description": "Combine multiple PDF files into one single document in seconds. 100% private in-browser processing with zero server uploads.",
         "h1": "Merge PDF Files Online",
         "subtitle": "Combine, stitch, and reorder multiple PDF documents into one single file with zero server uploads.",
@@ -48,7 +48,7 @@ CANONICAL_TOOLS = [
     },
     {
         "path": "split-pdf",
-        "title": "Split PDF Pages Online Free – Extract Pages | PDFBolt",
+        "title": "Split PDF Online – Extract Pages Free | PDFBolt",
         "description": "Extract specific pages or page ranges from any PDF document into separate files instantly in your browser with zero data exposure.",
         "h1": "Split PDF Document Pages",
         "subtitle": "Extract specific pages, custom ranges, or burst multi-page documents into individual files with client-side privacy.",
@@ -80,7 +80,7 @@ CANONICAL_TOOLS = [
     },
     {
         "path": "compress-pdf",
-        "title": "Compress PDF Online Free – Reduce PDF Size | PDFBolt",
+        "title": "Compress PDF Online Free – No Upload | PDFBolt",
         "description": "Compress and reduce PDF file size without losing readability. 3 compression profiles for maximum size reduction with local privacy.",
         "h1": "Compress PDF File Size Online",
         "subtitle": "Shrink heavy PDF documents below 10MB or 2MB for email attachments and portal submissions while keeping text sharp.",
@@ -112,7 +112,7 @@ CANONICAL_TOOLS = [
     },
     {
         "path": "pdf-to-word",
-        "title": "Convert PDF to Word Online Free (.docx) | PDFBolt",
+        "title": "PDF to Word Converter – Free, No Upload | PDFBolt",
         "description": "Convert PDF documents to editable Microsoft Word (.docx) files. Preserves layouts, tables, fonts, and bold styles.",
         "h1": "Convert PDF to Word Document (.docx)",
         "subtitle": "Transform static PDF documents into fully editable Microsoft Word (.docx) files with layout and table preservation.",
@@ -144,9 +144,9 @@ CANONICAL_TOOLS = [
     },
     {
         "path": "pdf-to-excel",
-        "title": "Convert PDF to Excel Online Free (.xlsx) | PDFBolt",
+        "title": "PDF to Excel Converter – Free & Private | PDFBolt",
         "description": "Extract tables and spreadsheet data from PDF into editable Microsoft Excel (.xlsx) workbooks with automatic numeric coercion.",
-        "h1": "Convert PDF Tables to Microsoft Excel (.xlsx)",
+        "h1": "PDF to Excel Converter (.xlsx)",
         "subtitle": "Extract financial statements, balance sheets, and invoices into structured, formula-ready Excel spreadsheets.",
         "quick_answer": "To convert PDF to Excel: 1. Select your PDF containing tabular data. 2. Click 'Convert to Excel'. 3. Download your structured .xlsx workbook.",
         "features": [
@@ -175,7 +175,7 @@ CANONICAL_TOOLS = [
     },
     {
         "path": "pdf-to-ppt",
-        "title": "Convert PDF to PowerPoint Online Free (.pptx) | PDFBolt",
+        "title": "PDF to PPT Converter – Free Online | PDFBolt",
         "description": "Convert PDF documents into editable Microsoft PowerPoint presentation slides (.pptx) with crisp high-resolution layouts.",
         "h1": "Convert PDF to PowerPoint Presentation (.pptx)",
         "subtitle": "Transform static PDF presentation handouts into editable Microsoft PowerPoint (.pptx) slide decks.",
@@ -237,7 +237,7 @@ CANONICAL_TOOLS = [
     },
     {
         "path": "word-to-pdf",
-        "title": "Convert Word to PDF Online Free (.docx to .pdf) | PDFBolt",
+        "title": "Word to PDF Converter – Free Online | PDFBolt",
         "description": "Convert Microsoft Word (.docx) documents to standard PDF files with vector layout fidelity in your web browser.",
         "h1": "Convert Word Document (.docx) to PDF",
         "subtitle": "Standardize Microsoft Word (.docx) files into secure, non-editable PDF documents with vector fidelity.",
@@ -268,7 +268,7 @@ CANONICAL_TOOLS = [
     },
     {
         "path": "excel-to-pdf",
-        "title": "Convert Excel to PDF Online Free (.xlsx to .pdf) | PDFBolt",
+        "title": "Excel to PDF Converter – Free & Private | PDFBolt",
         "description": "Convert Microsoft Excel spreadsheets (.xlsx) into clean, printable PDF documents with custom table styling.",
         "h1": "Convert Excel Spreadsheet (.xlsx) to PDF",
         "subtitle": "Transform Excel sheets (.xlsx) into clean, print-ready PDF tables with auto-scaled column widths.",
@@ -299,7 +299,7 @@ CANONICAL_TOOLS = [
     },
     {
         "path": "ppt-to-pdf",
-        "title": "Convert PPT to PDF Online Free (.pptx to .pdf) | PDFBolt",
+        "title": "PowerPoint to PDF Converter – Free Online | PDFBolt",
         "description": "Convert PowerPoint presentations (.pptx) to PDF format with slide-by-slide layout preservation.",
         "h1": "Convert PowerPoint Slides (.pptx) to PDF",
         "subtitle": "Convert PowerPoint presentations (.pptx) into standardized PDF slide decks ready for printing and sharing.",
@@ -330,7 +330,7 @@ CANONICAL_TOOLS = [
     },
     {
         "path": "jpg-to-pdf",
-        "title": "Convert JPG Images to PDF Online Free | PDFBolt",
+        "title": "JPG to PDF Converter – Free, In Your Browser | PDFBolt",
         "description": "Convert JPG, PNG, and WebP images into a clean, multi-page PDF document. Arrange images and set page orientation.",
         "h1": "Convert JPG & Images to PDF Document",
         "subtitle": "Combine photos, receipts, and image scans into a single multi-page PDF document.",
@@ -361,9 +361,9 @@ CANONICAL_TOOLS = [
     },
     {
         "path": "html-to-pdf",
-        "title": "Convert HTML to PDF Online Free | PDFBolt",
+        "title": "HTML to PDF Converter – Free Online | PDFBolt",
         "description": "Convert HTML code or web page files directly into printable PDF documents with CSS layout fidelity.",
-        "h1": "Convert HTML & Web Code to PDF",
+        "h1": "HTML to PDF Converter",
         "subtitle": "Transform raw HTML code, invoices, and web pages into formatted PDF documents with CSS support.",
         "quick_answer": "To convert HTML to PDF: 1. Upload an HTML file or paste code. 2. Click 'Convert to PDF'. 3. Download your formatted PDF document.",
         "features": [
@@ -536,7 +536,7 @@ CANONICAL_TOOLS = [
             {
                 "heading": "Fake vs True Redaction Explained",
                 "paragraphs": [
-                    "Basic PDF editors simply draw black rectangles on top of text, leaving the underlying words selectable and copyable. PDFBolt flattens the redacted regions onto a physical pixel canvas, making data recovery mathematically impossible."
+                    "Basic PDF editors simply draw black rectangles on top of text, leaving the underlying words selectable and copyable. PDFBolt flattens the redacted regions onto a physical pixel canvas, permanently destroying character data from the exported PDF."
                 ]
             }
         ],
@@ -1108,7 +1108,7 @@ CANONICAL_GUIDES = [
                 "heading": "The Critical Difference Between Fake & True Redaction",
                 "paragraphs": [
                     "Many famous legal blunders happen because lawyers use basic annotation tools to draw black rectangles over text. The underlying text remains in the PDF stream and can be selected, copied, or extracted with one click.",
-                    "PDFBolt renders the marked regions onto a physical canvas and re-embeds only the flattened image layer, making data recovery mathematically impossible."
+                    "PDFBolt renders the marked regions onto a physical canvas and re-embeds only the flattened image layer, permanently destroying character data from the exported PDF."
                 ]
             }
         ],
@@ -2069,7 +2069,7 @@ def generate_prerendered_pages():
         generated_count += 1
 
     # Category 5: Homepage (Root Index)
-    home_title = "Free Online PDF Tools – 100% Private & Fast | PDFBolt"
+    home_title = "Free Online PDF Tools – Merge, Compress & Edit | PDFBolt"
     home_desc = "Use 25+ free online PDF tools to merge, compress, split, convert, edit and protect PDFs. 100% private in-browser WebAssembly processing with zero server uploads."
     home_canonical = f"{CANONICAL_DOMAIN}/"
 
@@ -2116,7 +2116,7 @@ def generate_prerendered_pages():
           Free Online PDF Tools for Every Task
         </h1>
         <p style="font-size: 1.25rem; color: #475569; margin: 0 auto; max-width: 820px; line-height: 1.6;">
-          Merge, compress, split, convert, edit, and protect PDF files directly inside your web browser. 100% private, client-side WebAssembly execution with zero server uploads and zero tracking.
+          Merge, compress, split, convert, edit, and protect PDF files directly inside your web browser. 100% private, client-side WebAssembly execution with zero server uploads and anonymous site analytics only.
         </p>
 
         <!-- Trust Badges -->
@@ -2127,7 +2127,7 @@ def generate_prerendered_pages():
           </div>
           <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 18px;">
             <div style="font-weight: 800; font-size: 1rem; color: #0f172a; margin-bottom: 4px;">⚡ Instant Zero-Upload Speed</div>
-            <p style="margin: 0; font-size: 0.85rem; color: #475569;">Skip heavy file upload and download wait times. Process gigabyte-scale documents with local CPU acceleration.</p>
+            <p style="margin: 0; font-size: 0.85rem; color: #475569;">Skip heavy file upload and download wait times. Process documents locally with device-level CPU acceleration.</p>
           </div>
           <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 18px;">
             <div style="font-weight: 800; font-size: 1rem; color: #0f172a; margin-bottom: 4px;">✨ Free & Unlimited Usage</div>
@@ -2198,7 +2198,7 @@ def generate_prerendered_pages():
           </div>
           <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 20px;">
             <h3 style="font-size: 1.1rem; font-weight: 800; color: #0f172a; margin: 0 0 8px 0;">Is PDFBolt completely free to use?</h3>
-            <p style="margin: 0; color: #334155; font-size: 0.95rem; line-height: 1.6;">Yes! All tools on PDFBolt are 100% free with no file size limits, daily usage quotas, hidden subscriptions, or watermark additions.</p>
+            <p style="margin: 0; color: #334155; font-size: 0.95rem; line-height: 1.6;">Yes! All tools on PDFBolt are 100% free with no paywalls, daily document quotas, hidden subscriptions, or watermarks. Document size capacity scales with your device memory.</p>
           </div>
           <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 20px;">
             <h3 style="font-size: 1.1rem; font-weight: 800; color: #0f172a; margin: 0 0 8px 0;">What formats can I convert to and from PDF?</h3>
@@ -2206,7 +2206,7 @@ def generate_prerendered_pages():
           </div>
           <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 20px;">
             <h3 style="font-size: 1.1rem; font-weight: 800; color: #0f172a; margin: 0 0 8px 0;">Can I use PDFBolt for confidential business or medical documents?</h3>
-            <p style="margin: 0; color: #334155; font-size: 0.95rem; line-height: 1.6;">Absolutely. Because zero bytes leave your device, PDFBolt inherently complies with strict confidentiality agreements (NDAs), HIPAA guidelines, and GDPR regulations.</p>
+            <p style="margin: 0; color: #334155; font-size: 0.95rem; line-height: 1.6;">Absolutely. Because zero document files are uploaded to our servers, PDFBolt is engineered to support your strict confidentiality agreements (NDAs), HIPAA workflows, and GDPR data isolation requirements.</p>
           </div>
         </div>
       </section>
@@ -2259,7 +2259,7 @@ def generate_prerendered_pages():
                     "name": "Is PDFBolt completely free to use?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Yes! All tools on PDFBolt are 100% free with no file size limits, daily usage quotas, hidden subscriptions, or watermark additions."
+                        "text": "Yes! All tools on PDFBolt are 100% free with no paywalls, daily document quotas, hidden subscriptions, or watermarks. Document size capacity scales with your device memory."
                     }
                 },
                 {
@@ -2275,7 +2275,7 @@ def generate_prerendered_pages():
                     "name": "Can I use PDFBolt for confidential business or medical documents?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Absolutely. Because zero bytes leave your device, PDFBolt inherently complies with strict confidentiality agreements (NDAs), HIPAA guidelines, and GDPR regulations."
+                        "text": "Absolutely. Because zero document files are uploaded to our servers, PDFBolt is engineered to support your strict confidentiality agreements (NDAs), HIPAA workflows, and GDPR data isolation requirements."
                     }
                 }
             ]

@@ -134,7 +134,7 @@ const SEOManager: React.FC = () => {
 
     document.title = title;
 
-    const metaDesc = document.getElementById('seo-description');
+    const metaDesc = document.querySelector('meta[name="description"]') || document.getElementById('seo-description');
     if (metaDesc) {
       metaDesc.setAttribute('content', description);
     }

@@ -19,15 +19,17 @@ const SEOLandingPage: React.FC<SEOLandingPageProps> = ({ tool: toolProp, toolId,
   const { hasActiveWork } = useActiveWork();
 
   const baseUrl = 'https://pdfbolt.in';
-  const canonicalUrl = `${baseUrl}${tool.canonicalPath || location.pathname}`;
+  const rawPath = tool?.canonicalPath || location.pathname;
+  const canonicalPath = rawPath.endsWith('/') ? rawPath : `${rawPath}/`;
+  const canonicalUrl = `${baseUrl}${canonicalPath}`;
 
   // Software Application Schema
   const softwareSchema = {
     "@context": "https://schema.org",
     "@type": "WebApplication",
-    "name": `PDFBolt ${tool.title}`,
+    "name": `PDFBolt ${tool?.title || 'Tool'}`,
     "url": canonicalUrl,
-    "description": tool.description,
+    "description": tool?.description,
     "applicationCategory": "UtilitiesApplication",
     "operatingSystem": "Any",
     "offers": {
@@ -35,11 +37,11 @@ const SEOLandingPage: React.FC<SEOLandingPageProps> = ({ tool: toolProp, toolId,
       "price": "0",
       "priceCurrency": "USD"
     },
-    "featureList": tool.features?.join(', ') || "PDF Tools"
+    "featureList": tool?.features?.join(', ') || "PDF Tools"
   };
 
   // HowTo Schema
-  const howToSchema = tool.howToSteps ? {
+  const howToSchema = tool?.howToSteps ? {
     "@context": "https://schema.org",
     "@type": "HowTo",
     "name": `How to ${tool.title}`,
@@ -53,7 +55,7 @@ const SEOLandingPage: React.FC<SEOLandingPageProps> = ({ tool: toolProp, toolId,
   } : null;
 
   // FAQ Schema
-  const faqSchema = tool.faqs ? {
+  const faqSchema = tool?.faqs ? {
     "@context": "https://schema.org",
     "@type": "FAQPage",
     "mainEntity": tool.faqs.map(f => ({
@@ -75,36 +77,36 @@ const SEOLandingPage: React.FC<SEOLandingPageProps> = ({ tool: toolProp, toolId,
         "@type": "ListItem",
         "position": 1,
         "name": "Home",
-        "item": baseUrl
+        "item": `${baseUrl}/`
       },
       {
         "@type": "ListItem",
         "position": 2,
         "name": "PDF Tools",
-        "item": `${baseUrl}/tools`
+        "item": `${baseUrl}/tools/`
       },
       {
         "@type": "ListItem",
         "position": 3,
-        "name": tool.title,
+        "name": tool?.title || 'PDF Tool',
         "item": canonicalUrl
       }
     ]
   };
 
   // Fetch related tools & guides objects
-  const relatedToolsList = (tool.relatedTools || [])
+  const relatedToolsList = (tool?.relatedTools || [])
     .map(id => TOOLS.find(t => t.id === id))
     .filter(Boolean);
 
   return (
     <div className={`animate-fadeIn w-full ${hasActiveWork ? 'h-[calc(100vh-64px)] overflow-hidden bg-[#f4f5f8] dark:bg-slate-950 flex flex-col' : 'min-h-[calc(100vh-64px)] lg:h-[calc(100vh-64px)] lg:overflow-hidden flex flex-col justify-between bg-white dark:bg-slate-900'}`}>
       <Helmet>
-        <title>{tool.seoTitle || `${tool.title} – Free & Private Online Tool | PDFBolt`}</title>
-        <meta name="description" content={tool.description} />
+        <title>{tool?.seoTitle || `${tool?.title || 'PDF Tool'} – Free & Private Online Tool | PDFBolt`}</title>
+        <meta name="description" content={tool?.description} />
         <link rel="canonical" href={canonicalUrl} />
-        <meta property="og:title" content={tool.seoTitle || tool.title} />
-        <meta property="og:description" content={tool.description} />
+        <meta property="og:title" content={tool?.seoTitle || tool?.title} />
+        <meta property="og:description" content={tool?.description} />
         <meta property="og:url" content={canonicalUrl} />
         <script type="application/ld+json">{JSON.stringify(softwareSchema)}</script>
         <script type="application/ld+json">{JSON.stringify(breadcrumbSchema)}</script>
@@ -112,28 +114,26 @@ const SEOLandingPage: React.FC<SEOLandingPageProps> = ({ tool: toolProp, toolId,
         {faqSchema && <script type="application/ld+json">{JSON.stringify(faqSchema)}</script>}
       </Helmet>
 
-      {/* 1. HERO HEADER (Clean, Minimal, Shown only before file upload) */}
-      {!hasActiveWork && (
-        <div className={`pt-6 pb-4 border-b shrink-0 ${darkMode ? 'border-slate-800 bg-slate-900/50' : 'border-slate-100 bg-slate-50'}`}>
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
-            {/* Breadcrumb Navigation */}
-            <nav className="flex justify-center items-center gap-2 text-xs font-semibold mb-1 text-slate-500">
-              <Link to="/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Home</Link>
-              <span>/</span>
-              <Link to="/tools" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">PDF Tools</Link>
-              <span>/</span>
-              <span className="text-yellow-700 dark:text-yellow-400 font-bold">{tool.title}</span>
-            </nav>
+      {/* 1. HERO HEADER (Always retained in DOM for SEO & A11y, visually hidden during active interaction) */}
+      <div className={hasActiveWork ? "sr-only" : `pt-6 pb-4 border-b shrink-0 ${darkMode ? 'border-slate-800 bg-slate-900/50' : 'border-slate-100 bg-slate-50'}`}>
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
+          {/* Breadcrumb Navigation */}
+          <nav className="flex justify-center items-center gap-2 text-xs font-semibold mb-1 text-slate-500">
+            <Link to="/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Home</Link>
+            <span>/</span>
+            <Link to="/tools" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">PDF Tools</Link>
+            <span>/</span>
+            <span className="text-yellow-700 dark:text-yellow-400 font-bold">{tool?.title}</span>
+          </nav>
 
-            <h1 className={`text-3xl sm:text-4xl md:text-5xl font-black mb-2 tracking-tight leading-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>
-              {tool.title}
-            </h1>
-            <p className={`text-sm sm:text-base max-w-xl mx-auto font-medium ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
-              {tool.description}
-            </p>
-          </div>
+          <h1 className={`text-3xl sm:text-4xl md:text-5xl font-black mb-2 tracking-tight leading-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+            {tool?.title}
+          </h1>
+          <p className={`text-sm sm:text-base max-w-xl mx-auto font-medium ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+            {tool?.description}
+          </p>
         </div>
-      )}
+      </div>
 
       {/* 2. THE WORKING INTERACTIVE TOOL (Full space when active, centered when landing) */}
       <div className={hasActiveWork ? "w-full h-full flex-grow overflow-hidden" : "flex-grow flex items-center justify-center p-4 sm:p-6 my-auto"}>

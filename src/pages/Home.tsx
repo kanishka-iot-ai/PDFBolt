@@ -474,7 +474,58 @@ const Home: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
         </div>
       </section>
 
-      {/* 5. CUSTOMER CARE & SUPPORT SECTION */}
+      {/* 5. PRIVACY VERIFICATION WALKTHROUGH */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 py-12">
+        <div className={`p-8 sm:p-12 rounded-3xl border ${darkMode ? 'bg-slate-900/60 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
+          <div className="max-w-3xl mx-auto text-center mb-10">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 font-bold text-xs uppercase tracking-widest mb-3 border border-emerald-500/20">
+              <Shield size={14} /> Trust & Transparency
+            </div>
+            <h2 className={`text-2xl sm:text-3xl md:text-4xl font-black mb-3 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+              How to Verify That Your Files Never Leave Your Device
+            </h2>
+            <p className={`text-sm sm:text-base leading-relaxed ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+              You don&apos;t have to take our word for it. You can independently confirm our zero-upload architecture using your browser&apos;s built-in developer tools in 4 simple steps:
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className={`p-5 rounded-2xl border ${darkMode ? 'bg-slate-800/40 border-slate-700/60' : 'bg-white border-slate-200 shadow-sm'}`}>
+              <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-yellow-500/20 text-yellow-700 dark:text-yellow-400 font-black text-sm mb-3">1</span>
+              <h3 className={`font-bold text-sm mb-1.5 ${darkMode ? 'text-white' : 'text-slate-900'}`}>Open DevTools</h3>
+              <p className={`text-xs leading-relaxed ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+                Press <kbd className="px-1.5 py-0.5 rounded bg-slate-200 dark:bg-slate-700 font-mono text-[10px]">F12</kbd> or right-click anywhere and select <strong>Inspect</strong>.
+              </p>
+            </div>
+
+            <div className={`p-5 rounded-2xl border ${darkMode ? 'bg-slate-800/40 border-slate-700/60' : 'bg-white border-slate-200 shadow-sm'}`}>
+              <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-yellow-500/20 text-yellow-700 dark:text-yellow-400 font-black text-sm mb-3">2</span>
+              <h3 className={`font-bold text-sm mb-1.5 ${darkMode ? 'text-white' : 'text-slate-900'}`}>Click Network Tab</h3>
+              <p className={`text-xs leading-relaxed ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+                Switch to the <strong>Network</strong> tab to monitor all outgoing HTTP requests and file transfers.
+              </p>
+            </div>
+
+            <div className={`p-5 rounded-2xl border ${darkMode ? 'bg-slate-800/40 border-slate-700/60' : 'bg-white border-slate-200 shadow-sm'}`}>
+              <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-yellow-500/20 text-yellow-700 dark:text-yellow-400 font-black text-sm mb-3">3</span>
+              <h3 className={`font-bold text-sm mb-1.5 ${darkMode ? 'text-white' : 'text-slate-900'}`}>Process Any PDF</h3>
+              <p className={`text-xs leading-relaxed ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+                Drop a PDF into Merge, Compress, Split, or any tool and run the operation.
+              </p>
+            </div>
+
+            <div className={`p-5 rounded-2xl border ${darkMode ? 'bg-slate-800/40 border-slate-700/60' : 'bg-white border-slate-200 shadow-sm'}`}>
+              <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-yellow-500/20 text-yellow-700 dark:text-yellow-400 font-black text-sm mb-3">4</span>
+              <h3 className={`font-bold text-sm mb-1.5 ${darkMode ? 'text-white' : 'text-slate-900'}`}>Verify 0 KB Uploaded</h3>
+              <p className={`text-xs leading-relaxed ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+                Confirm zero file payload requests. Processing happens 100% locally in your browser memory.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 6. CUSTOMER CARE & SUPPORT SECTION */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 py-16 sm:py-20">
         <div
           className={`p-8 sm:p-12 md:p-16 rounded-[2.5rem] border relative overflow-hidden text-center transition-all ${

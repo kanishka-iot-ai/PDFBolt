@@ -12,6 +12,140 @@ services:
     buildCommand: npm install && npm run build
     staticPublishPath: ./dist
     routes:
+      # 301 Canonical Trailing-Slash Redirects (Ensures Prerendered HTML is Served on Render)
+      - type: redirect
+        source: /merge-pdf
+        destination: /merge-pdf/
+      - type: redirect
+        source: /split-pdf
+        destination: /split-pdf/
+      - type: redirect
+        source: /compress-pdf
+        destination: /compress-pdf/
+      - type: redirect
+        source: /pdf-to-word
+        destination: /pdf-to-word/
+      - type: redirect
+        source: /pdf-to-excel
+        destination: /pdf-to-excel/
+      - type: redirect
+        source: /pdf-to-ppt
+        destination: /pdf-to-ppt/
+      - type: redirect
+        source: /pdf-to-jpg
+        destination: /pdf-to-jpg/
+      - type: redirect
+        source: /word-to-pdf
+        destination: /word-to-pdf/
+      - type: redirect
+        source: /excel-to-pdf
+        destination: /excel-to-pdf/
+      - type: redirect
+        source: /ppt-to-pdf
+        destination: /ppt-to-pdf/
+      - type: redirect
+        source: /jpg-to-pdf
+        destination: /jpg-to-pdf/
+      - type: redirect
+        source: /html-to-pdf
+        destination: /html-to-pdf/
+      - type: redirect
+        source: /edit-pdf
+        destination: /edit-pdf/
+      - type: redirect
+        source: /protect-pdf
+        destination: /protect-pdf/
+      - type: redirect
+        source: /unlock-pdf
+        destination: /unlock-pdf/
+      - type: redirect
+        source: /sign-pdf
+        destination: /sign-pdf/
+      - type: redirect
+        source: /redact-pdf
+        destination: /redact-pdf/
+      - type: redirect
+        source: /ocr-pdf
+        destination: /ocr-pdf/
+      - type: redirect
+        source: /scan-to-pdf
+        destination: /scan-to-pdf/
+      - type: redirect
+        source: /scan-handwriting-to-pdf
+        destination: /scan-handwriting-to-pdf/
+      - type: redirect
+        source: /rotate-pdf
+        destination: /rotate-pdf/
+      - type: redirect
+        source: /organize-pdf
+        destination: /organize-pdf/
+      - type: redirect
+        source: /add-page-numbers-to-pdf
+        destination: /add-page-numbers-to-pdf/
+      - type: redirect
+        source: /watermark-pdf
+        destination: /watermark-pdf/
+      - type: redirect
+        source: /delete-pdf-pages
+        destination: /delete-pdf-pages/
+      - type: redirect
+        source: /compare-pdf
+        destination: /compare-pdf/
+      - type: redirect
+        source: /repair-pdf
+        destination: /repair-pdf/
+      - type: redirect
+        source: /pdf-to-qr-code
+        destination: /pdf-to-qr-code/
+      - type: redirect
+        source: /analyze-pdf
+        destination: /analyze-pdf/
+      - type: redirect
+        source: /tools
+        destination: /tools/
+      - type: redirect
+        source: /guides
+        destination: /guides/
+      - type: redirect
+        source: /encyclopedia
+        destination: /encyclopedia/
+      - type: redirect
+        source: /student-pdf-tools
+        destination: /student-pdf-tools/
+      - type: redirect
+        source: /business-pdf-tools
+        destination: /business-pdf-tools/
+      - type: redirect
+        source: /developer-pdf-tools
+        destination: /developer-pdf-tools/
+      - type: redirect
+        source: /compare/online-pdf-tools
+        destination: /compare/online-pdf-tools/
+      - type: redirect
+        source: /tools/pdf-size-calculator
+        destination: /tools/pdf-size-calculator/
+      - type: redirect
+        source: /test-files
+        destination: /test-files/
+      - type: redirect
+        source: /about
+        destination: /about/
+      - type: redirect
+        source: /privacy
+        destination: /privacy/
+      - type: redirect
+        source: /terms
+        destination: /terms/
+      - type: redirect
+        source: /contact
+        destination: /contact/
+      - type: redirect
+        source: /cookies
+        destination: /cookies/
+      - type: redirect
+        source: /offline-mode
+        destination: /offline-mode/
+      # Fallback SPA rewrite for dynamic routes
       - type: rewrite
         source: /*
         destination: /index.html
