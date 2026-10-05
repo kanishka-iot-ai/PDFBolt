@@ -25,7 +25,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, Response
 
 from backend.app.config import settings
-from backend.app.core.errors import PDFProcessingException, pdf_exception_handler, generic_exception_handler
+from backend.app.core.errors import PDFBoltError, PDFProcessingException, pdf_exception_handler, generic_exception_handler
 from backend.app.core.security import rate_limiter
 from backend.app.core.logging import logger
 from backend.app.api.v1.router import api_v1_router
@@ -160,6 +160,7 @@ async def security_and_timing_middleware(request: Request, call_next):
 
 
 # Register Exception Handlers
+app.add_exception_handler(PDFBoltError, pdf_exception_handler)
 app.add_exception_handler(PDFProcessingException, pdf_exception_handler)
 app.add_exception_handler(Exception, generic_exception_handler)
 
