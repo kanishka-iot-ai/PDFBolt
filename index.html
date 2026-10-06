@@ -59,12 +59,6 @@
       ['pointerdown', 'touchstart', 'scroll', 'keydown'].forEach(function(ev) {
         window.addEventListener(ev, initThirdParty, { passive: true, once: true });
       });
-
-      if ('requestIdleCallback' in window) {
-        requestIdleCallback(function() { setTimeout(initThirdParty, 2500); }, { timeout: 4000 });
-      } else {
-        setTimeout(initThirdParty, 3500);
-      }
     })();
   </script>
 
