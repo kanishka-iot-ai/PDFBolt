@@ -1,57 +1,101 @@
 {
-  "specVersion": "1.0.0",
-  "name": "PDFBolt",
-  "description": "Privacy-first in-browser and cloud PDF toolkit for document conversion, compression, and editing.",
-  "homepage": "https://pdfbolt.in/",
+  "specVersion": "1.0",
   "entries": [
     {
-      "id": "merge-pdf",
-      "name": "Merge PDF",
-      "description": "Combine multiple PDF files into one single document.",
+      "identifier": "urn:air:pdfbolt:doc:llms",
+      "displayName": "PDFBolt Agent Skills & LLM Documentation",
+      "url": "https://pdfbolt.in/llms.txt",
+      "type": "text/markdown; profile=\"urn:air:agent-skills\"",
+      "description": "Comprehensive specifications, capabilities, and workflows of PDFBolt tools for AI agents and LLMs.",
+      "representativeQueries": [
+        "PDFBolt tool capabilities and features",
+        "browser-based PDF processing documentation",
+        "how to use PDFBolt tools with AI agents"
+      ]
+    },
+    {
+      "identifier": "urn:air:pdfbolt:tool:merge-pdf",
+      "displayName": "Merge PDF Tool",
       "url": "https://pdfbolt.in/merge-pdf/",
-      "type": "tool"
+      "type": "text/markdown; profile=\"urn:air:agent-skills\"",
+      "description": "Combine multiple PDF documents into a single file with custom page reordering.",
+      "representativeQueries": [
+        "merge PDF files online free",
+        "combine multiple PDF documents",
+        "stitch PDF pages together"
+      ]
     },
     {
-      "id": "compress-pdf",
-      "name": "Compress PDF",
-      "description": "Reduce PDF file size while retaining visual quality.",
+      "identifier": "urn:air:pdfbolt:tool:compress-pdf",
+      "displayName": "Compress PDF Tool",
       "url": "https://pdfbolt.in/compress-pdf/",
-      "type": "tool"
+      "type": "text/markdown; profile=\"urn:air:agent-skills\"",
+      "description": "Reduce PDF file size by up to 85% while retaining vector text sharpness and image quality.",
+      "representativeQueries": [
+        "compress PDF online without losing quality",
+        "reduce PDF file size below 2MB",
+        "shrink heavy PDF documents for email"
+      ]
     },
     {
-      "id": "split-pdf",
-      "name": "Split PDF",
-      "description": "Extract specific pages or page ranges from any PDF.",
+      "identifier": "urn:air:pdfbolt:tool:split-pdf",
+      "displayName": "Split PDF Tool",
       "url": "https://pdfbolt.in/split-pdf/",
-      "type": "tool"
+      "type": "text/markdown; profile=\"urn:air:agent-skills\"",
+      "description": "Extract specific pages or page ranges from any PDF document into separate files.",
+      "representativeQueries": [
+        "split PDF pages online",
+        "extract page ranges from PDF",
+        "separate PDF document pages"
+      ]
     },
     {
-      "id": "pdf-to-word",
-      "name": "PDF to Word",
-      "description": "Convert PDF documents to editable Word DOCX files.",
+      "identifier": "urn:air:pdfbolt:tool:pdf-to-word",
+      "displayName": "PDF to Word Converter",
       "url": "https://pdfbolt.in/pdf-to-word/",
-      "type": "tool"
+      "type": "text/markdown; profile=\"urn:air:agent-skills\"",
+      "description": "Convert PDF documents to editable Microsoft Word DOCX files with preserved formatting.",
+      "representativeQueries": [
+        "convert PDF to Word docx online",
+        "turn PDF into editable Word document",
+        "PDF to Word text and table converter"
+      ]
     },
     {
-      "id": "word-to-pdf",
-      "name": "Word to PDF",
-      "description": "Convert Word DOCX files to PDF format.",
+      "identifier": "urn:air:pdfbolt:tool:word-to-pdf",
+      "displayName": "Word to PDF Converter",
       "url": "https://pdfbolt.in/word-to-pdf/",
-      "type": "tool"
+      "type": "text/markdown; profile=\"urn:air:agent-skills\"",
+      "description": "Convert Microsoft Word DOCX documents into PDF format with accurate typography.",
+      "representativeQueries": [
+        "convert Word DOCX to PDF online",
+        "Word to PDF document converter",
+        "turn DOCX into PDF"
+      ]
     },
     {
-      "id": "protect-pdf",
-      "name": "Protect PDF",
-      "description": "Add password encryption to PDF documents.",
+      "identifier": "urn:air:pdfbolt:tool:protect-pdf",
+      "displayName": "Protect PDF Tool",
       "url": "https://pdfbolt.in/protect-pdf/",
-      "type": "tool"
+      "type": "text/markdown; profile=\"urn:air:agent-skills\"",
+      "description": "Encrypt PDF documents with 128-bit/256-bit AES password security.",
+      "representativeQueries": [
+        "password protect PDF file",
+        "encrypt PDF document with password",
+        "secure sensitive PDF files"
+      ]
     },
     {
-      "id": "unlock-pdf",
-      "name": "Unlock PDF",
-      "description": "Remove password protection from PDF documents.",
+      "identifier": "urn:air:pdfbolt:tool:unlock-pdf",
+      "displayName": "Unlock PDF Tool",
       "url": "https://pdfbolt.in/unlock-pdf/",
-      "type": "tool"
+      "type": "text/markdown; profile=\"urn:air:agent-skills\"",
+      "description": "Remove password protection and permissions restrictions from authorized PDF files.",
+      "representativeQueries": [
+        "unlock password protected PDF",
+        "remove password from PDF online",
+        "decrypt PDF document"
+      ]
     }
   ]
 }
