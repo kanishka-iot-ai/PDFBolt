@@ -69,6 +69,14 @@ export default defineConfig(({ mode }) => {
           assetFileNames: 'assets/[name]-[hash].[ext]',
           manualChunks(id) {
             const normalizedId = id.replace(/\\/g, '/');
+            if (
+              normalizedId.includes('vite/preload-helper') ||
+              normalizedId.includes('commonjsHelpers') ||
+              normalizedId.includes('\0vite') ||
+              normalizedId.includes('plugin-vue')
+            ) {
+              return 'vendor-core';
+            }
             if (normalizedId.includes('/node_modules/')) {
               if (
                 normalizedId.includes('/react/') || 

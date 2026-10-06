@@ -29,8 +29,8 @@ const Footer: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
             <img 
               src="/pdfbolt-logo.webp" 
               alt="PDFBolt" 
-              width="150"
-              height="40"
+              width="124"
+              height="100"
               className="h-10 w-auto object-contain transition-transform duration-300 group-hover:scale-105" 
             />
           </Link>

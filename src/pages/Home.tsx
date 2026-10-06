@@ -87,7 +87,7 @@ const Home: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
   };
 
   return (
-    <div className="animate-fadeIn">
+    <div>
       {/* 1. NEW COMPACT HERO SECTION (Above the fold) */}
       <section
         className={`relative overflow-hidden pt-6 pb-6 sm:pt-10 sm:pb-8 text-center border-b ${
@@ -98,7 +98,7 @@ const Home: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
 
         <div className="max-w-4xl mx-auto px-4 sm:px-6 relative z-10">
           {/* Small Badge */}
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/15 dark:bg-amber-500/20 border border-amber-600/30 dark:border-amber-400/30 text-amber-900 dark:text-amber-300 font-black text-[11px] uppercase tracking-widest mb-3 animate-slideDown">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/15 dark:bg-amber-500/20 border border-amber-600/30 dark:border-amber-400/30 text-amber-900 dark:text-amber-300 font-black text-[11px] uppercase tracking-widest mb-3">
             <Star size={12} className="fill-current" /> PROFESSIONAL PDF TOOLKIT
           </div>
 
@@ -107,7 +107,7 @@ const Home: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
           <h1
             className={`text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-tight mb-3 leading-tight ${
               darkMode ? 'text-white' : 'text-slate-900'
-            } animate-slideUp`}
+            }`}
           >
             Free Online PDF Tools for Every Task
           </h1>
@@ -116,13 +116,13 @@ const Home: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
           <p
             className={`text-sm sm:text-base md:text-lg max-w-2xl mx-auto mb-5 sm:mb-6 font-normal leading-relaxed ${
               darkMode ? 'text-slate-300' : 'text-slate-600'
-            } animate-slideUp`}
+            }`}
           >
             Merge, compress, split, convert, edit and protect PDFs online. Fast, private and easy to use.
           </p>
 
           {/* Compact Search Bar */}
-          <div className="max-w-xl mx-auto relative animate-slideUp">
+          <div className="max-w-xl mx-auto relative">
             <div
               className={`relative flex items-center px-3 py-1.5 sm:py-2 rounded-full border shadow-md transition-all duration-200 ${
                 darkMode

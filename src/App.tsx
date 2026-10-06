@@ -6,14 +6,11 @@ import Footer from './components/Footer';
 import { soundEngine } from './utils/sounds';
 import { NotifySystem } from './types';
 import { TOOLS } from './constants';
-import { ALL_LANDING_PAGES } from './data/landingPages';
 import ErrorBoundary from './components/ErrorBoundary';
 import AdSenseScript from './components/AdSenseScript';
 import CookieConsent from './components/CookieConsent';
 import { ActiveWorkProvider, useActiveWork } from './context/ActiveWorkContext';
 import { apiClient } from './services/apiClient';
-
-const LANDING_PAGES_BY_SLUG = new Map(ALL_LANDING_PAGES.map(p => [p.slug, p]));
 
 // Eagerly import Home to prevent CLS from Suspense fallback displacement
 import Home from './pages/Home';
@@ -115,14 +112,9 @@ const SEOManager: React.FC = () => {
     // O(1) Map lookup — checks both bare and slash variant
     const tool = TOOLS_BY_PATH.get(pathname) ?? TOOLS_BY_PATH.get(pathNorm);
     const cleanSlug = pathNorm.startsWith('/') ? pathNorm.slice(1) : pathNorm;
-    const targetedPage = LANDING_PAGES_BY_SLUG.get(cleanSlug);
-
     if (tool) {
       title = `${tool.seoTitle || `${tool.title} Online`} | PDFBolt`;
       description = tool.description;
-    } else if (targetedPage) {
-      title = `${targetedPage.seoTitle || targetedPage.title}`;
-      description = targetedPage.metaDescription;
     } else if (pathNorm === '/no-upload-pdf-tools') {
       title = "No-Upload PDF Tools – 100% Client-Side Private Document Toolkit | PDFBolt";
       description = "Merge, compress, split, redact, and edit PDF files in your browser with zero file uploads. Powered by WebAssembly for 100% data confidentiality and zero data leaks.";

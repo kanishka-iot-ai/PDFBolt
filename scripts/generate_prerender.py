@@ -1607,6 +1607,17 @@ def generate_prerendered_pages():
     with open(INDEX_HTML, "r", encoding="utf-8") as f:
         base_template = f.read()
 
+    # Optimize CSS delivery for non-blocking rendering (Eliminates render-blocking audit)
+    css_match = re.search(r'<link rel="stylesheet" crossorigin href="(/assets/index-[^"]+\.css)">', base_template)
+    if css_match:
+        css_href = css_match.group(1)
+        async_css = (
+            f'<link rel="preload" as="style" href="{css_href}">\n'
+            f'  <link rel="stylesheet" href="{css_href}" media="print" onload="this.media=\'all\'">\n'
+            f'  <noscript><link rel="stylesheet" href="{css_href}"></noscript>'
+        )
+        base_template = base_template.replace(css_match.group(0), async_css)
+
     generated_count = 0
     full_directory_html = build_full_platform_directory()
 
