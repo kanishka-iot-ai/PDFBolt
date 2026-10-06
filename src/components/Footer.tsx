@@ -48,7 +48,7 @@ const Footer: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
               href="https://www.trustpilot.com/review/pdfbolt.in" 
               target="_blank" 
               rel="noopener noreferrer"
-              className={`px-2.5 py-1.5 rounded-xl text-[11px] font-bold flex items-center gap-1 transition-transform hover:scale-105 ${darkMode ? 'bg-slate-800 text-emerald-400 border border-slate-700' : 'bg-white shadow-sm text-emerald-600 border border-slate-200'}`}
+              className={`px-2.5 py-1.5 rounded-xl text-[11px] font-bold flex items-center gap-1 transition-transform hover:scale-105 ${darkMode ? 'bg-slate-800 text-emerald-400 border border-slate-700' : 'bg-white shadow-sm text-emerald-700 border border-slate-200'}`}
               aria-label="Trustpilot Reviews"
             >
               ★ Trustpilot

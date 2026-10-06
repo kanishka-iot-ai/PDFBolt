@@ -1,0 +1,57 @@
+{
+  "specVersion": "1.0.0",
+  "name": "PDFBolt",
+  "description": "Privacy-first in-browser and cloud PDF toolkit for document conversion, compression, and editing.",
+  "homepage": "https://pdfbolt.in/",
+  "entries": [
+    {
+      "id": "merge-pdf",
+      "name": "Merge PDF",
+      "description": "Combine multiple PDF files into one single document.",
+      "url": "https://pdfbolt.in/merge-pdf/",
+      "type": "tool"
+    },
+    {
+      "id": "compress-pdf",
+      "name": "Compress PDF",
+      "description": "Reduce PDF file size while retaining visual quality.",
+      "url": "https://pdfbolt.in/compress-pdf/",
+      "type": "tool"
+    },
+    {
+      "id": "split-pdf",
+      "name": "Split PDF",
+      "description": "Extract specific pages or page ranges from any PDF.",
+      "url": "https://pdfbolt.in/split-pdf/",
+      "type": "tool"
+    },
+    {
+      "id": "pdf-to-word",
+      "name": "PDF to Word",
+      "description": "Convert PDF documents to editable Word DOCX files.",
+      "url": "https://pdfbolt.in/pdf-to-word/",
+      "type": "tool"
+    },
+    {
+      "id": "word-to-pdf",
+      "name": "Word to PDF",
+      "description": "Convert Word DOCX files to PDF format.",
+      "url": "https://pdfbolt.in/word-to-pdf/",
+      "type": "tool"
+    },
+    {
+      "id": "protect-pdf",
+      "name": "Protect PDF",
+      "description": "Add password encryption to PDF documents.",
+      "url": "https://pdfbolt.in/protect-pdf/",
+      "type": "tool"
+    },
+    {
+      "id": "unlock-pdf",
+      "name": "Unlock PDF",
+      "description": "Remove password protection from PDF documents.",
+      "url": "https://pdfbolt.in/unlock-pdf/",
+      "type": "tool"
+    }
+  ]
+}

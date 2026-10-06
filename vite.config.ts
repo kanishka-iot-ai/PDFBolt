@@ -51,6 +51,16 @@ export default defineConfig(({ mode }) => {
       },
       modulePreload: {
         polyfill: false,
+        resolveDependencies(filename, deps) {
+          return deps.filter(dep => 
+            !dep.includes('vendor-jspdf') && 
+            !dep.includes('vendor-exceljs') && 
+            !dep.includes('vendor-pdflib') && 
+            !dep.includes('vendor-office') && 
+            !dep.includes('vendor-tesseract') &&
+            !dep.includes('vendor-html2canvas')
+          );
+        },
       },
       rollupOptions: {
         output: {

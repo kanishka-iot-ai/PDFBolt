@@ -72,7 +72,6 @@ const ToolCard: React.FC<ToolCardProps> = ({ tool, darkMode, compact = false }) 
   return (
     <Link
       to={targetPath}
-      aria-label={`Open ${tool.title} tool: ${tool.description}`}
       onMouseEnter={handlePrefetch}
       onFocus={handlePrefetch}
       className="tool-card-link block h-full group outline-none focus-visible:ring-2 focus-visible:ring-yellow-500 focus-visible:ring-offset-2 rounded-2xl transition-transform duration-200 hover:-translate-y-1"
