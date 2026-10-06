@@ -31,6 +31,8 @@ const Footer: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
               alt="PDFBolt" 
               width="124"
               height="100"
+              loading="lazy"
+              decoding="async"
               className="h-10 w-auto object-contain transition-transform duration-300 group-hover:scale-105" 
             />
           </Link>
