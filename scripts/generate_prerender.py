@@ -1620,6 +1620,17 @@ def generate_prerendered_pages():
 
     generated_count = 0
     full_directory_html = build_full_platform_directory()
+    focused_nav_html = """
+    <div style="border-top: 1px solid #e2e8f0; padding-top: 24px; margin-top: 36px; text-align: center;">
+      <p style="font-size: 0.95rem; color: #64748b; margin-bottom: 12px; font-weight: 600;">Explore More PDFBolt Tools &amp; Resources</p>
+      <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;">
+        <a href="/tools/" style="display: inline-flex; align-items: center; padding: 8px 16px; background: #f8fafc; border: 1px solid #cbd5e1; color: #0f172a; border-radius: 8px; font-weight: 700; font-size: 0.85rem; text-decoration: none;">All 25+ PDF Tools &rarr;</a>
+        <a href="/guides/" style="display: inline-flex; align-items: center; padding: 8px 16px; background: #f8fafc; border: 1px solid #cbd5e1; color: #0f172a; border-radius: 8px; font-weight: 700; font-size: 0.85rem; text-decoration: none;">How-To Guides &rarr;</a>
+        <a href="/no-upload-pdf-tools/" style="display: inline-flex; align-items: center; padding: 8px 16px; background: #f8fafc; border: 1px solid #cbd5e1; color: #0f172a; border-radius: 8px; font-weight: 700; font-size: 0.85rem; text-decoration: none;">No-Upload Privacy &rarr;</a>
+        <a href="/encyclopedia/" style="display: inline-flex; align-items: center; padding: 8px 16px; background: #f8fafc; border: 1px solid #cbd5e1; color: #0f172a; border-radius: 8px; font-weight: 700; font-size: 0.85rem; text-decoration: none;">Knowledge Base &rarr;</a>
+      </div>
+    </div>
+    """
 
     # Category 1: Tools
     for tool in CANONICAL_TOOLS:
@@ -1700,25 +1711,11 @@ def generate_prerendered_pages():
           {sections_html}
 
           <!-- Limits, Trade-Offs & Troubleshooting (AdSense Publisher Content) -->
-          <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; margin-bottom: 36px;">
-            <h2 style="font-size: 1.4rem; font-weight: 800; color: #0f172a; margin: 0 0 16px 0;">Technical Limitations &amp; Honest Trade-Offs</h2>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 20px;">
-              <div style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 8px; padding: 16px;">
-                <h3 style="font-size: 1.05rem; font-weight: 700; color: #0f172a; margin: 0 0 6px 0;">Device Memory (RAM) Allocation</h3>
-                <p style="margin: 0; color: #475569; font-size: 0.9rem; line-height: 1.6;">Because processing runs client-side inside your browser sandbox, performance scales with available RAM. We recommend files under 100MB on mobile and 250MB on desktop. For multi-gigabyte files, splitting into smaller sections ensures optimal responsiveness.</p>
-              </div>
-              <div style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 8px; padding: 16px;">
-                <h3 style="font-size: 1.05rem; font-weight: 700; color: #0f172a; margin: 0 0 6px 0;">Quality vs. File Size Trade-Offs</h3>
-                <p style="margin: 0; color: #475569; font-size: 0.9rem; line-height: 1.6;">Vector typography, geometric line art, and text layers remain 100% crisp regardless of operations. Raster photography and embedded JPEG scans are resampled proportionally according to the chosen compression preset.</p>
-              </div>
-            </div>
-            
-            <h3 style="font-size: 1.15rem; font-weight: 700; color: #0f172a; margin: 20px 0 10px 0;">Troubleshooting Common Document Issues</h3>
-            <ul style="color: #334155; padding-left: 20px; line-height: 1.7; font-size: 0.95rem; margin: 0;">
-              <li><strong>Password-Protected Files:</strong> If your PDF is locked with user or permissions encryption, use our <a href="/unlock-pdf/" style="color: #b45309; font-weight: 600; text-decoration: underline;">Unlock PDF</a> utility before editing or compressing.</li>
-              <li><strong>Scanned Bitmaps Without Selectable Text:</strong> If text cannot be highlighted with your cursor, run the file through <a href="/ocr-pdf/" style="color: #b45309; font-weight: 600; text-decoration: underline;">OCR PDF</a> first to reconstruct an invisible searchable text layer.</li>
-              <li><strong>Browser Tab Unresponsive:</strong> Close background memory-heavy tabs or use private browsing mode to disable third-party browser extensions that interfere with WebAssembly workers.</li>
-            </ul>
+          <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-bottom: 32px;">
+            <h2 style="font-size: 1.25rem; font-weight: 800; color: #0f172a; margin: 0 0 10px 0;">Client-Side Performance &amp; Privacy</h2>
+            <p style="margin: 0; color: #475569; font-size: 0.95rem; line-height: 1.6;">
+              {h1} executes 100% inside your local browser memory sandbox using WebAssembly. Your files are never transmitted across the network or stored on external servers. For multi-gigabyte or heavily nested files, splitting into smaller sections ensures instant responsiveness on low-memory mobile devices.
+            </p>
           </div>
 
           <div style="margin-bottom: 36px;">
@@ -1733,7 +1730,7 @@ def generate_prerendered_pages():
             </ul>
           </div>
 
-          {full_directory_html}
+          {focused_nav_html}
         </div>
         """
 
@@ -1897,7 +1894,7 @@ def generate_prerendered_pages():
             </ul>
           </div>
 
-          {full_directory_html}
+          {focused_nav_html}
         </div>
         """
 
@@ -2015,7 +2012,7 @@ def generate_prerendered_pages():
             </ul>
           </div>
 
-          {full_directory_html}
+          {focused_nav_html}
         </div>
         """
 
@@ -2365,7 +2362,7 @@ def generate_prerendered_pages():
             <ul style="list-style: none; padding: 0; margin: 0;">{related_li}</ul>
           </div>
 
-          {full_directory_html}
+          {focused_nav_html}
         </div>
         """
 
