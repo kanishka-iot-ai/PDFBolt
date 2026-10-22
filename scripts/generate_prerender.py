@@ -2265,6 +2265,16 @@ def generate_prerendered_pages():
         features_li = "".join([f"<li style='margin-bottom: 8px;'>{f}</li>" for f in tp.get("features", [])])
         steps_ol = "".join([f"<li style='margin-bottom: 12px;'><strong>{s['name']}:</strong> {s['text']}</li>" for s in tp.get("how_to", [])])
 
+        sections_html = ""
+        for sec in tp.get("sections", []):
+            paragraphs_html = "".join([f"<p style='margin-bottom: 12px; color: #334155; line-height: 1.65;'>{p}</p>" for p in sec.get("paragraphs", [])])
+            sections_html += f"""
+            <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; margin-bottom: 32px;">
+              <h2 style="font-size: 1.35rem; font-weight: 800; color: #0f172a; margin: 0 0 16px 0;">{sec['heading']}</h2>
+              {paragraphs_html}
+            </div>
+            """
+
         portal_table_html = ""
         if "portal_specs" in tp and tp["portal_specs"]:
             rows_html = "".join([f"""
@@ -2343,6 +2353,8 @@ def generate_prerendered_pages():
             <ol style="padding-left: 20px; margin: 0; color: #334155;">{steps_ol}</ol>
           </div>
 
+          {sections_html}
+
           <div style="margin-bottom: 32px;">
             <h2 style="font-size: 1.35rem; font-weight: 800; color: #0f172a; margin-bottom: 16px;">Frequently Asked Questions</h2>
             {faqs_html}
@@ -2378,6 +2390,18 @@ def generate_prerendered_pages():
                 ]
             }
         ]
+
+        if tp.get("how_to"):
+            json_ld_schemas.append({
+                "@context": "https://schema.org",
+                "@type": "HowTo",
+                "name": f"How to {h1}",
+                "description": description,
+                "step": [
+                    {"@type": "HowToStep", "position": idx + 1, "name": s["name"], "text": s["text"]}
+                    for idx, s in enumerate(tp["how_to"])
+                ]
+            })
 
         if faq_schema_entities:
             json_ld_schemas.append({
@@ -2666,9 +2690,22 @@ def write_page(base_template, path, title, description, canonical_url, body_cont
     if body_content:
         root_start = html.find('<div id="root">')
         if root_start != -1:
-            marker = html.find('Structured Data for SEO', root_start)
-            if marker != -1:
-                root_end = html.rfind('</div>', root_start, marker) + 6
+            brace_count = 0
+            i = root_start
+            root_end = -1
+            while i < len(html):
+                if html[i:i+4] == '<div':
+                    brace_count += 1
+                    i += 4
+                elif html[i:i+6] == '</div>':
+                    brace_count -= 1
+                    i += 6
+                    if brace_count == 0:
+                        root_end = i
+                        break
+                else:
+                    i += 1
+            if root_end != -1:
                 html = html[:root_start] + f'<div id="root">\n{body_content}\n  </div>\n\n' + html[root_end:]
 
     # Strip any static body schemas from base template
