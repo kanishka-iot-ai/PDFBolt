@@ -375,8 +375,8 @@ TARGETED_PAGES = [
     {
         "path": "compress-pdf-to-300kb",
         "h1": "Compress PDF to 300KB Online",
-        "title": "Compress PDF to 300KB Online Free | PDFBolt",
-        "description": "Compress PDF to 300KB online free. Ideal for UPSC OTR portal, state PSC exams, and government job certificates. Zero upload privacy and instant download.",
+        "title": "Compress PDF to 300KB Online (Exact Target Size, Zero Upload) | PDFBolt",
+        "description": "Compress PDF to 300KB online for free with exact target size control. 100% private in-browser compression for UPSC OTR, SSC, and state job portals with zero server uploads.",
         "subtitle": "Optimize PDF files to under 300KB for UPSC, State Public Service Commissions, and immigration portals.",
         "quick_answer": "To compress PDF to 300KB: 1. Drag & drop your PDF file. 2. The exact 300 KB target size is pre-selected. 3. Optionally enable Grayscale for scanned certificates. 4. Click 'Compress PDF' and download your UPSC-compliant file under 300KB.",
         "target_badge": "Under 300 KB (UPSC & Portal Ready)",

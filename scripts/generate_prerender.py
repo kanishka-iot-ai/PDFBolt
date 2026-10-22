@@ -144,8 +144,8 @@ CANONICAL_TOOLS = [
     },
     {
         "path": "pdf-to-excel",
-        "title": "PDF to Excel Converter – Free & Private | PDFBolt",
-        "description": "Extract tables and spreadsheet data from PDF into editable Microsoft Excel (.xlsx) workbooks with automatic numeric coercion.",
+        "title": "Convert PDF to Excel Online Free – 100% Private, No Upload | PDFBolt",
+        "description": "Convert PDF tables into editable Microsoft Excel (.xlsx) spreadsheets online for free. 100% private in-browser extraction with zero file uploads or registration.",
         "h1": "PDF to Excel Converter (.xlsx)",
         "subtitle": "Extract financial statements, balance sheets, and invoices into structured, formula-ready Excel spreadsheets.",
         "quick_answer": "To convert PDF to Excel: 1. Select your PDF containing tabular data. 2. Click 'Convert to Excel'. 3. Download your structured .xlsx workbook.",

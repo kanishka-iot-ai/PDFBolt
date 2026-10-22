@@ -164,7 +164,7 @@ export const TOOLS: ToolMetadata[] = [
   {
     id: ToolType.PDF_TO_EXCEL,
     title: 'PDF to Excel',
-    seoTitle: 'PDF to Excel Converter – Free & Private | PDFBolt',
+    seoTitle: 'Convert PDF to Excel Online Free – 100% Private, No Upload | PDFBolt',
     canonicalPath: '/pdf-to-excel/',
     path: '/pdf-to-excel',
     description: 'Extract tables, spreadsheets, and tabular financial data from PDF into clean Microsoft Excel (.xlsx) sheets.',
