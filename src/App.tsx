@@ -68,7 +68,7 @@ const NotFoundPage = () => (
       <Link to="/" aria-label="Go to PDFBolt home" className="px-6 py-3 bg-yellow-500 text-slate-950 rounded-xl font-bold hover:bg-yellow-400 transition-colors shadow-md text-sm">
         Go Home
       </Link>
-      <Link to="/tools" className="px-6 py-3 bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 rounded-xl font-bold hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors text-sm">
+      <Link to="/tools/" className="px-6 py-3 bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 rounded-xl font-bold hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors text-sm">
         Browse All Tools
       </Link>
     </div>
@@ -308,39 +308,39 @@ const MainLayout: React.FC<MainLayoutProps> = ({ darkMode, setDarkMode, soundEna
             <Route path="/compare/smallpdf-alternative" element={<AlternativeLandingPage darkMode={darkMode} defaultCompetitor="smallpdf-alternative" />} />
             <Route path="/compare/adobe-acrobat-alternative" element={<AlternativeLandingPage darkMode={darkMode} defaultCompetitor="adobe-acrobat-alternative" />} />
             <Route path="/free-pdf-editor-no-watermark-no-signup" element={<TargetedCompressPage pageSlug="free-pdf-editor-no-watermark-no-signup" darkMode={darkMode} notify={notify} />} />
-            <Route path="/ilovepdf-limit-reached-free-alternative" element={<Navigate to="/compare/ilovepdf-alternative" replace />} />
-            <Route path="/smallpdf-daily-limit-alternative" element={<Navigate to="/compare/smallpdf-alternative" replace />} />
+            <Route path="/ilovepdf-limit-reached-free-alternative" element={<Navigate to="/compare/ilovepdf-alternative/" replace />} />
+            <Route path="/smallpdf-daily-limit-alternative" element={<Navigate to="/compare/smallpdf-alternative/" replace />} />
 
             {/* Clean Canonical Redirects for Short Aliases & Secondary Search Queries */}
-            <Route path="/pdf-to-images" element={<Navigate to="/pdf-to-jpg" replace />} />
-            <Route path="/pdf-editor" element={<Navigate to="/edit-pdf" replace />} />
-            <Route path="/reorder-pages" element={<Navigate to="/organize-pdf" replace />} />
-            <Route path="/extract-pages" element={<Navigate to="/split-pdf" replace />} />
-            <Route path="/extract-pdf-pages" element={<Navigate to="/split-pdf" replace />} />
-            <Route path="/add-page-numbers" element={<Navigate to="/add-page-numbers-to-pdf" replace />} />
-            <Route path="/qr-pdf-share" element={<Navigate to="/pdf-to-qr-code" replace />} />
-            <Route path="/pdf-analyzer" element={<Navigate to="/analyze-pdf" replace />} />
-            <Route path="/analyze" element={<Navigate to="/analyze-pdf" replace />} />
-            <Route path="/tools/pdf-analyzer" element={<Navigate to="/analyze-pdf" replace />} />
-            <Route path="/merge" element={<Navigate to="/merge-pdf" replace />} />
-            <Route path="/split" element={<Navigate to="/split-pdf" replace />} />
-            <Route path="/compress" element={<Navigate to="/compress-pdf" replace />} />
-            <Route path="/pdf-to-qr" element={<Navigate to="/pdf-to-qr-code" replace />} />
-            <Route path="/organize" element={<Navigate to="/organize-pdf" replace />} />
-            <Route path="/edit" element={<Navigate to="/edit-pdf" replace />} />
-            <Route path="/page-numbers" element={<Navigate to="/add-page-numbers-to-pdf" replace />} />
-            <Route path="/rotate" element={<Navigate to="/rotate-pdf" replace />} />
-            <Route path="/watermark" element={<Navigate to="/watermark-pdf" replace />} />
-            <Route path="/delete-pages" element={<Navigate to="/delete-pdf-pages" replace />} />
-            <Route path="/protect" element={<Navigate to="/protect-pdf" replace />} />
-            <Route path="/unlock" element={<Navigate to="/unlock-pdf" replace />} />
-            <Route path="/sign" element={<Navigate to="/sign-pdf" replace />} />
-            <Route path="/redact" element={<Navigate to="/redact-pdf" replace />} />
-            <Route path="/repair" element={<Navigate to="/repair-pdf" replace />} />
-            <Route path="/ocr" element={<Navigate to="/ocr-pdf" replace />} />
-            <Route path="/scan-pdf" element={<Navigate to="/scan-to-pdf" replace />} />
-            <Route path="/scan-handwriting" element={<Navigate to="/scan-handwriting-to-pdf" replace />} />
-            <Route path="/compare" element={<Navigate to="/compare-pdf" replace />} />
+            <Route path="/pdf-to-images" element={<Navigate to="/pdf-to-jpg/" replace />} />
+            <Route path="/pdf-editor" element={<Navigate to="/edit-pdf/" replace />} />
+            <Route path="/reorder-pages" element={<Navigate to="/organize-pdf/" replace />} />
+            <Route path="/extract-pages" element={<Navigate to="/split-pdf/" replace />} />
+            <Route path="/extract-pdf-pages" element={<Navigate to="/split-pdf/" replace />} />
+            <Route path="/add-page-numbers" element={<Navigate to="/add-page-numbers-to-pdf/" replace />} />
+            <Route path="/qr-pdf-share" element={<Navigate to="/pdf-to-qr-code/" replace />} />
+            <Route path="/pdf-analyzer" element={<Navigate to="/analyze-pdf/" replace />} />
+            <Route path="/analyze" element={<Navigate to="/analyze-pdf/" replace />} />
+            <Route path="/tools/pdf-analyzer" element={<Navigate to="/analyze-pdf/" replace />} />
+            <Route path="/merge" element={<Navigate to="/merge-pdf/" replace />} />
+            <Route path="/split" element={<Navigate to="/split-pdf/" replace />} />
+            <Route path="/compress" element={<Navigate to="/compress-pdf/" replace />} />
+            <Route path="/pdf-to-qr" element={<Navigate to="/pdf-to-qr-code/" replace />} />
+            <Route path="/organize" element={<Navigate to="/organize-pdf/" replace />} />
+            <Route path="/edit" element={<Navigate to="/edit-pdf/" replace />} />
+            <Route path="/page-numbers" element={<Navigate to="/add-page-numbers-to-pdf/" replace />} />
+            <Route path="/rotate" element={<Navigate to="/rotate-pdf/" replace />} />
+            <Route path="/watermark" element={<Navigate to="/watermark-pdf/" replace />} />
+            <Route path="/delete-pages" element={<Navigate to="/delete-pdf-pages/" replace />} />
+            <Route path="/protect" element={<Navigate to="/protect-pdf/" replace />} />
+            <Route path="/unlock" element={<Navigate to="/unlock-pdf/" replace />} />
+            <Route path="/sign" element={<Navigate to="/sign-pdf/" replace />} />
+            <Route path="/redact" element={<Navigate to="/redact-pdf/" replace />} />
+            <Route path="/repair" element={<Navigate to="/repair-pdf/" replace />} />
+            <Route path="/ocr" element={<Navigate to="/ocr-pdf/" replace />} />
+            <Route path="/scan-pdf" element={<Navigate to="/scan-to-pdf/" replace />} />
+            <Route path="/scan-handwriting" element={<Navigate to="/scan-handwriting-to-pdf/" replace />} />
+            <Route path="/compare" element={<Navigate to="/compare-pdf/" replace />} />
 
             {/* Static Support Pages */}
             <Route path="/privacy" element={<PrivacyPage darkMode={darkMode} />} />
@@ -349,7 +349,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ darkMode, setDarkMode, soundEna
             <Route path="/contact" element={<ContactPage darkMode={darkMode} />} />
             <Route path="/cookies" element={<CookiesPage darkMode={darkMode} />} />
             <Route path="/offline-mode" element={<OfflineModePage darkMode={darkMode} />} />
-            <Route path="/offline" element={<Navigate to="/offline-mode" replace />} />
+            <Route path="/offline" element={<Navigate to="/offline-mode/" replace />} />
             <Route path="/tutorials" element={<TutorialsPage darkMode={darkMode} />} />
             <Route path="/qr-success" element={<QRSuccess darkMode={darkMode} />} />
             <Route path="/s/:shareId" element={<QRSuccess darkMode={darkMode} />} />

@@ -115,6 +115,8 @@ export async function addPageNumbers(file: File): Promise<Uint8Array> {
 export interface CompressionOptions {
   profile: 'max' | 'high' | 'balanced' | 'high-compression' | 'extreme' | 'custom' | 'target';
   targetSizeMB?: number;
+  targetSizeKB?: number;
+  grayscale?: boolean;
   customDpi?: number; // 72, 96, 150, 200, 300
   customQuality?: number; // 0.1 - 1.0
   stripMetadata?: boolean;
@@ -270,22 +272,26 @@ export async function compressPdfAdvanced(
     } else if (options.profile === 'custom') {
       scale = (options.customDpi || 150) / 96;
       quality = options.customQuality || 0.80;
-    } else if (options.profile === 'target' && options.targetSizeMB) {
+    } else if ((options.profile === 'target' || options.targetSizeKB) && (options.targetSizeKB || options.targetSizeMB)) {
+      const effectiveTargetMB = options.targetSizeKB ? (options.targetSizeKB / 1024) : (options.targetSizeMB || 1);
       const currentMB = file.size / (1024 * 1024);
-      const targetRatio = Math.max(0.1, Math.min(0.95, options.targetSizeMB / currentMB));
+      const targetRatio = Math.max(0.05, Math.min(0.95, effectiveTargetMB / currentMB));
       
       if (targetRatio >= 0.75) {
-        scale = 2.2;
-        quality = 0.88;
-      } else if (targetRatio >= 0.5) {
-        scale = 1.8;
-        quality = 0.82;
-      } else if (targetRatio >= 0.3) {
+        scale = 2.0;
+        quality = 0.85;
+      } else if (targetRatio >= 0.45) {
         scale = 1.6;
-        quality = 0.76;
+        quality = 0.78;
+      } else if (targetRatio >= 0.25) {
+        scale = 1.4;
+        quality = 0.70;
+      } else if (targetRatio >= 0.12) {
+        scale = 1.25;
+        quality = 0.60;
       } else {
-        scale = 1.5;
-        quality = 0.72;
+        scale = 1.1;
+        quality = 0.50;
       }
     }
 
@@ -302,6 +308,19 @@ export async function compressPdfAdvanced(
       canvas.height = viewport.height;
 
       await page.render({ canvasContext: context, viewport }).promise;
+
+      // Optional Grayscale conversion for exam documents, black-and-white forms & certificates
+      if (options.grayscale) {
+        const imgData = context.getImageData(0, 0, canvas.width, canvas.height);
+        const d = imgData.data;
+        for (let idx = 0; idx < d.length; idx += 4) {
+          const v = 0.299 * d[idx] + 0.587 * d[idx + 1] + 0.114 * d[idx + 2];
+          d[idx] = v;
+          d[idx + 1] = v;
+          d[idx + 2] = v;
+        }
+        context.putImageData(imgData, 0, 0);
+      }
 
       // Capture original Page 1 preview
       if (i === 1) {

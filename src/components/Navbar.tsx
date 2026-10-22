@@ -179,7 +179,7 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
                         <ul className="space-y-1 mb-6">
                           <li>
                             <Link 
-                              to="/analyze-pdf" 
+                              to="/analyze-pdf/" 
                               onClick={(e) => {
                                 setIsToolsOpen(false);
                                 handleSafeNavigation(e, "/analyze-pdf");
@@ -192,7 +192,7 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
                           </li>
                           <li>
                             <Link 
-                              to="/tools/pdf-size-calculator" 
+                              to="/tools/pdf-size-calculator/" 
                               onClick={(e) => {
                                 setIsToolsOpen(false);
                                 handleSafeNavigation(e, "/tools/pdf-size-calculator");
@@ -205,7 +205,7 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
                           </li>
                           <li>
                             <Link 
-                              to="/test-files" 
+                              to="/test-files/" 
                               onClick={(e) => {
                                 setIsToolsOpen(false);
                                 handleSafeNavigation(e, "/test-files");
@@ -218,7 +218,7 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
                           </li>
                           <li>
                             <Link 
-                              to="/compare/online-pdf-tools" 
+                              to="/compare/online-pdf-tools/" 
                               onClick={(e) => {
                                 setIsToolsOpen(false);
                                 handleSafeNavigation(e, "/compare/online-pdf-tools");
@@ -233,7 +233,7 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
                       </div>
 
                       <Link
-                        to="/tools"
+                        to="/tools/"
                         onClick={(e) => {
                           setIsToolsOpen(false);
                           handleSafeNavigation(e, "/tools");
@@ -248,16 +248,16 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
               )}
             </div>
             
-            <NavLink to="/analyze-pdf">
+            <NavLink to="/analyze-pdf/">
               <span className="inline-flex items-center gap-1 text-yellow-700 dark:text-yellow-400 font-extrabold">
                 <Sparkles size={14} /> PDF Analyzer
               </span>
             </NavLink>
 
-            <NavLink to="/tools">Tools Hub</NavLink>
-            <NavLink to="/guides">Guides</NavLink>
-            <NavLink to="/encyclopedia">Encyclopedia</NavLink>
-            <NavLink to="/student-pdf-tools">Workflows</NavLink>
+            <NavLink to="/tools/">Tools Hub</NavLink>
+            <NavLink to="/guides/">Guides</NavLink>
+            <NavLink to="/encyclopedia/">Encyclopedia</NavLink>
+            <NavLink to="/student-pdf-tools/">Workflows</NavLink>
 
             <div className="h-4 w-px bg-slate-200 dark:bg-slate-700"></div>
             
@@ -325,7 +325,7 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
               <Home size={18} /> Home
             </Link>
             <Link 
-              to="/tools" 
+              to="/tools/" 
               onClick={(e) => {
                 setIsOpen(false);
                 handleSafeNavigation(e, "/tools");
@@ -335,7 +335,7 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
               🛠️ PDF Tools Hub
             </Link>
             <Link 
-              to="/analyze-pdf" 
+              to="/analyze-pdf/" 
               onClick={(e) => {
                 setIsOpen(false);
                 handleSafeNavigation(e, "/analyze-pdf");
@@ -345,7 +345,7 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
               ✨ PDF Analyzer
             </Link>
             <Link 
-              to="/guides" 
+              to="/guides/" 
               onClick={(e) => {
                 setIsOpen(false);
                 handleSafeNavigation(e, "/guides");
@@ -355,7 +355,7 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
               📚 How-To Guides
             </Link>
             <Link 
-              to="/encyclopedia" 
+              to="/encyclopedia/" 
               onClick={(e) => {
                 setIsOpen(false);
                 handleSafeNavigation(e, "/encyclopedia");
@@ -365,7 +365,7 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
               🔬 Format Encyclopedia
             </Link>
             <Link 
-              to="/student-pdf-tools" 
+              to="/student-pdf-tools/" 
               onClick={(e) => {
                 setIsOpen(false);
                 handleSafeNavigation(e, "/student-pdf-tools");
@@ -375,7 +375,7 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
               🎓 Student Workflow
             </Link>
             <Link 
-              to="/business-pdf-tools" 
+              to="/business-pdf-tools/" 
               onClick={(e) => {
                 setIsOpen(false);
                 handleSafeNavigation(e, "/business-pdf-tools");
@@ -385,7 +385,7 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
               💼 Business Workflow
             </Link>
             <Link 
-              to="/compare/online-pdf-tools" 
+              to="/compare/online-pdf-tools/" 
               onClick={(e) => {
                 setIsOpen(false);
                 handleSafeNavigation(e, "/compare/online-pdf-tools");
@@ -395,7 +395,7 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
               ⚖️ Privacy Comparison
             </Link>
             <Link 
-              to="/tools/pdf-size-calculator" 
+              to="/tools/pdf-size-calculator/" 
               onClick={(e) => {
                 setIsOpen(false);
                 handleSafeNavigation(e, "/tools/pdf-size-calculator");

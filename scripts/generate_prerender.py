@@ -1661,14 +1661,14 @@ def generate_prerendered_pages():
                 }
             })
 
-        related_li = "".join([f'<li style="margin-bottom: 6px;"><a href="/{r[0]}" style="color: #b45309; text-decoration: underline; font-weight: 600;">{r[1]}</a></li>' for r in tool.get("related", [])])
+        related_li = "".join([f'<li style="margin-bottom: 6px;"><a href="/{r[0]}/" style="color: #b45309; text-decoration: underline; font-weight: 600;">{r[1]}</a></li>' for r in tool.get("related", [])])
 
         body_content = f"""
         <div style="max-width: 1000px; margin: 0 auto; padding: 32px 20px; font-family: system-ui, -apple-system, sans-serif; line-height: 1.65; color: #1e293b;">
           
           <nav aria-label="Breadcrumb" style="margin-bottom: 24px; font-size: 0.875rem; color: #64748b;">
             <a href="/" style="color: #b45309; text-decoration: none;">Home</a> &gt; 
-            <a href="/tools" style="color: #b45309; text-decoration: none;">PDF Tools</a> &gt; 
+            <a href="/tools/" style="color: #b45309; text-decoration: none;">PDF Tools</a> &gt; 
             <span style="color: #0f172a; font-weight: 600;">{h1}</span>
           </nav>
 
@@ -1836,7 +1836,7 @@ def generate_prerendered_pages():
                 "acceptedAnswer": {"@type": "Answer", "text": faq["a"]}
             })
 
-        related_li = "".join([f'<li style="margin-bottom: 6px;"><a href="/{r[0]}" style="color: #b45309; text-decoration: underline; font-weight: 600;">{r[1]}</a></li>' for r in guide.get("related_tools", [])])
+        related_li = "".join([f'<li style="margin-bottom: 6px;"><a href="/{r[0]}/" style="color: #b45309; text-decoration: underline; font-weight: 600;">{r[1]}</a></li>' for r in guide.get("related_tools", [])])
 
         body_content = f"""
         <div style="max-width: 900px; margin: 0 auto; padding: 32px 20px; font-family: system-ui, -apple-system, sans-serif; line-height: 1.7; color: #1e293b;">
@@ -1983,7 +1983,7 @@ def generate_prerendered_pages():
             </div>
             """
 
-        related_li = "".join([f'<li style="margin-bottom: 6px;"><a href="/{r[0]}" style="color: #b45309; text-decoration: underline; font-weight: 600;">{r[1]}</a></li>' for r in article.get("related_tools", [])])
+        related_li = "".join([f'<li style="margin-bottom: 6px;"><a href="/{r[0]}/" style="color: #b45309; text-decoration: underline; font-weight: 600;">{r[1]}</a></li>' for r in article.get("related_tools", [])])
 
         body_content = f"""
         <div style="max-width: 900px; margin: 0 auto; padding: 32px 20px; font-family: system-ui, -apple-system, sans-serif; line-height: 1.7; color: #1e293b;">
@@ -2068,27 +2068,27 @@ def generate_prerendered_pages():
             if page.get("hub_type") == "tools":
                 tools_grid = "".join([f"""
                 <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-bottom: 16px;">
-                  <h3 style="font-size: 1.15rem; font-weight: 700; color: #0f172a; margin: 0 0 8px 0;"><a href="/{t['path']}" style="color: #b45309; text-decoration: underline;">{t['h1']}</a></h3>
+                  <h3 style="font-size: 1.15rem; font-weight: 700; color: #0f172a; margin: 0 0 8px 0;"><a href="/{t['path']}/" style="color: #b45309; text-decoration: underline;">{t['h1']}</a></h3>
                   <p style="margin: 0 0 12px 0; color: #475569; font-size: 0.95rem;">{t['description']}</p>
-                  <a href="/{t['path']}" style="display: inline-block; background: #f59e0b; color: #000; font-weight: bold; padding: 6px 14px; border-radius: 6px; text-decoration: none; font-size: 0.85rem;">Open Tool &rarr;</a>
+                  <a href="/{t['path']}/" style="display: inline-block; background: #f59e0b; color: #000; font-weight: bold; padding: 6px 14px; border-radius: 6px; text-decoration: none; font-size: 0.85rem;">Open Tool &rarr;</a>
                 </div>
                 """ for t in CANONICAL_TOOLS])
                 hub_content = f"<div style='display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin: 32px 0;'>{tools_grid}</div>"
             elif page.get("hub_type") == "guides":
                 guides_grid = "".join([f"""
                 <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-bottom: 16px;">
-                  <h3 style="font-size: 1.15rem; font-weight: 700; color: #0f172a; margin: 0 0 8px 0;"><a href="/guides/{g['slug']}" style="color: #b45309; text-decoration: underline;">{g['title']}</a></h3>
+                  <h3 style="font-size: 1.15rem; font-weight: 700; color: #0f172a; margin: 0 0 8px 0;"><a href="/guides/{g['slug']}/" style="color: #b45309; text-decoration: underline;">{g['title']}</a></h3>
                   <p style="margin: 0 0 12px 0; color: #475569; font-size: 0.95rem;">{g['summary']}</p>
-                  <a href="/guides/{g['slug']}" style="display: inline-block; background: #0f172a; color: #fff; font-weight: bold; padding: 6px 14px; border-radius: 6px; text-decoration: none; font-size: 0.85rem;">Read Guide &rarr;</a>
+                  <a href="/guides/{g['slug']}/" style="display: inline-block; background: #0f172a; color: #fff; font-weight: bold; padding: 6px 14px; border-radius: 6px; text-decoration: none; font-size: 0.85rem;">Read Guide &rarr;</a>
                 </div>
                 """ for g in CANONICAL_GUIDES])
                 hub_content = f"<div style='display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin: 32px 0;'>{guides_grid}</div>"
             elif page.get("hub_type") == "encyclopedia":
                 encyc_grid = "".join([f"""
                 <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-bottom: 16px;">
-                  <h3 style="font-size: 1.15rem; font-weight: 700; color: #0f172a; margin: 0 0 8px 0;"><a href="/encyclopedia/{e['slug']}" style="color: #b45309; text-decoration: underline;">{e['title']}</a></h3>
+                  <h3 style="font-size: 1.15rem; font-weight: 700; color: #0f172a; margin: 0 0 8px 0;"><a href="/encyclopedia/{e['slug']}/" style="color: #b45309; text-decoration: underline;">{e['title']}</a></h3>
                   <p style="margin: 0 0 12px 0; color: #475569; font-size: 0.95rem;">{e['summary']}</p>
-                  <a href="/encyclopedia/{e['slug']}" style="display: inline-block; background: #6b21a8; color: #fff; font-weight: bold; padding: 6px 14px; border-radius: 6px; text-decoration: none; font-size: 0.85rem;">Read Specification &rarr;</a>
+                  <a href="/encyclopedia/{e['slug']}/" style="display: inline-block; background: #6b21a8; color: #fff; font-weight: bold; padding: 6px 14px; border-radius: 6px; text-decoration: none; font-size: 0.85rem;">Read Specification &rarr;</a>
                 </div>
                 """ for e in CANONICAL_ENCYCLOPEDIA])
                 hub_content = f"<div style='display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin: 32px 0;'>{encyc_grid}</div>"
@@ -2400,11 +2400,11 @@ def generate_prerendered_pages():
         <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between; transition: all 0.2s ease;">
           <div>
             <h3 style="font-size: 1.15rem; font-weight: 800; color: #0f172a; margin: 0 0 8px 0;">
-              <a href="/{t['path']}" style="color: #0f172a; text-decoration: none;">{t['h1']}</a>
+              <a href="/{t['path']}/" style="color: #0f172a; text-decoration: none;">{t['h1']}</a>
             </h3>
             <p style="margin: 0 0 12px 0; color: #475569; font-size: 0.9rem; line-height: 1.5;">{t['description']}</p>
           </div>
-          <a href="/{t['path']}" style="display: inline-flex; align-items: center; gap: 4px; font-weight: 700; font-size: 0.85rem; color: #b45309; text-decoration: none;">
+          <a href="/{t['path']}/" style="display: inline-flex; align-items: center; gap: 4px; font-weight: 700; font-size: 0.85rem; color: #b45309; text-decoration: none;">
             Open Tool &rarr;
           </a>
         </div>
@@ -2417,11 +2417,11 @@ def generate_prerendered_pages():
       <div>
         <span style="font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: #b45309; background: #fef3c7; padding: 2px 8px; border-radius: 4px;">In-Depth Guide</span>
         <h3 style="font-size: 1.1rem; font-weight: 800; color: #0f172a; margin: 12px 0 8px 0;">
-          <a href="/guides/{g['slug']}" style="color: #0f172a; text-decoration: none;">{g['title']}</a>
+          <a href="/guides/{g['slug']}/" style="color: #0f172a; text-decoration: none;">{g['title']}</a>
         </h3>
         <p style="margin: 0; color: #475569; font-size: 0.875rem; line-height: 1.5;">{g['summary']}</p>
       </div>
-      <a href="/guides/{g['slug']}" style="margin-top: 14px; font-weight: 700; font-size: 0.85rem; color: #b45309; text-decoration: underline;">Read Full Tutorial &rarr;</a>
+      <a href="/guides/{g['slug']}/" style="margin-top: 14px; font-weight: 700; font-size: 0.85rem; color: #b45309; text-decoration: underline;">Read Full Tutorial &rarr;</a>
     </div>
     ''' for g in CANONICAL_GUIDES[:6]])
 

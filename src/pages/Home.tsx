@@ -351,7 +351,7 @@ const Home: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
               </h2>
             </div>
             <Link
-              to="/guides"
+              to="/guides/"
               className="inline-flex items-center gap-2 font-bold text-sm text-yellow-700 dark:text-yellow-400 hover:underline"
             >
               View All 13+ Guides <Globe size={16} />
@@ -361,7 +361,7 @@ const Home: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
             <Link
-              to="/guides/how-to-convert-pdf-to-word"
+              to="/guides/how-to-convert-pdf-to-word/"
               className={`p-5 sm:p-6 rounded-2xl border transition-all duration-200 hover:-translate-y-1 hover:border-yellow-500/50 flex flex-col justify-between ${
                 darkMode ? 'bg-slate-800/60 border-slate-700' : 'bg-white border-slate-200 shadow-sm'
               }`}
@@ -383,7 +383,7 @@ const Home: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
             </Link>
 
             <Link
-              to="/guides/how-to-compress-a-pdf"
+              to="/guides/how-to-compress-a-pdf/"
               className={`p-5 sm:p-6 rounded-2xl border transition-all duration-200 hover:-translate-y-1 hover:border-yellow-500/50 flex flex-col justify-between ${
                 darkMode ? 'bg-slate-800/60 border-slate-700' : 'bg-white border-slate-200 shadow-sm'
               }`}
@@ -405,7 +405,7 @@ const Home: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
             </Link>
 
             <Link
-              to="/guides/how-to-merge-pdf-files"
+              to="/guides/how-to-merge-pdf-files/"
               className={`p-5 sm:p-6 rounded-2xl border transition-all duration-200 hover:-translate-y-1 hover:border-yellow-500/50 flex flex-col justify-between ${
                 darkMode ? 'bg-slate-800/60 border-slate-700' : 'bg-white border-slate-200 shadow-sm'
               }`}
@@ -430,7 +430,7 @@ const Home: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
           {/* Persona Workflows & Encyclopedia Sub-Grid */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mt-6">
             <Link
-              to="/student-pdf-tools"
+              to="/student-pdf-tools/"
               className={`p-5 sm:p-6 rounded-2xl border transition-all hover:border-yellow-500/40 ${
                 darkMode ? 'bg-slate-800/30 border-slate-800' : 'bg-white border-slate-200 shadow-sm'
               }`}
@@ -444,7 +444,7 @@ const Home: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
             </Link>
 
             <Link
-              to="/business-pdf-tools"
+              to="/business-pdf-tools/"
               className={`p-5 sm:p-6 rounded-2xl border transition-all hover:border-yellow-500/40 ${
                 darkMode ? 'bg-slate-800/30 border-slate-800' : 'bg-white border-slate-200 shadow-sm'
               }`}
@@ -458,7 +458,7 @@ const Home: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
             </Link>
 
             <Link
-              to="/encyclopedia"
+              to="/encyclopedia/"
               className={`p-5 sm:p-6 rounded-2xl border transition-all hover:border-yellow-500/40 ${
                 darkMode ? 'bg-slate-800/30 border-slate-800' : 'bg-white border-slate-200 shadow-sm'
               }`}
@@ -478,48 +478,48 @@ const Home: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
               <h3 className={`text-sm font-black uppercase tracking-wider ${darkMode ? 'text-white' : 'text-slate-900'}`}>
                 🎯 Exact Size Targets & Official Exam Uploads
               </h3>
-              <Link to="/no-upload-pdf-tools" className="text-xs font-bold text-yellow-700 dark:text-yellow-400 hover:underline">
+              <Link to="/no-upload-pdf-tools/" className="text-xs font-bold text-yellow-700 dark:text-yellow-400 hover:underline">
                 View All No-Upload Tools &rarr;
               </Link>
             </div>
             <div className="flex flex-wrap gap-2 text-xs font-semibold">
-              <Link to="/compress-pdf-to-20kb" className={`px-3 py-1.5 rounded-lg border transition-colors ${darkMode ? 'bg-slate-800 border-slate-700 text-slate-300 hover:border-yellow-500' : 'bg-white border-slate-200 text-slate-700 hover:border-yellow-500'}`}>
+              <Link to="/compress-pdf-to-20kb/" className={`px-3 py-1.5 rounded-lg border transition-colors ${darkMode ? 'bg-slate-800 border-slate-700 text-slate-300 hover:border-yellow-500' : 'bg-white border-slate-200 text-slate-700 hover:border-yellow-500'}`}>
                 To 20KB
               </Link>
-              <Link to="/compress-pdf-to-50kb" className={`px-3 py-1.5 rounded-lg border transition-colors ${darkMode ? 'bg-slate-800 border-slate-700 text-slate-300 hover:border-yellow-500' : 'bg-white border-slate-200 text-slate-700 hover:border-yellow-500'}`}>
+              <Link to="/compress-pdf-to-50kb/" className={`px-3 py-1.5 rounded-lg border transition-colors ${darkMode ? 'bg-slate-800 border-slate-700 text-slate-300 hover:border-yellow-500' : 'bg-white border-slate-200 text-slate-700 hover:border-yellow-500'}`}>
                 To 50KB
               </Link>
-              <Link to="/compress-pdf-to-100kb" className={`px-3 py-1.5 rounded-lg border transition-colors ${darkMode ? 'bg-slate-800 border-slate-700 text-slate-300 hover:border-yellow-500' : 'bg-white border-slate-200 text-slate-700 hover:border-yellow-500'}`}>
+              <Link to="/compress-pdf-to-100kb/" className={`px-3 py-1.5 rounded-lg border transition-colors ${darkMode ? 'bg-slate-800 border-slate-700 text-slate-300 hover:border-yellow-500' : 'bg-white border-slate-200 text-slate-700 hover:border-yellow-500'}`}>
                 To 100KB
               </Link>
-              <Link to="/compress-pdf-to-200kb" className={`px-3 py-1.5 rounded-lg border transition-colors ${darkMode ? 'bg-slate-800 border-slate-700 text-slate-300 hover:border-yellow-500' : 'bg-white border-slate-200 text-slate-700 hover:border-yellow-500'}`}>
+              <Link to="/compress-pdf-to-200kb/" className={`px-3 py-1.5 rounded-lg border transition-colors ${darkMode ? 'bg-slate-800 border-slate-700 text-slate-300 hover:border-yellow-500' : 'bg-white border-slate-200 text-slate-700 hover:border-yellow-500'}`}>
                 To 200KB
               </Link>
-              <Link to="/compress-pdf-to-500kb" className={`px-3 py-1.5 rounded-lg border transition-colors ${darkMode ? 'bg-slate-800 border-slate-700 text-slate-300 hover:border-yellow-500' : 'bg-white border-slate-200 text-slate-700 hover:border-yellow-500'}`}>
+              <Link to="/compress-pdf-to-500kb/" className={`px-3 py-1.5 rounded-lg border transition-colors ${darkMode ? 'bg-slate-800 border-slate-700 text-slate-300 hover:border-yellow-500' : 'bg-white border-slate-200 text-slate-700 hover:border-yellow-500'}`}>
                 To 500KB
               </Link>
-              <Link to="/compress-pdf-to-1mb" className={`px-3 py-1.5 rounded-lg border transition-colors ${darkMode ? 'bg-slate-800 border-slate-700 text-slate-300 hover:border-yellow-500' : 'bg-white border-slate-200 text-slate-700 hover:border-yellow-500'}`}>
+              <Link to="/compress-pdf-to-1mb/" className={`px-3 py-1.5 rounded-lg border transition-colors ${darkMode ? 'bg-slate-800 border-slate-700 text-slate-300 hover:border-yellow-500' : 'bg-white border-slate-200 text-slate-700 hover:border-yellow-500'}`}>
                 To 1MB
               </Link>
-              <Link to="/compress-pdf-for-ssc" className={`px-3 py-1.5 rounded-lg border transition-colors ${darkMode ? 'bg-slate-800 border-slate-700 text-slate-300 hover:border-yellow-500' : 'bg-white border-slate-200 text-slate-700 hover:border-yellow-500'}`}>
+              <Link to="/compress-pdf-for-ssc/" className={`px-3 py-1.5 rounded-lg border transition-colors ${darkMode ? 'bg-slate-800 border-slate-700 text-slate-300 hover:border-yellow-500' : 'bg-white border-slate-200 text-slate-700 hover:border-yellow-500'}`}>
                 SSC Portal
               </Link>
-              <Link to="/compress-pdf-for-upsc" className={`px-3 py-1.5 rounded-lg border transition-colors ${darkMode ? 'bg-slate-800 border-slate-700 text-slate-300 hover:border-yellow-500' : 'bg-white border-slate-200 text-slate-700 hover:border-yellow-500'}`}>
+              <Link to="/compress-pdf-for-upsc/" className={`px-3 py-1.5 rounded-lg border transition-colors ${darkMode ? 'bg-slate-800 border-slate-700 text-slate-300 hover:border-yellow-500' : 'bg-white border-slate-200 text-slate-700 hover:border-yellow-500'}`}>
                 UPSC CSE
               </Link>
-              <Link to="/compress-pdf-for-neet" className={`px-3 py-1.5 rounded-lg border transition-colors ${darkMode ? 'bg-slate-800 border-slate-700 text-slate-300 hover:border-yellow-500' : 'bg-white border-slate-200 text-slate-700 hover:border-yellow-500'}`}>
+              <Link to="/compress-pdf-for-neet/" className={`px-3 py-1.5 rounded-lg border transition-colors ${darkMode ? 'bg-slate-800 border-slate-700 text-slate-300 hover:border-yellow-500' : 'bg-white border-slate-200 text-slate-700 hover:border-yellow-500'}`}>
                 NEET
               </Link>
-              <Link to="/compress-pdf-for-jee" className={`px-3 py-1.5 rounded-lg border transition-colors ${darkMode ? 'bg-slate-800 border-slate-700 text-slate-300 hover:border-yellow-500' : 'bg-white border-slate-200 text-slate-700 hover:border-yellow-500'}`}>
+              <Link to="/compress-pdf-for-jee/" className={`px-3 py-1.5 rounded-lg border transition-colors ${darkMode ? 'bg-slate-800 border-slate-700 text-slate-300 hover:border-yellow-500' : 'bg-white border-slate-200 text-slate-700 hover:border-yellow-500'}`}>
                 JEE Main
               </Link>
-              <Link to="/merge-aadhaar-and-pan-card" className={`px-3 py-1.5 rounded-lg border transition-colors ${darkMode ? 'bg-slate-800 border-slate-700 text-slate-300 hover:border-yellow-500' : 'bg-white border-slate-200 text-slate-700 hover:border-yellow-500'}`}>
+              <Link to="/merge-aadhaar-and-pan-card/" className={`px-3 py-1.5 rounded-lg border transition-colors ${darkMode ? 'bg-slate-800 border-slate-700 text-slate-300 hover:border-yellow-500' : 'bg-white border-slate-200 text-slate-700 hover:border-yellow-500'}`}>
                 Aadhaar + PAN
               </Link>
-              <Link to="/compare/ilovepdf-alternative" className={`px-3 py-1.5 rounded-lg border transition-colors ${darkMode ? 'bg-slate-800 border-slate-700 text-slate-300 hover:border-yellow-500' : 'bg-white border-slate-200 text-slate-700 hover:border-yellow-500'}`}>
+              <Link to="/compare/ilovepdf-alternative/" className={`px-3 py-1.5 rounded-lg border transition-colors ${darkMode ? 'bg-slate-800 border-slate-700 text-slate-300 hover:border-yellow-500' : 'bg-white border-slate-200 text-slate-700 hover:border-yellow-500'}`}>
                 iLovePDF Alternative
               </Link>
-              <Link to="/free-pdf-editor-no-watermark-no-signup" className={`px-3 py-1.5 rounded-lg border transition-colors ${darkMode ? 'bg-slate-800 border-slate-700 text-slate-300 hover:border-yellow-500' : 'bg-white border-slate-200 text-slate-700 hover:border-yellow-500'}`}>
+              <Link to="/free-pdf-editor-no-watermark-no-signup/" className={`px-3 py-1.5 rounded-lg border transition-colors ${darkMode ? 'bg-slate-800 border-slate-700 text-slate-300 hover:border-yellow-500' : 'bg-white border-slate-200 text-slate-700 hover:border-yellow-500'}`}>
                 Free Editor (No Watermark)
               </Link>
             </div>
@@ -601,13 +601,13 @@ const Home: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link
-                to="/contact"
+                to="/contact/"
                 className="px-6 py-3.5 bg-yellow-500 hover:bg-yellow-400 text-slate-950 rounded-full font-bold text-base shadow-lg shadow-yellow-500/20 hover:-translate-y-0.5 transition-all w-full sm:w-auto"
               >
                 Contact Support
               </Link>
               <Link
-                to="/about"
+                to="/about/"
                 className={`px-6 py-3.5 rounded-full font-bold text-base border transition-all w-full sm:w-auto ${
                   darkMode
                     ? 'border-slate-700 text-white hover:bg-slate-800'

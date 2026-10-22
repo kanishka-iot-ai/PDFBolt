@@ -222,7 +222,7 @@ const CalculatorPage: React.FC<CalculatorPageProps> = ({ darkMode }) => {
 
               <div className="pt-8">
                 <Link
-                  to="/compress"
+                  to="/compress-pdf/"
                   className="w-full py-4 bg-yellow-500 hover:bg-yellow-400 text-slate-950 font-black text-sm rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2"
                 >
                   Compress My PDF Now <ArrowRight size={16} />

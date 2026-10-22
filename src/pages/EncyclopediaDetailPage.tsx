@@ -72,7 +72,7 @@ const EncyclopediaDetailPage: React.FC<EncyclopediaDetailPageProps> = ({ darkMod
         <nav className="flex items-center gap-2 text-xs font-semibold mb-6 text-slate-500">
           <Link to="/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Home</Link>
           <span>/</span>
-          <Link to="/encyclopedia" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Encyclopedia</Link>
+          <Link to="/encyclopedia/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Encyclopedia</Link>
           <span>/</span>
           <span className="text-yellow-700 dark:text-yellow-400 font-bold truncate max-w-xs">{article.title}</span>
         </nav>

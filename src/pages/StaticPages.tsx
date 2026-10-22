@@ -723,7 +723,7 @@ export const AboutPage: React.FC<{ darkMode: boolean }> = ({ darkMode }) => (
           Commitment to Editorial & Educational Standards
         </h2>
         <p className="text-sm sm:text-base">
-          In addition to our software suite, PDFBolt publishes comprehensive educational resources—including our <Link to="/encyclopedia" className="font-bold text-yellow-700 dark:text-yellow-400 underline">PDF Format Encyclopedia</Link> and step-by-step <Link to="/guides" className="font-bold text-yellow-700 dark:text-yellow-400 underline">How-To Knowledge Base</Link>—to help professionals, educators, and students understand PDF/A archiving standards, OCR layers, vector vs. raster rendering, and document security.
+          In addition to our software suite, PDFBolt publishes comprehensive educational resources—including our <Link to="/encyclopedia/" className="font-bold text-yellow-700 dark:text-yellow-400 underline">PDF Format Encyclopedia</Link> and step-by-step <Link to="/guides/" className="font-bold text-yellow-700 dark:text-yellow-400 underline">How-To Knowledge Base</Link>—to help professionals, educators, and students understand PDF/A archiving standards, OCR layers, vector vs. raster rendering, and document security.
         </p>
       </section>
 
@@ -772,7 +772,7 @@ export const AboutPage: React.FC<{ darkMode: boolean }> = ({ darkMode }) => (
           <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">Our engineering and support team is here to assist you.</p>
         </div>
         <Link 
-          to="/contact" 
+          to="/contact/" 
           className="px-6 py-3 rounded-xl bg-yellow-500 hover:bg-yellow-400 text-slate-950 font-black text-xs uppercase tracking-wider shadow-md transition-all shrink-0 inline-flex items-center gap-2"
         >
           Contact Our Team <ArrowRight size={14} />

@@ -91,7 +91,7 @@ const CookieConsent: React.FC<CookieConsentProps> = ({ darkMode }) => {
             Essential Only
           </button>
           <Link
-            to="/privacy"
+            to="/privacy/"
             className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 hover:text-yellow-700 dark:hover:text-yellow-400 underline ml-1 shrink-0"
           >
             Privacy

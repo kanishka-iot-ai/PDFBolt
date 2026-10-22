@@ -127,7 +127,7 @@ const ComparisonPage: React.FC<ComparisonPageProps> = ({ darkMode }) => {
             Explore all 25+ client-side tools with no file limits, no registrations, and 100% privacy.
           </p>
           <Link
-            to="/tools"
+            to="/tools/"
             className="inline-flex items-center gap-2 px-8 py-4 bg-yellow-500 hover:bg-yellow-400 text-slate-950 font-black text-sm rounded-2xl shadow-lg transition-all"
           >
             Open All PDF Tools <ArrowRight size={16} />

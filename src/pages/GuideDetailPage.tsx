@@ -115,7 +115,7 @@ const GuideDetailPage: React.FC<GuideDetailPageProps> = ({ darkMode }) => {
         <nav className="flex items-center gap-2 text-xs font-semibold mb-6 text-slate-500">
           <Link to="/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Home</Link>
           <span>/</span>
-          <Link to="/guides" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Guides</Link>
+          <Link to="/guides/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Guides</Link>
           <span>/</span>
           <span className="text-yellow-700 dark:text-yellow-400 font-bold truncate max-w-xs">{guide.title}</span>
         </nav>
@@ -131,7 +131,7 @@ const GuideDetailPage: React.FC<GuideDetailPageProps> = ({ darkMode }) => {
             Updated on {guide.updatedAt}
           </span>
           <span className="text-xs font-semibold text-slate-600 dark:text-slate-300 flex items-center gap-1">
-            Written by <Link to="/about" className="font-bold text-yellow-700 dark:text-yellow-400 hover:underline">Kanishka Giri</Link>
+            Written by <Link to="/about/" className="font-bold text-yellow-700 dark:text-yellow-400 hover:underline">Kanishka Giri</Link>
           </span>
         </div>
 
@@ -264,10 +264,10 @@ const GuideDetailPage: React.FC<GuideDetailPageProps> = ({ darkMode }) => {
               Kanishka Giri specializes in client-side WebAssembly architectures, document forensics, and zero-trust cryptography. He leads technical standards, browser sandbox security, and core PDF processing engines at PDFBolt.
             </p>
             <div className="flex items-center gap-4 text-xs font-bold">
-              <Link to="/about" className="text-yellow-700 dark:text-yellow-400 hover:underline">
+              <Link to="/about/" className="text-yellow-700 dark:text-yellow-400 hover:underline">
                 Editorial Standards & Team &rarr;
               </Link>
-              <Link to="/privacy" className="text-yellow-700 dark:text-yellow-400 hover:underline">
+              <Link to="/privacy/" className="text-yellow-700 dark:text-yellow-400 hover:underline">
                 Zero-Upload Privacy Guarantee &rarr;
               </Link>
             </div>

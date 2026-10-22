@@ -43,12 +43,12 @@ const getIconStyles = (category: string): string => {
 
 // Route → lazy chunk map for hover prefetching
 const PREFETCH_MAP: Record<string, () => Promise<unknown>> = {
-  '/merge-pdf':    () => import('../pages/MergeTool'),
-  '/compress-pdf': () => import('../pages/CompressTool'),
-  '/edit-pdf':     () => import('../pages/EditTool'),
-  '/redact-pdf':   () => import('../pages/RedactTool'),
-  '/scan-handwriting-to-pdf': () => import('../pages/HandwritingTool'),
-  '/analyze-pdf':  () => import('../pages/AnalyzerPage'),
+  '/merge-pdf/':    () => import('../pages/MergeTool'),
+  '/compress-pdf/': () => import('../pages/CompressTool'),
+  '/edit-pdf/':     () => import('../pages/EditTool'),
+  '/redact-pdf/':   () => import('../pages/RedactTool'),
+  '/scan-handwriting-to-pdf/': () => import('../pages/HandwritingTool'),
+  '/analyze-pdf/':  () => import('../pages/AnalyzerPage'),
 };
 
 interface ToolCardProps {

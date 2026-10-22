@@ -121,7 +121,7 @@ const SEOLandingPage: React.FC<SEOLandingPageProps> = ({ tool: toolProp, toolId,
           <nav className="flex justify-center items-center gap-2 text-xs font-semibold mb-1 text-slate-500">
             <Link to="/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Home</Link>
             <span>/</span>
-            <Link to="/tools" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">PDF Tools</Link>
+            <Link to="/tools/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">PDF Tools</Link>
             <span>/</span>
             <span className="text-yellow-700 dark:text-yellow-400 font-bold">{tool?.title}</span>
           </nav>

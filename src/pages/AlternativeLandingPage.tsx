@@ -171,7 +171,7 @@ const AlternativeLandingPage: React.FC<{ darkMode: boolean; defaultCompetitor?: 
           <nav aria-label="Breadcrumb" className="flex justify-center items-center gap-2 text-xs font-semibold mb-3 text-slate-500">
             <Link to="/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Home</Link>
             <span>/</span>
-            <Link to="/compare/online-pdf-tools" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Comparisons</Link>
+            <Link to="/compare/online-pdf-tools/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Comparisons</Link>
             <span>/</span>
             <span className="text-yellow-700 dark:text-yellow-400 font-bold">{data.name} Alternative</span>
           </nav>

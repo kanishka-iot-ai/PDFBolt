@@ -197,7 +197,7 @@ const HubPage: React.FC<HubPageProps> = ({ darkMode }) => {
               </p>
             </div>
             <Link
-              to="/no-upload-pdf-tools"
+              to="/no-upload-pdf-tools/"
               className="inline-flex items-center gap-1.5 text-xs font-bold text-yellow-700 dark:text-yellow-400 hover:underline"
             >
               Learn about No-Upload Privacy <ArrowRight size={14} />
@@ -311,7 +311,7 @@ const HubPage: React.FC<HubPageProps> = ({ darkMode }) => {
           </div>
           <Link
 
-            to="/tools/pdf-size-calculator"
+            to="/tools/pdf-size-calculator/"
             className="flex-shrink-0 px-6 py-3.5 bg-yellow-500 hover:bg-yellow-400 text-slate-950 font-black text-sm rounded-2xl shadow-lg transition-all"
           >
             Launch Calculator

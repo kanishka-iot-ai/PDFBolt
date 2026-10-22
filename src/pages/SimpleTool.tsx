@@ -9,7 +9,7 @@ import { ocrPdf, ocrPdfToSearchablePdf } from '../services/ocrService';
 import { pptToPdf, pdfToPpt } from '../services/pptService';
 import { redactPdf, repairPdf } from '../services/sanitizeService';
 import { comparePdfDocuments } from '../services/compareService';
-import { FileText, Download, CheckCircle2, Settings2, Eye, EyeOff, X, Image as ImageIcon, Lock, Zap, ArrowRight, Trash2, Plus, Copy, Check, AlertCircle, Target } from 'lucide-react';
+import { FileText, Download, CheckCircle2, Settings2, Eye, EyeOff, X, Image as ImageIcon, Lock, Zap, ArrowRight, Trash2, Plus, Copy, Check, AlertCircle, Target, ShieldCheck } from 'lucide-react';
 import { NotifySystem } from '../types';
 
 import ProgressBar from '../components/ProgressBar';
@@ -104,6 +104,23 @@ const SimpleTool: React.FC<SimpleToolProps> = ({ title, mode, darkMode, notify, 
   const [result, setResult] = useState<string | { name: string, url: string }[] | null>(null);
   const [resultKind, setResultKind] = useState<ResultKind>('pdf');
   const [showPreview, setShowPreview] = useState(false);
+  const parseInitialTargetKB = (hint?: string): number => {
+    if (!hint) return 100;
+    const underMatch = hint.match(/Under\s+(\d+)\s*(KB|MB)/i);
+    if (underMatch) {
+      const val = parseInt(underMatch[1], 10);
+      return underMatch[2].toUpperCase() === 'MB' ? val * 1024 : val;
+    }
+    const kbMatch = hint.match(/(\d+)\s*KB/i);
+    if (kbMatch) return parseInt(kbMatch[1], 10);
+    const mbMatch = hint.match(/(\d+)\s*MB/i);
+    if (mbMatch) return parseInt(mbMatch[1], 10) * 1024;
+    return 100;
+  };
+
+  const [compressMethod, setCompressMethod] = useState<'target' | 'preset'>(targetSizeHint ? 'target' : 'preset');
+  const [targetKB, setTargetKB] = useState<number>(() => parseInitialTargetKB(targetSizeHint));
+  const [grayscale, setGrayscale] = useState<boolean>(false);
   const [compressionLevel, setCompressionLevel] = useState(initialCompressionLevel || 'recommended');
   const [pageInput, setPageInput] = useState('');
   const [password, setPassword] = useState('');
@@ -350,7 +367,9 @@ const SimpleTool: React.FC<SimpleToolProps> = ({ title, mode, darkMode, notify, 
           outputKind = 'zip';
         } else if (file) {
           const compRes = await compressPdfAdvanced(file, {
-            profile: compressionLevel === 'extreme' ? 'extreme' : compressionLevel === 'less' ? 'high' : 'balanced'
+            profile: compressMethod === 'target' ? 'target' : (compressionLevel === 'extreme' ? 'extreme' : compressionLevel === 'less' ? 'high' : 'balanced'),
+            targetSizeKB: compressMethod === 'target' ? targetKB : undefined,
+            grayscale: grayscale
           });
           b = compRes.compressedBytes;
           setCompressionStats({
@@ -1119,39 +1138,163 @@ const SimpleTool: React.FC<SimpleToolProps> = ({ title, mode, darkMode, notify, 
                 </div>
               )}
 
-              {/* Compression Level Settings */}
+              {/* Compression Settings: Target Size Mode & Presets */}
               {mode === 'compress' && (
-                <div className="space-y-3">
-                  <label className="block text-xs font-black uppercase tracking-widest text-slate-500">Compression Level</label>
-                  {[
-                    { id: 'extreme', title: 'Extreme Compression', desc: 'Less quality, high compression', tag: 'Maximum Size Reduction' },
-                    { id: 'recommended', title: 'Recommended Compression', desc: 'Good quality, good compression', tag: 'Most Popular' },
-                    { id: 'less', title: 'Less Compression', desc: 'High quality, less compression', tag: 'Best Quality' }
-                  ].map((level) => (
-                    <button
-                      key={level.id}
-                      type="button"
-                      onClick={() => setCompressionLevel(level.id)}
-                      className={`w-full p-4 rounded-xl border-2 text-left transition-all flex items-start justify-between gap-3 cursor-pointer ${
-                        compressionLevel === level.id
-                          ? 'border-[#e53935] bg-red-50/50 dark:bg-red-950/20 text-slate-900 dark:text-white ring-2 ring-[#e53935]/20 shadow-sm'
-                          : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 text-slate-700 dark:text-slate-300'
-                      }`}
-                    >
+                <div className="space-y-4">
+                  {/* Trust Banner (Airplane Mode Test) */}
+                  <div className={`p-3.5 rounded-2xl border flex items-start gap-3 text-xs font-semibold ${darkMode ? 'bg-emerald-950/20 border-emerald-900/40 text-emerald-300' : 'bg-emerald-50 border-emerald-200 text-emerald-800'}`}>
+                    <ShieldCheck size={18} className="shrink-0 mt-0.5 text-emerald-500" />
+                    <div>
+                      <p className="font-black uppercase tracking-wider text-[10px] text-emerald-600 dark:text-emerald-400 mb-0.5">100% In-Browser Privacy</p>
+                      <p className="leading-relaxed">
+                        Test it yourself: disconnect from Wi-Fi or turn on Airplane mode right now. Your file compresses completely offline inside your browser RAM without uploading anywhere.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Mode Selector: Target KB vs Preset */}
+                  <div>
+                    <label className="block text-xs font-black uppercase tracking-widest text-slate-500 mb-2">Compression Mode</label>
+                    <div className="grid grid-cols-2 gap-2 p-1 bg-slate-100 dark:bg-slate-800 rounded-xl">
+                      <button
+                        type="button"
+                        onClick={() => setCompressMethod('target')}
+                        className={`py-2.5 px-3 rounded-lg text-xs font-black transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                          compressMethod === 'target'
+                            ? 'bg-white dark:bg-slate-700 shadow-sm text-yellow-700 dark:text-yellow-400 ring-1 ring-slate-200 dark:ring-slate-600'
+                            : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                        }`}
+                      >
+                        <Target size={14} /> Exact Target Size
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setCompressMethod('preset')}
+                        className={`py-2.5 px-3 rounded-lg text-xs font-black transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                          compressMethod === 'preset'
+                            ? 'bg-white dark:bg-slate-700 shadow-sm text-yellow-700 dark:text-yellow-400 ring-1 ring-slate-200 dark:ring-slate-600'
+                            : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                        }`}
+                      >
+                        <Zap size={14} /> Presets
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Target Size Input & Quick Chips */}
+                  {compressMethod === 'target' ? (
+                    <div className="space-y-3 p-4 rounded-2xl border bg-slate-50/50 dark:bg-slate-800/40 border-slate-200 dark:border-slate-700">
                       <div>
-                        <div className="flex items-center gap-2">
-                          <p className="text-xs font-black uppercase tracking-wider">{level.title}</p>
-                          {level.id === 'recommended' && (
-                            <span className="text-[9px] font-black uppercase px-2 py-0.5 bg-red-100 text-red-700 rounded-full">Recommended</span>
-                          )}
+                        <div className="flex justify-between items-center mb-1.5">
+                          <label className="text-xs font-black uppercase tracking-wider text-slate-700 dark:text-slate-200">
+                            Target Maximum File Size
+                          </label>
+                          <span className="text-xs font-black text-yellow-700 dark:text-yellow-400">
+                            {targetKB >= 1024 ? `${(targetKB / 1024).toFixed(1)} MB` : `${targetKB} KB`}
+                          </span>
                         </div>
-                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{level.desc}</p>
+                        <div className="relative">
+                          <input
+                            type="number"
+                            min="10"
+                            max="10000"
+                            step="10"
+                            value={targetKB}
+                            onChange={(e) => setTargetKB(Math.max(10, parseInt(e.target.value, 10) || 100))}
+                            className={`w-full p-3.5 pr-14 rounded-xl text-base font-black border focus:ring-2 focus:ring-yellow-500 transition-all outline-none ${
+                              darkMode ? 'bg-slate-900 border-slate-700 text-white' : 'bg-white border-slate-200 text-slate-900'
+                            }`}
+                          />
+                          <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-black text-slate-400 uppercase">
+                            KB
+                          </span>
+                        </div>
                       </div>
-                      {compressionLevel === level.id && (
-                        <CheckCircle2 size={18} className="text-[#e53935] shrink-0 mt-0.5" />
-                      )}
-                    </button>
-                  ))}
+
+                      {/* Quick Target Chips */}
+                      <div>
+                        <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Popular Exam & Portal Targets:</p>
+                        <div className="flex flex-wrap gap-1.5">
+                          {[
+                            { label: '20 KB', val: 20 },
+                            { label: '50 KB', val: 50 },
+                            { label: '100 KB', val: 100 },
+                            { label: '200 KB', val: 200 },
+                            { label: '300 KB', val: 300 },
+                            { label: '500 KB', val: 500 },
+                            { label: '1 MB', val: 1024 }
+                          ].map((chip) => (
+                            <button
+                              key={chip.label}
+                              type="button"
+                              onClick={() => setTargetKB(chip.val)}
+                              className={`px-2.5 py-1 rounded-lg text-xs font-bold border transition-all cursor-pointer ${
+                                targetKB === chip.val
+                                  ? 'bg-yellow-500 text-slate-950 border-yellow-500 shadow-sm'
+                                  : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-yellow-500'
+                              }`}
+                            >
+                              {chip.label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    /* Preset Mode */
+                    <div className="space-y-2.5">
+                      {[
+                        { id: 'extreme', title: 'Extreme Compression', desc: 'Less quality, high compression', tag: 'Maximum Size Reduction' },
+                        { id: 'recommended', title: 'Recommended Compression', desc: 'Good quality, good compression', tag: 'Most Popular' },
+                        { id: 'less', title: 'Less Compression', desc: 'High quality, less compression', tag: 'Best Quality' }
+                      ].map((level) => (
+                        <button
+                          key={level.id}
+                          type="button"
+                          onClick={() => setCompressionLevel(level.id)}
+                          className={`w-full p-3.5 rounded-xl border-2 text-left transition-all flex items-start justify-between gap-3 cursor-pointer ${
+                            compressionLevel === level.id
+                              ? 'border-[#e53935] bg-red-50/50 dark:bg-red-950/20 text-slate-900 dark:text-white ring-2 ring-[#e53935]/20 shadow-sm'
+                              : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 text-slate-700 dark:text-slate-300'
+                          }`}
+                        >
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <p className="text-xs font-black uppercase tracking-wider">{level.title}</p>
+                              {level.id === 'recommended' && (
+                                <span className="text-[9px] font-black uppercase px-2 py-0.5 bg-red-100 text-red-700 rounded-full">Recommended</span>
+                              )}
+                            </div>
+                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{level.desc}</p>
+                          </div>
+                          {compressionLevel === level.id && (
+                            <CheckCircle2 size={18} className="text-[#e53935] shrink-0 mt-0.5" />
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Grayscale Toggle (Black & White conversion for exams) */}
+                  <label className="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 dark:border-slate-700 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                    <input
+                      type="checkbox"
+                      checked={grayscale}
+                      onChange={(e) => setGrayscale(e.target.checked)}
+                      className="mt-0.5 w-4 h-4 rounded text-yellow-600 focus:ring-yellow-500 cursor-pointer accent-yellow-500"
+                    />
+                    <div>
+                      <span className="text-xs font-black text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                        Convert to Black & White (Grayscale)
+                        <span className="text-[9px] font-black uppercase px-2 py-0.5 bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-300 rounded-full">
+                          Save up to 80%
+                        </span>
+                      </span>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">
+                        Recommended for SSC, UPSC, and portal certificate uploads. Strips colored scanner noise while preserving crisp 300 DPI text contrast.
+                      </p>
+                    </div>
+                  </label>
                 </div>
               )}
 
