@@ -475,10 +475,12 @@ export async function watermarkPdf(file: File, text: string, fontSize: number = 
 }
 
 
-interface ImageFitOptions {
+export interface ImageFitOptions {
   pageSize: 'fit' | 'a4' | 'letter';
   orientation: 'portrait' | 'landscape';
   margin: 'none' | 'small' | 'standard'; // standard=50pt, small=20pt, none=0
+  targetSizeKB?: number;
+  grayscale?: boolean;
 }
 
 async function convertImageToPngBytes(file: File): Promise<ArrayBuffer> {
@@ -514,6 +516,101 @@ async function convertImageToPngBytes(file: File): Promise<ArrayBuffer> {
   }
 }
 
+async function optimizeImageForPdf(
+  file: File,
+  targetKBPerImage?: number,
+  grayscale?: boolean
+): Promise<{ bytes: ArrayBuffer; isJpg: boolean }> {
+  const type = file.type.toLowerCase();
+  if (!targetKBPerImage && !grayscale) {
+    if (type.includes('jpeg') || type.includes('jpg')) {
+      return { bytes: await file.arrayBuffer(), isJpg: true };
+    }
+    if (type.includes('png')) {
+      return { bytes: await file.arrayBuffer(), isJpg: false };
+    }
+    return { bytes: await convertImageToPngBytes(file), isJpg: false };
+  }
+
+  const imageUrl = URL.createObjectURL(file);
+  const image = new Image();
+  image.decoding = 'async';
+
+  try {
+    await new Promise<void>((resolve, reject) => {
+      image.onload = () => resolve();
+      image.onerror = () => reject(new Error(`Could not read image "${file.name}".`));
+      image.src = imageUrl;
+    });
+
+    let width = image.naturalWidth;
+    let height = image.naturalHeight;
+
+    if (targetKBPerImage) {
+      const maxDim = targetKBPerImage <= 100 ? 1280 : targetKBPerImage <= 300 ? 1600 : 2048;
+      if (width > maxDim || height > maxDim) {
+        if (width > height) {
+          height = Math.round((height * maxDim) / width);
+          width = maxDim;
+        } else {
+          width = Math.round((width * maxDim) / height);
+          height = maxDim;
+        }
+      }
+    }
+
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+
+    const context = canvas.getContext('2d');
+    if (!context) {
+      throw new Error("This browser could not prepare the image canvas.");
+    }
+
+    context.fillStyle = '#ffffff';
+    context.fillRect(0, 0, width, height);
+    context.drawImage(image, 0, 0, width, height);
+
+    if (grayscale) {
+      const imgData = context.getImageData(0, 0, width, height);
+      const data = imgData.data;
+      for (let i = 0; i < data.length; i += 4) {
+        const gray = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
+        data[i] = gray;
+        data[i + 1] = gray;
+        data[i + 2] = gray;
+      }
+      context.putImageData(imgData, 0, 0);
+    }
+
+    let quality = 0.82;
+    if (targetKBPerImage) {
+      if (targetKBPerImage <= 50) quality = 0.55;
+      else if (targetKBPerImage <= 100) quality = 0.68;
+      else if (targetKBPerImage <= 200) quality = 0.78;
+      else quality = 0.85;
+    }
+
+    let blob = await new Promise<Blob | null>(resolve => canvas.toBlob(resolve, 'image/jpeg', quality));
+    if (!blob) {
+      throw new Error(`Could not compress "${file.name}".`);
+    }
+
+    if (targetKBPerImage && blob.size > targetKBPerImage * 1024 && quality > 0.45) {
+      const lowerQuality = Math.max(0.40, quality - 0.25);
+      const smallerBlob = await new Promise<Blob | null>(resolve => canvas.toBlob(resolve, 'image/jpeg', lowerQuality));
+      if (smallerBlob && smallerBlob.size < blob.size) {
+        blob = smallerBlob;
+      }
+    }
+
+    return { bytes: await blob.arrayBuffer(), isJpg: true };
+  } finally {
+    URL.revokeObjectURL(imageUrl);
+  }
+}
+
 /**
  * Converts multiple image files into one PDF.
  */
@@ -532,20 +629,12 @@ export async function imagesToPdf(files: File[], options: ImageFitOptions = { pa
     standard: 50
   };
 
-  for (const f of files) {
-    let imgBytes = await f.arrayBuffer();
-    let img;
-    const type = f.type.toLowerCase();
+  const perImageTargetKB = options.targetSizeKB ? Math.max(15, Math.floor(options.targetSizeKB / files.length)) : undefined;
 
+  for (const f of files) {
     try {
-      if (type.includes('jpeg') || type.includes('jpg')) {
-        img = await pdfDoc.embedJpg(imgBytes);
-      } else if (type.includes('png')) {
-        img = await pdfDoc.embedPng(imgBytes);
-      } else {
-        imgBytes = await convertImageToPngBytes(f);
-        img = await pdfDoc.embedPng(imgBytes);
-      }
+      const { bytes, isJpg } = await optimizeImageForPdf(f, perImageTargetKB, options.grayscale);
+      const img = isJpg ? await pdfDoc.embedJpg(bytes) : await pdfDoc.embedPng(bytes);
 
       let pageWidth, pageHeight, drawX, drawY, drawWidth, drawHeight;
 

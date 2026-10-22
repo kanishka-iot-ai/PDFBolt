@@ -402,8 +402,21 @@ const SimpleTool: React.FC<SimpleToolProps> = ({ title, mode, darkMode, notify, 
         b = await imagesToPdf(multiFiles, {
           pageSize: imgPageSize,
           orientation: imgOrientation,
-          margin: imgMargin
+          margin: imgMargin,
+          targetSizeKB: compressMethod === 'target' ? targetKB : undefined,
+          grayscale: grayscale
         });
+        if (compressMethod === 'target' || grayscale) {
+          const originalTotal = multiFiles.reduce((acc, curr) => acc + curr.size, 0);
+          const outputTotal = b.byteLength;
+          const savedBytes = Math.max(0, originalTotal - outputTotal);
+          setCompressionStats({
+            originalSizeBytes: originalTotal,
+            compressedSizeBytes: outputTotal,
+            savedBytes,
+            savedPercent: Number(((savedBytes / originalTotal) * 100).toFixed(2))
+          });
+        }
       }
       else if (mode === 'word2pdf' && file) {
         setStatusMessage("Connecting to Word conversion engine...");
@@ -1138,8 +1151,8 @@ const SimpleTool: React.FC<SimpleToolProps> = ({ title, mode, darkMode, notify, 
                 </div>
               )}
 
-              {/* Compression Settings: Target Size Mode & Presets */}
-              {mode === 'compress' && (
+              {/* Compression & Optimization Settings: Target Size Mode & Presets */}
+              {(mode === 'compress' || isImageTool) && (
                 <div className="space-y-4">
                   {/* Trust Banner (Airplane Mode Test) */}
                   <div className={`p-3.5 rounded-2xl border flex items-start gap-3 text-xs font-semibold ${darkMode ? 'bg-emerald-950/20 border-emerald-900/40 text-emerald-300' : 'bg-emerald-50 border-emerald-200 text-emerald-800'}`}>
@@ -1470,7 +1483,7 @@ const SimpleTool: React.FC<SimpleToolProps> = ({ title, mode, darkMode, notify, 
           </div>
 
           {/* Compression Savings Report */}
-          {mode === 'compress' && compressionStats && (
+          {(mode === 'compress' || isImageTool) && compressionStats && (
             <div className="w-full p-6 sm:p-8 rounded-3xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-xl text-center space-y-4">
               <div>
                 <span className="text-[11px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400">

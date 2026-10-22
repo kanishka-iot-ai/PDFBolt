@@ -910,71 +910,125 @@ export const WORKFLOW_PAGES: LandingPageContent[] = [
   {
     slug: 'jpg-to-pdf-for-exam',
     toolType: 'jpg2pdf',
-    customHint: 'Exam Form Mode: Convert marksheet or certificate photo to PDF under 100KB/200KB',
+    presetLevel: 'recommended',
+    targetSizeHint: 'Under 200 KB (Exam Portal Mode)',
     title: 'JPG to PDF for Exam Forms & Government Applications | PDFBolt',
     h1: 'JPG to PDF for Exam Forms',
-    subtitle: 'Convert phone photos of certificates, marksheets, and identity cards into standard, lightweight PDF files for online exam portals.',
+    subtitle: 'Convert smartphone photos of certificates, marksheets, and identity cards into clean, sub-200KB PDF documents for exam portals.',
     seoTitle: 'JPG to PDF for Exam Form Online Free – Exact Portal Size | PDFBolt',
-    metaDescription: 'Convert JPG to PDF for exam forms free online. Turn photos of marksheets, signatures, and certificates into compliant PDF files under 100KB or 200KB.',
-    quickAnswer: 'To convert JPG to PDF for exam forms: 1. Upload your photo or scanned JPG. 2. Click "Convert to PDF". 3. Download your standard PDF file ready for exam portal submission.',
+    metaDescription: 'Convert JPG to PDF for exam forms free online. Turn smartphone photos of marksheets, certificates, and ID cards into compliant PDF files under 100KB or 200KB.',
+    quickAnswer: 'To convert JPG to PDF for exam forms: 1. Drag & drop your certificate or marksheet photos. 2. Select \'Exact Target Size\' (200 KB is pre-selected for exam portals). 3. Optionally toggle \'Convert to Black & White\' to eliminate table shadows and color grain. 4. Click \'Convert to PDF\' and download your verified, sub-200KB document.',
+    portalSpecs: [
+      { name: 'Class 10 / Matriculation Marksheet Photo', allowedSize: '100 KB – 200 KB', allowedFormat: 'PDF', notes: 'Mandatory proof of date of birth (SSC, State PSCs)' },
+      { name: 'Degree / Diploma Certificate Photo', allowedSize: '100 KB – 300 KB', allowedFormat: 'PDF', notes: 'Must display clear college seal and candidate name' },
+      { name: 'Category / Caste Validity Certificate Photo', allowedSize: '100 KB – 200 KB', allowedFormat: 'PDF', notes: 'Central Government format for reservation benefits' },
+      { name: 'Photo ID Proof (Aadhaar / Voter ID / PAN)', allowedSize: 'Under 300 KB', allowedFormat: 'PDF', notes: 'Both front and back sides included in one PDF' },
+      { name: 'Candidate Photograph & Signature', allowedSize: '20–50 KB / 10–20 KB', allowedFormat: 'JPEG / JPG', notes: 'Keep as raw JPG; do not convert photo/signature to PDF' },
+    ],
     keyHighlights: [
+      'Calibrated for SSC, UPSC, State PSC, and Railway recruitment portals (Last Verified: October 2026)',
       'Converts smartphone camera snapshots into standardized A4 PDF documents',
-      'Automatically scales resolution to pass exam upload filters',
-      '100% in-browser processing with zero server uploads',
-      'Batch conversion supported for multi-page certificates'
+      'Exact Target Size Mode guarantees the output PDF stays strictly below 200KB or 100KB',
+      'Grayscale (B&W) conversion strips background shadows, uneven lighting, and paper grain for an 80% size drop',
+      '100% in-browser WebAssembly execution: confidential marksheets and identity proofs never leave your device',
     ],
     steps: [
-      { name: 'Upload JPG Photo', text: 'Select your photo of a certificate or marksheet.' },
-      { name: 'Convert to PDF', text: 'Click Convert to compile the image into a clean PDF.' },
-      { name: 'Upload to Exam Portal', text: 'Download and submit on your exam website.' }
+      { name: 'Upload JPG Photos', text: 'Select photos of your marksheet, certificate, or identity card.' },
+      { name: 'Set Target & Grayscale', text: 'Select 200 KB (or 100 KB) and enable Black & White mode to remove room shadow noise.' },
+      { name: 'Download Exam PDF', text: 'Generate your lightweight, compliant PDF and submit on the exam portal without size errors.' },
     ],
     sections: [
       {
-        heading: 'Converting Phone Snapshots into Official PDF Certificates',
+        heading: 'Why Exam Portals Reject Raw Phone Photos & Demand PDF Documents',
         paragraphs: [
-          'Many exam registration portals refuse raw JPG files for educational proofs, requiring valid PDF documents instead. PDFBolt embeds your scanned photo into an official ISO-compliant PDF container with standard margins.'
+          'When applying for national recruitment or entrance exams (SSC, UPSC, NEET, JEE, State PSCs), candidate document upload fields strictly mandate PDF format for all academic transcripts and caste certificates. Uploading raw JPEG or PNG photos produces an immediate \'Invalid File Format\' error.',
+          'Smartphone cameras capture photos at resolutions between 12 and 48 megapixels, producing JPEG files between 3MB and 10MB with heavy table shadows, angled lighting, and background color noise. PDFBolt embeds and calibrates your photo into an official ISO-standard PDF container sized safely under 200KB.',
         ]
-      }
+      },
+      {
+        heading: 'Converting Phone Snapshots into a Crisp Sub-200KB PDF Without Blurring',
+        paragraphs: [
+          'Simply downsampling an entire image using basic web converters causes numbers, roll codes, and gazetted officer stamps to become illegible. If examination authorities cannot verify these details during document verification, candidate forms are rejected.',
+          'PDFBolt resamples high-resolution photos using bicubic interpolation while preserving dark text strokes. By specifying an exact limit (such as 180 KB or 200 KB), the engine calibrates JPEG compression tables so the final PDF lands precisely within the approved portal threshold.',
+        ]
+      },
+      {
+        heading: 'Why Grayscale Mode Eliminates Uneven Lighting, Shadows, and Color Noise',
+        paragraphs: [
+          'When photographing a certificate on a desk, indoor lighting often creates gradient shadows, yellowish tints from overhead bulbs, and paper texture grain. This color data accounts for up to 75% of the total file size without adding any verification value.',
+          'Toggling PDFBolt\'s \'Convert to Black & White (Grayscale)\' option converts background paper noise into clean white space while rendering text and stamps in high-contrast black. This dramatically drops file size by 65% to 80% while enhancing readability.',
+        ]
+      },
     ],
     faqs: [
-      { q: 'Can I convert multiple JPG photos into a single PDF marksheet?', a: 'Yes! Upload multiple JPG files and arrange them in page sequence before clicking Convert to PDF.' }
+      { q: 'Why do government exam portals reject JPG images and require PDF format?', a: 'Exam portals require PDF format for certificates and marksheets because PDFs preserve standardized page dimensions (like A4), prevent unauthorized image tampering, and ensure consistent rendering across official verification workstations.' },
+      { q: 'How can I convert a 5MB phone photo into a PDF under 200KB for SSC or UPSC?', a: 'Upload your photo here, select \'Exact Target Size\', and type 180 KB. Turn on \'Convert to Black & White (Grayscale)\' to strip phone camera color grain. PDFBolt will produce a crisp PDF well below 200KB in seconds.' },
+      { q: 'Can I combine multiple photos of a multi-page marksheet into a single PDF under 300KB?', a: 'Yes! Upload all photos together. You can reorder pages by dragging them into sequence. PDFBolt will merge and compress them into a single PDF that satisfies the portal limit.' },
+      { q: 'Will roll numbers, subject marks, and seals remain legible at 200KB?', a: 'Yes! PDFBolt preserves sharp edge contrast during compression so roll numbers, percentages, university watermarks, and registrar signatures remain distinct and verifiable.' },
+      { q: 'Are my educational certificates uploaded to any external server?', a: 'Never. PDFBolt processes images 100% locally in your device memory via client-side WebAssembly. No files or personal data are ever uploaded to any cloud server.' },
     ],
-    relatedSlugs: ['compress-pdf-for-ssc', 'pdf-size-reducer-for-government-portal', 'compress-pdf-to-100kb']
+    relatedSlugs: ['compress-pdf-for-ssc', 'compress-pdf-for-upsc', 'pdf-size-reducer-for-government-portal', 'compress-pdf-to-100kb']
   },
   {
     slug: 'pdf-to-jpg-for-aadhaar',
     toolType: 'pdf2jpg',
-    customHint: 'Aadhaar Image Mode: Extract high-resolution JPG from e-Aadhaar under 50KB/100KB',
+    presetLevel: 'recommended',
+    targetSizeHint: 'Aadhaar Image Mode (50KB–200KB JPG)',
     title: 'PDF to JPG for Aadhaar Upload Online Free | PDFBolt',
     h1: 'PDF to JPG for Aadhaar Upload',
-    subtitle: 'Convert your e-Aadhaar PDF into high-clarity JPG images for portals and mobile apps that only accept image uploads.',
+    subtitle: 'Convert your e-Aadhaar PDF into crisp, high-clarity JPG images for mobile apps and portals that only accept image uploads.',
     seoTitle: 'PDF to JPG for Aadhaar Card Upload Online Free | PDFBolt',
     metaDescription: 'Convert PDF to JPG for Aadhaar upload online free. Extract high-resolution front and back JPG images from your e-Aadhaar PDF with 100% local browser privacy.',
-    quickAnswer: 'To convert PDF to JPG for Aadhaar: 1. Drag & drop your e-Aadhaar PDF. 2. Click "Convert to JPG". 3. Download your crisp JPG image files instantly.',
+    quickAnswer: 'To convert PDF to JPG for Aadhaar: 1. Drag & drop your e-Aadhaar PDF. 2. If locked, remove the password using PDFBolt Unlock PDF first. 3. Click \'Convert to JPG\' to render 300 DPI high-contrast images. 4. Download your verified JPG files ready for instant upload.',
+    portalSpecs: [
+      { name: 'Telecom SIM Activation & e-KYC', allowedSize: 'Under 500 KB to 1 MB', allowedFormat: 'JPEG / JPG', notes: 'Must show clear photo, name, and address' },
+      { name: 'Airline Web Check-in & Travel Portals', allowedSize: 'Under 1 MB', allowedFormat: 'JPEG / JPG', notes: 'Clear full name and date of birth' },
+      { name: 'State Scholarship & Welfare Portals', allowedSize: '50 KB – 100 KB', allowedFormat: 'JPEG / JPG', notes: 'Clear 12-digit Aadhaar number and QR code' },
+      { name: 'Banking & Payment App Verification (Paytm, PhonePe)', allowedSize: 'Under 1 MB', allowedFormat: 'JPEG / JPG', notes: 'Front side with photo and back side with address' },
+    ],
     keyHighlights: [
-      'Extracts front and back Aadhaar card images at 300 DPI resolution',
-      'Safe local execution protects your confidential 12-digit UID and biometric QR code',
-      'Outputs lightweight JPG images that pass 50KB–100KB photo upload rules',
-      'No email, signup, or payment needed'
+      'Renders e-Aadhaar PDF pages into high-resolution JPG images at 300 DPI',
+      'Last Verified: October 2026 for Banking KYC, Telecom Portals & DigiLocker',
+      'Ensures UIDAI secure QR codes and candidate photograph remain razor sharp',
+      '100% client-side WebAssembly execution: confidential 12-digit UID numbers never leave your device',
     ],
     steps: [
-      { name: 'Upload e-Aadhaar PDF', text: 'Select your downloaded Aadhaar card PDF.' },
-      { name: 'Rasterize to JPG', text: 'Our engine renders the page canvas at high DPI.' },
-      { name: 'Save JPG Images', text: 'Download individual JPG images ready for portal upload.' }
+      { name: 'Select e-Aadhaar PDF', text: 'Choose your official e-Aadhaar PDF file.' },
+      { name: 'Convert to High-DPI JPG', text: 'Our engine renders the page canvas locally with crisp contrast.' },
+      { name: 'Download JPG Images', text: 'Save your individual front and back JPG files ready for portal upload.' },
     ],
     sections: [
       {
-        heading: 'Why Portals Request Aadhaar in JPG Rather Than PDF',
+        heading: 'Why Some Portals Require Aadhaar in JPG Format Rather Than PDF',
         paragraphs: [
-          'Certain portals—such as telecom SIM registration, airline web check-in, and local government identity forms—only accept image formats (.jpg, .jpeg) and automatically reject PDF files. PDFBolt extracts the visual page with perfect clarity.'
+          'While national recruitment portals prefer PDF documents, numerous commercial and mobile verification systems—including telecom SIM KYC, airline check-in, gig-economy onboarding, and state welfare schemes—only accept image formats (.jpg, .jpeg). Attempting to upload a PDF file causes an \'Unsupported File Type\' error.',
+          'Converting an official e-Aadhaar PDF to JPG allows you to crop and submit the exact front or back card view required by the mobile app validator.',
         ]
-      }
+      },
+      {
+        heading: 'Handling Password-Protected e-Aadhaar PDFs Before Converting',
+        paragraphs: [
+          'Official e-Aadhaar files downloaded from the UIDAI portal (eaadhaar.uidai.gov.in) are encrypted with an 8-character master password consisting of the first 4 letters of your name in capital letters followed by your four-digit birth year (e.g. AMIT1998).',
+          'Conversion engines cannot open encrypted files without authorization. To convert your e-Aadhaar to JPG: first unlock it using PDFBolt\'s \'Unlock PDF\' tool to strip the encryption locally in your browser, then upload the unlocked file here to produce crystal-clear JPGs.',
+        ]
+      },
+      {
+        heading: 'Zero Server Uploads: Protecting Your Biometric QR & Personal Data',
+        paragraphs: [
+          'An e-Aadhaar contains highly sensitive personal identifiers including your 12-digit Aadhaar number, Virtual ID (VID), date of birth, biometric QR code, and home address. Uploading this file to public cloud converters exposes your data to potential breach and identity theft.',
+          'PDFBolt processes your document entirely inside your local device RAM using WebAssembly. No files or personal data are ever uploaded to our servers or stored in any database.',
+        ]
+      },
     ],
     faqs: [
-      { q: 'What if my e-Aadhaar PDF is password protected?', a: 'Use our Unlock PDF tool first to remove the password, then convert it to JPG.' }
+      { q: 'What should I do if my e-Aadhaar PDF is password protected?', a: 'e-Aadhaar PDFs have a password (first 4 letters of your name in capital letters + year of birth). Unlock it first using PDFBolt\'s Unlock PDF tool in your browser, then convert the unlocked file to JPG here.' },
+      { q: 'Will the UIDAI biometric QR code remain readable after converting to JPG?', a: 'Yes! PDFBolt renders the PDF at high resolution (300 DPI), ensuring that QR codes, candidate photographs, and UIDAI seals remain sharp and machine-scannable.' },
+      { q: 'How can I ensure the output JPG is under 100KB for government scholarship portals?', a: 'PDFBolt optimizes JPEG compression curves automatically to produce lightweight files typically between 50KB and 150KB that easily pass portal size gates.' },
+      { q: 'Can I convert e-Aadhaar on an Android phone or iPhone?', a: 'Yes! PDFBolt works seamlessly in Google Chrome or Apple Safari on mobile devices with zero app installations.' },
+      { q: 'Are my 12-digit Aadhaar number or address sent to any server?', a: 'Never. All rasterization and conversion happens 100% inside your browser memory using client-side WebAssembly. Zero bytes leave your device.' },
     ],
-    relatedSlugs: ['merge-aadhaar-and-pan-card', 'compress-pdf-for-ssc', 'jpg-to-pdf-for-exam']
-  }
+    relatedSlugs: ['merge-aadhaar-and-pan-card', 'compress-pdf-for-ssc', 'jpg-to-pdf-for-exam', 'unlock-pdf']
+  },
 ];
 
 // ---------------------------------------------------------------------------
