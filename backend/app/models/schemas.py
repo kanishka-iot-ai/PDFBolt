@@ -36,6 +36,7 @@ class OperationType(str, Enum):
     PDF_TO_IMAGE = "pdf_to_image"
     IMAGE_TO_PDF = "image_to_pdf"
     ANALYZE = "analyze"
+    GRAYSCALE = "grayscale"
 
 
 class FileMetadata(BaseModel):

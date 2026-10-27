@@ -35,6 +35,7 @@ export enum ToolType {
   PDF_TO_QR = 'pdf-to-qr',
   SCAN_HANDWRITING = 'scan-handwriting',
   ANALYZER = 'analyze',
+  COLOR_TO_BW = 'color-to-bw',
 }
 
 export interface FAQ {

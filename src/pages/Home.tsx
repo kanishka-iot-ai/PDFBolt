@@ -33,7 +33,8 @@ const POPULAR_TOOL_IDS: ToolType[] = [
   ToolType.UNLOCK,
   ToolType.ROTATE,
   ToolType.WATERMARK,
-  ToolType.ORGANIZE
+  ToolType.ORGANIZE,
+  ToolType.COLOR_TO_BW
 ];
 
 const Home: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {

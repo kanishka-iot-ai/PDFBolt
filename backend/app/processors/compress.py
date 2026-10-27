@@ -61,7 +61,7 @@ class PDFCompressionEngine:
         if not os.path.exists(input_path):
             raise FileNotFoundError(f"Input PDF not found at {input_path}")
 
-    def compress_to_target_kb(self, output_path: str, target_kb: int, grayscale: bool = False) -> tuple[bool, float]:
+    def compress_to_target_kb(self, output_path: str, target_kb: int) -> tuple[bool, float]:
         """
         Attempts to compress a PDF to fit strictly under target_kb ceiling.
         Returns (success: bool, final_size_kb: float).
@@ -84,7 +84,7 @@ class PDFCompressionEngine:
             )
             current_doc.close()
 
-            if temp_io.tell() <= target_bytes and not grayscale:
+            if temp_io.tell() <= target_bytes:
                 with open(output_path, "wb") as f:
                     f.write(temp_io.getvalue())
                 return True, temp_io.tell() / 1024
@@ -93,10 +93,8 @@ class PDFCompressionEngine:
 
         # Phase 2: Iteratively compress embedded images with decreasing quality and resolution
         qualities = [85, 70, 50, 30, 15]
-        color_modes = ["L", "1"] if grayscale else ["RGB", "L", "1"]
-
-        for color_mode in color_modes:
-            for quality in qualities:
+        # Compression strictly preserves color fidelity (RGB / original color channels)
+        for quality in qualities:
                 try:
                     doc = pymupdf.open(self.input_path)
                     doc.set_metadata({})
@@ -124,11 +122,9 @@ class PDFCompressionEngine:
 
                                 pil_img = Image.open(io.BytesIO(image_bytes))
 
-                                # Convert color mode
-                                if color_mode == "L":
-                                    pil_img = pil_img.convert("L")
-                                elif color_mode == "1":
-                                    pil_img = pil_img.convert("1")
+                                # Preserve color fidelity: convert transparent/paletted to RGB
+                                if pil_img.mode in ("RGBA", "LA", "P"):
+                                    pil_img = pil_img.convert("RGB")
 
                                 # Downsample if image is large
                                 max_wh = 600 if target_kb <= 50 else (800 if target_kb <= 200 else 1200)
@@ -136,12 +132,7 @@ class PDFCompressionEngine:
                                     pil_img.thumbnail((max_wh, max_wh), Image.Resampling.LANCZOS)
 
                                 img_byte_arr = io.BytesIO()
-                                if color_mode == "1":
-                                    pil_img.save(img_byte_arr, format="PNG", optimize=True)
-                                else:
-                                    if pil_img.mode in ("RGBA", "P"):
-                                        pil_img = pil_img.convert("RGB")
-                                    pil_img.save(img_byte_arr, format="JPEG", quality=quality, optimize=True)
+                                pil_img.save(img_byte_arr, format="JPEG", quality=quality, optimize=True)
 
                                 # Replace original image in the PDF safely
                                 try:
@@ -170,7 +161,7 @@ class PDFCompressionEngine:
                             f.write(temp_io.getvalue())
                         return True, current_size / 1024
                 except Exception as iter_err:
-                    logger.debug(f"Phase 2 iteration error (mode={color_mode}, q={quality}): {iter_err}")
+                    logger.debug(f"Phase 2 iteration error (q={quality}): {iter_err}")
                     continue
 
         # Phase 3: Adaptive Rasterization Fallback (Enforces strict ceilings for stubborn/scanned PDFs)
@@ -185,11 +176,8 @@ class PDFCompressionEngine:
                 pix = page.get_pixmap(dpi=target_dpi)
                 img_data = pix.tobytes("png")
 
-                img = Image.open(io.BytesIO(img_data))
-                if target_kb <= 100 or grayscale:
-                    img = img.convert("L")
-                else:
-                    img = img.convert("RGB")
+                # Preserve full RGB color in compression fallback
+                img = Image.open(io.BytesIO(img_data)).convert("RGB")
 
                 img_byte_arr = io.BytesIO()
                 img.save(img_byte_arr, format="JPEG", quality=jpeg_q, optimize=True)
@@ -440,7 +428,6 @@ class CompressProcessor(BaseProcessor):
         if preset and str(preset) in GOVERNMENT_PRESETS:
             target_kb = GOVERNMENT_PRESETS[str(preset)]
 
-        grayscale = bool(opts.get("grayscale") or opts.get("black_and_white") or opts.get("mono"))
         level = opts.get("profile") or opts.get("level") or opts.get("strength") or "EXTREME"
 
         candidate_path = self.temp_dir / f"candidate_{self.job_id}.pdf"
@@ -450,9 +437,9 @@ class CompressProcessor(BaseProcessor):
         if target_kb and HAS_PYMUPDF:
             try:
                 target_kb_int = int(target_kb)
-                logger.info(f"Target size compression requested: {target_kb_int} KB (grayscale={grayscale}, preset={preset})")
+                logger.info(f"Target size compression requested: {target_kb_int} KB (preset={preset})")
                 engine = PDFCompressionEngine(str(input_pdf))
-                success, final_kb = engine.compress_to_target_kb(str(candidate_path), target_kb_int, grayscale=grayscale)
+                success, final_kb = engine.compress_to_target_kb(str(candidate_path), target_kb_int)
                 self.settings["target_kb"] = target_kb_int
                 self.settings["target_achieved"] = success
                 self.settings["final_size_kb"] = round(final_kb, 2)

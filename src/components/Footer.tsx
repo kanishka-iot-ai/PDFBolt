@@ -72,6 +72,7 @@ const Footer: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
             <li><Link to="/redact-pdf/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Redact PDF</Link></li>
             <li><Link to="/ocr-pdf/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">OCR PDF</Link></li>
             <li><Link to="/scan-to-pdf/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Scan to PDF</Link></li>
+            <li><Link to="/color-pdf-to-black-and-white/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Color PDF to B&W</Link></li>
             <li><Link to="/tools/" className="text-yellow-700 dark:text-yellow-400 font-bold hover:underline">View All 25+ Tools →</Link></li>
           </ul>
         </nav>

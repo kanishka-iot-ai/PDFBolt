@@ -44,6 +44,7 @@ from backend.app.processors.compare import CompareProcessor
 from backend.app.processors.word_to_pdf import WordToPdfProcessor
 from backend.app.processors.excel_to_pdf import ExcelToPdfProcessor
 from backend.app.processors.html_to_pdf import HtmlToPdfProcessor
+from backend.app.processors.grayscale import GrayscaleProcessor
 
 PROCESSOR_REGISTRY: Dict[str, Type[BaseProcessor]] = {
     "merge_pdf": MergeProcessor,
@@ -124,6 +125,15 @@ PROCESSOR_REGISTRY: Dict[str, Type[BaseProcessor]] = {
     "html-to-pdf": HtmlToPdfProcessor,
     "html_to_pdf": HtmlToPdfProcessor,
     "html2pdf": HtmlToPdfProcessor,
+    "grayscale": GrayscaleProcessor,
+    "grayscale_pdf": GrayscaleProcessor,
+    "grayscale-pdf": GrayscaleProcessor,
+    "color_to_bw": GrayscaleProcessor,
+    "color-to-bw": GrayscaleProcessor,
+    "black_and_white": GrayscaleProcessor,
+    "black-and-white": GrayscaleProcessor,
+    "pdf_to_grayscale": GrayscaleProcessor,
+    "pdf-to-grayscale": GrayscaleProcessor,
 }
 
 

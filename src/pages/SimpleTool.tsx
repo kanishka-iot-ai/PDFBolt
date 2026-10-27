@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import FileUploader from '../components/FileUploader';
 import SignatureCanvas, { SignatureCanvasRef } from '../components/SignatureCanvas';
 import { createZipFromFiles } from '../services/zipService';
-import { rotateFile, addPageNumbers, compressPdf, compressPdfAdvanced, watermarkPdf, deletePages, reorderPages, splitPdf, imagesToPdf } from '../services/pdfService';
+import { rotateFile, addPageNumbers, compressPdf, compressPdfAdvanced, watermarkPdf, deletePages, reorderPages, splitPdf, imagesToPdf, convertPdfToGrayscale } from '../services/pdfService';
 import { wordToPdf, excelToPdf, htmlToPdf, pdfToJpg, pdfToWord, pdfToExcel } from '../services/conversionService';
 import { protectPdf, unlockPdf, removePermissions, signPdf } from '../services/securityService';
 import { ocrPdf, ocrPdfToSearchablePdf } from '../services/ocrService';
@@ -121,7 +121,8 @@ const SimpleTool: React.FC<SimpleToolProps> = ({ title, mode, darkMode, notify, 
 
   const [compressMethod, setCompressMethod] = useState<'target' | 'preset'>(targetSizeHint ? 'target' : 'preset');
   const [targetKB, setTargetKB] = useState<number>(() => parseInitialTargetKB(targetSizeHint));
-  const [grayscale, setGrayscale] = useState<boolean>(false);
+  const [bwMode, setBwMode] = useState<'grayscale' | 'monochrome'>('grayscale');
+  const [bwDpi, setBwDpi] = useState<number>(150);
   const [compressionLevel, setCompressionLevel] = useState(initialCompressionLevel || 'recommended');
   const [pageInput, setPageInput] = useState('');
   const [password, setPassword] = useState('');
@@ -374,8 +375,7 @@ const SimpleTool: React.FC<SimpleToolProps> = ({ title, mode, darkMode, notify, 
               setStatusMessage('Applying precision byte-budget compression engine...');
               const targetPayload = {
                 profile: compressMethod === 'target' ? 'target' : (compressionLevel === 'extreme' ? 'extreme' : compressionLevel === 'less' ? 'high' : 'balanced'),
-                target_kb: compressMethod === 'target' ? targetKB : (compressionLevel === 'extreme' ? 100 : undefined),
-                grayscale: grayscale
+                target_kb: compressMethod === 'target' ? targetKB : (compressionLevel === 'extreme' ? 100 : undefined)
               };
               const res = await apiClient.submitJob('compress', file, targetPayload);
               const arrayBuf = await res.outputBlob.arrayBuffer();
@@ -397,8 +397,7 @@ const SimpleTool: React.FC<SimpleToolProps> = ({ title, mode, darkMode, notify, 
           if (!backendSuccess) {
             const compRes = await compressPdfAdvanced(file, {
               profile: compressMethod === 'target' ? 'target' : (compressionLevel === 'extreme' ? 'extreme' : compressionLevel === 'less' ? 'high' : 'balanced'),
-              targetSizeKB: compressMethod === 'target' ? targetKB : undefined,
-              grayscale: grayscale
+              targetSizeKB: compressMethod === 'target' ? targetKB : undefined
             });
             b = compRes.compressedBytes;
             setCompressionStats({
@@ -410,6 +409,31 @@ const SimpleTool: React.FC<SimpleToolProps> = ({ title, mode, darkMode, notify, 
           }
         } else {
           throw new Error("No file selected.");
+        }
+      }
+      else if ((mode === 'color-to-bw' || mode === 'grayscale') && file) {
+        let backendSuccess = false;
+        const isBackendUp = await apiClient.checkBackend();
+        if (isBackendUp) {
+          try {
+            setStatusMessage('Converting to Black & White via high-performance engine...');
+            const grayPayload = {
+              mode: bwMode,
+              dpi: bwDpi,
+              preserve_vector: bwMode === 'grayscale'
+            };
+            const res = await apiClient.submitJob('grayscale', file, grayPayload);
+            const arrayBuf = await res.outputBlob.arrayBuffer();
+            b = new Uint8Array(arrayBuf);
+            backendSuccess = true;
+          } catch (backendErr) {
+            console.warn("Backend grayscale conversion notice, falling back to local canvas engine:", backendErr);
+          }
+        }
+
+        if (!backendSuccess) {
+          setStatusMessage('Converting PDF to Black & White locally in browser...');
+          b = await convertPdfToGrayscale(file, { mode: bwMode, dpi: bwDpi });
         }
       }
       else if (mode === 'watermark' && file) b = await watermarkPdf(file, watermarkText || 'CONFIDENTIAL', watermarkSize);
@@ -433,10 +457,9 @@ const SimpleTool: React.FC<SimpleToolProps> = ({ title, mode, darkMode, notify, 
           pageSize: imgPageSize,
           orientation: imgOrientation,
           margin: imgMargin,
-          targetSizeKB: compressMethod === 'target' ? targetKB : undefined,
-          grayscale: grayscale
+          targetSizeKB: compressMethod === 'target' ? targetKB : undefined
         });
-        if (compressMethod === 'target' || grayscale) {
+        if (compressMethod === 'target') {
           const originalTotal = multiFiles.reduce((acc, curr) => acc + curr.size, 0);
           const outputTotal = b.byteLength;
           const savedBytes = Math.max(0, originalTotal - outputTotal);
@@ -1371,26 +1394,85 @@ const SimpleTool: React.FC<SimpleToolProps> = ({ title, mode, darkMode, notify, 
                     </div>
                   )}
 
-                  {/* Grayscale Toggle (Black & White conversion for exams) */}
-                  <label className="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 dark:border-slate-700 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-                    <input
-                      type="checkbox"
-                      checked={grayscale}
-                      onChange={(e) => setGrayscale(e.target.checked)}
-                      className="mt-0.5 w-4 h-4 rounded text-yellow-600 focus:ring-yellow-500 cursor-pointer accent-yellow-500"
-                    />
-                    <div>
-                      <span className="text-xs font-black text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
-                        Convert to Black & White (Grayscale)
-                        <span className="text-[9px] font-black uppercase px-2 py-0.5 bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-300 rounded-full">
-                          Save up to 80%
-                        </span>
-                      </span>
-                      <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">
-                        Recommended for SSC, UPSC, and portal certificate uploads. Strips colored scanner noise while preserving crisp 300 DPI text contrast.
-                      </p>
+
+                </div>
+              )}
+
+              {/* Color PDF to Black and White Tool Settings */}
+              {(mode === 'color-to-bw' || mode === 'grayscale') && (
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-xs font-black uppercase tracking-wider text-slate-500 mb-2">
+                      Conversion Mode
+                    </label>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <button
+                        type="button"
+                        onClick={() => setBwMode('grayscale')}
+                        className={`p-3.5 rounded-xl border text-left transition-all flex flex-col justify-between ${
+                          bwMode === 'grayscale'
+                            ? 'border-yellow-500 bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 font-bold'
+                            : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 text-slate-700 dark:text-slate-300'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-xs font-black">Smooth Grayscale</span>
+                          <span className="text-[10px] uppercase font-bold px-1.5 py-0.5 rounded bg-slate-200 dark:bg-slate-700">8-Bit Gray</span>
+                        </div>
+                        <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-tight">
+                          Best for documents with photos, graphics, charts, and signatures. Smooth 256 tone transitions.
+                        </p>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setBwMode('monochrome')}
+                        className={`p-3.5 rounded-xl border text-left transition-all flex flex-col justify-between ${
+                          bwMode === 'monochrome'
+                            ? 'border-yellow-500 bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 font-bold'
+                            : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 text-slate-700 dark:text-slate-300'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-xs font-black">Pure Black & White</span>
+                          <span className="text-[10px] uppercase font-bold px-1.5 py-0.5 rounded bg-slate-200 dark:bg-slate-700">1-Bit Mono</span>
+                        </div>
+                        <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-tight">
+                          High-contrast monochrome for forms, text, certificates & maximum printer toner savings.
+                        </p>
+                      </button>
                     </div>
-                  </label>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-black uppercase tracking-wider text-slate-500 mb-2">
+                      Resolution Quality
+                    </label>
+                    <div className="grid grid-cols-2 gap-3">
+                      <button
+                        type="button"
+                        onClick={() => setBwDpi(150)}
+                        className={`py-2 px-3 rounded-lg border text-xs font-bold transition-all ${
+                          bwDpi === 150
+                            ? 'border-yellow-500 bg-yellow-500/10 text-yellow-600 dark:text-yellow-400'
+                            : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400'
+                        }`}
+                      >
+                        150 DPI (Balanced / Fast)
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setBwDpi(300)}
+                        className={`py-2 px-3 rounded-lg border text-xs font-bold transition-all ${
+                          bwDpi === 300
+                            ? 'border-yellow-500 bg-yellow-500/10 text-yellow-600 dark:text-yellow-400'
+                            : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400'
+                        }`}
+                      >
+                        300 DPI (High-Res Print Quality)
+                      </button>
+                    </div>
+                  </div>
                 </div>
               )}
 

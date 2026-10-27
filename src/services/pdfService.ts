@@ -707,3 +707,77 @@ export async function imagesToPdf(files: File[], options: ImageFitOptions = { pa
 
   return await pdfDoc.save();
 }
+
+
+export interface GrayscaleOptions {
+  mode?: 'grayscale' | 'monochrome';
+  dpi?: number;
+  threshold?: number;
+}
+
+/**
+ * Converts any PDF document into crisp Black & White (Grayscale or Monochrome)
+ * fully inside the browser memory via PDF.js canvas and pdf-lib.
+ */
+export async function convertPdfToGrayscale(
+  file: File,
+  options: GrayscaleOptions = {}
+): Promise<Uint8Array> {
+  const { PDFDocument } = await import('pdf-lib');
+  const arrayBuffer = await file.arrayBuffer();
+  const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+  const newPdf = await PDFDocument.create();
+
+  const isMonochrome = options.mode === 'monochrome';
+  const threshold = options.threshold || 128;
+  const targetDpi = options.dpi || 150;
+  const scale = targetDpi / 72;
+
+  for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+    const page = await pdf.getPage(pageNum);
+    const viewport = page.getViewport({ scale });
+    const canvas = document.createElement('canvas');
+    canvas.width = viewport.width;
+    canvas.height = viewport.height;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) continue;
+
+    await page.render({ canvasContext: ctx, viewport }).promise;
+
+    const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const d = imgData.data;
+    for (let i = 0; i < d.length; i += 4) {
+      const v = 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2];
+      if (isMonochrome) {
+        const monoVal = v > threshold ? 255 : 0;
+        d[i] = monoVal;
+        d[i + 1] = monoVal;
+        d[i + 2] = monoVal;
+      } else {
+        d[i] = v;
+        d[i + 1] = v;
+        d[i + 2] = v;
+      }
+    }
+    ctx.putImageData(imgData, 0, 0);
+
+    const blob: Blob = await new Promise((resolve) =>
+      canvas.toBlob((b) => resolve(b!), isMonochrome ? 'image/png' : 'image/jpeg', 0.85)
+    );
+    const imgBytes = new Uint8Array(await blob.arrayBuffer());
+    const embeddedImg = isMonochrome
+      ? await newPdf.embedPng(imgBytes)
+      : await newPdf.embedJpg(imgBytes);
+
+    const origViewport = page.getViewport({ scale: 1.0 });
+    const newPage = newPdf.addPage([origViewport.width, origViewport.height]);
+    newPage.drawImage(embeddedImg, {
+      x: 0,
+      y: 0,
+      width: origViewport.width,
+      height: origViewport.height
+    });
+  }
+
+  return await newPdf.save();
+}

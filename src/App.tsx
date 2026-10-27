@@ -281,6 +281,9 @@ const MainLayout: React.FC<MainLayoutProps> = ({ darkMode, setDarkMode, soundEna
             <Route path="/compare-pdf" element={<SEOLandingPage toolId="compare" darkMode={darkMode}><SimpleTool title="Compare PDF" mode="compare" darkMode={darkMode} notify={notify} /></SEOLandingPage>} />
             <Route path="/repair-pdf" element={<SEOLandingPage toolId="repair" darkMode={darkMode}><SimpleTool title="Repair PDF" mode="repair" darkMode={darkMode} notify={notify} /></SEOLandingPage>} />
             <Route path="/pdf-to-qr-code" element={<SEOLandingPage toolId="pdf-to-qr" darkMode={darkMode}><QRTool darkMode={darkMode} notify={notify} /></SEOLandingPage>} />
+            <Route path="/color-pdf-to-black-and-white" element={<SEOLandingPage toolId="color-to-bw" darkMode={darkMode}><SimpleTool title="Color PDF to Black & White" mode="color-to-bw" darkMode={darkMode} notify={notify} /></SEOLandingPage>} />
+            <Route path="/grayscale-pdf" element={<Navigate to="/color-pdf-to-black-and-white/" replace />} />
+            <Route path="/pdf-to-black-and-white" element={<Navigate to="/color-pdf-to-black-and-white/" replace />} />
             <Route path="/analyze-pdf" element={<AnalyzerPage darkMode={darkMode} notify={notify} />} />
             <Route path="/pdf-builder" element={<Navigate to="/analyze-pdf/" replace />} />
 

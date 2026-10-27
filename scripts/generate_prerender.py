@@ -934,6 +934,40 @@ CANONICAL_TOOLS = [
         ],
         "related": [("pdf-to-ppt", "PDF to PowerPoint"), ("pdf-to-word", "PDF to Word"), ("ocr-pdf", "OCR PDF"), ("compare-pdf", "Compare PDF")]
     },
+    {
+        "path": "color-pdf-to-black-and-white",
+        "title": "Convert Color PDF to Black and White Online Free | PDFBolt",
+        "description": "Convert full-color PDFs to high-contrast black and white or smooth grayscale online. Save printer ink and toner, remove scanner background tint, and meet portal requirements.",
+        "h1": "Convert Color PDF to Black and White Online",
+        "subtitle": "Transform color PDF documents into clean, ink-saving grayscale or high-contrast monochrome documents with 100% privacy.",
+        "quick_answer": "To convert a color PDF to black and white: 1. Drag & drop your color PDF file. 2. Choose between Smooth Grayscale (8-bit) or Pure Black & White (1-bit monochrome). 3. Click 'Convert to Black & White' and download your ink-saving file instantly.",
+        "features": [
+            "Smooth 8-bit grayscale for photographs, charts, and illustrations",
+            "High-contrast 1-bit monochrome for certificates, forms, and maximum ink savings",
+            "Reduces expensive printer ink and laser toner consumption by up to 80%",
+            "Preserves sharp 300 DPI text contrast with zero data retention or leaks"
+        ],
+        "how_to": [
+            {"name": "Upload Color PDF", "text": "Select your document from your computer, phone, or tablet."},
+            {"name": "Select Conversion Mode", "text": "Choose between Smooth Grayscale or High-Contrast Monochrome and resolution."},
+            {"name": "Convert & Download", "text": "Click 'Convert to Black & White' and download your print-ready document immediately."}
+        ],
+        "sections": [
+            {
+                "heading": "Why Convert Color PDFs to Black & White?",
+                "paragraphs": [
+                    "Color printer cartridges cost up to four times more than standard black toner. Converting multi-page color documents to black and white before printing saves dramatic office printing expenses.",
+                    "Furthermore, many government, exam, and state admission portals strictly require clean black-and-white or grayscale scans to eliminate room lighting shadows and ensure automated document verification passes without rejection."
+                ]
+            }
+        ],
+        "faqs": [
+            {"q": "What is the difference between Grayscale and Pure Black & White?", "a": "Grayscale retains 256 delicate shades of gray, perfect for diagrams and photographs. Pure Black & White converts all pixels strictly to 100% black or white, ideal for text, certificates, and maximizing toner savings."},
+            {"q": "Will my text remain sharp and readable?", "a": "Yes! Our conversion engine preserves high text contrast at up to 300 DPI, ensuring all fonts, seals, and signatures remain crisp and legible."},
+            {"q": "Are my files uploaded or stored on any server?", "a": "Never. Conversion is processed either directly in your browser memory via WebAssembly or through our ephemeral zero-retention backend with an automatic 15-minute deletion guarantee."}
+        ],
+        "related": [("compress-pdf", "Compress PDF"), ("scan-to-pdf", "Scan to PDF"), ("ocr-pdf", "OCR PDF"), ("edit-pdf", "Edit PDF")]
+    },
 ]
 
 # =========================================================================

@@ -17,6 +17,7 @@ from backend.app.processors.pdf_to_image import PDFToImageProcessor, ImageToPDFP
 from backend.app.processors.pdf_to_word import PDFToWordProcessor
 from backend.app.processors.pdf_to_excel import PDFToExcelProcessor
 from backend.app.processors.pdf_to_ppt import PDFToPPTProcessor
+from backend.app.processors.grayscale import GrayscaleProcessor
 from backend.app.core.errors import PDFProcessingException, ErrorCode
 
 
@@ -123,6 +124,7 @@ class JobManager:
                 OperationType.PDF_TO_WORD.value: PDFToWordProcessor,
                 OperationType.PDF_TO_EXCEL.value: PDFToExcelProcessor,
                 OperationType.PDF_TO_PPT.value: PDFToPPTProcessor,
+                OperationType.GRAYSCALE.value: GrayscaleProcessor,
             }
 
             proc_class = processor_map.get(op)

@@ -4,7 +4,7 @@ import {
   QrCode, Image as ImageIcon, FileImage, Type, Droplets, FileText,
   FilePlus, Table, Globe, FileStack, Lock, Unlock, PenTool, EyeOff,
   Wrench, Search, Files, Trash2, Scan, GraduationCap, Briefcase, Code,
-  Calculator, CheckCircle2, ShieldCheck, Zap, Sparkles, HelpCircle, BookOpen, Layers
+  Calculator, CheckCircle2, ShieldCheck, Zap, Sparkles, HelpCircle, BookOpen, Layers, Contrast
 } from 'lucide-react';
 import {
   ToolMetadata, ToolType, Guide, EncyclopediaArticle,
@@ -856,6 +856,36 @@ export const TOOLS: ToolMetadata[] = [
     ],
     relatedTools: [ToolType.PDF_TO_PPT, ToolType.PDF_TO_WORD, ToolType.PDF_TO_EXCEL, ToolType.OCR],
     relatedGuides: ['how-to-convert-pdf-to-word', 'how-to-convert-pdf-to-ppt']
+  },
+  {
+    id: ToolType.COLOR_TO_BW,
+    title: 'Color PDF to Black & White',
+    seoTitle: 'Convert Color PDF to Black and White Online Free | PDFBolt',
+    canonicalPath: '/color-pdf-to-black-and-white/',
+    path: '/color-pdf-to-black-and-white/',
+    seoPath: '/grayscale-pdf',
+    description: 'Convert color PDFs to clean black and white or smooth grayscale. Save printer ink and toner, remove colored background scanner noise, and comply with portal rules.',
+    icon: 'Contrast',
+    category: 'convert-to',
+    features: ['Smooth 8-bit grayscale & 1-bit monochrome', 'Saves up to 80% printer toner & ink', 'Crisp 300 DPI text contrast', '100% Private local or cloud processing'],
+    howToSteps: [
+      { name: 'Upload PDF', text: 'Select or drag-and-drop your color PDF file.' },
+      { name: 'Select Mode', text: 'Choose between Smooth Grayscale or High-Contrast Monochrome.' },
+      { name: 'Convert & Download', text: 'Click Convert and download your black and white PDF.' }
+    ],
+    quickAnswer: 'To convert color PDF to black and white: Upload your PDF, choose between Grayscale or High-Contrast Monochrome, click "Convert to Black & White", and download your optimized document immediately.',
+    longDescription: 'PDFBolt Color PDF to Black & White converter transforms full-color PDFs into crisp grayscale or high-contrast monochrome documents. Ideal for slashing expensive office printing costs, eliminating colored scanner shadows, and preparing compliant document uploads for UPSC, SSC, state portals, and college admissions.',
+    useCases: [
+      { title: 'Save Printer Ink & Toner', description: 'Convert color-heavy presentations, reports, and manuals to black and white before sending to standard office printers.' },
+      { title: 'Government Portal Uploads', description: 'Transform colored scans of marksheets, certificates, and ID cards into clean monochrome PDFs required by public service portals.' }
+    ],
+    faqs: [
+      { q: 'What is the difference between Grayscale and Pure Black & White?', a: 'Grayscale uses 256 shades of gray to preserve photographic nuances and shaded diagrams. Pure Black & White (Monochrome) binarizes pages into high-contrast black and white, maximizing text clarity and printer ink savings.' },
+      { q: 'Will my text stay sharp after conversion?', a: 'Yes. Our converter maintains sharp text edges at up to 300 DPI, ensuring letters, numbers, and signatures remain 100% legible.' },
+      { q: 'Are my files kept private?', a: 'Yes. Processing can run 100% locally in your browser with zero data leaving your device, or via our ephemeral 15-minute auto-purge backend.' }
+    ],
+    relatedTools: [ToolType.COMPRESS, ToolType.SCAN_TO_PDF, ToolType.OCR],
+    relatedGuides: ['how-to-compress-a-pdf-for-email']
   }
 ];
 
@@ -1873,7 +1903,7 @@ export const getIcon = (name: string) => {
     Calculator: <Calculator className="w-8 h-8" />, CheckCircle2: <CheckCircle2 className="w-8 h-8" />,
     ShieldCheck: <ShieldCheck className="w-8 h-8" />, Zap: <Zap className="w-8 h-8" />,
     Sparkles: <Sparkles className="w-8 h-8" />, HelpCircle: <HelpCircle className="w-8 h-8" />,
-    BookOpen: <BookOpen className="w-8 h-8" />, Layers: <Layers className="w-8 h-8" />
+    BookOpen: <BookOpen className="w-8 h-8" />, Layers: <Layers className="w-8 h-8" />, Contrast: <Contrast className="w-8 h-8" />
   };
   return icons[name] || <FileText className="w-8 h-8" />;
 };
