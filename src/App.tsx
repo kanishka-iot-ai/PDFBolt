@@ -282,7 +282,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ darkMode, setDarkMode, soundEna
             <Route path="/repair-pdf" element={<SEOLandingPage toolId="repair" darkMode={darkMode}><SimpleTool title="Repair PDF" mode="repair" darkMode={darkMode} notify={notify} /></SEOLandingPage>} />
             <Route path="/pdf-to-qr-code" element={<SEOLandingPage toolId="pdf-to-qr" darkMode={darkMode}><QRTool darkMode={darkMode} notify={notify} /></SEOLandingPage>} />
             <Route path="/analyze-pdf" element={<AnalyzerPage darkMode={darkMode} notify={notify} />} />
-            <Route path="/pdf-builder" element={<Home darkMode={darkMode} />} />
+            <Route path="/pdf-builder" element={<Navigate to="/analyze-pdf/" replace />} />
 
             {/* Targeted Size Compression Routes (Wave 1 & 2) */}
             <Route path="/compress-pdf-to-20kb" element={<TargetedCompressPage pageSlug="compress-pdf-to-20kb" darkMode={darkMode} notify={notify} />} />
@@ -324,6 +324,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ darkMode, setDarkMode, soundEna
             <Route path="/reorder-pages" element={<Navigate to="/organize-pdf/" replace />} />
             <Route path="/extract-pages" element={<Navigate to="/split-pdf/" replace />} />
             <Route path="/extract-pdf-pages" element={<Navigate to="/split-pdf/" replace />} />
+            <Route path="/split-pdf-pages" element={<Navigate to="/split-pdf/" replace />} />
             <Route path="/add-page-numbers" element={<Navigate to="/add-page-numbers-to-pdf/" replace />} />
             <Route path="/qr-pdf-share" element={<Navigate to="/pdf-to-qr-code/" replace />} />
             <Route path="/pdf-analyzer" element={<Navigate to="/analyze-pdf/" replace />} />

@@ -917,37 +917,6 @@ CANONICAL_TOOLS = [
         ],
         "related": [("pdf-to-ppt", "PDF to PowerPoint"), ("pdf-to-word", "PDF to Word"), ("ocr-pdf", "OCR PDF"), ("compare-pdf", "Compare PDF")]
     },
-    {
-        "path": "pdf-builder",
-        "title": "AI PDF Builder & Slide Presentation Generator | PDFBolt",
-        "description": "Build executive slide presentations, structured documents, and clean PDF exports using client-side AI analysis.",
-        "h1": "AI PDF Builder & Slide Deck Generator",
-        "subtitle": "Transform raw PDF documents into structured slide decks, outlines, and executive briefings.",
-        "quick_answer": "To build presentations from PDF: 1. Upload your source document. 2. Review generated slide layouts. 3. Export to PPTX or PDF.",
-        "features": [
-            "Instant presentation slide deck construction",
-            "Structured multi-page outline generation",
-            "Client-side AI extraction with zero cloud storage",
-            "Export directly to PDF and editable PPTX format"
-        ],
-        "how_to": [
-            {"name": "Upload Source PDF", "text": "Select the research paper or whitepaper."},
-            {"name": "Review Slide Outline", "text": "Inspect generated slide topics and bullet points."},
-            {"name": "Export PPTX", "text": "Download your presentation deck."}
-        ],
-        "sections": [
-            {
-                "heading": "Automated Presentation Generation",
-                "paragraphs": [
-                    "Turn dense 50-page reports into clean, visual 10-slide executive presentations in seconds."
-                ]
-            }
-        ],
-        "faqs": [
-            {"q": "Can I edit the generated slides?", "a": "Yes, exported PPTX files are fully editable in PowerPoint, Google Slides, and Keynote."}
-        ],
-        "related": [("analyze-pdf", "Analyze PDF"), ("pdf-to-ppt", "PDF to PowerPoint"), ("pdf-to-word", "PDF to Word"), ("compress-pdf", "Compress PDF")]
-    }
 ]
 
 # =========================================================================

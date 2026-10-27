@@ -247,6 +247,15 @@ services:
       - type: redirect
         source: /guides/jpg-ko-pdf-kaise-banaye
         destination: /guides/jpg-ko-pdf-kaise-banaye/
+      - type: redirect
+        source: /pdf-builder
+        destination: /analyze-pdf/
+      - type: redirect
+        source: /pdf-builder/
+        destination: /analyze-pdf/
+      - type: redirect
+        source: /split-pdf-pages
+        destination: /split-pdf/
       # Fallback SPA rewrite for dynamic routes
       - type: rewrite
         source: /*
