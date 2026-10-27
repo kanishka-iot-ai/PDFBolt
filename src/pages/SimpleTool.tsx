@@ -367,18 +367,47 @@ const SimpleTool: React.FC<SimpleToolProps> = ({ title, mode, darkMode, notify, 
           b = await createZipFromFiles(multiFiles);
           outputKind = 'zip';
         } else if (file) {
-          const compRes = await compressPdfAdvanced(file, {
-            profile: compressMethod === 'target' ? 'target' : (compressionLevel === 'extreme' ? 'extreme' : compressionLevel === 'less' ? 'high' : 'balanced'),
-            targetSizeKB: compressMethod === 'target' ? targetKB : undefined,
-            grayscale: grayscale
-          });
-          b = compRes.compressedBytes;
-          setCompressionStats({
-            originalSizeBytes: compRes.originalSizeBytes,
-            compressedSizeBytes: compRes.compressedSizeBytes,
-            savedBytes: compRes.savedBytes,
-            savedPercent: compRes.savedPercent
-          });
+          let backendSuccess = false;
+          const isBackendUp = await apiClient.checkBackend();
+          if (isBackendUp) {
+            try {
+              setStatusMessage('Applying precision byte-budget compression engine...');
+              const targetPayload = {
+                profile: compressMethod === 'target' ? 'target' : (compressionLevel === 'extreme' ? 'extreme' : compressionLevel === 'less' ? 'high' : 'balanced'),
+                target_kb: compressMethod === 'target' ? targetKB : (compressionLevel === 'extreme' ? 100 : undefined),
+                grayscale: grayscale
+              };
+              const res = await apiClient.submitJob('compress', file, targetPayload);
+              const arrayBuf = await res.outputBlob.arrayBuffer();
+              b = new Uint8Array(arrayBuf);
+              backendSuccess = true;
+              if (res.metrics) {
+                setCompressionStats({
+                  originalSizeBytes: res.metrics.original_size_bytes,
+                  compressedSizeBytes: res.metrics.output_size_bytes,
+                  savedBytes: res.metrics.saved_bytes,
+                  savedPercent: res.metrics.reduction_percent
+                });
+              }
+            } catch (backendErr) {
+              console.warn("Backend precision compression notice, falling back to local engine:", backendErr);
+            }
+          }
+
+          if (!backendSuccess) {
+            const compRes = await compressPdfAdvanced(file, {
+              profile: compressMethod === 'target' ? 'target' : (compressionLevel === 'extreme' ? 'extreme' : compressionLevel === 'less' ? 'high' : 'balanced'),
+              targetSizeKB: compressMethod === 'target' ? targetKB : undefined,
+              grayscale: grayscale
+            });
+            b = compRes.compressedBytes;
+            setCompressionStats({
+              originalSizeBytes: compRes.originalSizeBytes,
+              compressedSizeBytes: compRes.compressedSizeBytes,
+              savedBytes: compRes.savedBytes,
+              savedPercent: compRes.savedPercent
+            });
+          }
         } else {
           throw new Error("No file selected.");
         }

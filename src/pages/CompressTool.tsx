@@ -112,6 +112,7 @@ const CompressTool: React.FC<CompressToolProps> = ({ darkMode, notify }) => {
         const settingsPayload = {
           profile: targetMode !== 'auto' ? 'target' : selectedProfile,
           target_size_mb: targetMode !== 'auto' ? targetSizeMB : undefined,
+          target_kb: targetMode !== 'auto' && targetSizeMB ? Math.round(targetSizeMB * 1024) : undefined,
           custom_dpi: customDpi,
           custom_quality: customQuality,
           strip_metadata: stripMetadata

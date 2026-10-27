@@ -231,6 +231,10 @@ class JobService:
                 "fast_path_eligible": fast_path_eligible,
                 "fast_path_sla_met": (result.duration_s <= settings.JOB_FAST_PATH_TARGET_SECONDS) if fast_path_eligible else None
             }
+            if hasattr(processor, 'settings') and "target_kb" in processor.settings:
+                job.metrics["target_kb"] = processor.settings["target_kb"]
+                job.metrics["target_achieved"] = processor.settings.get("target_achieved", True)
+                job.metrics["final_size_kb"] = processor.settings.get("final_size_kb", round((job.output_size or 0) / 1024, 2))
 
             return job
 
