@@ -50,7 +50,7 @@ def convert_pdf_to_bw(input_path: str, output_path: str) -> bool:
         except Exception as clean_err:
             logger.debug(f"clean_contents notice: {clean_err}")
 
-        # 1. Convert all embedded images to Grayscale
+        # 1. Convert all embedded images (photos, graphics) to Grayscale
         try:
             image_list = page.get_images(full=True)
         except Exception:
@@ -60,12 +60,17 @@ def convert_pdf_to_bw(input_path: str, output_path: str) -> bool:
             xref = img_info[0]
             try:
                 pix = pymupdf.Pixmap(doc, xref)
+                # If image has multiple channels (color), convert to Grayscale
                 if pix.colorspace and pix.colorspace.n > 1:
-                    gray_pix = pymupdf.Pixmap(pymupdf.csGRAY, pix)
-                    doc.update_stream(xref, gray_pix.tobytes())
-            except Exception as img_err:
-                logger.debug(f"Image xref {xref} grayscale notice: {img_err}")
-                pass
+                    if pix.alpha:
+                        clean_pix = pymupdf.Pixmap(pymupdf.csRGB, pix)
+                        gray_pix = pymupdf.Pixmap(pymupdf.csGRAY, clean_pix)
+                    else:
+                        gray_pix = pymupdf.Pixmap(pymupdf.csGRAY, pix)
+                    # Use replace_image to safely update both the stream and dictionary keys (like ColorSpace)
+                    page.replace_image(xref, pixmap=gray_pix)
+            except Exception as e:
+                logger.debug(f"Could not convert image {xref}: {e}")
 
         # 2. Intercept and rewrite all color operators in the content streams
         try:
@@ -93,7 +98,7 @@ def convert_pdf_to_bw(input_path: str, output_path: str) -> bool:
                 gray = 0.299 * r + 0.587 * g + 0.114 * b
                 gray = min(max(gray, 0.0), 1.0)
                 new_op = "g" if op == "rg" else "G"
-                return f"{gray:.3f} {new_op}"
+                return f"{gray:.3f} {new_op} "
 
             # Convert CMYK values (e.g. 'c m y k k' or 'c m y k K') to Gray ('y g' / 'y G')
             def replace_cmyk(match):
@@ -104,7 +109,7 @@ def convert_pdf_to_bw(input_path: str, output_path: str) -> bool:
                 gray = 0.299 * r + 0.587 * g + 0.114 * b
                 gray = min(max(gray, 0.0), 1.0)
                 new_op = "g" if op == "k" else "G"
-                return f"{gray:.3f} {new_op}"
+                return f"{gray:.3f} {new_op} "
 
             # Convert generic color space parameters (e.g. '0.1 0.2 0.3 sc' or '0.1 0.2 0.3 scn')
             def replace_sc(match):
@@ -124,7 +129,7 @@ def convert_pdf_to_bw(input_path: str, output_path: str) -> bool:
 
                 gray = min(max(gray, 0.0), 1.0)
                 new_op = "g" if op in ["sc", "scn"] else "G"
-                return f"{gray:.3f} {new_op}"
+                return f"{gray:.3f} {new_op} "
 
             # Clean RGB patterns
             rgb_pattern = r"(\-?\d*\.?\d+)\s+(\-?\d*\.?\d+)\s+(\-?\d*\.?\d+)\s+(rg|RG)\b"

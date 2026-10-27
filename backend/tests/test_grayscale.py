@@ -1,12 +1,46 @@
 import io
 from pathlib import Path
 from fastapi.testclient import TestClient
+from PIL import Image
+import pymupdf
+
 from backend.app.main import app
 from backend.app.processors.grayscale import GrayscaleProcessor, convert_pdf_to_bw
 from backend.app.core.validation import validate_pdf_output
 
 client = TestClient(app)
 FIXTURES = Path(__file__).parent / "fixtures"
+
+
+def test_convert_pdf_with_embedded_photos(tmp_path):
+    # Create test document with photo image and vector shapes
+    test_pdf = tmp_path / "photo_doc.pdf"
+    doc = pymupdf.open()
+    page = doc.new_page(width=400, height=400)
+
+    # Insert color photo
+    photo = Image.new("RGB", (150, 150), color=(255, 80, 20))
+    photo_io = io.BytesIO()
+    photo.save(photo_io, format="JPEG")
+    page.insert_image(pymupdf.Rect(50, 50, 200, 200), stream=photo_io.getvalue())
+    page.insert_text((50, 250), "Certificate Photo Verification", color=(0, 0, 1), fontsize=14)
+    doc.save(str(test_pdf))
+    doc.close()
+
+    output_pdf = tmp_path / "bw_photo_doc.pdf"
+    success = convert_pdf_to_bw(str(test_pdf), str(output_pdf))
+
+    assert success is True
+    assert output_pdf.exists()
+
+    # Verify that the embedded photo was updated to grayscale colorspace (n=1)
+    res_doc = pymupdf.open(str(output_pdf))
+    img_list = res_doc[0].get_images(full=True)
+    assert len(img_list) > 0
+    xref = img_list[0][0]
+    pix = pymupdf.Pixmap(res_doc, xref)
+    assert pix.colorspace.n == 1
+    res_doc.close()
 
 
 def test_convert_pdf_to_bw_direct(tmp_path):
