@@ -225,11 +225,11 @@ const FileUploader: React.FC<FileUploaderProps> = ({
           <span>Select {formatBadge} {multiple ? 'files' : 'file'}</span>
         </button>
 
-        <p className="mt-3 text-xs sm:text-sm font-semibold text-slate-400 dark:text-slate-500">
+        <p className="mt-3 text-xs sm:text-sm font-semibold text-slate-600 dark:text-slate-400">
           or drop {formatBadge} here
         </p>
 
-        <p className="mt-2 text-[11px] sm:text-xs text-slate-400 dark:text-slate-500 max-w-sm text-center">
+        <p className="mt-2 text-[11px] sm:text-xs text-slate-600 dark:text-slate-400 max-w-sm text-center">
           ⚡ In-browser processing: Recommended &lt;80MB on mobile, &lt;250MB on desktop to preserve device RAM.
         </p>
 

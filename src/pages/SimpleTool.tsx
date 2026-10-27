@@ -775,10 +775,10 @@ const SimpleTool: React.FC<SimpleToolProps> = ({ title, mode, darkMode, notify, 
           {mode === 'compress' && (
             <div className={`p-4 sm:p-5 rounded-3xl border text-left animate-fadeIn ${darkMode ? 'bg-slate-900/60 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
-                <span className="text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                <span className="text-xs font-black uppercase tracking-wider text-slate-700 dark:text-slate-300">
                   Popular Target Sizes & Portal Requirements:
                 </span>
-                <span className="text-[11px] font-semibold text-amber-600 dark:text-amber-400">
+                <span className="text-[11px] font-semibold text-amber-800 dark:text-amber-300">
                   Pre-calibrated exact size ceilings
                 </span>
               </div>

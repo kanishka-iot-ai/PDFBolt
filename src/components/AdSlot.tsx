@@ -104,7 +104,7 @@ const AdSlot: React.FC<AdSlotProps> = ({
       }}
     >
       {showLabel && (
-        <span className="block text-[10px] uppercase font-bold tracking-widest text-slate-400 dark:text-slate-500 mb-1 text-center select-none">
+        <span className="block text-[10px] uppercase font-bold tracking-widest text-slate-500 dark:text-slate-400 mb-1 text-center select-none">
           {labelText}
         </span>
       )}
@@ -127,7 +127,7 @@ const AdSlot: React.FC<AdSlotProps> = ({
         />
       </div>
 
-      <p className="mt-1 text-[9px] text-slate-400 dark:text-slate-500 font-medium select-none tracking-tight">
+      <p className="mt-1 text-[9px] text-slate-500 dark:text-slate-400 font-medium select-none tracking-tight">
         Third-party advertisement • PDFBolt is not affiliated with or endorsing advertised services.
       </p>
     </aside>

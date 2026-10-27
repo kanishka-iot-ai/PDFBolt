@@ -136,6 +136,9 @@ const Home: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
               />
               <input
                 type="text"
+                id="search-pdf-tools"
+                name="searchPdfTools"
+                autoComplete="off"
                 aria-label="Search PDF tools"
                 placeholder="Search PDF tools..."
                 value={searchQuery}

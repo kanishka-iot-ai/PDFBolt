@@ -555,7 +555,7 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
                     </div>
 
                     {/* Platform Badge */}
-                    <div className="mt-8 flex items-center gap-2 text-[10px] sm:text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
+                    <div className="mt-8 flex items-center gap-2 text-[10px] sm:text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
                         <ShieldCheck size={14} className="text-emerald-500" />
                         <span>
                             {platform === 'android'
