@@ -55,16 +55,43 @@ export async function mergeFiles(files: File[]): Promise<Uint8Array> {
   const merged = await PDFDocument.create();
   for (const f of files) {
     try {
-      let pdfBytes: ArrayBuffer | null = await f.arrayBuffer();
-      const pdf: any = await PDFDocument.load(pdfBytes);
-      const indices = pdf.getPageIndices();
-      const copiedPages = await merged.copyPages(pdf, indices);
-      copiedPages.forEach(p => merged.addPage(p));
-      // Immediate null dereference for low-RAM mobile V8 heap relief
-      pdfBytes = null;
-    } catch (err) {
+      const isImage = f.type.startsWith('image/') || /\.(jpe?g|png|webp|bmp)$/i.test(f.name);
+      if (isImage) {
+        const { bytes, isJpg } = await optimizeImageForPdf(f);
+        const img = isJpg ? await merged.embedJpg(bytes) : await merged.embedPng(bytes);
+
+        // Standard A4 dimensions in points: 595.28 x 841.89
+        const a4Width = 595.28;
+        const a4Height = 841.89;
+        const margin = 20;
+        const maxW = a4Width - (margin * 2);
+        const maxH = a4Height - (margin * 2);
+        const scale = Math.min(maxW / img.width, maxH / img.height, 1);
+        const drawW = img.width * scale;
+        const drawH = img.height * scale;
+        const page = merged.addPage([a4Width, a4Height]);
+        page.drawImage(img, {
+          x: (a4Width - drawW) / 2,
+          y: (a4Height - drawH) / 2,
+          width: drawW,
+          height: drawH,
+        });
+      } else {
+        let pdfBytes: ArrayBuffer | null = await f.arrayBuffer();
+        const pdf: any = await PDFDocument.load(pdfBytes);
+        const indices = pdf.getPageIndices();
+        const copiedPages = await merged.copyPages(pdf, indices);
+        copiedPages.forEach(p => merged.addPage(p));
+        // Immediate null dereference for low-RAM mobile V8 heap relief
+        pdfBytes = null;
+      }
+    } catch (err: any) {
       console.error(`Error processing ${f.name}:`, err);
-      throw new Error(`Failed to load PDF: ${f.name}`);
+      const msg = err?.message || '';
+      if (msg.toLowerCase().includes('password') || msg.toLowerCase().includes('encrypted')) {
+        throw new Error(`File "${f.name}" is password-protected (such as e-Aadhaar). Please unlock it using PDFBolt Unlock PDF tool first.`);
+      }
+      throw new Error(`Failed to load ${f.name}: ${msg || 'unsupported file'}`);
     }
   }
   const result = await merged.save();

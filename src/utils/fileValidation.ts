@@ -200,19 +200,16 @@ export async function validateFileTypeAndBytes(file: File, allowedMimes: string[
     // Magic byte sniffing
     const { detectedType, isEncrypted } = await sniffMagicBytes(file);
 
-    // If PDF expected
-    if (allowedMimes.includes('application/pdf')) {
-        if (detectedType !== 'application/pdf') {
-            return {
-                valid: false,
-                error: `"${fileName}" is not a valid PDF document.`,
-                humanError: createHumanError(
-                    "Invalid PDF Structure",
-                    `The file "${fileName}" does not contain standard PDF header bytes (%PDF-). It may be renamed or corrupted.`,
-                    "Please choose an intact PDF document."
-                )
-            };
-        }
+    const expectsPdf = allowedMimes.includes('application/pdf');
+    const expectsImage = allowedMimes.some(m => m.startsWith('image/'));
+    const expectsOffice = allowedMimes.some(m => m.includes('openxmlformats') || m.includes('msword') || m.includes('ms-excel') || m.includes('ms-powerpoint'));
+
+    const isPdf = detectedType === 'application/pdf';
+    const isImage = (detectedType && detectedType.startsWith('image/')) || ['jpg', 'jpeg', 'png', 'webp', 'bmp'].includes(ext);
+    const isOffice = detectedType === 'application/zip' || ['docx', 'xlsx', 'pptx', 'doc', 'xls', 'ppt'].includes(ext);
+
+    // If matches allowed PDF
+    if (expectsPdf && isPdf) {
         if (isEncrypted) {
             return {
                 valid: true,
@@ -222,43 +219,71 @@ export async function validateFileTypeAndBytes(file: File, allowedMimes: string[
         return { valid: true };
     }
 
-    // If Image expected
-    if (allowedMimes.some(m => m.startsWith('image/'))) {
-        const isImage = detectedType && detectedType.startsWith('image/');
-        const isImageExt = ['jpg', 'jpeg', 'png', 'webp', 'bmp'].includes(ext);
-        if (!isImage && !isImageExt) {
-            return {
-                valid: false,
-                error: `"${fileName}" is not a supported image file.`,
-                humanError: createHumanError(
-                    "Unsupported Image Format",
-                    `The file "${fileName}" could not be recognized as a valid JPEG, PNG, or WebP image.`,
-                    "Try converting the image to standard PNG or JPG first."
-                )
-            };
-        }
+    // If matches allowed Image
+    if (expectsImage && isImage) {
         return { valid: true };
     }
 
-    // If Office doc expected
-    if (allowedMimes.some(m => m.includes('openxmlformats') || m.includes('msword') || m.includes('ms-excel') || m.includes('ms-powerpoint'))) {
-        const isZipBased = detectedType === 'application/zip';
-        const isOfficeExt = ['docx', 'xlsx', 'pptx', 'doc', 'xls', 'ppt'].includes(ext);
-        if (!isZipBased && !isOfficeExt) {
-            return {
-                valid: false,
-                error: `"${fileName}" is not a valid Office document.`,
-                humanError: createHumanError(
-                    "Corrupted Office Document",
-                    `The file "${fileName}" could not be parsed as a valid DOCX, XLSX, or PPTX container.`,
-                    "Please ensure the document opens cleanly in Microsoft Office or Google Docs before uploading."
-                )
-            };
-        }
+    // If matches allowed Office doc
+    if (expectsOffice && isOffice) {
         return { valid: true };
     }
 
-    return { valid: true };
+    // If only PDF was allowed and failed
+    if (expectsPdf && !expectsImage && !expectsOffice) {
+        return {
+            valid: false,
+            error: `"${fileName}" is not a valid PDF document.`,
+            humanError: createHumanError(
+                "Invalid PDF Structure",
+                `The file "${fileName}" does not contain standard PDF header bytes (%PDF-). It may be renamed or corrupted.`,
+                "Please choose an intact PDF document."
+            )
+        };
+    }
+
+    // If only Image was allowed and failed
+    if (expectsImage && !expectsPdf && !expectsOffice) {
+        return {
+            valid: false,
+            error: `"${fileName}" is not a supported image file.`,
+            humanError: createHumanError(
+                "Unsupported Image Format",
+                `The file "${fileName}" could not be recognized as a valid JPEG, PNG, or WebP image.`,
+                "Try converting the image to standard PNG or JPG first."
+            )
+        };
+    }
+
+    // If only Office was allowed and failed
+    if (expectsOffice && !expectsPdf && !expectsImage) {
+        return {
+            valid: false,
+            error: `"${fileName}" is not a valid Office document.`,
+            humanError: createHumanError(
+                "Corrupted Office Document",
+                `The file "${fileName}" could not be parsed as a valid DOCX, XLSX, or PPTX container.`,
+                "Please ensure the document opens cleanly in Microsoft Office or Google Docs before uploading."
+            )
+        };
+    }
+
+    // Mixed expectation failure (e.g. PDF or Image)
+    const allowedNames = [
+        expectsPdf ? "PDF documents" : null,
+        expectsImage ? "Images (JPG, PNG, WebP)" : null,
+        expectsOffice ? "Office documents" : null
+    ].filter(Boolean).join(" or ");
+
+    return {
+        valid: false,
+        error: `"${fileName}" is not a supported format. Please upload ${allowedNames}.`,
+        humanError: createHumanError(
+            "Unsupported Format",
+            `The file "${fileName}" does not match the permitted file formats (${allowedNames}).`,
+            `Please select a valid ${allowedNames}.`
+        )
+    };
 }
 
 /**

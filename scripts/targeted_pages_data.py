@@ -1042,41 +1042,43 @@ TARGETED_PAGES = [
     {
         "path": "merge-aadhaar-and-pan-card",
         "h1": "Merge Aadhaar & PAN Card into One PDF",
-        "title": "Merge Aadhaar Card and PAN Card into One PDF Online Free | PDFBolt",
-        "description": "Merge Aadhaar and PAN card into one PDF online for free. Combine front/back identity proofs for bank KYC, PAN-Aadhaar linking, and visa verification with 100% browser privacy.",
+        "title": "Merge Aadhaar and PAN Card into One PDF Online Free (100% Private) | PDFBolt",
+        "description": "Merge Aadhaar and PAN card into one PDF online for free. Combine mobile phone photos (JPG/PNG) or PDFs for bank KYC, Demat, and income tax with zero server uploads.",
         "subtitle": "Combine Aadhaar card (front and back) and PAN card into a single PDF document for banking KYC, government portals, and visa applications.",
-        "quick_answer": "To merge Aadhaar and PAN card into one PDF: 1. Upload your Aadhaar (front & back) and PAN card (as PDFs or images). 2. Drag to arrange pages in order (Aadhaar Page 1, PAN Page 2). 3. Click 'Merge PDF' and download your combined, KYC-ready document with zero server upload.",
+        "quick_answer": "To merge Aadhaar and PAN card into one PDF: 1. Upload your Aadhaar (front & back) and PAN card (as photos or PDFs). 2. Drag cards to arrange the page sequence. 3. Click 'Merge PDF' to instantly generate and download your combined, KYC-ready document with zero server upload.",
         "target_badge": "Combined Identity Mode (Under 1MB KYC Ready)",
+        "custom_hint": "Upload Aadhaar (Front & Back) + PAN Card as Photos (JPG/PNG) or PDFs",
         "portal_specs": [
             {"name": "Bank Account Opening & KYC (SBI, HDFC, ICICI)", "size": "Under 1 MB or 2 MB", "format": "Single PDF", "notes": "Must contain both Aadhaar and PAN in one file"},
+            {"name": "Demat & Stock Trading KYC (Zerodha, Groww, Upstox)", "size": "Under 1 MB or 2 MB", "format": "Single PDF", "notes": "Mandatory PAN and Aadhaar proof of address & identity"},
             {"name": "Income Tax PAN-Aadhaar Linking Proof", "size": "Under 1 MB", "format": "PDF", "notes": "Used during grievance redressal on incometax.gov.in"},
             {"name": "Passport Seva & Visa Applications", "size": "Under 1 MB", "format": "PDF", "notes": "All identity numbers and dates of birth must be clearly visible"},
-            {"name": "Demat & Mutual Fund KYC (CAMS, Karvy, Zerodha)", "size": "Under 500 KB to 1 MB", "format": "Single PDF", "notes": "Clear color or high-contrast black & white scan"},
+            {"name": "Mutual Fund & CAMS / KFintech KYC", "size": "Under 500 KB to 1 MB", "format": "Single PDF", "notes": "Clear color or high-contrast black & white scan"},
         ],
         "features": [
             "Combines Aadhaar front, Aadhaar back, and PAN card into a single organized PDF document",
-            "Last Verified: October 2026 for PAN-Aadhaar Linking, Bank Account Opening & KYC Portals",
-            "Supports both image files (JPG, PNG) and existing PDF scans",
+            "Accepts mobile phone photos (JPG, PNG, WebP) and official PDF scans seamlessly",
+            "Auto-calibrates layout to standard A4 pages with zero quality loss",
             "100% client-side WebAssembly execution: sensitive biometric and ID numbers never leave your device",
         ],
         "how_to": [
-            {"name": "Add Aadhaar & PAN", "text": "Select your Aadhaar card (front/back) and PAN card files."},
-            {"name": "Arrange Order", "text": "Drag and drop the cards into the desired order (e.g., Aadhaar first, PAN second)."},
-            {"name": "Download Merged PDF", "text": "Generate your combined identity document ready for bank and government uploads."},
+            {"name": "Add Aadhaar & PAN", "text": "Select your Aadhaar card (front and back photos/PDF) and PAN card."},
+            {"name": "Arrange Sequence", "text": "Drag and drop the cards into your desired order (e.g. Aadhaar Page 1, PAN Page 2)."},
+            {"name": "Download Merged PDF", "text": "Generate your combined identity document ready for immediate bank and KYC uploads."},
         ],
         "sections": [
             {
                 "heading": "Why Banks, NBFCs, and Government Portals Require a Single Combined PDF",
                 "paragraphs": [
-                    "When completing Video KYC for bank accounts (SBI, HDFC, ICICI), opening Demat trading accounts, or submitting passport supporting documents, portal upload interfaces typically provide only a single file upload slot labeled 'Proof of Identity (POI) & Proof of Address (POA)'.",
-                    "Uploading separate image files is rejected by the portal validator. Merging your Aadhaar card and PAN card into a single well-structured PDF ensures all required identity details are submitted in one transaction.",
+                    "When completing Video KYC for bank accounts (SBI, HDFC, ICICI, Kotak), opening Demat trading accounts (Zerodha, Groww, AngelOne), or submitting passport supporting documents, upload interfaces typically provide only a single file upload slot labeled 'Proof of Identity (POI) & Proof of Address (POA)'.",
+                    "Uploading separate image files is rejected by the automated validator. Merging your Aadhaar card and PAN card into a single well-structured PDF ensures all required identity details are submitted in one seamless transaction.",
                 ]
             },
             {
                 "heading": "Handling Password-Protected e-Aadhaar Before Merging",
                 "paragraphs": [
-                    "Official e-Aadhaar PDFs downloaded from uidai.gov.in are encrypted with a password composed of the first 4 letters of your name in capital letters followed by your birth year (e.g., KANI1995). Document merger tools cannot merge password-encrypted PDFs directly.",
-                    "To merge your e-Aadhaar with your PAN card: first open PDFBolt's 'Unlock PDF' tool and enter your password. Download the unlocked PDF, then return here to merge it with your PAN card in seconds.",
+                    "Official e-Aadhaar PDFs downloaded from uidai.gov.in are encrypted with a password composed of the first 4 letters of your name in capital letters followed by your birth year (e.g. KANI1995). Standard document merger tools cannot merge password-encrypted PDFs directly.",
+                    "To merge your e-Aadhaar with your PAN card: first open PDFBolt's free <a href=\"/unlock-pdf/\" style=\"color: #2563eb; font-weight: 600;\">Unlock PDF</a> tool and enter your password. Download the unlocked PDF, then return here to merge it with your PAN card in seconds.",
                 ]
             },
             {
@@ -1089,12 +1091,20 @@ TARGETED_PAGES = [
         ],
         "faqs": [
             {"q": "Why do banking and KYC portals require Aadhaar and PAN in a single PDF?", "a": "Most automated KYC systems have only one document upload field for identity verification. Combining Aadhaar (address + identity) and PAN (tax identity) into one PDF allows the automated verification software to validate all credentials at once."},
-            {"q": "How do I merge my e-Aadhaar if it has a password?", "a": "e-Aadhaar PDFs have a password (first 4 letters of your name in caps + year of birth). First, unlock it using PDFBolt's Unlock PDF tool, then upload the unlocked file here along with your PAN card."},
-            {"q": "Can I merge JPG photo scans of my Aadhaar and PAN cards?", "a": "Yes! You can upload JPG, PNG, or PDF files. PDFBolt will convert images to clean, print-grade PDF pages and combine them seamlessly into one document."},
-            {"q": "How can I ensure the merged file stays under 500KB or 1MB for bank uploads?", "a": "After merging, if your combined PDF is larger than your portal's limit, drop it into PDFBolt's Compress PDF tool with 'Exact Target Size' set to 450 KB or 900 KB."},
+            {"q": "Can I upload camera photos (JPG / PNG) directly from my mobile phone?", "a": "Yes! PDFBolt allows you to upload JPG, PNG, WebP photos or PDF files interchangeably. Our engine automatically converts photos into high-resolution A4 PDF pages and merges them in the sequence you specify."},
+            {"q": "How do I merge my e-Aadhaar if it has a password?", "a": "e-Aadhaar PDFs have an 8-character password (first 4 letters of your name in caps + year of birth). First, unlock it using PDFBolt's Unlock PDF tool, then upload the unlocked file here along with your PAN card."},
+            {"q": "How can I ensure the merged file stays under 1MB or 2MB for bank uploads?", "a": "After merging, if your combined PDF is larger than your portal's limit, use PDFBolt's Compress PDF tool with 'Exact Target Size' set to 900 KB or 1.8 MB to stay safely under the ceiling."},
             {"q": "Are my Aadhaar and PAN numbers safe when using PDFBolt?", "a": "Completely safe. PDFBolt executes 100% inside your browser using client-side WebAssembly. No files, metadata, or document bytes are ever sent to our servers or third parties."},
         ],
-        "related": [("compress-pdf-for-upsc", "Compress Pdf For Upsc"), ("compress-pdf-to-200kb", "Compress Pdf To 200Kb"), ("pdf-size-reducer-for-government-portal", "Pdf Size Reducer For Government Portal"), ("jpg-to-pdf-for-exam", "Jpg To Pdf For Exam")]
+        "related": [
+            ("merge-pdf", "Merge PDF"),
+            ("unlock-pdf", "Unlock PDF (e-Aadhaar)"),
+            ("compress-pdf-to-1mb", "Compress to 1MB"),
+            ("compress-pdf-to-500kb", "Compress to 500KB"),
+            ("jpg-to-pdf", "JPG to PDF"),
+            ("pdf-to-jpg-for-aadhaar", "PDF to JPG for Aadhaar"),
+            ("compress-pdf-to-200kb", "Compress to 200KB")
+        ]
     },
     {
         "path": "merge-documents-for-visa-application",

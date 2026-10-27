@@ -13,9 +13,10 @@ export interface MergeToolProps {
   darkMode: boolean;
   notify: NotifySystem;
   customHint?: string;
+  allowImages?: boolean;
 }
 
-const MergeTool: React.FC<MergeToolProps> = ({ darkMode, notify, customHint }) => {
+const MergeTool: React.FC<MergeToolProps> = ({ darkMode, notify, customHint, allowImages = false }) => {
   const { setHasActiveWork } = useActiveWork();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [files, setFiles] = useState<File[]>([]);
@@ -46,16 +47,20 @@ const MergeTool: React.FC<MergeToolProps> = ({ darkMode, notify, customHint }) =
     if (nf.length === 0) return;
     setErrorMessage(null);
 
-    // Validate PDF files
+    const allowedTypes = allowImages
+      ? [...ALLOWED_MIME_TYPES.PDF, ...ALLOWED_MIME_TYPES.IMAGE]
+      : ALLOWED_MIME_TYPES.PDF;
+
+    // Validate files
     const validation = await validateFiles(nf, {
-      allowedTypes: ALLOWED_MIME_TYPES.PDF,
+      allowedTypes,
       maxSize: MAX_FILE_SIZE.PDF,
       maxFiles: 50,
-      checkStructure: true
+      checkStructure: !allowImages
     });
 
     if (!validation.valid) {
-      setErrorMessage(validation.error || 'Invalid PDF files selected.');
+      setErrorMessage(validation.error || 'Invalid files selected.');
       return;
     }
 
@@ -149,6 +154,7 @@ const MergeTool: React.FC<MergeToolProps> = ({ darkMode, notify, customHint }) =
           )}
           <FileUploader 
             onFilesSelected={handleFiles} 
+            accept={allowImages ? ".pdf,image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp" : ".pdf"}
             darkMode={darkMode}
             warning={ramWarning}
             onClearWarning={() => setRamWarning(null)}
@@ -354,7 +360,7 @@ const MergeTool: React.FC<MergeToolProps> = ({ darkMode, notify, customHint }) =
       <input
         type="file"
         multiple
-        accept=".pdf"
+        accept={allowImages ? ".pdf,image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp" : ".pdf"}
         className="hidden"
         ref={fileInputRef}
         onChange={(e) => {

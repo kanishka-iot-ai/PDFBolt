@@ -135,6 +135,7 @@ const TargetedCompressPage: React.FC<TargetedCompressPageProps> = ({ pageSlug: p
               darkMode={darkMode}
               notify={notify}
               customHint={page.customHint}
+              allowImages={page.slug === 'merge-aadhaar-and-pan-card' || page.slug.includes('merge')}
             />
           )}
 
