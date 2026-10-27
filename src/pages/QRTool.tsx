@@ -276,9 +276,7 @@ const QRTool: React.FC<QRToolProps> = ({ darkMode, notify }) => {
                 {/* Expiry / Retention Options */}
                 <div className="space-y-2">
                   <label className="text-xs font-bold uppercase text-slate-400 tracking-wider">Access Duration</label>
-                  <select
-                    value={durationSeconds}
-                    onChange={(e) => setDurationSeconds(Number(e.target.value))}
+                  <select id="qr-retention-select" name="durationSeconds" value={durationSeconds} onChange={(e) => setDurationSeconds(Number(e.target.value))}
                     className={`w-full p-4 rounded-xl font-bold text-sm border outline-none transition-all ${
                       darkMode ? 'bg-slate-900 border-slate-700 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
                     }`}

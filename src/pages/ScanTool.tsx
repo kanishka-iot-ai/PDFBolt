@@ -468,6 +468,8 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
             {/* Native Mobile Camera Input: Google ML Kit (Android) & Apple VisionKit (iOS) */}
             <input
                 ref={nativeCameraInputRef}
+                id="scan-camera-input"
+                name="scanCameraInput"
                 type="file"
                 accept="image/*"
                 capture="environment"
@@ -479,6 +481,8 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
             {/* Gallery & File System Inputs */}
             <input
                 ref={galleryInputRef}
+                id="scan-gallery-input"
+                name="scanGalleryInput"
                 type="file"
                 accept="image/*"
                 multiple
@@ -487,6 +491,8 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
             />
             <input
                 ref={fileInputRef}
+                id="scan-file-input"
+                name="scanFileInput"
                 type="file"
                 accept="image/*,.pdf"
                 multiple

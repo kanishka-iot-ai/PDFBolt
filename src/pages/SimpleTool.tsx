@@ -946,10 +946,10 @@ const SimpleTool: React.FC<SimpleToolProps> = ({ title, mode, darkMode, notify, 
                         </p>
                       </div>
                     ) : (
-                      <label className="w-48 aspect-[1/1.414] rounded-xl border-2 border-dashed border-blue-400 dark:border-blue-700 flex flex-col items-center justify-center text-xs text-blue-600 dark:text-blue-400 font-bold cursor-pointer hover:bg-blue-50/50">
+                      <label htmlFor="simple-tool-file2-input" className="w-48 aspect-[1/1.414] rounded-xl border-2 border-dashed border-blue-400 dark:border-blue-700 flex flex-col items-center justify-center text-xs text-blue-600 dark:text-blue-400 font-bold cursor-pointer hover:bg-blue-50/50">
                         <Plus size={24} className="mb-1" />
                         <span>Upload File 2</span>
-                        <input type="file" accept=".pdf" className="hidden" onChange={e => { if (e.target.files?.[0]) { handle([e.target.files[0]]); e.target.value = ''; } }} />
+                        <input id="simple-tool-file2-input" name="simpleToolFile2" type="file" accept=".pdf" className="hidden" onChange={e => { if (e.target.files?.[0]) { handle([e.target.files[0]]); e.target.value = ''; } }} />
                       </label>
                     )}
                   </div>
@@ -959,13 +959,15 @@ const SimpleTool: React.FC<SimpleToolProps> = ({ title, mode, darkMode, notify, 
 
             {/* Floating Add More Button on the Canvas Top Right */}
             <div className="absolute top-4 sm:top-6 right-4 sm:right-6 z-10">
-              <label className="relative flex items-center justify-center w-11 h-11 rounded-full bg-[#e53935] hover:bg-[#d32f2f] text-white shadow-xl hover:scale-105 transition-all cursor-pointer" title="Add more files">
+              <label htmlFor="simple-tool-add-more-input" className="relative flex items-center justify-center w-11 h-11 rounded-full bg-[#e53935] hover:bg-[#d32f2f] text-white shadow-xl hover:scale-105 transition-all cursor-pointer" title="Add more files">
                 <Plus size={22} />
                 <span className="absolute -top-1 -left-1 w-5 h-5 rounded-full bg-black text-white text-[10px] font-black flex items-center justify-center border-2 border-white">
                   {multiFiles.length > 0 ? multiFiles.length : 1}
                 </span>
                 <input
                   type="file"
+                  id="simple-tool-add-more-input"
+                  name="simpleToolAddMore"
                   accept={getAcceptAttribute(mode, isImageTool)}
                   multiple={isImageTool || mode === 'compare'}
                   className="hidden"
@@ -1077,9 +1079,11 @@ const SimpleTool: React.FC<SimpleToolProps> = ({ title, mode, darkMode, notify, 
               {mode === 'watermark' && (
                 <div className="space-y-4">
                   <div className="space-y-1.5">
-                    <label className="block text-xs font-black uppercase tracking-widest text-slate-500">Watermark Text</label>
+                    <label htmlFor="watermark-text-input" className="block text-xs font-black uppercase tracking-widest text-slate-500">Watermark Text</label>
                     <input
                       type="text"
+                      id="watermark-text-input"
+                      name="watermarkText"
                       value={watermarkText}
                       onChange={(e) => setWatermarkText(e.target.value)}
                       placeholder="CONFIDENTIAL"
@@ -1088,11 +1092,13 @@ const SimpleTool: React.FC<SimpleToolProps> = ({ title, mode, darkMode, notify, 
                   </div>
                   <div className="space-y-1.5">
                     <div className="flex justify-between items-center">
-                      <label className="block text-xs font-black uppercase tracking-widest text-slate-500">Font Size ({watermarkSize})</label>
+                      <label htmlFor="watermark-size-slider" className="block text-xs font-black uppercase tracking-widest text-slate-500">Font Size ({watermarkSize})</label>
                       <span className="text-xs font-bold text-yellow-600 dark:text-yellow-400">{watermarkSize}px</span>
                     </div>
                     <input
                       type="range"
+                      id="watermark-size-slider"
+                      name="watermarkSize"
                       min="10"
                       max="200"
                       value={watermarkSize}
@@ -1106,11 +1112,13 @@ const SimpleTool: React.FC<SimpleToolProps> = ({ title, mode, darkMode, notify, 
               {/* Page Inputs */}
               {needsPageInput && (
                 <div className="space-y-2">
-                  <label className="block text-xs font-black uppercase tracking-widest text-slate-500">
+                  <label htmlFor="simple-page-input" className="block text-xs font-black uppercase tracking-widest text-slate-500">
                     {mode === 'organize' ? 'New Page Order' : mode === 'split' ? 'Page Range to Extract' : 'Pages to Delete'}
                   </label>
                   <input
                     type="text"
+                    id="simple-page-input"
+                    name="pageRange"
                     value={pageInput}
                     onChange={(e) => {
                       setPageInput(e.target.value);
@@ -1152,12 +1160,15 @@ const SimpleTool: React.FC<SimpleToolProps> = ({ title, mode, darkMode, notify, 
               {needsPassword && (
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <label className="block text-xs font-black uppercase tracking-widest text-slate-500">
+                    <label htmlFor="simple-doc-password" className="block text-xs font-black uppercase tracking-widest text-slate-500">
                       {mode === 'protect' ? 'Set Document Password' : 'Enter Password'}
                     </label>
                     <div className="relative">
                       <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                       <input
+                        id="simple-doc-password"
+                        name="docPassword"
+                        autoComplete="current-password"
                         type={showPassword ? 'text' : 'password'}
                         value={password}
                         onChange={(e) => {
@@ -1240,7 +1251,7 @@ const SimpleTool: React.FC<SimpleToolProps> = ({ title, mode, darkMode, notify, 
                     <div className="space-y-3 p-4 rounded-2xl border bg-slate-50/50 dark:bg-slate-800/40 border-slate-200 dark:border-slate-700">
                       <div>
                         <div className="flex justify-between items-center mb-1.5">
-                          <label className="text-xs font-black uppercase tracking-wider text-slate-700 dark:text-slate-200">
+                          <label htmlFor="target-kb-input" className="text-xs font-black uppercase tracking-wider text-slate-700 dark:text-slate-200">
                             Target Maximum File Size
                           </label>
                           <span className="text-xs font-black text-yellow-700 dark:text-yellow-400">
@@ -1250,6 +1261,8 @@ const SimpleTool: React.FC<SimpleToolProps> = ({ title, mode, darkMode, notify, 
                         <div className="relative">
                           <input
                             type="number"
+                            id="target-kb-input"
+                            name="targetKb"
                             min="10"
                             max="10000"
                             step="10"

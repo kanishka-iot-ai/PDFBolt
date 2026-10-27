@@ -267,10 +267,12 @@ ${message}`)}`;
             {/* Name & Email Fields */}
             <div className="grid sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-[11px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 ml-1">
+                <label htmlFor="contact-user-name" className="text-[11px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 ml-1">
                   Your Name
                 </label>
                 <input 
+                  id="contact-user-name"
+                  autoComplete="name"
                   required 
                   name="user_name" 
                   type="text" 
@@ -284,10 +286,12 @@ ${message}`)}`;
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-[11px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 ml-1">
+                <label htmlFor="contact-user-email" className="text-[11px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 ml-1">
                   Your Email
                 </label>
                 <input 
+                  id="contact-user-email"
+                  autoComplete="email"
                   required 
                   name="user_email" 
                   type="email" 
@@ -303,10 +307,11 @@ ${message}`)}`;
 
             {/* Message Area */}
             <div className="space-y-1.5">
-              <label className="text-[11px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 ml-1">
+              <label htmlFor="contact-message" className="text-[11px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 ml-1">
                 Your Message
               </label>
               <textarea 
+                id="contact-message"
                 required 
                 name="message" 
                 rows={5} 

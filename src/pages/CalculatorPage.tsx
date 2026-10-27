@@ -89,12 +89,14 @@ const CalculatorPage: React.FC<CalculatorPageProps> = ({ darkMode }) => {
             {/* Current Size Slider */}
             <div>
               <div className="flex justify-between items-center mb-2">
-                <label className={`text-sm font-bold ${darkMode ? 'text-slate-300' : 'text-slate-700'}`}>
+                <label htmlFor="calc-file-size" className={`text-sm font-bold ${darkMode ? 'text-slate-300' : 'text-slate-700'}`}>
                   Current PDF File Size
                 </label>
                 <span className="text-sm font-black text-yellow-700 dark:text-yellow-400">{currentSizeMB} MB</span>
               </div>
               <input
+                id="calc-file-size"
+                name="currentSizeMB"
                 type="range"
                 min="1"
                 max="200"
@@ -113,12 +115,14 @@ const CalculatorPage: React.FC<CalculatorPageProps> = ({ darkMode }) => {
             {/* Page Count */}
             <div>
               <div className="flex justify-between items-center mb-2">
-                <label className={`text-sm font-bold ${darkMode ? 'text-slate-300' : 'text-slate-700'}`}>
+                <label htmlFor="calc-page-count" className={`text-sm font-bold ${darkMode ? 'text-slate-300' : 'text-slate-700'}`}>
                   Total Pages
                 </label>
                 <span className="text-sm font-black text-yellow-700 dark:text-yellow-400">{pageCount} Pages</span>
               </div>
               <input
+                id="calc-page-count"
+                name="pageCount"
                 type="range"
                 min="1"
                 max="500"

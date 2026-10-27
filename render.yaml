@@ -256,6 +256,19 @@ services:
       - type: redirect
         source: /split-pdf-pages
         destination: /split-pdf/
+      # Security Hardening: Explicit 404 rewrite for dotfiles & sensitive keys (Stops scanner 200 SPA fallback)
+      - type: rewrite
+        source: /.env*
+        destination: /404.html
+      - type: rewrite
+        source: /.git/*
+        destination: /404.html
+      - type: rewrite
+        source: /server.key
+        destination: /404.html
+      - type: rewrite
+        source: /*.key
+        destination: /404.html
       # Fallback SPA rewrite for dynamic routes
       - type: rewrite
         source: /*
@@ -278,7 +291,7 @@ services:
         value: camera=(self), microphone=(), geolocation=()
       - path: /*
         name: Content-Security-Policy
-        value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://pagead2.googlesyndication.com https://www.googletagmanager.com https://*.clarity.ms; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self' https://pdfbolt.in https://pdfbolt-api.onrender.com https://generativelanguage.googleapis.com blob: data: https://www.google-analytics.com https://*.clarity.ms https://*.bing.com; frame-src 'self' https://googleads.g.doubleclick.net https://www.googletagmanager.com; object-src 'none'; base-uri 'self';"
+        value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://pagead2.googlesyndication.com https://adservice.google.com https://tpc.googlesyndication.com https://www.googletagmanager.com https://*.clarity.ms https://scripts.clarity.ms; worker-src 'self' blob:; child-src 'self' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https: https://*.google-analytics.com https://*.googlesyndication.com https://*.doubleclick.net https://*.clarity.ms https://*.bing.com; font-src 'self' data:; connect-src 'self' blob: data: https://pdfbolt.in https://www.pdfbolt.in https://pdfbolt-api.onrender.com https://generativelanguage.googleapis.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://pagead2.googlesyndication.com https://*.googlesyndication.com https://*.adtrafficquality.google https://googleads.g.doubleclick.net https://*.doubleclick.net https://*.google.com https://*.clarity.ms https://*.bing.com; frame-src 'self' https://googleads.g.doubleclick.net https://tpc.googlesyndication.com https://www.google.com https://pagead2.googlesyndication.com https://www.googletagmanager.com; object-src 'none'; base-uri 'self'; form-action 'self';"
       - path: /assets/*
         name: Cache-Control
         value: public, max-age=31536000, immutable

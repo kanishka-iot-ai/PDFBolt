@@ -381,11 +381,13 @@ const CompressTool: React.FC<CompressToolProps> = ({ darkMode, notify }) => {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <div>
                       <div className="flex justify-between text-xs font-bold mb-1">
-                        <span>JPEG Quality</span>
+                        <label htmlFor="compress-jpeg-quality">JPEG Quality</label>
                         <span className="text-yellow-500">{customQuality}%</span>
                       </div>
                       <input
                         type="range"
+                        id="compress-jpeg-quality"
+                        name="customQuality"
                         min="20"
                         max="95"
                         value={customQuality}

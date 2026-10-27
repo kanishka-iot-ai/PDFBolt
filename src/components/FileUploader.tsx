@@ -186,6 +186,8 @@ const FileUploader: React.FC<FileUploaderProps> = ({
       {/* Hidden File Inputs */}
       <input
         type="file"
+        id="pdf-file-upload-input"
+        name="pdfFileUpload"
         ref={fileInputRef}
         onChange={handleFileInput}
         accept={accept}
@@ -194,6 +196,8 @@ const FileUploader: React.FC<FileUploaderProps> = ({
       />
       <input
         type="file"
+        id="pdf-folder-upload-input"
+        name="pdfFolderUpload"
         ref={folderInputRef}
         onChange={handleFileInput}
         // @ts-ignore

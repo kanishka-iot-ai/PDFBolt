@@ -230,9 +230,7 @@ const TranscriptionEditor: React.FC<TranscriptionEditorProps> = ({
 
           {/* Editable Text Area */}
           <div className="relative flex-grow flex flex-col">
-            <textarea
-              value={currentPage.text}
-              onChange={(e) => onUpdatePageText(currentPageIndex, e.target.value)}
+            <textarea id="transcription-editor-text" name="transcriptionText" value={currentPage.text} onChange={(e) => onUpdatePageText(currentPageIndex, e.target.value)}
               placeholder="Transcribed handwritten text will appear here. You can freely edit, format, or type new text."
               rows={16}
               className={`w-full flex-grow p-4 rounded-2xl border font-sans text-sm md:text-base leading-relaxed resize-none outline-none focus:ring-2 focus:ring-yellow-500 transition-all ${

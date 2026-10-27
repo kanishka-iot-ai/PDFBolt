@@ -403,10 +403,7 @@ ${analysis.keyFindings.map((kf, i) => `${i + 1}. ${kf}`).join('\n')}
                 onSubmit={(e) => { e.preventDefault(); handleAsk(); }}
                 className="flex gap-2"
               >
-                <input
-                  type="text"
-                  value={question}
-                  onChange={(e) => setQuestion(e.target.value)}
+                <input id="analyzer-question-input" name="question" autoComplete="off" type="text" value={question} onChange={(e) => setQuestion(e.target.value)}
                   placeholder="Ask a question about this document..."
                   aria-label="Ask a question about this document"
                   disabled={asking}

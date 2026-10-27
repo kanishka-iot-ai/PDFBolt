@@ -42,6 +42,7 @@ temp/
 uploads/
 storage/
 jobs/
+scratch/
 
 # Private certificates, tokens, and keys
 *.pem

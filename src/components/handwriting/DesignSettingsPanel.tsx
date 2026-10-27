@@ -60,10 +60,12 @@ const DesignSettingsPanel: React.FC<DesignSettingsPanelProps> = ({
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         {/* Document Title */}
         <div className="col-span-full">
-          <label className="block text-xs font-black uppercase tracking-wider text-slate-400 mb-2">
+          <label htmlFor="handwriting-doc-title" className="block text-xs font-black uppercase tracking-wider text-slate-400 mb-2">
             Document Title
           </label>
           <input
+            id="handwriting-doc-title"
+            name="documentTitle"
             type="text"
             value={settings.documentTitle}
             onChange={(e) => updateSetting('documentTitle', e.target.value)}
@@ -126,10 +128,12 @@ const DesignSettingsPanel: React.FC<DesignSettingsPanelProps> = ({
 
         {/* Font Family */}
         <div>
-          <label className="block text-xs font-black uppercase tracking-wider text-slate-400 mb-2">
+          <label htmlFor="handwriting-font-family" className="block text-xs font-black uppercase tracking-wider text-slate-400 mb-2">
             Font Family
           </label>
           <select
+            id="handwriting-font-family"
+            name="fontFamily"
             value={settings.font}
             onChange={(e) => updateSetting('font', e.target.value as FontFamily)}
             className={`w-full px-4 py-2.5 rounded-xl border text-xs font-bold outline-none ${

@@ -359,6 +359,8 @@ const MergeTool: React.FC<MergeToolProps> = ({ darkMode, notify, customHint, all
       {/* Hidden uploader for 'Add More' button */}
       <input
         type="file"
+        id="merge-tool-add-more-input"
+        name="mergeToolAddMore"
         multiple
         accept={allowImages ? ".pdf,image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp" : ".pdf"}
         className="hidden"

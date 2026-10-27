@@ -534,9 +534,9 @@ const EditTool: React.FC<EditToolProps> = ({ darkMode, notify }) => {
                     >
                         <Type size={20} />
                     </button>
-                    <label className="p-3 rounded-xl transition-all cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700" aria-label="Upload and insert image" title="Add Image">
+                    <label htmlFor="edit-tool-image-input" className="p-3 rounded-xl transition-all cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700" aria-label="Upload and insert image" title="Add Image">
                         <ImageIcon size={20} />
-                        <input type="file" accept="image/*" className="hidden" onChange={handleAddImage} />
+                        <input id="edit-tool-image-input" name="editToolImage" type="file" accept="image/*" className="hidden" onChange={handleAddImage} />
                     </label>
                     <button
                         type="button"
