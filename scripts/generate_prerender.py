@@ -44,7 +44,7 @@ CANONICAL_TOOLS = [
             {"q": "Will merging PDFs decrease image or text quality?", "a": "Never. PDFBolt preserves the original vector typography, embedded color profiles, and high-resolution images without lossy compression."},
             {"q": "Are my files uploaded to any server?", "a": "No. PDFBolt executes 100% locally in your web browser. Your confidential files never leave your device."}
         ],
-        "related": [("compress-pdf", "Compress PDF"), ("split-pdf", "Split PDF"), ("organize-pdf", "Organize PDF Pages"), ("add-page-numbers-to-pdf", "Add Page Numbers")]
+        "related": [("compress-pdf", "Compress PDF"), ("split-pdf", "Split PDF"), ("merge-aadhaar-and-pan-card", "Merge Aadhaar & PAN Card"), ("merge-documents-for-visa-application", "Merge Documents for Visa Application"), ("guides/how-to-merge-pdf-files", "How to Merge PDF Files (Guide)"), ("organize-pdf", "Organize PDF Pages")]
     },
     {
         "path": "split-pdf",
@@ -76,7 +76,7 @@ CANONICAL_TOOLS = [
             {"q": "Can I extract non-consecutive pages?", "a": "Yes! Enter comma-separated ranges such as '1-3, 5, 8, 10-12' to extract exactly the pages you need."},
             {"q": "Does splitting remove bookmarks?", "a": "Relevant page bookmarks and internal hyperlinks are retained for the extracted pages."}
         ],
-        "related": [("merge-pdf", "Merge PDF"), ("delete-pdf-pages", "Delete PDF Pages"), ("organize-pdf", "Organize PDF"), ("compress-pdf", "Compress PDF")]
+        "related": [("merge-pdf", "Merge PDF"), ("delete-pdf-pages", "Delete PDF Pages"), ("guides/how-to-split-a-pdf", "How to Split PDF Pages (Guide)"), ("guides/how-to-remove-pages-from-pdf", "How to Delete & Remove Pages (Guide)"), ("organize-pdf", "Organize PDF"), ("compress-pdf", "Compress PDF")]
     },
     {
         "path": "compress-pdf",
@@ -157,7 +157,7 @@ CANONICAL_TOOLS = [
             {"q": "Can I edit the converted file in Google Docs?", "a": "Yes! The output is a standard OpenXML .docx file 100% compatible with Word, Google Docs, and Pages."},
             {"q": "Does this work on scanned PDFs?", "a": "Yes, our neural OCR engine recognizes scanned pages and turns them into editable text."}
         ],
-        "related": [("word-to-pdf", "Word to PDF"), ("pdf-to-excel", "PDF to Excel"), ("pdf-to-ppt", "PDF to PowerPoint"), ("ocr-pdf", "OCR PDF")]
+        "related": [("word-to-pdf", "Word to PDF"), ("pdf-to-excel", "PDF to Excel"), ("guides/how-to-convert-pdf-to-word", "How to Convert PDF to Word (Guide)"), ("encyclopedia/what-is-pdf", "What is a PDF? Format Architecture"), ("pdf-to-ppt", "PDF to PowerPoint"), ("ocr-pdf", "OCR PDF")]
     },
     {
         "path": "pdf-to-excel",
@@ -188,7 +188,7 @@ CANONICAL_TOOLS = [
         "faqs": [
             {"q": "Will multi-page bank statements export to multiple sheets?", "a": "Yes, each document page generates a dedicated worksheet, with table data aligned sequentially."}
         ],
-        "related": [("excel-to-pdf", "Excel to PDF"), ("pdf-to-word", "PDF to Word"), ("ocr-pdf", "OCR PDF"), ("split-pdf", "Split PDF")]
+        "related": [("excel-to-pdf", "Excel to PDF"), ("pdf-to-word", "PDF to Word"), ("guides/how-to-convert-pdf-to-excel", "How to Convert PDF Tables to Excel (Guide)"), ("ocr-pdf", "OCR PDF"), ("split-pdf", "Split PDF")]
     },
     {
         "path": "pdf-to-ppt",
@@ -374,7 +374,7 @@ CANONICAL_TOOLS = [
         "faqs": [
             {"q": "Can I combine different image formats?", "a": "Yes! You can mix JPG, PNG, and WebP images in the same PDF."}
         ],
-        "related": [("pdf-to-jpg", "PDF to JPG"), ("scan-to-pdf", "Scan to PDF"), ("merge-pdf", "Merge PDF"), ("compress-pdf", "Compress PDF")]
+        "related": [("pdf-to-jpg", "PDF to JPG"), ("jpg-to-pdf-for-exam", "JPG to PDF for Exam Portals"), ("merge-aadhaar-and-pan-card", "Merge Aadhaar & PAN Card"), ("scan-to-pdf", "Scan to PDF"), ("merge-pdf", "Merge PDF"), ("compress-pdf", "Compress PDF")]
     },
     {
         "path": "html-to-pdf",
@@ -436,7 +436,7 @@ CANONICAL_TOOLS = [
         "faqs": [
             {"q": "Does PDFBolt place a watermark on my edited PDF?", "a": "Never! All PDFBolt tools are 100% free with zero watermarks or ads embedded in your documents."}
         ],
-        "related": [("sign-pdf", "Sign PDF"), ("redact-pdf", "Redact PDF"), ("watermark-pdf", "Watermark PDF"), ("organize-pdf", "Organize PDF")]
+        "related": [("sign-pdf", "Sign PDF"), ("redact-pdf", "Redact PDF"), ("guides/how-to-edit-a-pdf", "How to Edit a PDF Document (Guide)"), ("compare/adobe-acrobat-alternative", "Adobe Acrobat Free Alternative"), ("encyclopedia/what-is-pdf", "What is a PDF Document?"), ("watermark-pdf", "Watermark PDF"), ("organize-pdf", "Organize PDF")]
     },
     {
         "path": "protect-pdf",
@@ -529,7 +529,7 @@ CANONICAL_TOOLS = [
         "faqs": [
             {"q": "Is my signature saved on a server?", "a": "Never. Your signature is drawn in client-side memory and embedded directly into your PDF."}
         ],
-        "related": [("protect-pdf", "Protect PDF"), ("edit-pdf", "Edit PDF"), ("redact-pdf", "Redact PDF"), ("watermark-pdf", "Watermark PDF")]
+        "related": [("protect-pdf", "Protect PDF"), ("edit-pdf", "Edit PDF"), ("guides/how-to-sign-a-pdf", "How to Electronically Sign a PDF (Guide)"), ("encyclopedia/pdf-vs-pdfa", "PDF vs PDF/A Archival Standards"), ("redact-pdf", "Redact PDF"), ("watermark-pdf", "Watermark PDF")]
     },
     {
         "path": "redact-pdf",
@@ -560,7 +560,7 @@ CANONICAL_TOOLS = [
         "faqs": [
             {"q": "Can someone inspect the PDF source code to see redacted text?", "a": "No! True redaction permanently deletes the underlying character codes from the PDF file."}
         ],
-        "related": [("protect-pdf", "Protect PDF"), ("edit-pdf", "Edit PDF"), ("delete-pdf-pages", "Delete PDF Pages"), ("repair-pdf", "Repair PDF")]
+        "related": [("protect-pdf", "Protect PDF"), ("edit-pdf", "Edit PDF"), ("guides/how-to-redact-a-pdf", "How to Permanently Redact Sensitive Data (Guide)"), ("delete-pdf-pages", "Delete PDF Pages"), ("repair-pdf", "Repair PDF")]
     },
     {
         "path": "ocr-pdf",
@@ -591,7 +591,7 @@ CANONICAL_TOOLS = [
         "faqs": [
             {"q": "What languages are supported?", "a": "English and Latin-based languages are fully supported with high recognition accuracy."}
         ],
-        "related": [("pdf-to-word", "PDF to Word"), ("scan-to-pdf", "Scan to PDF"), ("scan-handwriting-to-pdf", "Scan Handwriting to PDF"), ("pdf-to-excel", "PDF to Excel")]
+        "related": [("pdf-to-word", "PDF to Word"), ("scan-to-pdf", "Scan to PDF"), ("guides/how-to-ocr-a-pdf", "How to OCR a PDF to Searchable Text (Guide)"), ("encyclopedia/what-is-ocr", "What is Optical Character Recognition (OCR)?"), ("encyclopedia/searchable-pdf-vs-scanned-pdf", "Searchable vs Scanned PDF Guide"), ("scan-handwriting-to-pdf", "Scan Handwriting to PDF"), ("pdf-to-excel", "PDF to Excel")]
     },
     {
         "path": "scan-to-pdf",
@@ -622,7 +622,7 @@ CANONICAL_TOOLS = [
         "faqs": [
             {"q": "Are my camera photos sent to a server?", "a": "No. All camera frames and PDF compiling take place locally in your browser."}
         ],
-        "related": [("ocr-pdf", "OCR PDF"), ("scan-handwriting-to-pdf", "Scan Handwriting"), ("jpg-to-pdf", "JPG to PDF"), ("compress-pdf", "Compress PDF")]
+        "related": [("ocr-pdf", "OCR PDF"), ("scan-handwriting-to-pdf", "Scan Handwriting"), ("encyclopedia/vector-vs-raster-pdf", "Vector vs Raster PDF: Resolution Guide"), ("encyclopedia/what-is-pdf", "What is a PDF Document?"), ("jpg-to-pdf", "JPG to PDF"), ("compress-pdf", "Compress PDF")]
     },
     {
         "path": "scan-handwriting-to-pdf",
@@ -1710,7 +1710,7 @@ def generate_prerendered_pages():
           </div>
 
           <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; margin-bottom: 36px;">
-            <h2 style="font-size: 1.25rem; font-weight: 700; color: #0f172a; margin: 0 0 12px 0;">Related PDF Utilities</h2>
+            <h2 style="font-size: 1.25rem; font-weight: 700; color: #0f172a; margin: 0 0 12px 0;">Related PDF Utilities &amp; In-Depth Guides</h2>
             <ul style="padding-left: 20px; margin: 0;">
               {related_li}
             </ul>
