@@ -102,13 +102,30 @@ CANONICAL_TOOLS = [
                 "paragraphs": [
                     "Unlike crude compressors that convert entire pages into blurry JPEG screenshots, PDFBolt analyzes individual document streams. We purge unreferenced font subsets, deduplicate embedded objects, and optimize image bitmaps while keeping text razor-sharp at any zoom level."
                 ]
+            },
+            {
+                "heading": "Target Size Presets for Government & Exam Portals",
+                "paragraphs": [
+                    "Need your PDF resized to meet an exact portal limit? Use our specialized target size compressors designed for Indian government portals, recruitment exams, and visa submissions: <a href=\"/compress-pdf-to-300kb/\" style=\"color: #2563eb; font-weight: 600;\">Compress PDF to 300KB</a> (for UPSC OTR, EPFO passbook, AICTE scholarships, and Udyam/FSSAI licensing), <a href=\"/compress-pdf-to-200kb/\" style=\"color: #2563eb; font-weight: 600;\">Compress PDF to 200KB</a> (for UPSC CSE, JEE Mains, and NEET), <a href=\"/compress-pdf-to-100kb/\" style=\"color: #2563eb; font-weight: 600;\">Compress PDF to 100KB</a> (for CBSE and ICSE boards), <a href=\"/compress-pdf-to-50kb/\" style=\"color: #2563eb; font-weight: 600;\">Compress PDF to 50KB</a>, and <a href=\"/compress-pdf-to-20kb/\" style=\"color: #2563eb; font-weight: 600;\">Compress PDF to 20KB</a> (for SSC and signature uploads)."
+                ]
             }
         ],
         "faqs": [
             {"q": "How small can PDFBolt make my file?", "a": "Depending on image density, PDFBolt routinely achieves 50% to 85% file size reductions."},
-            {"q": "Will my text look blurry after compression?", "a": "No. PDFBolt preserves vector fonts so text remains clean and crisp even on high-DPI displays."}
+            {"q": "Will my text look blurry after compression?", "a": "No. PDFBolt preserves vector fonts so text remains clean and crisp even on high-DPI displays."},
+            {"q": "Can I compress a PDF to an exact size like 300KB or 200KB?", "a": "Yes! PDFBolt offers dedicated target size tools including 20KB, 50KB, 100KB, 200KB, 300KB, 500KB, and 1MB with automatic DPI and quality optimization to hit exact portal thresholds without manual guesswork."}
         ],
-        "related": [("merge-pdf", "Merge PDF"), ("pdf-to-jpg", "PDF to JPG"), ("split-pdf", "Split PDF"), ("repair-pdf", "Repair Damaged PDF")]
+        "related": [
+            ("compress-pdf-to-300kb", "Compress PDF to 300KB"),
+            ("compress-pdf-to-200kb", "Compress PDF to 200KB"),
+            ("compress-pdf-to-100kb", "Compress PDF to 100KB"),
+            ("compress-pdf-to-50kb", "Compress PDF to 50KB"),
+            ("compress-pdf-to-20kb", "Compress PDF to 20KB"),
+            ("compress-pdf-to-500kb", "Compress PDF to 500KB"),
+            ("compress-pdf-to-1mb", "Compress PDF to 1MB"),
+            ("merge-pdf", "Merge PDF"),
+            ("split-pdf", "Split PDF")
+        ]
     },
     {
         "path": "pdf-to-word",

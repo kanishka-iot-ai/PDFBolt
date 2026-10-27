@@ -25,6 +25,8 @@ coverage/
 htmlcov/
 .coverage
 .coverage.*
+.pytest_tmp*/
+temp_pytest_run/
 
 # Logs
 *.log

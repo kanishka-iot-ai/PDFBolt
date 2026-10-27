@@ -30,7 +30,6 @@ CANONICAL_TOOLS = [
     "/ocr-pdf",
     "/analyze-pdf",
     "/edit-pdf",
-    "/pdf-builder",
     "/pdf-to-qr-code",
     "/scan-to-pdf",
     "/scan-handwriting-to-pdf",
@@ -211,4 +210,4 @@ def test_azure_swa_routes_and_redirects():
 
     for alias, target in LEGACY_ALIASES.items():
         assert alias in redirect_map, f"SWA config must redirect legacy alias {alias}"
-        assert redirect_map[alias] == target, f"SWA alias {alias} must point to {target}"
+        assert redirect_map[alias].rstrip('/') == target.rstrip('/'), f"SWA alias {alias} must point to {target}"

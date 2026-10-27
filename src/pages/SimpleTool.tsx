@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import React, { useState, useEffect, useRef } from 'react';
 import FileUploader from '../components/FileUploader';
 import SignatureCanvas, { SignatureCanvasRef } from '../components/SignatureCanvas';
@@ -770,6 +771,46 @@ const SimpleTool: React.FC<SimpleToolProps> = ({ title, mode, darkMode, notify, 
             warning={ramWarning}
             onClearWarning={() => setRamWarning(null)}
           />
+
+          {mode === 'compress' && (
+            <div className={`p-4 sm:p-5 rounded-3xl border text-left animate-fadeIn ${darkMode ? 'bg-slate-900/60 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+                <span className="text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                  Popular Target Sizes & Portal Requirements:
+                </span>
+                <span className="text-[11px] font-semibold text-amber-600 dark:text-amber-400">
+                  Pre-calibrated exact size ceilings
+                </span>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {[
+                  { label: '300 KB (UPSC/SSC)', to: '/compress-pdf-to-300kb/' },
+                  { label: '20 KB (Govt Forms)', to: '/compress-pdf-to-20kb/' },
+                  { label: '50 KB', to: '/compress-pdf-to-50kb/' },
+                  { label: '100 KB', to: '/compress-pdf-to-100kb/' },
+                  { label: '200 KB', to: '/compress-pdf-to-200kb/' },
+                  { label: '500 KB', to: '/compress-pdf-to-500kb/' },
+                  { label: '1 MB', to: '/compress-pdf-to-1mb/' },
+                  { label: 'RRB Railway', to: '/compress-pdf-for-rrb/' },
+                  { label: 'JEE Main Form', to: '/compress-pdf-for-jee/' },
+                  { label: 'UPSC OTR', to: '/compress-pdf-for-upsc/' },
+                  { label: 'Aadhaar + PAN Merge', to: '/merge-aadhaar-and-pan-card/' },
+                ].map(p => (
+                  <Link
+                    key={p.to}
+                    to={p.to}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all border ${
+                      darkMode
+                        ? 'bg-slate-800 border-slate-700 hover:border-yellow-500 text-slate-200'
+                        : 'bg-white border-slate-200 hover:border-yellow-500 text-slate-700 shadow-sm'
+                    }`}
+                  >
+                    {p.label}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       ) : !result ? (
         /* ── 2-COLUMN FULL-SCREEN WORKSPACE (iLovePDF Style) ── */

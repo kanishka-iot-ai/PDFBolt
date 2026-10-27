@@ -374,12 +374,19 @@ TARGETED_PAGES = [
     },
     {
         "path": "compress-pdf-to-300kb",
-        "h1": "300KB PDF Compressor – Compress PDF to 300KB Online",
-        "title": "300KB PDF Compressor – Resize & Compress PDF to 300KB Online Free | PDFBolt",
+        "h1": "Compress PDF to 300KB Online",
+        "title": "Compress PDF to 300KB Online Free (Exact Size & High Quality) | PDFBolt",
         "description": "Resize and compress PDF to 300KB online for free with exact target size. Fast, private in-browser tool for UPSC OTR, SSC, High Court & government job portals.",
         "subtitle": "Optimize PDF files to under 300KB for UPSC, State Public Service Commissions, and immigration portals.",
         "quick_answer": "To compress PDF to 300KB: 1. Drag & drop your PDF file. 2. The exact 300 KB target size is pre-selected. 3. Optionally enable Grayscale for scanned certificates. 4. Click 'Compress PDF' and download your UPSC-compliant file under 300KB.",
-        "target_badge": "Under 300 KB (UPSC & Portal Ready)",
+        "target_badge": "Under 300 KB (UPSC, EPFO & Portal Ready)",
+        "portal_specs": [
+            {"name": "UPSC OTR & CSE Portal", "size": "20 KB – 300 KB", "format": "PDF", "notes": "Mandatory for Aadhaar, matriculation, and caste certificates"},
+            {"name": "EPFO Unified Member Portal", "size": "Max 300 KB", "format": "PDF", "notes": "Bank passbook, cancelled cheque, and claim verification"},
+            {"name": "AICTE Pragati & Saksham", "size": "Max 300 KB", "format": "PDF", "notes": "Student bonafide, marksheet, and income certificate"},
+            {"name": "Udyam & FSSAI (FoSCoS)", "size": "Max 300 KB", "format": "PDF", "notes": "Business registration, rental agreement, and ID proof"},
+            {"name": "State PSC (UPPSC / BPSC / MPSC)", "size": "20 KB – 300 KB", "format": "PDF", "notes": "Government recruitment applications & certificates"},
+        ],
         "features": [
             "Exact ceiling required by UPSC (Union Public Service Commission) portals",
             "Preserves scanned signatures and institutional stamps",
@@ -425,13 +432,13 @@ TARGETED_PAGES = [
             }
         ],
         "faqs": [
-            {"q": "Why does the UPSC portal strictly enforce a 20KB to 300KB window?", "a": "UPSC servers process millions of candidate documents per examination cycle. The 20KB minimum ensures documents are clear enough for human verification, while the 300KB maximum prevents server storage exhaustion and network timeouts during peak application hours."},
+            {"q": "How do I compress a PDF to 300KB for EPFO, AICTE, or FSSAI portal uploads?", "a": "Upload your passbook, marksheet, or registration certificate to PDFBolt. Our engine automatically pre-selects the exact 300KB target ceiling. If your document has color scanner background noise, toggle Grayscale mode to drop the size safely into the 150KB–260KB window without losing text sharpness."}, {"q": "Why does the UPSC portal strictly enforce a 20KB to 300KB window?", "a": "UPSC servers process millions of candidate documents per examination cycle. The 20KB minimum ensures documents are clear enough for human verification, while the 300KB maximum prevents server storage exhaustion and network timeouts during peak application hours."},
             {"q": "How can I compress a 10-page marksheet into under 300KB without losing text sharpness?", "a": "Select 'Exact Target Size' and enter 300 KB. PDFBolt maintains vector text sharpness while downsampling raster background scans to 150 DPI, which is the official standard for government document verification."},
             {"q": "Will official seals, stamps, and signatures remain valid at 300KB?", "a": "Yes. PDFBolt optimizes compression curves specifically for institutional seals, wet signatures, and university watermarks so they remain dark, legible, and verifiable."},
             {"q": "When should I use the 'Convert to Black & White (Grayscale)' toggle?", "a": "Enable Grayscale mode when compressing certificates, marksheets, or affidavits scanned on color flatbeds. Converting background color noise to crisp black and white reduces file size by up to 80% while enhancing readability."},
             {"q": "Are my sensitive identity documents (Aadhaar, Voter ID, PAN) safe during compression?", "a": "100% safe. PDFBolt operates entirely in your browser using local WebAssembly. Zero bytes, zero filenames, and zero personal details are ever uploaded to any cloud server."}
         ],
-        "related": [("compress-pdf-to-200kb", "Compress to 200KB"), ("compress-pdf-to-500kb", "Compress to 500KB"), ("compress-pdf-for-upsc", "Compress for UPSC")]
+        "related": [("compress-pdf-to-20kb", "Compress to 20KB"), ("compress-pdf-to-50kb", "Compress to 50KB"), ("compress-pdf-to-100kb", "Compress to 100KB"), ("compress-pdf-to-200kb", "Compress to 200KB"), ("compress-pdf-to-500kb", "Compress to 500KB"), ("compress-pdf-to-1mb", "Compress to 1MB"), ("compress-pdf-for-upsc", "Compress for UPSC OTR"), ("compress-pdf-for-ssc", "Compress for SSC"), ("compress-pdf-for-rrb", "Compress for RRB")]
     },
     {
         "path": "compress-pdf-to-500kb",

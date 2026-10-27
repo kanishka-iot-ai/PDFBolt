@@ -306,27 +306,27 @@ const TargetedCompressPage: React.FC<TargetedCompressPageProps> = ({ pageSlug: p
           <h2 className={`text-lg sm:text-xl font-bold mb-4 ${darkMode ? 'text-white' : 'text-slate-900'}`}>Need a Different File Size or Portal Target?</h2>
           <div className="flex flex-wrap justify-center gap-2">
             {[
-              { label: '20 KB', href: '/compress-pdf-to-20kb' },
-              { label: '50 KB', href: '/compress-pdf-to-50kb' },
-              { label: '100 KB', href: '/compress-pdf-to-100kb' },
-              { label: '200 KB', href: '/compress-pdf-to-200kb' },
-              { label: '300 KB', href: '/compress-pdf-to-300kb' },
-              { label: '500 KB', href: '/compress-pdf-to-500kb' },
-              { label: '1 MB', href: '/compress-pdf-to-1mb' },
-              { label: '2 MB', href: '/compress-pdf-to-2mb' },
-              { label: 'SSC CGL/CHSL', href: '/compress-pdf-for-ssc' },
-              { label: 'UPSC OTR', href: '/compress-pdf-for-upsc' },
-              { label: 'NEET Exam', href: '/compress-pdf-for-neet' },
-              { label: 'JEE Main', href: '/compress-pdf-for-jee' },
-              { label: 'IBPS Bank', href: '/compress-pdf-for-ibps' },
-              { label: 'Aadhaar + PAN Merge', href: '/merge-aadhaar-and-pan-card' },
-              { label: 'Govt Portals', href: '/pdf-size-reducer-for-government-portal' }
+              { label: '20 KB', href: '/compress-pdf-to-20kb/' },
+              { label: '50 KB', href: '/compress-pdf-to-50kb/' },
+              { label: '100 KB', href: '/compress-pdf-to-100kb/' },
+              { label: '200 KB', href: '/compress-pdf-to-200kb/' },
+              { label: '300 KB', href: '/compress-pdf-to-300kb/' },
+              { label: '500 KB', href: '/compress-pdf-to-500kb/' },
+              { label: '1 MB', href: '/compress-pdf-to-1mb/' },
+              { label: '2 MB', href: '/compress-pdf-to-2mb/' },
+              { label: 'SSC CGL/CHSL', href: '/compress-pdf-for-ssc/' },
+              { label: 'UPSC OTR', href: '/compress-pdf-for-upsc/' },
+              { label: 'NEET Exam', href: '/compress-pdf-for-neet/' },
+              { label: 'JEE Main', href: '/compress-pdf-for-jee/' },
+              { label: 'IBPS Bank', href: '/compress-pdf-for-ibps/' },
+              { label: 'Aadhaar + PAN Merge', href: '/merge-aadhaar-and-pan-card/' },
+              { label: 'Govt Portals', href: '/pdf-size-reducer-for-government-portal/' }
             ].map(link => (
               <Link
                 key={link.href}
                 to={link.href}
                 className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all border ${
-                  link.href === `/${page.slug}`
+                  link.href.replace(/\/$/, '') === `/${page.slug}`
                     ? 'bg-yellow-500 text-slate-950 border-yellow-500'
                     : darkMode
                       ? 'bg-slate-800 border-slate-700 text-slate-300 hover:border-slate-600'
