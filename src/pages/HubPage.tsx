@@ -212,14 +212,14 @@ const HubPage: React.FC<HubPageProps> = ({ darkMode }) => {
               </h3>
               <div className="flex flex-wrap gap-2">
                 {[
-                  { label: '20 KB', path: '/compress-pdf-to-20kb' },
-                  { label: '50 KB', path: '/compress-pdf-to-50kb' },
-                  { label: '100 KB', path: '/compress-pdf-to-100kb' },
-                  { label: '200 KB', path: '/compress-pdf-to-200kb' },
-                  { label: '300 KB', path: '/compress-pdf-to-300kb' },
-                  { label: '500 KB', path: '/compress-pdf-to-500kb' },
-                  { label: '1 MB', path: '/compress-pdf-to-1mb' },
-                  { label: '2 MB', path: '/compress-pdf-to-2mb' },
+                  { label: '20 KB', path: '/compress-pdf-to-20kb/' },
+                  { label: '50 KB', path: '/compress-pdf-to-50kb/' },
+                  { label: '100 KB', path: '/compress-pdf-to-100kb/' },
+                  { label: '200 KB', path: '/compress-pdf-to-200kb/' },
+                  { label: '300 KB', path: '/compress-pdf-to-300kb/' },
+                  { label: '500 KB', path: '/compress-pdf-to-500kb/' },
+                  { label: '1 MB', path: '/compress-pdf-to-1mb/' },
+                  { label: '2 MB', path: '/compress-pdf-to-2mb/' },
                 ].map(item => (
                   <Link
                     key={item.path}
@@ -241,13 +241,13 @@ const HubPage: React.FC<HubPageProps> = ({ darkMode }) => {
               </h3>
               <div className="flex flex-wrap gap-2">
                 {[
-                  { label: 'SSC Portal', path: '/compress-pdf-for-ssc' },
-                  { label: 'UPSC CSE', path: '/compress-pdf-for-upsc' },
-                  { label: 'NEET Exam', path: '/compress-pdf-for-neet' },
-                  { label: 'JEE Main', path: '/compress-pdf-for-jee' },
-                  { label: 'IBPS Bank PO', path: '/compress-pdf-for-ibps' },
-                  { label: 'RRB Railway', path: '/compress-pdf-for-rrb' },
-                  { label: 'Govt Portals', path: '/pdf-size-reducer-for-government-portal' },
+                  { label: 'SSC Portal', path: '/compress-pdf-for-ssc/' },
+                  { label: 'UPSC CSE', path: '/compress-pdf-for-upsc/' },
+                  { label: 'NEET Exam', path: '/compress-pdf-for-neet/' },
+                  { label: 'JEE Main', path: '/compress-pdf-for-jee/' },
+                  { label: 'IBPS Bank PO', path: '/compress-pdf-for-ibps/' },
+                  { label: 'RRB Railway', path: '/compress-pdf-for-rrb/' },
+                  { label: 'Govt Portals', path: '/pdf-size-reducer-for-government-portal/' },
                 ].map(item => (
                   <Link
                     key={item.path}
@@ -269,11 +269,11 @@ const HubPage: React.FC<HubPageProps> = ({ darkMode }) => {
               </h3>
               <div className="flex flex-wrap gap-2">
                 {[
-                  { label: 'Aadhaar + PAN Merge', path: '/merge-aadhaar-and-pan-card' },
-                  { label: 'Visa Documents Merge', path: '/merge-documents-for-visa-application' },
-                  { label: 'JPG to PDF for Exams', path: '/jpg-to-pdf-for-exam' },
-                  { label: 'PDF to JPG for Aadhaar', path: '/pdf-to-jpg-for-aadhaar' },
-                  { label: 'Free Watermark-Free Editor', path: '/free-pdf-editor-no-watermark-no-signup' },
+                  { label: 'Aadhaar + PAN Merge', path: '/merge-aadhaar-and-pan-card/' },
+                  { label: 'Visa Documents Merge', path: '/merge-documents-for-visa-application/' },
+                  { label: 'JPG to PDF for Exams', path: '/jpg-to-pdf-for-exam/' },
+                  { label: 'PDF to JPG for Aadhaar', path: '/pdf-to-jpg-for-aadhaar/' },
+                  { label: 'Free Watermark-Free Editor', path: '/free-pdf-editor-no-watermark-no-signup/' },
                   { label: 'iLovePDF Alternative', path: '/compare/ilovepdf-alternative' },
                   { label: 'Smallpdf Alternative', path: '/compare/smallpdf-alternative' },
                 ].map(item => (

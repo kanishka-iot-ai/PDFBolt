@@ -1164,22 +1164,22 @@ export const OfflineModePage: React.FC<{ darkMode: boolean }> = ({ darkMode }) =
           </h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
             {[
-              { name: 'Merge PDF', path: '/merge-pdf' },
-              { name: 'Split PDF', path: '/split-pdf' },
-              { name: 'Compress PDF', path: '/compress-pdf' },
-              { name: 'Protect PDF', path: '/protect-pdf' },
-              { name: 'Unlock PDF', path: '/unlock-pdf' },
-              { name: 'Sign PDF', path: '/sign-pdf' },
-              { name: 'Redact PDF', path: '/redact-pdf' },
-              { name: 'Edit PDF', path: '/edit-pdf' },
-              { name: 'Rotate PDF', path: '/rotate-pdf' },
-              { name: 'Organize PDF', path: '/organize-pdf' },
-              { name: 'Add Page Numbers', path: '/add-page-numbers-to-pdf' },
-              { name: 'Watermark PDF', path: '/watermark-pdf' },
-              { name: 'Delete Pages', path: '/delete-pdf-pages' },
-              { name: 'JPG to PDF', path: '/jpg-to-pdf' },
-              { name: 'PDF to JPG', path: '/pdf-to-jpg' },
-              { name: 'OCR PDF', path: '/ocr-pdf' },
+              { name: 'Merge PDF', path: '/merge-pdf/' },
+              { name: 'Split PDF', path: '/split-pdf/' },
+              { name: 'Compress PDF', path: '/compress-pdf/' },
+              { name: 'Protect PDF', path: '/protect-pdf/' },
+              { name: 'Unlock PDF', path: '/unlock-pdf/' },
+              { name: 'Sign PDF', path: '/sign-pdf/' },
+              { name: 'Redact PDF', path: '/redact-pdf/' },
+              { name: 'Edit PDF', path: '/edit-pdf/' },
+              { name: 'Rotate PDF', path: '/rotate-pdf/' },
+              { name: 'Organize PDF', path: '/organize-pdf/' },
+              { name: 'Add Page Numbers', path: '/add-page-numbers-to-pdf/' },
+              { name: 'Watermark PDF', path: '/watermark-pdf/' },
+              { name: 'Delete Pages', path: '/delete-pdf-pages/' },
+              { name: 'JPG to PDF', path: '/jpg-to-pdf/' },
+              { name: 'PDF to JPG', path: '/pdf-to-jpg/' },
+              { name: 'OCR PDF', path: '/ocr-pdf/' },
             ].map((t) => (
               <Link 
                 key={t.path} 

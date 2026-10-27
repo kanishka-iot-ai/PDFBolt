@@ -20,11 +20,11 @@ const Footer: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
   };
 
   return (
-    <footer className={`py-20 border-t mt-auto transition-colors duration-300 ${darkMode ? 'bg-slate-900 border-slate-800 text-slate-400' : 'bg-slate-50 border-slate-200 text-slate-600'}`}>
-      <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-10">
+    <footer className={`py-16 border-t mt-auto transition-colors duration-300 ${darkMode ? 'bg-slate-900 border-slate-800 text-slate-400' : 'bg-slate-50 border-slate-200 text-slate-600'}`}>
+      <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8">
         
-        {/* Brand & Privacy Column */}
-        <div className="lg:col-span-1">
+        {/* Col 1: Brand & Privacy Column */}
+        <div className="sm:col-span-2 md:col-span-1 lg:col-span-1">
           <Link to="/" className="inline-block mb-4 group" aria-label="Go to PDFBolt home">
             <img 
               src="/pdfbolt-logo.webp" 
@@ -58,61 +58,89 @@ const Footer: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
           </div>
         </div>
 
-        {/* Popular Tools */}
-        <nav aria-label="Popular PDF Tools">
+        {/* Col 2: Core PDF Tools */}
+        <nav aria-label="Core PDF Tools">
           <p className={`font-black uppercase text-xs tracking-widest mb-4 ${darkMode ? 'text-slate-200' : 'text-slate-900'}`}>PDF Tools</p>
-          <ul className="space-y-2.5 text-xs font-semibold">
+          <ul className="space-y-2 text-xs font-semibold">
             <li><Link to="/analyze-pdf/" className="text-yellow-700 dark:text-yellow-400 font-bold hover:underline">✨ AI PDF Analyzer</Link></li>
             <li><Link to="/merge-pdf/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Merge PDF</Link></li>
             <li><Link to="/split-pdf/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Split PDF</Link></li>
             <li><Link to="/compress-pdf/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Compress PDF</Link></li>
             <li><Link to="/pdf-to-word/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">PDF to Word</Link></li>
             <li><Link to="/pdf-to-excel/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">PDF to Excel</Link></li>
+            <li><Link to="/edit-pdf/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Edit PDF</Link></li>
             <li><Link to="/redact-pdf/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Redact PDF</Link></li>
             <li><Link to="/ocr-pdf/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">OCR PDF</Link></li>
+            <li><Link to="/scan-to-pdf/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Scan to PDF</Link></li>
             <li><Link to="/tools/" className="text-yellow-700 dark:text-yellow-400 font-bold hover:underline">View All 25+ Tools →</Link></li>
           </ul>
         </nav>
 
-        {/* How-To Guides */}
-        <nav aria-label="PDF How-To Guides">
-          <p className={`font-black uppercase text-xs tracking-widest mb-4 ${darkMode ? 'text-slate-200' : 'text-slate-900'}`}>Knowledge Base</p>
-          <ul className="space-y-2.5 text-xs font-semibold">
+        {/* Col 3: Target Size Compressors (GSC High-Impression Queries) */}
+        <nav aria-label="Target Size Compressors">
+          <p className={`font-black uppercase text-xs tracking-widest mb-4 ${darkMode ? 'text-slate-200' : 'text-slate-900'}`}>Target Size</p>
+          <ul className="space-y-2 text-xs font-semibold">
+            <li><Link to="/compress-pdf-to-300kb/" className="text-yellow-700 dark:text-yellow-400 font-bold hover:underline">300KB Compressor</Link></li>
+            <li><Link to="/compress-pdf-to-20kb/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">20KB Compressor</Link></li>
+            <li><Link to="/compress-pdf-to-50kb/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">50KB Compressor</Link></li>
+            <li><Link to="/compress-pdf-to-100kb/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">100KB Compressor</Link></li>
+            <li><Link to="/compress-pdf-to-200kb/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">200KB Compressor</Link></li>
+            <li><Link to="/compress-pdf-to-500kb/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">500KB Compressor</Link></li>
+            <li><Link to="/compress-pdf-to-1mb/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">1MB Compressor</Link></li>
+            <li><Link to="/pdf-size-reducer-for-government-portal/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Govt Portal Reducer</Link></li>
+            <li><Link to="/tools/pdf-size-calculator/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">PDF Size Calculator</Link></li>
+          </ul>
+        </nav>
+
+        {/* Col 4: Exam & Portal Tools (High CTR Niches) */}
+        <nav aria-label="Government and Exam Portal Tools">
+          <p className={`font-black uppercase text-xs tracking-widest mb-4 ${darkMode ? 'text-slate-200' : 'text-slate-900'}`}>Exam & Govt</p>
+          <ul className="space-y-2 text-xs font-semibold">
+            <li><Link to="/compress-pdf-for-rrb/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">RRB Application</Link></li>
+            <li><Link to="/compress-pdf-for-jee/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">JEE Main Form</Link></li>
+            <li><Link to="/compress-pdf-for-ssc/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">SSC CGL / CHSL</Link></li>
+            <li><Link to="/compress-pdf-for-upsc/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">UPSC OTR & CSE</Link></li>
+            <li><Link to="/compress-pdf-for-neet/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">NEET UG Portal</Link></li>
+            <li><Link to="/compress-pdf-for-ibps/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">IBPS Bank Exam</Link></li>
+            <li><Link to="/merge-aadhaar-and-pan-card/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Merge Aadhaar & PAN</Link></li>
+            <li><Link to="/merge-documents-for-visa-application/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Visa Documents Merge</Link></li>
+            <li><Link to="/jpg-to-pdf-for-exam/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">JPG to PDF for Exam</Link></li>
+            <li><Link to="/pdf-to-jpg-for-aadhaar/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">PDF to JPG for Aadhaar</Link></li>
+          </ul>
+        </nav>
+
+        {/* Col 5: Knowledge Base & Alternatives */}
+        <nav aria-label="Knowledge Base and Alternatives">
+          <p className={`font-black uppercase text-xs tracking-widest mb-4 ${darkMode ? 'text-slate-200' : 'text-slate-900'}`}>Guides & Compare</p>
+          <ul className="space-y-2 text-xs font-semibold">
+            <li><Link to="/guides/how-to-edit-a-pdf/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">How to Edit a PDF</Link></li>
+            <li><Link to="/guides/how-to-sign-a-pdf/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">How to Sign a PDF</Link></li>
+            <li><Link to="/guides/how-to-ocr-a-pdf/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">How to OCR a PDF</Link></li>
             <li><Link to="/guides/how-to-convert-pdf-to-word/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Convert PDF to Word</Link></li>
             <li><Link to="/guides/how-to-compress-a-pdf/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Compress Below 2MB</Link></li>
-            <li><Link to="/guides/how-to-merge-pdf-files/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Combine Multiple PDFs</Link></li>
-            <li><Link to="/guides/how-to-redact-a-pdf/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Permanently Redact Data</Link></li>
-            <li><Link to="/guides/how-to-protect-a-pdf/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Password Protect PDF</Link></li>
+            <li><Link to="/compare/adobe-acrobat-alternative/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Adobe Acrobat Alt</Link></li>
+            <li><Link to="/compare/ilovepdf-alternative/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">iLovePDF Alternative</Link></li>
+            <li><Link to="/compare/smallpdf-alternative/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Smallpdf Alternative</Link></li>
+            <li><Link to="/free-pdf-editor-no-watermark-no-signup/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Free PDF Editor</Link></li>
             <li><Link to="/guides/" className="text-yellow-700 dark:text-yellow-400 font-bold hover:underline">All How-To Guides →</Link></li>
           </ul>
         </nav>
 
-        {/* Workflows & Reference */}
-        <nav aria-label="Workflows & Encyclopedia">
-          <p className={`font-black uppercase text-xs tracking-widest mb-4 ${darkMode ? 'text-slate-200' : 'text-slate-900'}`}>Ecosystem</p>
-          <ul className="space-y-2.5 text-xs font-semibold">
-            <li><Link to="/student-pdf-tools/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Student Study Workflow</Link></li>
-            <li><Link to="/business-pdf-tools/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Business Legal Workflow</Link></li>
-            <li><Link to="/developer-pdf-tools/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Developer Architecture</Link></li>
-            <li><Link to="/encyclopedia/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">PDF Format Encyclopedia</Link></li>
-            <li><Link to="/compare/online-pdf-tools/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Privacy Comparison</Link></li>
-            <li><Link to="/tools/pdf-size-calculator/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">PDF Size Calculator</Link></li>
-            <li><Link to="/test-files/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Sample Test Files</Link></li>
-          </ul>
-        </nav>
-
-        {/* Company & Support */}
-        <div>
-          <p className={`font-black uppercase text-xs tracking-widest mb-4 ${darkMode ? 'text-slate-200' : 'text-slate-900'}`}>Support & Legal</p>
-          <ul className="space-y-2.5 text-xs font-semibold">
+        {/* Col 6: Support, Ecosystem & Legal */}
+        <nav aria-label="Ecosystem and Legal">
+          <p className={`font-black uppercase text-xs tracking-widest mb-4 ${darkMode ? 'text-slate-200' : 'text-slate-900'}`}>About & Legal</p>
+          <ul className="space-y-2 text-xs font-semibold">
             <li><Link to="/about/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">About PDFBolt</Link></li>
-            <li><Link to="/contact/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors flex items-center gap-1.5"><Headphones size={13} /> Contact & Support</Link></li>
+            <li><Link to="/contact/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors flex items-center gap-1.5"><Headphones size={13} /> Contact Support</Link></li>
             <li><Link to="/privacy/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors flex items-center gap-1.5"><ShieldCheck size={13} className="text-emerald-500" /> Privacy Policy</Link></li>
             <li><Link to="/terms/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Terms of Service</Link></li>
+            <li><Link to="/student-pdf-tools/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Student Workflow</Link></li>
+            <li><Link to="/business-pdf-tools/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Business Workflow</Link></li>
+            <li><Link to="/encyclopedia/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">PDF Encyclopedia</Link></li>
             <li><Link to="/offline-mode/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors flex items-center gap-1.5"><CheckCircle size={13} className="text-green-500" /> Offline Mode</Link></li>
             <li><Link to="/cookies/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Cookie Preferences</Link></li>
           </ul>
-        </div>
+        </nav>
 
       </div>
 

@@ -203,10 +203,10 @@ const AlternativeLandingPage: React.FC<{ darkMode: boolean; defaultCompetitor?: 
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-16">
           {[
-            { label: 'Merge PDF', path: '/merge-pdf', desc: 'Combine multiple files with zero limits' },
-            { label: 'Compress PDF', path: '/compress-pdf', desc: 'Shrink file size with local privacy' },
-            { label: 'PDF to Word', path: '/pdf-to-word', desc: 'Convert to editable DOCX formatting' },
-            { label: 'Sign & Edit', path: '/edit-pdf', desc: 'Annotate and draw digital signatures' }
+            { label: 'Merge PDF', path: '/merge-pdf/', desc: 'Combine multiple files with zero limits' },
+            { label: 'Compress PDF', path: '/compress-pdf/', desc: 'Shrink file size with local privacy' },
+            { label: 'PDF to Word', path: '/pdf-to-word/', desc: 'Convert to editable DOCX formatting' },
+            { label: 'Sign & Edit', path: '/edit-pdf/', desc: 'Annotate and draw digital signatures' }
           ].map(tool => (
             <Link
               key={tool.path}
