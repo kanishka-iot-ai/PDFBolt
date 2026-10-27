@@ -1,6 +1,6 @@
 import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation, Link, Navigate } from 'react-router-dom';
-import { HelmetProvider } from 'react-helmet-async';
+import { Helmet, HelmetProvider } from 'react-helmet-async';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import { soundEngine } from './utils/sounds';
@@ -61,6 +61,10 @@ const PageLoader = () => (
 
 const NotFoundPage = () => (
   <div className="min-h-[60vh] flex flex-col items-center justify-center text-center px-6">
+    <Helmet>
+      <title>404: Page Not Found | PDFBolt</title>
+      <meta name="robots" content="noindex, nofollow" />
+    </Helmet>
     <h1 className="text-6xl font-black mb-4 text-slate-900 dark:text-white">404</h1>
     <h2 className="text-2xl font-bold mb-4 text-slate-600 dark:text-slate-400">Page Not Found</h2>
     <p className="mb-8 text-slate-500 max-w-md text-sm">The tool or guide you are looking for doesn't exist or has been relocated.</p>

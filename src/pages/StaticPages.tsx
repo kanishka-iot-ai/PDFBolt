@@ -81,16 +81,18 @@ export const ContactPage: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
     setLoading(true);
     setErrorMessage(null);
 
-    const SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID || 'service_lrshcpf';
-    const TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID || 'template_ykqay24';
+    const SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID || '';
+    const TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID || '';
     const PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY || '';
 
     try {
-      if (form.current) {
+      if (form.current && SERVICE_ID && TEMPLATE_ID && PUBLIC_KEY) {
         const emailjs = (await import('@emailjs/browser')).default;
         await emailjs.sendForm(SERVICE_ID, TEMPLATE_ID, form.current, PUBLIC_KEY);
         setLoading(false);
         setSubmitted(true);
+      } else {
+        throw new Error('Email service unconfigured, using fallback direct email.');
       }
     } catch (err: any) {
       console.warn('[PDFBolt Support] Fallback to direct mailto:', err);

@@ -102,11 +102,16 @@ async def lifespan(app: FastAPI):
     keepalive_task.cancel()
 
 
+is_production = settings.APP_ENV.lower() == "production" or not settings.DEBUG
+
 app = FastAPI(
     title=settings.APP_NAME,
     version=settings.APP_VERSION,
     description="Enterprise-grade, modular, secure PDF processing engine with 15-min ephemeral document retention.",
-    lifespan=lifespan
+    lifespan=lifespan,
+    docs_url=None if is_production else "/docs",
+    redoc_url=None if is_production else "/redoc",
+    openapi_url=None if is_production else "/openapi.json"
 )
 
 # CORS Middleware
@@ -174,13 +179,15 @@ app.include_router(direct_convert_router)
 
 @app.api_route("/", methods=["GET", "HEAD"])
 def root():
-    return {
+    resp = {
         "status": "healthy",
         "service": settings.APP_NAME,
         "version": settings.APP_VERSION,
-        "docs": "/docs",
         "health": "/health"
     }
+    if not is_production:
+        resp["docs"] = "/docs"
+    return resp
 
 
 @app.head("/")

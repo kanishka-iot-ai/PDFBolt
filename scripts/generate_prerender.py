@@ -2747,7 +2747,7 @@ def generate_404_page(base_template):
     </div>
     '''
 
-    html = re.sub(r'<title>.*?</title>', f'<title>{title}</title>', base_template)
+    html = re.sub(r'<title>.*?</title>', f'<title>{title}</title>\n  <meta name="robots" content="noindex, nofollow">', base_template)
     if re.search(r'<meta[^>]*name=[\"\']description[\"\'][^>]*>', html, flags=re.IGNORECASE):
         html = re.sub(r'<meta[^>]*name=[\"\']description[\"\'][^>]*>', f'<meta name="description" data-rh="true"\n    content="{description}">', html, flags=re.IGNORECASE)
     else:
