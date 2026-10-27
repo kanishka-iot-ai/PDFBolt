@@ -37,43 +37,58 @@ export const SIZE_COMPRESSION_PAGES: LandingPageContent[] = [
     slug: 'compress-pdf-to-20kb',
     toolType: 'compress',
     presetLevel: 'extreme',
-    targetSizeHint: 'Under 20 KB (Extreme Deflate)',
-    title: 'Compress PDF to 20KB Online Free (High Quality) | PDFBolt',
+    targetSizeHint: 'Under 20 KB (Govt Exams & Strict Ceilings)',
+    portalSpecs: [
+      { name: 'SSC CGL / CHSL / MTS Portal', allowedSize: '10 KB – 20 KB', allowedFormat: 'PDF / JPG', notes: 'Candidate signature & left thumb impression (strict ceiling)' },
+      { name: 'UPSC Civil Services & NDA Portal', allowedSize: '20 KB – 300 KB', allowedFormat: 'PDF only', notes: 'Photo ID proof & identity slip verification floor' },
+      { name: 'IBPS PO / Clerk / RRB Recruitment', allowedSize: '10 KB – 20 KB', allowedFormat: 'PDF / JPG', notes: 'Candidate handwritten declaration & signature scan' },
+      { name: 'State PSCs (BPSC, UPPSC, MPSC, TNPSC)', allowedSize: 'Max 20 KB', allowedFormat: 'PDF', notes: 'Candidate identity slips & verification uploads' },
+      { name: 'GATE / JAM / NTA Candidate Upload', allowedSize: '10 KB – 20 KB', allowedFormat: 'PDF / JPG', notes: 'Official signature slip verification threshold' },
+    ],
+    title: 'Compress PDF to 20KB Online Free (Exact Size & Govt Portal Preset) | PDFBolt',
     h1: 'Compress PDF to 20KB Online',
     subtitle: 'Reduce PDF file size to under 20KB for signatures, thumb impressions, and portal requirements with local browser privacy.',
-    seoTitle: 'Compress PDF to 20KB Online Free – Keep Text Clear | PDFBolt',
-    metaDescription: 'Compress PDF to 20KB online for free without losing clarity. Perfect for government portal document uploads, signatures, and thumbnail photos with zero server uploads.',
-    quickAnswer: 'To compress a PDF to 20KB: 1. Drag and drop your PDF into PDFBolt. 2. Extreme compression is pre-selected for maximum size reduction. 3. Click "Compress PDF" to download your lightweight file under 20KB instantly.',
+    seoTitle: 'Compress PDF to 20KB Online Free (Exact Size & Govt Portal Preset) | PDFBolt',
+    metaDescription: 'Compress PDF to 20KB online free without losing readability. Exact size calibration for SSC, UPSC, IBPS, and state recruitment exam portals. 100% private in-browser.',
+    quickAnswer: 'To compress a PDF to 20KB: 1. Drag and drop your PDF into PDFBolt. 2. Extreme compression is pre-selected with exact 19.9KB ceiling calibration. 3. Click "Compress PDF" to download your lightweight file under 20KB instantly.',
     keyHighlights: [
-      'Pre-configured Extreme Compression algorithm for sub-20KB output',
+      'Pre-configured Extreme Compression algorithm with 18KB–19.9KB safety ceiling',
       'Purges non-essential metadata streams, redundant fonts, and color profiles',
-      'Preserves character legibility and vector line boundaries',
+      'High contrast retention for ink curves, stamps, and biometric thumb impressions',
       '100% private in-browser WebAssembly execution with zero server uploads'
     ],
     steps: [
-      { name: 'Upload Target Document', text: 'Select your PDF signature, certificate, or single-page form.' },
-      { name: 'Extreme Preset Activated', text: 'Our high-deflate compression engine optimizes color depth and font tables.' },
-      { name: 'Download Under 20KB File', text: 'Save your compressed PDF and upload it directly to your application portal.' }
+      { name: 'Upload Target Document', text: 'Select your single-page PDF signature, certificate slip, or identity form.' },
+      { name: '20KB Ceiling Activated', text: 'Our high-deflate compression engine optimizes color depth and downsamples raster layers to 8-bit grayscale.' },
+      { name: 'Download Under 20KB File', text: 'Save your compressed PDF and upload it directly to your application portal without file size rejection.' }
     ],
     sections: [
       {
-        heading: 'How to Reach 20KB Without Making Text Illegible',
+        heading: 'What Actually Fits in a 20KB PDF & Technical Optimization',
         paragraphs: [
-          'Shrinking a PDF document to under 20KB is one of the toughest challenges on modern recruitment and immigration websites. Standard PDF files frequently exceed 500KB simply due to embedded XML metadata, thumbnail dictionaries, and full TrueType font subsets.',
-          'PDFBolt solves this by applying aggressive stream deflating and purging all non-renderable overhead directly in your browser memory. For image-heavy documents, it converts 24-bit RGB pixel layers to efficient 8-bit grayscale channels, keeping file sizes minuscule while retaining crisp text edges.'
+          'Shrinking a PDF document below 20KB is one of the most restrictive document constraints enforced by Indian recruitment portals (SSC CGL/CHSL, IBPS, and State PSCs). A standard multi-page document or one containing embedded TrueType font families often has a minimum floor of 150KB–200KB solely in font metrics and structural dictionaries. To hit 20KB, the document should be a single page, cropped signature, or certificate scan.',
+          'PDFBolt achieves the 20KB target by deflating object streams, stripping unnecessary XML metadata, and downsampling raster layers into optimized 8-bit grayscale channels. Our engine targets an exact 18 KB – 19.9 KB safety ceiling, ensuring portal validators enforcing strict "< 20KB" rules never reject your upload due to byte rounding.'
         ],
         tips: [
           'Ensure the original file has only 1 or 2 pages for optimal sub-20KB compression.',
           'For scanned certificates, crop any excess white borders before uploading to reduce raw image data.'
         ]
+      },
+      {
+        heading: 'Uploading a Signature? PDF vs JPG Exam Requirements',
+        paragraphs: [
+          'Many Indian recruitment exams (such as SSC and IBPS) specifically request signatures in JPEG/JPG format between 10KB and 20KB, while others mandate PDF. Always check your official notification guidelines before uploading. If your portal requires an image file instead of a PDF, you can instantly convert your output using PDFBolt\'s free PDF to JPG or JPG to PDF tools.'
+        ]
       }
     ],
     faqs: [
-      { q: 'Will my 20KB PDF be accepted by government exam portals?', a: 'Yes. Most government job portals (such as SSC, UPSC, and State PSCs) mandate document or signature sizes between 10KB and 20KB. PDFBolt is calibrated to meet these exact thresholds.' },
-      { q: 'Does compressing to 20KB blur my digital signature?', a: 'No. Our algorithm retains contrast thresholds on ink curves and strokes, preventing fuzzy artifacts.' },
-      { q: 'Is my confidential file safe when compressed?', a: 'Completely safe. PDFBolt executes locally in your browser sandbox using WebAssembly. Your files are never uploaded to remote cloud servers.' }
+      { q: 'Will my 20KB PDF be accepted by government exam portals?', a: 'Yes. Most government job portals (such as SSC, UPSC, and State PSCs) mandate document or signature sizes between 10KB and 20KB. PDFBolt is calibrated to meet these exact thresholds with an automated 19.9KB ceiling.' },
+      { q: 'Does PDFBolt land under 20KB or exactly 20.0KB?', a: 'PDFBolt targets an exact 18 KB to 19.9 KB window. Government portal upload validators typically check if the file size is strictly less than 20,480 bytes, so landing at 19.2 KB prevents any upload rejection errors.' },
+      { q: 'Does compressing to 20KB blur my digital signature or thumb impression?', a: 'No. Our algorithm applies high-contrast curve preservation to dark ink strokes against light paper backgrounds, ensuring your signature remains crisp, dark, and verified by human examiners.' },
+      { q: 'Can a multi-page PDF fit into 20KB?', a: 'Fitting more than 1 or 2 pages into 20KB is technically difficult because page structures, font tables, and vector objects each require several kilobytes. If your multi-page document cannot reach 20KB, check our 50KB or 100KB compressors.' },
+      { q: 'Are my sensitive identity documents (Aadhaar, Signature) uploaded to a cloud server?', a: '100% private. All compression processing occurs inside your device\'s browser memory using local WebAssembly. Zero files or personal data are ever uploaded to remote servers.' }
     ],
-    relatedSlugs: ['compress-pdf-to-50kb', 'compress-pdf-to-100kb', 'compress-pdf-for-ssc', 'pdf-size-reducer-for-government-portal']
+    relatedSlugs: ['compress-pdf-to-50kb', 'compress-pdf-to-100kb', 'compress-pdf-to-200kb', 'compress-pdf-to-300kb', 'compress-pdf-to-500kb', 'compress-pdf-to-1mb', 'compress-pdf-for-ssc', 'compress-pdf-for-upsc', 'compress-pdf-for-rrb']
   },
   {
     slug: 'compress-pdf-to-50kb',

@@ -250,27 +250,62 @@ TARGETED_PAGES = [
     {
         "path": "compress-pdf-to-20kb",
         "h1": "Compress PDF to 20KB Online",
-        "title": "Compress PDF to 20KB Online Free (High Quality) | PDFBolt",
-        "description": "Compress PDF to 20KB online for free without losing clarity. Perfect for government portal document uploads, signatures, and thumbnail photos with zero server uploads.",
+        "title": "Compress PDF to 20KB Online Free (Exact Size & Govt Portal Preset) | PDFBolt",
+        "description": "Compress PDF to 20KB online free without losing readability. Exact size calibration for SSC, UPSC, IBPS, and state recruitment exam portals. 100% private in-browser.",
         "subtitle": "Reduce PDF file size to under 20KB for signatures, thumb impressions, and portal requirements with local browser privacy.",
-        "quick_answer": "To compress a PDF to 20KB: 1. Drag and drop your PDF into PDFBolt. 2. Extreme compression is pre-selected for maximum size reduction. 3. Click 'Compress PDF' to download your lightweight file under 20KB instantly.",
-        "target_badge": "Under 20 KB (Extreme Deflate)",
+        "quick_answer": "To compress a PDF to 20KB: 1. Drag and drop your PDF into PDFBolt. 2. Extreme compression is pre-selected with exact 19.9KB ceiling calibration. 3. Click 'Compress PDF' to download your lightweight file under 20KB instantly.",
+        "target_badge": "Under 20 KB (Govt Exams & Strict Ceilings)",
+        "portal_specs": [
+            {"name": "SSC CGL / CHSL / MTS Portal", "size": "10 KB – 20 KB", "format": "PDF / JPG", "notes": "Candidate signature & left thumb impression (strict ceiling)"},
+            {"name": "UPSC Civil Services & NDA Portal", "size": "20 KB – 300 KB", "format": "PDF only", "notes": "Photo ID proof & identity slip verification floor"},
+            {"name": "IBPS PO / Clerk / RRB Recruitment", "size": "10 KB – 20 KB", "format": "PDF / JPG", "notes": "Candidate handwritten declaration & signature scan"},
+            {"name": "State PSCs (BPSC, UPPSC, MPSC, TNPSC)", "size": "Max 20 KB", "format": "PDF", "notes": "Candidate identity slips & verification uploads"},
+            {"name": "GATE / JAM / NTA Candidate Upload", "size": "10 KB – 20 KB", "format": "PDF / JPG", "notes": "Official signature slip verification threshold"}
+        ],
         "features": [
-            "Pre-configured Extreme Compression algorithm for sub-20KB output",
+            "Pre-configured Extreme Compression algorithm with 18KB–19.9KB safety ceiling",
             "Purges non-essential metadata streams, redundant fonts, and color profiles",
-            "Preserves character legibility and vector line boundaries",
+            "High contrast retention for ink curves, stamps, and biometric thumb impressions",
             "100% private in-browser WebAssembly execution with zero server uploads"
         ],
         "how_to": [
-            {"name": "Upload Target Document", "text": "Select your PDF signature, certificate, or single-page form."},
-            {"name": "Extreme Preset Activated", "text": "Our high-deflate compression engine optimizes color depth and font tables."},
-            {"name": "Download Under 20KB File", "text": "Save your compressed PDF and upload it directly to your application portal."}
+            {"name": "Upload Target Document", "text": "Select your single-page PDF signature, certificate slip, or identity form."},
+            {"name": "20KB Ceiling Activated", "text": "Our high-deflate compression engine optimizes color depth and downsamples raster layers to 8-bit grayscale."},
+            {"name": "Download Under 20KB File", "text": "Save your compressed PDF and upload it directly to your application portal without file size rejection."}
+        ],
+        "sections": [
+            {
+                "heading": "What Actually Fits in a 20KB PDF & Technical Optimization",
+                "paragraphs": [
+                    "Shrinking a PDF document below 20KB is one of the most restrictive document constraints enforced by Indian recruitment portals (SSC CGL/CHSL, IBPS, and State PSCs). A standard multi-page document or one containing embedded TrueType font families often has a minimum floor of 150KB–200KB solely in font metrics and structural dictionaries. To hit 20KB, the document should be a single page, cropped signature, or certificate scan.",
+                    "PDFBolt achieves the 20KB target by deflating object streams, stripping unnecessary XML metadata, and downsampling raster layers into optimized 8-bit grayscale channels. Our engine targets an exact 18 KB – 19.9 KB safety ceiling, ensuring portal validators enforcing strict '< 20KB' rules never reject your upload due to byte rounding."
+                ]
+            },
+            {
+                "heading": "Uploading a Signature? PDF vs JPG Exam Requirements",
+                "paragraphs": [
+                    "Many Indian recruitment exams (such as SSC and IBPS) specifically request signatures in JPEG/JPG format between 10KB and 20KB, while others mandate PDF. Always check your official notification guidelines before uploading. If your portal requires an image file instead of a PDF, you can instantly convert your output using PDFBolt's free PDF to JPG or JPG to PDF tools."
+                ]
+            }
         ],
         "faqs": [
-            {"q": "Will my 20KB PDF be accepted by government exam portals?", "a": "Yes. Most government job portals (such as SSC, UPSC, and State PSCs) mandate document or signature sizes between 10KB and 20KB. PDFBolt is calibrated to meet these exact thresholds."},
-            {"q": "Does compressing to 20KB blur my digital signature?", "a": "No. Our algorithm retains contrast thresholds on ink curves and strokes, preventing fuzzy artifacts."}
+            {"q": "Will my 20KB PDF be accepted by government exam portals?", "a": "Yes. Most government job portals (such as SSC, UPSC, and State PSCs) mandate document or signature sizes between 10KB and 20KB. PDFBolt is calibrated to meet these exact thresholds with an automated 19.9KB ceiling."},
+            {"q": "Does PDFBolt land under 20KB or exactly 20.0KB?", "a": "PDFBolt targets an exact 18 KB to 19.9 KB window. Government portal upload validators typically check if the file size is strictly less than 20,480 bytes, so landing at 19.2 KB prevents any upload rejection errors."},
+            {"q": "Does compressing to 20KB blur my digital signature or thumb impression?", "a": "No. Our algorithm applies high-contrast curve preservation to dark ink strokes against light paper backgrounds, ensuring your signature remains crisp, dark, and verified by human examiners."},
+            {"q": "Can a multi-page PDF fit into 20KB?", "a": "Fitting more than 1 or 2 pages into 20KB is technically difficult because page structures, font tables, and vector objects each require several kilobytes. If your multi-page document cannot reach 20KB, check our 50KB or 100KB compressors."},
+            {"q": "Are my sensitive identity documents (Aadhaar, Signature) uploaded to a cloud server?", "a": "100% private. All compression processing occurs inside your device's browser memory using local WebAssembly. Zero files or personal data are ever uploaded to remote servers."}
         ],
-        "related": [("compress-pdf-to-50kb", "Compress to 50KB"), ("compress-pdf-to-100kb", "Compress to 100KB"), ("compress-pdf-for-ssc", "Compress for SSC")]
+        "related": [
+            ("compress-pdf-to-50kb", "Compress to 50KB"),
+            ("compress-pdf-to-100kb", "Compress to 100KB"),
+            ("compress-pdf-to-200kb", "Compress to 200KB"),
+            ("compress-pdf-to-300kb", "Compress to 300KB"),
+            ("compress-pdf-to-500kb", "Compress to 500KB"),
+            ("compress-pdf-to-1mb", "Compress to 1MB"),
+            ("compress-pdf-for-ssc", "Compress for SSC"),
+            ("compress-pdf-for-upsc", "Compress for UPSC"),
+            ("compress-pdf-for-rrb", "Compress for RRB")
+        ]
     },
     {
         "path": "compress-pdf-to-50kb",
