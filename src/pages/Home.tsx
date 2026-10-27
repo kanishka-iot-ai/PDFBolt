@@ -5,10 +5,10 @@ import { ToolType, ToolMetadata } from '../types';
 import ToolCard from '../components/ToolCard';
 import AdSlot from '../components/AdSlot';
 import {
-  Star,
   Edit3,
   Repeat,
   Shield,
+  ShieldCheck,
   Settings,
   FileText,
   Search,
@@ -83,30 +83,26 @@ const Home: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
     });
   }, [searchQuery, activeCategory, showAllTools, popularTools]);
 
-  const handleSuggestionClick = (query: string) => {
-    setSearchQuery(query);
-  };
-
   return (
     <div>
-      {/* 1. NEW COMPACT HERO SECTION (Above the fold) */}
+      {/* 1. HIGH-CONVERTING COMPACT HERO WITH INSTANT TRUST PILLARS (Above the fold) */}
       <section
-        className={`relative overflow-hidden pt-6 pb-6 sm:pt-10 sm:pb-8 text-center border-b ${
+        className={`relative overflow-hidden pt-5 pb-5 sm:pt-7 sm:pb-7 text-center border-b ${
           darkMode ? 'border-slate-800 bg-slate-950' : 'border-slate-100 bg-slate-50/80'
         }`}
       >
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[320px] sm:w-[600px] h-[200px] sm:h-[250px] bg-yellow-500/15 blur-[80px] sm:blur-[100px] rounded-full pointer-events-none"></div>
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[320px] sm:w-[540px] h-[160px] sm:h-[200px] bg-yellow-500/10 blur-[70px] sm:blur-[90px] rounded-full pointer-events-none"></div>
 
         <div className="max-w-4xl mx-auto px-4 sm:px-6 relative z-10">
-          {/* Small Badge */}
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/15 dark:bg-amber-500/20 border border-amber-600/30 dark:border-amber-400/30 text-amber-900 dark:text-amber-300 font-black text-[11px] uppercase tracking-widest mb-3">
-            <Star size={12} className="fill-current" /> PROFESSIONAL PDF TOOLKIT
+          {/* Top Security & Privacy Badge */}
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 dark:bg-emerald-500/20 border border-emerald-500/30 text-emerald-700 dark:text-emerald-400 font-bold text-[11px] uppercase tracking-wider mb-2.5">
+            <ShieldCheck size={13} className="text-emerald-500" />
+            <span>100% In-Browser &bull; Files Never Leave Your Device</span>
           </div>
-
 
           {/* Primary H1 */}
           <h1
-            className={`text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-tight mb-3 leading-tight ${
+            className={`text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black tracking-tight mb-2 leading-tight ${
               darkMode ? 'text-white' : 'text-slate-900'
             }`}
           >
@@ -115,95 +111,77 @@ const Home: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
 
           {/* Supporting Text */}
           <p
-            className={`text-sm sm:text-base md:text-lg max-w-2xl mx-auto mb-5 sm:mb-6 font-normal leading-relaxed ${
+            className={`text-xs sm:text-sm md:text-base max-w-xl mx-auto mb-3.5 font-normal leading-relaxed ${
               darkMode ? 'text-slate-300' : 'text-slate-600'
             }`}
           >
-            Merge, compress, split, convert, edit and protect PDFs online. Fast, private and easy to use.
+            Merge, compress, split, convert, edit and protect PDFs online. Fast, private and zero file limits.
           </p>
 
-          {/* Compact Search Bar */}
-          <div className="max-w-xl mx-auto relative">
+          {/* Front-Line 4 Trust Pillars Strip (Instantly visible above the fold) */}
+          <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 text-xs">
             <div
-              className={`relative flex items-center px-3 py-1.5 sm:py-2 rounded-full border shadow-md transition-all duration-200 ${
+              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[11px] sm:text-xs font-semibold ${
                 darkMode
-                  ? 'border-slate-700 bg-slate-900/90 focus-within:border-yellow-500'
-                  : 'border-slate-300 bg-white focus-within:border-yellow-500 shadow-slate-200/50'
+                  ? 'bg-slate-900/80 border-slate-800 text-slate-300'
+                  : 'bg-white border-slate-200 text-slate-700 shadow-sm'
               }`}
             >
-              <Search
-                className={`ml-2 mr-2 shrink-0 ${darkMode ? 'text-slate-400' : 'text-slate-400'}`}
-                size={18}
-              />
-              <input
-                type="text"
-                id="search-pdf-tools"
-                name="searchPdfTools"
-                autoComplete="off"
-                aria-label="Search PDF tools"
-                placeholder="Search PDF tools..."
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-                className="w-full bg-transparent border-none outline-none py-1 text-sm sm:text-base font-medium text-slate-900 dark:text-white placeholder:text-slate-400"
-              />
-              {searchQuery && (
-                <button
-                  type="button"
-                  onClick={() => setSearchQuery('')}
-                  aria-label="Clear search"
-                  className="p-1.5 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-full text-slate-400 transition-colors"
-                >
-                  <X size={16} />
-                </button>
-              )}
+              <Shield size={13} className="text-emerald-500 shrink-0" />
+              <span>
+                <strong className="font-bold text-slate-900 dark:text-white">100% Private:</strong> In-Browser
+              </span>
             </div>
-
-            {/* Quick Pill Suggestions */}
-            <div className="flex items-center justify-center gap-1.5 sm:gap-2 mt-2.5 flex-wrap text-xs text-slate-600 dark:text-slate-400">
-              <span className="hidden sm:inline font-bold text-slate-600 dark:text-slate-400">Try:</span>
-              {['Merge PDF', 'Compress PDF', 'PDF to Word', 'Protect PDF'].map(suggestion => (
-
-                <button
-                  key={suggestion}
-                  type="button"
-                  onClick={() => handleSuggestionClick(suggestion)}
-                  className={`px-2.5 py-0.5 rounded-full text-[11px] font-medium border transition-colors cursor-pointer ${
-                    darkMode
-                      ? 'bg-slate-900/60 border-slate-800 text-slate-300 hover:border-yellow-500/50 hover:text-yellow-400'
-                      : 'bg-white border-slate-200 text-slate-700 hover:border-yellow-600 hover:text-yellow-700'
-                  }`}
-                >
-                  {suggestion}
-                </button>
-              ))}
+            <div
+              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[11px] sm:text-xs font-semibold ${
+                darkMode
+                  ? 'bg-slate-900/80 border-slate-800 text-slate-300'
+                  : 'bg-white border-slate-200 text-slate-700 shadow-sm'
+              }`}
+            >
+              <Lock size={13} className="text-blue-500 shrink-0" />
+              <span>
+                <strong className="font-bold text-slate-900 dark:text-white">Zero Uploads:</strong> Device Only
+              </span>
+            </div>
+            <div
+              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[11px] sm:text-xs font-semibold ${
+                darkMode
+                  ? 'bg-slate-900/80 border-slate-800 text-slate-300'
+                  : 'bg-white border-slate-200 text-slate-700 shadow-sm'
+              }`}
+            >
+              <FileText size={13} className="text-purple-500 shrink-0" />
+              <span>
+                <strong className="font-bold text-slate-900 dark:text-white">25+ Tools:</strong> Full Suite
+              </span>
+            </div>
+            <div
+              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[11px] sm:text-xs font-semibold ${
+                darkMode
+                  ? 'bg-slate-900/80 border-slate-800 text-slate-300'
+                  : 'bg-white border-slate-200 text-slate-700 shadow-sm'
+              }`}
+            >
+              <Zap size={13} className="text-amber-500 shrink-0" />
+              <span>
+                <strong className="font-bold text-slate-900 dark:text-white">Fast &amp; Free:</strong> No Signup
+              </span>
             </div>
           </div>
         </div>
       </section>
 
       {/* 2. POPULAR PDF TOOLS & TOOL GRID (Immediately Above the fold) */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
-        {/* Category Selector Tabs */}
-        <div className="flex items-center justify-between gap-4 mb-6 flex-wrap">
-          <div>
-            <h2 className={`text-2xl sm:text-3xl font-black tracking-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>
-              {searchQuery
-                ? `Search Results (${filteredTools.length})`
-                : activeCategory === 'popular' && !showAllTools
-                ? 'Popular PDF Tools'
-                : categories.find(c => c.id === activeCategory)?.title || 'PDF Tools'}
-            </h2>
-            <p className={`text-xs sm:text-sm mt-0.5 ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
-              {searchQuery
-                ? `Showing tools matching "${searchQuery}"`
-                : activeCategory === 'popular' && !showAllTools
-                ? 'Most frequently used document utilities — 100% free and in-browser'
-                : 'Full suite of fast, secure browser-based PDF utilities'}
-            </p>
-          </div>
-
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+        {/* Category Selector Tabs & Docked Compact Filter */}
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 mb-6">
           {/* Category Filter Pills */}
-          <div role="tablist" aria-label="PDF tool categories" className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar py-1 w-full sm:w-auto -mx-4 px-4 sm:mx-0 sm:px-0">
+          <div
+            role="tablist"
+            aria-label="PDF tool categories"
+            className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar py-1 w-full lg:w-auto -mx-4 px-4 lg:mx-0 lg:px-0"
+          >
             {categories.map(cat => (
               <button
                 key={cat.id}
@@ -229,7 +207,46 @@ const Home: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
               </button>
             ))}
           </div>
+
+          {/* Compact Docked Tool Search Filter */}
+          <div className="relative w-full lg:w-64 shrink-0">
+            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+            <input
+              type="text"
+              id="filter-pdf-tools"
+              name="filterPdfTools"
+              autoComplete="off"
+              aria-label="Filter PDF tools"
+              placeholder="Filter 25+ tools..."
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              className={`w-full pl-8 pr-7 py-1.5 text-xs font-medium rounded-full border transition-all duration-200 outline-none ${
+                darkMode
+                  ? 'bg-slate-900/90 border-slate-700 text-white placeholder-slate-500 focus:border-yellow-500'
+                  : 'bg-white border-slate-300 text-slate-900 placeholder-slate-400 focus:border-yellow-500 shadow-sm'
+              }`}
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery('')}
+                aria-label="Clear filter"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
+              >
+                <X size={13} />
+              </button>
+            )}
+          </div>
         </div>
+
+        {/* Filter Indicator when searching */}
+        {searchQuery && (
+          <div className="mb-4">
+            <p className={`text-xs font-semibold ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+              Showing {filteredTools.length} tools matching "{searchQuery}"
+            </p>
+          </div>
+        )}
 
         {/* Primary Tools Grid */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5">
