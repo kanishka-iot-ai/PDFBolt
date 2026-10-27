@@ -19,8 +19,17 @@ from backend.app.core.validation import validate_pdf_output
 from backend.app.core.logging import logger
 
 
-# Pre-calibrated Government Exam & Public Portal Byte-Budget Presets (in KB)
-GOVERNMENT_PRESETS: Dict[str, int] = {
+# =========================================================================
+# Presets mapping (From PDFCompressionEngine Colab Engine)
+# =========================================================================
+PRESETS: Dict[str, int] = {
+    "UPSC": 300,
+    "SSC": 50,
+    "RRB_Railway": 100,
+    "JEE_Main": 300,
+    "NEET_UG": 300,
+    "IBPS": 100,
+    # Extended official portal presets & case-insensitive aliases
     "UPSC_Signature": 20,
     "upsc_signature": 20,
     "UPSC_Photo": 50,
@@ -31,11 +40,8 @@ GOVERNMENT_PRESETS: Dict[str, int] = {
     "ssc_signature": 20,
     "SSC_Photo": 50,
     "ssc_photo": 50,
-    "RRB_Railway": 100,
     "rrb_railway": 100,
-    "JEE_Main": 300,
     "jee_main": 300,
-    "NEET_UG": 300,
     "neet_ug": 300,
     "Standard_NIC_Portal": 200,
     "standard_nic_portal": 200,
@@ -44,160 +50,193 @@ GOVERNMENT_PRESETS: Dict[str, int] = {
     "rrb": 100,
     "jee": 300,
     "neet": 300,
-    "ibps": 50,
+    "ibps": 100,
     "nic": 200,
 }
+
+# Alias for backwards compatibility across existing tests & services
+GOVERNMENT_PRESETS = PRESETS
 
 
 class PDFCompressionEngine:
     """
-    Precision byte-budget PDF compression engine using PyMuPDF and Pillow.
-    Guarantees hard file-size ceilings for government exam portals (20KB, 50KB, 100KB, 200KB, 300KB)
-    via multi-phase optimization: metadata stripping -> iterative image downsampling & color reduction ->
-    adaptive single-layer rasterization fallback.
+    An accurate, iterative PDF compression engine designed to hit specific byte ceilings
+    while dynamically maximizing quality.
     """
+
     def __init__(self, input_path: str):
         self.input_path = input_path
         if not os.path.exists(input_path):
             raise FileNotFoundError(f"Input PDF not found at {input_path}")
 
-    def compress_to_target_kb(self, output_path: str, target_kb: int) -> tuple[bool, float]:
-        """
-        Attempts to compress a PDF to fit strictly under target_kb ceiling.
-        Returns (success: bool, final_size_kb: float).
-        """
+    @staticmethod
+    def compress_pdf(input_path: str, output_path: str, target_kb: int) -> bool:
         if not HAS_PYMUPDF:
-            return False, 0.0
+            logger.warning("PyMuPDF not available for PDFCompressionEngine.")
+            return False
 
         target_bytes = target_kb * 1024
 
-        # Phase 1: Try basic optimization & stripping metadata first
-        try:
-            current_doc = pymupdf.open(self.input_path)
-            temp_io = io.BytesIO()
-            current_doc.set_metadata({})
-            current_doc.save(
-                temp_io,
+        # 1. First, attempt a lossless optimization (garbage collection, compress streams, strip metadata)
+        doc = pymupdf.open(input_path)
+
+        # Strip metadata
+        doc.set_metadata({})
+
+        # Try saving with default clean compression
+        temp_buffer = io.BytesIO()
+        doc.save(
+            temp_buffer,
+            garbage=4,
+            deflate=True,
+            clean=True
+        )
+
+        current_size = temp_buffer.tell()
+        if current_size <= target_bytes:
+            with open(output_path, 'wb') as f:
+                f.write(temp_buffer.getvalue())
+            doc.close()
+            logger.info(f"[Success] Lossless compression hit target. Size: {current_size/1024:.2f} KB")
+            return True
+
+        doc.close()
+
+        # 2. Iterative Image Compression & Downsampling
+        # If lossless isn't enough, we extract, compress, and re-insert images
+        quality = 90
+        dpi_scale = 1.0
+
+        for attempt in range(5):
+            doc = pymupdf.open(input_path)
+            doc.set_metadata({})
+            has_images = False
+
+            for page_num in range(len(doc)):
+                page = doc[page_num]
+                try:
+                    image_list = page.get_images(full=True)
+                except Exception:
+                    image_list = []
+
+                if image_list:
+                    has_images = True
+
+                for img_info in image_list:
+                    xref = img_info[0]
+                    try:
+                        base_image = doc.extract_image(xref)
+                        if not base_image or not base_image.get("image"):
+                            continue
+                        image_bytes = base_image["image"]
+
+                        # Load to Pillow for processing
+                        image = Image.open(io.BytesIO(image_bytes))
+
+                        # Downsample image dimensions slightly if needed
+                        if dpi_scale < 1.0:
+                            new_size = (int(image.width * dpi_scale), int(image.height * dpi_scale))
+                            if new_size[0] > 0 and new_size[1] > 0:
+                                image = image.resize(new_size, Image.Resampling.LANCZOS)
+
+                        # Convert to grayscale / monochrome for small budget targets (< 50KB)
+                        if target_kb < 50 and image.mode in ("RGB", "RGBA"):
+                            image = image.convert("L")
+                        elif image.mode in ("RGBA", "LA", "P"):
+                            image = image.convert("RGB")
+
+                        # Compress image
+                        img_byte_arr = io.BytesIO()
+                        image.save(img_byte_arr, format="JPEG", quality=quality, optimize=True)
+                        compressed_img_bytes = img_byte_arr.getvalue()
+
+                        # Replace image in PDF safely
+                        try:
+                            page.replace_image(xref, stream=compressed_img_bytes)
+                        except Exception:
+                            doc.update_stream(xref, stream=compressed_img_bytes)
+                    except Exception as img_err:
+                        logger.debug(f"Image xref {xref} optimization notice: {img_err}")
+                        continue
+
+            temp_buffer = io.BytesIO()
+            doc.save(
+                temp_buffer,
                 garbage=4,
                 deflate=True,
                 clean=True
             )
-            current_doc.close()
 
-            if temp_io.tell() <= target_bytes:
-                with open(output_path, "wb") as f:
-                    f.write(temp_io.getvalue())
-                return True, temp_io.tell() / 1024
-        except Exception as e:
-            logger.debug(f"Phase 1 basic optimization notice: {e}")
-
-        # Phase 2: Iteratively compress embedded images with decreasing quality and resolution
-        qualities = [85, 70, 50, 30, 15]
-        # Compression strictly preserves color fidelity (RGB / original color channels)
-        for quality in qualities:
-                try:
-                    doc = pymupdf.open(self.input_path)
-                    doc.set_metadata({})
-                    has_images = False
-
-                    for page_num in range(len(doc)):
-                        page = doc[page_num]
-                        try:
-                            image_list = page.get_images(full=True)
-                        except Exception:
-                            image_list = []
-
-                        if image_list:
-                            has_images = True
-
-                        for img_info in image_list:
-                            xref = img_info[0]
-                            try:
-                                base_image = doc.extract_image(xref)
-                                if not base_image:
-                                    continue
-                                image_bytes = base_image.get("image")
-                                if not image_bytes:
-                                    continue
-
-                                pil_img = Image.open(io.BytesIO(image_bytes))
-
-                                # Preserve color fidelity: convert transparent/paletted to RGB
-                                if pil_img.mode in ("RGBA", "LA", "P"):
-                                    pil_img = pil_img.convert("RGB")
-
-                                # Downsample if image is large
-                                max_wh = 600 if target_kb <= 50 else (800 if target_kb <= 200 else 1200)
-                                if pil_img.width > max_wh or pil_img.height > max_wh:
-                                    pil_img.thumbnail((max_wh, max_wh), Image.Resampling.LANCZOS)
-
-                                img_byte_arr = io.BytesIO()
-                                pil_img.save(img_byte_arr, format="JPEG", quality=quality, optimize=True)
-
-                                # Replace original image in the PDF safely
-                                try:
-                                    page.replace_image(xref, stream=img_byte_arr.getvalue())
-                                except Exception:
-                                    doc.update_stream(xref, stream=img_byte_arr.getvalue())
-                            except Exception:
-                                continue
-
-                    if not has_images:
-                        doc.close()
-                        break
-
-                    temp_io = io.BytesIO()
-                    doc.save(
-                        temp_io,
-                        garbage=4,
-                        deflate=True,
-                        clean=True
-                    )
-                    doc.close()
-
-                    current_size = temp_io.tell()
-                    if current_size <= target_bytes:
-                        with open(output_path, "wb") as f:
-                            f.write(temp_io.getvalue())
-                        return True, current_size / 1024
-                except Exception as iter_err:
-                    logger.debug(f"Phase 2 iteration error (q={quality}): {iter_err}")
-                    continue
-
-        # Phase 3: Adaptive Rasterization Fallback (Enforces strict ceilings for stubborn/scanned PDFs)
-        try:
-            doc = pymupdf.open(self.input_path)
-            new_doc = pymupdf.open()
-
-            target_dpi = 72 if target_kb <= 50 else (96 if target_kb <= 150 else (120 if target_kb <= 300 else 150))
-            jpeg_q = 15 if target_kb <= 30 else (25 if target_kb <= 50 else (45 if target_kb <= 150 else 60))
-
-            for page in doc:
-                pix = page.get_pixmap(dpi=target_dpi)
-                img_data = pix.tobytes("png")
-
-                # Preserve full RGB color in compression fallback
-                img = Image.open(io.BytesIO(img_data)).convert("RGB")
-
-                img_byte_arr = io.BytesIO()
-                img.save(img_byte_arr, format="JPEG", quality=jpeg_q, optimize=True)
-
-                new_page = new_doc.new_page(width=page.rect.width, height=page.rect.height)
-                new_page.insert_image(new_page.rect, stream=img_byte_arr.getvalue())
-
-            temp_io = io.BytesIO()
-            new_doc.save(temp_io, garbage=4, deflate=True)
-            new_doc.close()
+            current_size = temp_buffer.tell()
             doc.close()
 
-            with open(output_path, "wb") as f:
-                f.write(temp_io.getvalue())
+            if current_size <= target_bytes:
+                with open(output_path, 'wb') as f:
+                    f.write(temp_buffer.getvalue())
+                logger.info(f"[Success] Compressed to {current_size/1024:.2f} KB (Quality: {quality}, Scale: {dpi_scale})")
+                return True
 
-            final_kb = temp_io.tell() / 1024
-            return temp_io.tell() <= target_bytes, final_kb
-        except Exception as p3_err:
-            logger.warning(f"Phase 3 rasterization fallback error: {p3_err}")
-            return False, 0.0
+            # Degrade parameters step-by-step to meet budget constraints
+            quality -= 15
+            dpi_scale -= 0.15
+            if quality < 20:
+                quality = 20
+            if dpi_scale < 0.4:
+                dpi_scale = 0.4
+
+        # 3. Fallback: Last resort for extremely low budgets (Rasterize whole page as high-contrast mono)
+        logger.warning("[Warning] Budget target is aggressive. Resorting to Monochrome Rasterization...")
+        try:
+            doc = pymupdf.open(input_path)
+            out_doc = pymupdf.open()
+
+            for page in doc:
+                # High-contrast render
+                pix = page.get_pixmap(dpi=150 if target_kb >= 100 else 100)
+                img = Image.open(io.BytesIO(pix.tobytes("png"))).convert("L")
+
+                img_byte_arr = io.BytesIO()
+                # Dynamic quality matching
+                img.save(img_byte_arr, format="JPEG", quality=30 if target_kb < 50 else 55, optimize=True)
+
+                # Rebuild clean page
+                new_page = out_doc.new_page(width=page.rect.width, height=page.rect.height)
+                new_page.insert_image(new_page.rect, stream=img_byte_arr.getvalue())
+
+            temp_buffer = io.BytesIO()
+            out_doc.save(temp_buffer, garbage=4, deflate=True)
+            current_size = temp_buffer.tell()
+
+            with open(output_path, 'wb') as f:
+                f.write(temp_buffer.getvalue())
+            out_doc.close()
+            doc.close()
+            logger.info(f"[Fallback Success] Monochromatic output generated at {current_size/1024:.2f} KB")
+            return current_size <= target_bytes
+        except Exception as fb_err:
+            logger.error(f"Fallback rasterization error: {fb_err}")
+            return False
+
+    def compress_to_target_kb(self, output_path: str, target_kb: int) -> tuple[bool, float]:
+        """
+        Instance adapter for BaseProcessor pipeline.
+        Returns (success: bool, final_size_kb: float).
+        """
+        success = self.compress_pdf(self.input_path, output_path, target_kb)
+        final_size_kb = (os.path.getsize(output_path) / 1024) if os.path.exists(output_path) else 0.0
+        return success, final_size_kb
+
+
+def compress_by_preset(input_path: str, output_path: str, preset_name: str) -> bool:
+    """
+    Executes compression targeting preset byte budgets (UPSC, SSC, RRB_Railway, JEE_Main, NEET_UG, IBPS).
+    """
+    if preset_name in PRESETS:
+        target = PRESETS[preset_name]
+        logger.info(f"Using preset: {preset_name} (Target: {target} KB)")
+        return PDFCompressionEngine.compress_pdf(input_path, output_path, target)
+    else:
+        raise ValueError(f"Preset {preset_name} not found.")
 
 
 class CompressProcessor(BaseProcessor):
