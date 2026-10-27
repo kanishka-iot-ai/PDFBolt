@@ -310,13 +310,20 @@ TARGETED_PAGES = [
     {
         "path": "compress-pdf-to-50kb",
         "h1": "Compress PDF to 50KB Online",
-        "title": "Compress PDF to 50KB Online Free (High Quality) | PDFBolt",
-        "description": "Compress PDF to 50KB online free. Reduce document file size below 50KB for government job applications, identity cards, and exam forms without losing readability.",
+        "title": "Compress PDF to 50KB Online Free (Exact Size & Govt Portal Preset) | PDFBolt",
+        "description": "Compress PDF to 50KB online free without losing readability. Exact size calibration for passport photos, SSC, UPSC, and banking portal uploads. 100% private in-browser.",
         "subtitle": "Shrink PDF documents to under 50KB for SSC, UPSC, banking, and university portal submissions.",
-        "quick_answer": "To compress a PDF to 50KB: 1. Upload your PDF file. 2. The Extreme compression profile is automatically loaded. 3. Click 'Compress PDF' and download your optimized sub-50KB document in seconds.",
-        "target_badge": "Under 50 KB (High Deflate)",
+        "quick_answer": "To compress a PDF to 50KB: 1. Upload your PDF file. 2. The 50KB ceiling preset is automatically loaded. 3. Optionally enable Grayscale for scanned certificates. 4. Click 'Compress PDF' and download your verified sub-50KB document in seconds.",
+        "target_badge": "Under 50 KB (High Deflate & Portal Ready)",
+        "portal_specs": [
+            {"name": "Passport Seva Photograph & Slip", "size": "20 KB – 50 KB", "format": "PDF / JPG", "notes": "Candidate photo, age proof, and address verification"},
+            {"name": "SBI & IBPS Candidate Signature & LTI", "size": "20 KB – 50 KB", "format": "PDF / JPG", "notes": "Left thumb impression and running-hand declaration"},
+            {"name": "State Scholarship & Welfare Portals", "size": "50 KB – 100 KB", "format": "PDF only", "notes": "Annual family income & student domicile certificates"},
+            {"name": "DigiLocker & NSP Document Upload", "size": "Under 50 KB – 100 KB", "format": "PDF", "notes": "Category, bonafide student proof, and fee receipts"},
+            {"name": "RRB Railway Travel Pass (SC/ST)", "size": "50 KB – 100 KB", "format": "PDF only", "notes": "Mandatory for free sleeper class rail travel authority"}
+        ],
         "features": [
-            "Tailored for 20KB–50KB exam upload limitations",
+            "Tailored for strict 20KB–50KB exam upload limitations",
             "Removes unreferenced XRef objects and compacts content streams",
             "Preserves high contrast for signatures, stamps, and official seals",
             "Zero server upload wait times with client-side WebAssembly"
@@ -326,20 +333,53 @@ TARGETED_PAGES = [
             {"name": "Apply 50KB Preset", "text": "Our engine applies stream downsampling and font deduplication."},
             {"name": "Download Document", "text": "Get your verified PDF under 50KB ready for immediate upload."}
         ],
+        "sections": [
+            {
+                "heading": "Why 50KB is the Universal Standard for Exam Portals",
+                "paragraphs": [
+                    "Major recruitment agencies—including the Staff Selection Commission (SSC), Union Public Service Commission (UPSC), and Institute of Banking Personnel Selection (IBPS)—require uploaded identification documents, caste certificates, and marksheets to stay strictly between 20KB and 50KB.",
+                    "Uploading files larger than 50KB results in immediate form rejection with error messages like 'File size exceeded'. PDFBolt ensures your file meets the exact limit without stripping legible details."
+                ]
+            },
+            {
+                "heading": "When to Use 50KB vs 20KB for Exam Uploads",
+                "paragraphs": [
+                    "While small signatures and thumb impressions are often capped at 20KB, certificates with fine text, stamps, and seals require up to 50KB to maintain legal validity. Compressing to 50KB strikes the ideal balance between low byte weight and high visual contrast."
+                ]
+            }
+        ],
         "faqs": [
             {"q": "Can I compress a multi-page PDF to under 50KB?", "a": "For best results, documents under 50KB should be 1 to 3 pages. For larger documents, try our 100KB or 200KB presets."},
+            {"q": "Will signatures and stamps remain dark and legible at 50KB?", "a": "Yes! PDFBolt applies edge contrast enhancement to ink curves and official seals, ensuring they pass automatic document verification and human audits."},
             {"q": "Do I need to sign up or pay to compress to 50KB?", "a": "No. PDFBolt is 100% free with no account creation, no subscriptions, and no hidden file paywalls."}
         ],
-        "related": [("compress-pdf-to-20kb", "Compress to 20KB"), ("compress-pdf-to-100kb", "Compress to 100KB"), ("compress-pdf-for-ssc", "Compress for SSC")]
+        "related": [
+            ("compress-pdf-to-20kb", "Compress to 20KB"),
+            ("compress-pdf-to-100kb", "Compress to 100KB"),
+            ("compress-pdf-to-200kb", "Compress to 200KB"),
+            ("compress-pdf-to-300kb", "Compress to 300KB"),
+            ("compress-pdf-to-500kb", "Compress to 500KB"),
+            ("compress-pdf-to-1mb", "Compress to 1MB"),
+            ("compress-pdf-for-ssc", "Compress for SSC"),
+            ("compress-pdf-for-upsc", "Compress for UPSC"),
+            ("compress-pdf-for-rrb", "Compress for RRB")
+        ]
     },
     {
         "path": "compress-pdf-to-100kb",
         "h1": "Compress PDF to 100KB Online",
-        "title": "Compress PDF to 100KB Online Free – Sharp & Readable | PDFBolt",
-        "description": "Compress PDF to 100KB online for free without losing quality. Ideal for job application portals, government websites, and email attachments with zero server uploads.",
+        "title": "Compress PDF to 100KB Online Free (Exact Size & High Quality) | PDFBolt",
+        "description": "Compress PDF to 100KB online for free without losing quality. Ideal for CBSE/ICSE marksheets, SSC CGL certificates, and university admission portals with zero server uploads.",
         "subtitle": "Shrink PDF documents to under 100KB while preserving sharp vector typography and clean graphics.",
-        "quick_answer": "To compress a PDF to 100KB: 1. Drag & drop your PDF file. 2. Select 'Exact Target Size' (100 KB is pre-selected). 3. Optionally toggle 'Convert to Black & White' for maximum reduction. 4. Click 'Compress PDF' and download your clean, portal-compliant file under 100KB.",
+        "quick_answer": "To compress a PDF to 100KB: 1. Drag & drop your PDF file. 2. The exact 100 KB ceiling is pre-selected. 3. Optionally toggle 'Convert to Black & White' for maximum reduction on scanned certificates. 4. Click 'Compress PDF' and download your clean, portal-compliant file under 100KB.",
         "target_badge": "Under 100 KB (Recommended for Portals)",
+        "portal_specs": [
+            {"name": "CBSE & ICSE Board Marksheets", "size": "Max 100 KB", "format": "PDF only", "notes": "Official matriculation / 12th passing certificate"},
+            {"name": "SSC CGL / CHSL Category & PwD", "size": "100 KB – 200 KB", "format": "PDF", "notes": "Central government SC/ST/OBC/EWS reservation validity"},
+            {"name": "RRB Railway Technical Qualification", "size": "100 KB – 200 KB", "format": "PDF only", "notes": "ITI / NAC / Engineering diploma certificates"},
+            {"name": "Domicile & Income Verification", "size": "50 KB – 100 KB", "format": "PDF", "notes": "Tahsil / Revenue authority issued state domicile proof"},
+            {"name": "Central University Admission Portals", "size": "Max 100 KB", "format": "PDF", "notes": "CUET UG/PG student enrollment & merit rank slips"}
+        ],
         "features": [
             "Targets the strict 100KB maximum file size ceiling required by admission portals",
             "Selectively downsamples raster graphics to 150 DPI while keeping text sharp",
@@ -381,31 +421,69 @@ TARGETED_PAGES = [
             {"q": "Is a 100KB PDF acceptable for GATE, State CET, and university portals?", "a": "Yes. 100KB is the standard ceiling across major admission portals (such as GATE, State CETs, and Central Universities). PDFBolt ensures compliance with official 150 DPI verification guidelines."},
             {"q": "Are my academic certificates stored on any server?", "a": "Never. PDFBolt runs 100% locally in your browser memory using WebAssembly. Your marks, personal information, and grades remain completely private on your device."}
         ],
-        "related": [("compress-pdf-to-50kb", "Compress to 50KB"), ("compress-pdf-to-200kb", "Compress to 200KB"), ("compress-pdf-for-neet", "Compress for NEET")]
+        "related": [
+            ("compress-pdf-to-20kb", "Compress to 20KB"),
+            ("compress-pdf-to-50kb", "Compress to 50KB"),
+            ("compress-pdf-to-200kb", "Compress to 200KB"),
+            ("compress-pdf-to-300kb", "Compress to 300KB"),
+            ("compress-pdf-to-500kb", "Compress to 500KB"),
+            ("compress-pdf-to-1mb", "Compress to 1MB"),
+            ("compress-pdf-for-neet", "Compress for NEET"),
+            ("compress-pdf-for-jee", "Compress for JEE"),
+            ("compress-pdf-for-ssc", "Compress for SSC")
+        ]
     },
     {
         "path": "compress-pdf-to-200kb",
         "h1": "Compress PDF to 200KB Online",
-        "title": "Compress PDF to 200KB Online Free – High Clarity | PDFBolt",
-        "description": "Compress PDF to 200KB online for free. Optimize multi-page academic transcripts, contracts, and NEET/JEE application documents with private local processing.",
+        "title": "Compress PDF to 200KB Online Free (Exact Size & Govt Portal Preset) | PDFBolt",
+        "description": "Compress PDF to 200KB online for free with exact target size. Perfect for NTA NEET, JEE Main, UPSC CSE, and SSC application documents with zero server uploads.",
         "subtitle": "Shrink multi-page marksheets, contracts, and certificates to under 200KB with sharp readability.",
-        "quick_answer": "To compress a PDF to 200KB: 1. Upload your file. 2. Select the Recommended compression setting. 3. Click 'Compress PDF' to download your high-clarity sub-200KB document.",
-        "target_badge": "Under 200 KB (Balanced Clarity)",
+        "quick_answer": "To compress a PDF to 200KB: 1. Upload your file. 2. The 200KB target ceiling is pre-selected. 3. Click 'Compress PDF' to download your high-clarity sub-200KB document.",
+        "target_badge": "Under 200 KB (Balanced Clarity & Portal Ready)",
+        "portal_specs": [
+            {"name": "NTA NEET & JEE Main Applications", "size": "50 KB – 300 KB", "format": "PDF only", "notes": "Class 10 passing, category, and PwBD disability certificates"},
+            {"name": "UPSC CSE Marksheet & Matriculation", "size": "100 KB – 200 KB", "format": "PDF only", "notes": "Mandatory proof of date of birth, degree, and category"},
+            {"name": "SSC CGL / CHSL Educational Qualification", "size": "100 KB – 200 KB", "format": "PDF", "notes": "Graduation degree and provisional certificate uploads"},
+            {"name": "Central Government Caste Validity", "size": "100 KB – 200 KB", "format": "PDF only", "notes": "Mandatory Central list format for active recruitment year"},
+            {"name": "High Court & District Court e-Filing", "size": "Under 200 KB – 2 MB", "format": "PDF/A", "notes": "Petitions, affidavits, and vakalatnama attachments"}
+        ],
         "features": [
             "Standard limit for NTA NEET, JEE Main, and UPSC One-Time Registration",
             "Comfortably compresses 5–10 page documents without degrading charts",
             "Maintains full searchability and text selectable capability",
-            "Executed 100% locally in device memory"
+            "Executed 100% locally in device memory with zero uploads"
         ],
         "how_to": [
-            {"name": "Select File", "text": "Upload your multi-page PDF transcript or application."},
-            {"name": "Process Document", "text": "Our engine balances vector fidelity and image deflate."},
-            {"name": "Download PDF", "text": "Save your file, optimized to pass 200KB portal filters."}
+            {"name": "Select File", "text": "Upload your multi-page PDF transcript, marksheet, or application form."},
+            {"name": "Process Document", "text": "Our engine balances vector fidelity and image deflation to stay below 200KB."},
+            {"name": "Download PDF", "text": "Save your file, pre-calibrated to pass all 200KB portal validators."}
+        ],
+        "sections": [
+            {
+                "heading": "Why 200KB is the Gold Standard for Multi-Page Documents",
+                "paragraphs": [
+                    "A 200KB limit provides the ideal balance between compact file size and high visual fidelity. It allows multi-page documents—such as college marksheets, caste certificates, and employment contracts—to retain their stamps, watermarks, and signatures without blurring.",
+                    "National testing bodies like the National Testing Agency (NTA) for NEET and JEE Main, as well as the UPSC, enforce strict 200KB or 300KB ceilings. PDFBolt's 200KB compressor ensures your PDF stays within bounds while keeping all signatures and verification seals dark and legible."
+                ]
+            }
         ],
         "faqs": [
-            {"q": "Is 200KB enough for a 10-page document?", "a": "For documents that are primarily text with minimal images, 200KB can easily accommodate 10 to 15 pages."}
+            {"q": "Is 200KB enough for a 10-page document?", "a": "For documents that are primarily text with minimal images, 200KB can easily accommodate 10 to 15 pages. For image-heavy scans, 5 to 8 pages fit cleanly with Grayscale mode."},
+            {"q": "Will my NEET or JEE Main application be accepted with this compressed PDF?", "a": "Yes. PDFBolt strictly conforms to NTA guidelines, preserving 150 DPI resolution and text clarity for date of birth and category certificates."},
+            {"q": "Can I compress password-protected PDFs?", "a": "If your PDF is password-protected, use our Unlock PDF tool first to remove the password, then compress it to 200KB."}
         ],
-        "related": [("compress-pdf-to-100kb", "Compress to 100KB"), ("compress-pdf-to-300kb", "Compress to 300KB"), ("compress-pdf-for-neet", "Compress for NEET")]
+        "related": [
+            ("compress-pdf-to-20kb", "Compress to 20KB"),
+            ("compress-pdf-to-50kb", "Compress to 50KB"),
+            ("compress-pdf-to-100kb", "Compress to 100KB"),
+            ("compress-pdf-to-300kb", "Compress to 300KB"),
+            ("compress-pdf-to-500kb", "Compress to 500KB"),
+            ("compress-pdf-to-1mb", "Compress to 1MB"),
+            ("compress-pdf-for-neet", "Compress for NEET"),
+            ("compress-pdf-for-jee", "Compress for JEE"),
+            ("compress-pdf-for-upsc", "Compress for UPSC")
+        ]
     },
     {
         "path": "compress-pdf-to-300kb",
