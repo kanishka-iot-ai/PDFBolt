@@ -82,15 +82,16 @@ async def lifespan(app: FastAPI):
 
 
 is_production = settings.APP_ENV.lower() == "production" or not settings.DEBUG
+show_docs = bool(settings.ENABLE_API_DOCS or (not is_production))
 
 app = FastAPI(
     title=settings.APP_NAME,
     version=settings.APP_VERSION,
     description="Enterprise-grade, modular, secure PDF processing engine with 15-min ephemeral document retention.",
     lifespan=lifespan,
-    docs_url=None if is_production else "/docs",
-    redoc_url=None if is_production else "/redoc",
-    openapi_url=None if is_production else "/openapi.json"
+    docs_url="/docs" if show_docs else None,
+    redoc_url="/redoc" if show_docs else None,
+    openapi_url="/openapi.json" if show_docs else None
 )
 
 # CORS Middleware (Hardened with strict methods, headers & 24h preflight caching)
