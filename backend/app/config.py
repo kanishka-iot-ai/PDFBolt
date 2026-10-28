@@ -16,8 +16,10 @@ class Settings(BaseSettings):
 
     # Partner & B2B Collaboration API Keys
     PARTNER_API_KEYS: Union[str, Dict[str, Any], List[str]] = {}
-    REQUIRE_API_KEY_FOR_EXTERNAL: bool = False
+    REQUIRE_API_KEY_FOR_EXTERNAL: bool = True
     ENABLE_API_DOCS: bool = True
+    ADMIN_PORTAL_PASSWORD: str = "Kkds@cuchd.in"
+    ADMIN_TOKEN_SECRET: str = "pdfbolt_admin_hmac_secret_key_8849f2b901a" 
     PARTNER_DEFAULT_RATE_LIMIT: int = 120
     FRONTEND_INTERNAL_TOKEN: str = "pdfbolt_app_internal_v1_secure"
     MAX_RATE_LIMITER_ENTRIES: int = 20000

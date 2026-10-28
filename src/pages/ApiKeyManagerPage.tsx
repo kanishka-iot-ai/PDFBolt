@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { 
   Key, Lock, ShieldCheck, Check, Copy, Trash2, Eye, EyeOff, 
   RefreshCw, Zap, Code, Terminal, Globe, AlertCircle, CheckCircle2, 
-  LogOut, Send, ExternalLink, ShieldAlert
+  LogOut, Send, ExternalLink, ShieldAlert, Loader2
 } from 'lucide-react';
 
 interface SavedApiKey {
@@ -14,8 +14,8 @@ interface SavedApiKey {
   createdAt: string;
 }
 
-const ADMIN_PASS = 'Kkds@cuchd.in';
-const STORAGE_AUTH_KEY = 'pdfbolt_admin_key_auth';
+const API_BASE_URL = 'https://pdfbolt-api.onrender.com';
+const STORAGE_TOKEN_KEY = 'pdfbolt_admin_session_token_v1';
 const STORAGE_VAULT_KEY = 'pdfbolt_vault_keys_v1';
 
 export const ApiKeyManagerPage: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
@@ -23,6 +23,8 @@ export const ApiKeyManagerPage: React.FC<{ darkMode: boolean }> = ({ darkMode })
   const [passwordInput, setPasswordInput] = useState<string>('');
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [authError, setAuthError] = useState<string>('');
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [isCheckingSession, setIsCheckingSession] = useState<boolean>(true);
 
   // Generator form state
   const [partnerName, setPartnerName] = useState<string>('');
@@ -39,10 +41,9 @@ export const ApiKeyManagerPage: React.FC<{ darkMode: boolean }> = ({ darkMode })
   const [savedKeys, setSavedKeys] = useState<SavedApiKey[]>([]);
   const [pingStatus, setPingStatus] = useState<{ [keyId: string]: string }>({});
 
-  // Check session auth on mount
+  // Check cryptographic server-side session on mount
   useEffect(() => {
     document.title = 'API Key Management & Partner Portal | PDFBolt';
-    // Ensure noindex, nofollow for this private admin page
     let metaRobots = document.querySelector('meta[name="robots"]') as HTMLMetaElement | null;
     if (!metaRobots) {
       metaRobots = document.createElement('meta');
@@ -51,9 +52,29 @@ export const ApiKeyManagerPage: React.FC<{ darkMode: boolean }> = ({ darkMode })
     }
     metaRobots.content = 'noindex, nofollow';
 
-    const savedAuth = sessionStorage.getItem(STORAGE_AUTH_KEY);
-    if (savedAuth === 'authenticated') {
-      setIsAuthenticated(true);
+    const savedToken = sessionStorage.getItem(STORAGE_TOKEN_KEY);
+    if (savedToken) {
+      fetch(`${API_BASE_URL}/api/v1/admin/auth/check`, {
+        headers: { 'Authorization': `Bearer ${savedToken}` }
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.valid) {
+          setIsAuthenticated(true);
+        } else {
+          sessionStorage.removeItem(STORAGE_TOKEN_KEY);
+          setIsAuthenticated(false);
+        }
+      })
+      .catch(() => {
+        sessionStorage.removeItem(STORAGE_TOKEN_KEY);
+        setIsAuthenticated(false);
+      })
+      .finally(() => {
+        setIsCheckingSession(false);
+      });
+    } else {
+      setIsCheckingSession(false);
     }
 
     try {
@@ -66,19 +87,43 @@ export const ApiKeyManagerPage: React.FC<{ darkMode: boolean }> = ({ darkMode })
     }
   }, []);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (passwordInput === ADMIN_PASS) {
-      sessionStorage.setItem(STORAGE_AUTH_KEY, 'authenticated');
-      setIsAuthenticated(true);
-      setAuthError('');
-    } else {
-      setAuthError('Access Denied: Incorrect password. Please try again.');
+    if (!passwordInput.trim() || isSubmitting) return;
+
+    setIsSubmitting(true);
+    setAuthError('');
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/v1/admin/auth/verify`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: passwordInput })
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.success && data.token) {
+        sessionStorage.setItem(STORAGE_TOKEN_KEY, data.token);
+        setIsAuthenticated(true);
+        setAuthError('');
+        setPasswordInput('');
+      } else if (res.status === 429) {
+        setAuthError(data.detail?.message || 'Security Lockout: Too many failed attempts. This IP address is temporarily blocked for 15 minutes.');
+      } else {
+        const remaining = data.detail?.remaining_attempts;
+        const remainingMsg = typeof remaining === 'number' ? ` (${remaining} attempts remaining before 15-min IP lockout)` : '';
+        setAuthError((data.detail?.message || 'Access Denied: Invalid administrator password.') + remainingMsg);
+      }
+    } catch (err: any) {
+      setAuthError('Network error: Unable to verify credentials with the security engine. Please try again.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const handleLogout = () => {
-    sessionStorage.removeItem(STORAGE_AUTH_KEY);
+    sessionStorage.removeItem(STORAGE_TOKEN_KEY);
     setIsAuthenticated(false);
     setPasswordInput('');
   };
@@ -140,7 +185,7 @@ export const ApiKeyManagerPage: React.FC<{ darkMode: boolean }> = ({ darkMode })
     setPingStatus(prev => ({ ...prev, [keyItem.id]: 'Testing...' }));
     const startTime = Date.now();
     try {
-      const res = await fetch('https://pdfbolt-api.onrender.com/api/v1/health', {
+      const res = await fetch(`${API_BASE_URL}/api/v1/health`, {
         headers: { 'X-API-Key': keyItem.key }
       });
       const elapsed = Date.now() - startTime;
@@ -168,18 +213,18 @@ export const ApiKeyManagerPage: React.FC<{ darkMode: boolean }> = ({ darkMode })
               <Lock size={32} strokeWidth={2.2} />
             </div>
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-amber-500/10 text-amber-600 dark:text-amber-400 mb-3 border border-amber-500/20">
-              <ShieldAlert size={14} /> Administrator Only
+              <ShieldAlert size={14} /> Server-Authenticated Portal
             </div>
             <h1 className="text-2xl sm:text-3xl font-black tracking-tight">API Key Management</h1>
             <p className={`mt-2 text-sm ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
-              Enter the administrator password to unlock partner API key generation and client integration credentials.
+              Enter administrator password. Verification is processed server-side with anti-brute-force rate limiting and HMAC token signing.
             </p>
           </div>
 
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
               <label className="block text-xs font-bold uppercase tracking-wider mb-2 opacity-80">
-                Portal Password
+                Administrator Password
               </label>
               <div className="relative">
                 <input
@@ -192,6 +237,7 @@ export const ApiKeyManagerPage: React.FC<{ darkMode: boolean }> = ({ darkMode })
                   placeholder="Enter administrator password"
                   autoFocus
                   required
+                  disabled={isSubmitting}
                   className={`w-full px-4 py-3.5 pr-12 rounded-xl text-sm font-medium border transition-all outline-none ${
                     authError 
                       ? 'border-red-500 focus:ring-2 focus:ring-red-500/30' 
@@ -209,8 +255,8 @@ export const ApiKeyManagerPage: React.FC<{ darkMode: boolean }> = ({ darkMode })
                 </button>
               </div>
               {authError && (
-                <div className="flex items-center gap-2 mt-2 text-xs font-semibold text-red-500">
-                  <AlertCircle size={14} />
+                <div className="flex items-start gap-2 mt-2.5 text-xs font-semibold text-red-500 bg-red-500/10 p-3 rounded-xl border border-red-500/20 leading-relaxed">
+                  <AlertCircle size={15} className="shrink-0 mt-0.5" />
                   <span>{authError}</span>
                 </div>
               )}
@@ -218,16 +264,26 @@ export const ApiKeyManagerPage: React.FC<{ darkMode: boolean }> = ({ darkMode })
 
             <button
               type="submit"
-              className="w-full mt-2 py-3.5 px-6 rounded-xl font-bold text-sm bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-slate-950 shadow-lg shadow-amber-500/20 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+              disabled={isSubmitting || !passwordInput.trim()}
+              className="w-full mt-2 py-3.5 px-6 rounded-xl font-bold text-sm bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-slate-950 shadow-lg shadow-amber-500/20 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
             >
-              <Key size={18} />
-              <span>Unlock Key Portal</span>
+              {isSubmitting ? (
+                <>
+                  <Loader2 size={18} className="animate-spin" />
+                  <span>Verifying with Server...</span>
+                </>
+              ) : (
+                <>
+                  <Key size={18} />
+                  <span>Authenticate & Unlock</span>
+                </>
+              )}
             </button>
           </form>
 
           <div className="mt-8 pt-6 border-t border-slate-200 dark:border-slate-800 text-center">
             <span className="text-xs opacity-50">
-              PDFBolt Enterprise Security • End-to-End Key Isolation
+              Protected by PDFBolt Anti-Brute-Force Shield • Max 5 Attempts per 15 Min
             </span>
           </div>
         </div>
@@ -289,7 +345,7 @@ with open("output.pdf", "wb") as f:
         }`}>
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 mb-2 border border-emerald-500/20">
-              <ShieldCheck size={14} /> Authenticated Admin Session
+              <ShieldCheck size={14} /> Cryptographically Verified Session
             </div>
             <h1 className="text-2xl sm:text-3xl font-black tracking-tight">API Key & Client Integration Portal</h1>
             <p className={`mt-1 text-sm ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
