@@ -56,6 +56,11 @@ def cleanup_temp_dir(dir_path: str):
 # ---------------------------------------------------------------------------
 @router.post("/word-to-pdf", summary="Convert DOCX/DOC to PDF with exact margins & fonts")
 async def convert_word_to_pdf(file: UploadFile = File(...), caller: PartnerIdentity = Depends(verify_partner_api_key)):
+    if caller.is_authenticated_partner and not caller.can_access_feature("word_to_pdf"):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail={"code": "FEATURE_NOT_PERMITTED", "message": "This API key does not have permission to execute the 'word_to_pdf' feature.", "allowed_features": caller.allowed_features}
+        )
     filename = file.filename or "document.docx"
     ext = Path(filename).suffix.lower()
 

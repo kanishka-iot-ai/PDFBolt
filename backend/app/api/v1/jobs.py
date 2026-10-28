@@ -62,6 +62,17 @@ async def create_and_process_job(
     if not upload_list:
         raise PDFBoltError("NO_FILES_PROVIDED", "No document files uploaded for processing.")
 
+    # Feature authorization check for partner keys
+    if caller.is_authenticated_partner and not caller.can_access_feature(operation):
+        raise HTTPException(
+            status_code=403,
+            detail={
+                "code": "FEATURE_NOT_PERMITTED",
+                "message": f"This API key does not have permission to execute the '{operation}' feature.",
+                "allowed_features": caller.allowed_features
+            }
+        )
+
     # Execute universal 20-step pipeline
     job = await job_service.execute_job(
         operation=operation,

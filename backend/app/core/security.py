@@ -231,6 +231,9 @@ class RateLimiter:
 rate_limiter = RateLimiter(requests_per_minute=60, max_entries=getattr(settings, "MAX_RATE_LIMITER_ENTRIES", 20000))
 
 
+import json
+from dataclasses import field
+
 @dataclass
 class PartnerIdentity:
     partner_id: str
@@ -238,6 +241,16 @@ class PartnerIdentity:
     tier: str
     rate_limit_per_minute: int
     is_authenticated_partner: bool
+    allowed_features: List[str] = field(default_factory=lambda: ["*"])
+    created_at: str = ""
+
+    def can_access_feature(self, feature_name: str) -> bool:
+        """Determines if this partner key is authorized to execute the requested feature."""
+        if not self.allowed_features or "*" in self.allowed_features or "all" in self.allowed_features:
+            return True
+        norm = feature_name.lower().replace("-", "_")
+        allowed_norm = [f.lower().replace("-", "_") for f in self.allowed_features]
+        return norm in allowed_norm or "*" in allowed_norm or "all" in allowed_norm
 
 
 def hash_api_key(raw_key: str) -> str:
@@ -248,41 +261,188 @@ def hash_api_key(raw_key: str) -> str:
 class PartnerKeyRegistry:
     def __init__(self):
         self._key_hash_map: Dict[str, PartnerIdentity] = {}
+        self._records_map: Dict[str, Dict[str, Any]] = {}
         self.reload_keys()
 
+    def _get_storage_path(self) -> Path:
+        base_dir = Path(getattr(settings, "TEMP_DIR", "/tmp/pdfbolt"))
+        try:
+            base_dir.mkdir(parents=True, exist_ok=True)
+            return base_dir / "partner_keys_vault.json"
+        except Exception:
+            fallback = Path(__file__).resolve().parent.parent / "data"
+            fallback.mkdir(parents=True, exist_ok=True)
+            return fallback / "partner_keys_vault.json"
+
     def reload_keys(self):
-        """Loads and pre-hashes configured partner keys into memory on startup."""
+        """Loads environment keys and dynamic persistent keys into memory."""
         self._key_hash_map.clear()
+        self._records_map.clear()
+
+        # 1. Environment Config Keys (render.yaml or ENV)
         raw_map = settings.PARTNER_API_KEYS if isinstance(settings.PARTNER_API_KEYS, dict) else {}
-        
         for pid, pdata in raw_map.items():
             if isinstance(pdata, str):
                 raw_key = pdata
                 tier = "standard"
                 rate_limit = settings.PARTNER_DEFAULT_RATE_LIMIT
+                features = ["*"]
             elif isinstance(pdata, dict):
                 raw_key = pdata.get("key", "")
                 tier = pdata.get("tier", "standard")
                 rate_limit = pdata.get("rate_limit", settings.PARTNER_DEFAULT_RATE_LIMIT)
+                features = pdata.get("allowed_features") or pdata.get("features") or ["*"]
             else:
                 continue
 
             if raw_key:
                 khash = hash_api_key(raw_key)
-                self._key_hash_map[khash] = PartnerIdentity(
+                identity = PartnerIdentity(
                     partner_id=pid,
                     name=pid.replace("_", " ").title(),
                     tier=tier,
                     rate_limit_per_minute=rate_limit,
-                    is_authenticated_partner=True
+                    is_authenticated_partner=True,
+                    allowed_features=features
                 )
+                self._key_hash_map[khash] = identity
+                self._records_map[pid] = {
+                    "partner_id": pid,
+                    "name": identity.name,
+                    "tier": tier,
+                    "rate_limit": rate_limit,
+                    "allowed_features": features,
+                    "created_at": "Environment Config",
+                    "key_preview": f"{raw_key[:14]}...{raw_key[-4:]}" if len(raw_key) > 18 else "***"
+                }
+
+        # 2. Dynamic Persistent Keys on Disk (Zero Render Manual Work)
+        storage_file = self._get_storage_path()
+        if storage_file.exists():
+            try:
+                with open(storage_file, "r", encoding="utf-8") as f:
+                    dynamic_data = json.load(f)
+                if isinstance(dynamic_data, dict):
+                    for pid, pdata in dynamic_data.items():
+                        raw_key = pdata.get("key", "")
+                        tier = pdata.get("tier", "pro")
+                        rate_limit = pdata.get("rate_limit", 300)
+                        features = pdata.get("allowed_features", ["*"])
+                        created_at = pdata.get("created_at", "Dynamic")
+                        name = pdata.get("name", pid.replace("_", " ").title())
+
+                        if raw_key:
+                            khash = hash_api_key(raw_key)
+                            self._key_hash_map[khash] = PartnerIdentity(
+                                partner_id=pid,
+                                name=name,
+                                tier=tier,
+                                rate_limit_per_minute=rate_limit,
+                                is_authenticated_partner=True,
+                                allowed_features=features,
+                                created_at=created_at
+                            )
+                            self._records_map[pid] = {
+                                "partner_id": pid,
+                                "name": name,
+                                "tier": tier,
+                                "rate_limit": rate_limit,
+                                "allowed_features": features,
+                                "created_at": created_at,
+                                "key_preview": f"{raw_key[:14]}...{raw_key[-4:]}"
+                            }
+            except Exception as e:
+                pass
+
+    def register_key(
+        self,
+        partner_id: str,
+        raw_key: str,
+        name: str,
+        tier: str = "pro",
+        rate_limit: int = 300,
+        allowed_features: Optional[List[str]] = None,
+        created_at: str = ""
+    ) -> PartnerIdentity:
+        """Dynamically registers and persists a key instantly without touching Render."""
+        features = allowed_features if (allowed_features and len(allowed_features) > 0) else ["*"]
+        khash = hash_api_key(raw_key)
+
+        identity = PartnerIdentity(
+            partner_id=partner_id,
+            name=name,
+            tier=tier,
+            rate_limit_per_minute=rate_limit,
+            is_authenticated_partner=True,
+            allowed_features=features,
+            created_at=created_at or time.strftime("%b %d, %Y, %I:%M %p")
+        )
+
+        self._key_hash_map[khash] = identity
+        self._records_map[partner_id] = {
+            "partner_id": partner_id,
+            "name": name,
+            "tier": tier,
+            "rate_limit": rate_limit,
+            "allowed_features": features,
+            "created_at": identity.created_at,
+            "key_preview": f"{raw_key[:14]}...{raw_key[-4:]}"
+        }
+
+        # Persist to disk
+        storage_file = self._get_storage_path()
+        try:
+            current_data = {}
+            if storage_file.exists():
+                with open(storage_file, "r", encoding="utf-8") as f:
+                    current_data = json.load(f)
+            current_data[partner_id] = {
+                "key": raw_key,
+                "name": name,
+                "tier": tier,
+                "rate_limit": rate_limit,
+                "allowed_features": features,
+                "created_at": identity.created_at
+            }
+            with open(storage_file, "w", encoding="utf-8") as f:
+                json.dump(current_data, f, indent=2)
+        except Exception:
+            pass
+
+        return identity
+
+    def delete_key(self, partner_id: str) -> bool:
+        """Revokes a key in real-time from memory and persistent disk."""
+        # Find hash to remove
+        found = False
+        target_hashes = [h for h, ident in self._key_hash_map.items() if ident.partner_id == partner_id]
+        for h in target_hashes:
+            self._key_hash_map.pop(h, None)
+            found = True
+        self._records_map.pop(partner_id, None)
+
+        storage_file = self._get_storage_path()
+        if storage_file.exists():
+            try:
+                with open(storage_file, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                if partner_id in data:
+                    del data[partner_id]
+                    with open(storage_file, "w", encoding="utf-8") as f:
+                        json.dump(data, f, indent=2)
+                    found = True
+            except Exception:
+                pass
+        return found
+
+    def list_keys(self) -> List[Dict[str, Any]]:
+        """Returns metadata for all registered partner keys."""
+        return list(self._records_map.values())
 
     def authenticate_key(self, raw_key: Optional[str]) -> Optional[PartnerIdentity]:
         if not raw_key:
             return None
         candidate_hash = hash_api_key(raw_key)
-        
-        # Constant-time comparison across registered key digests
         for stored_hash, identity in self._key_hash_map.items():
             if secrets.compare_digest(candidate_hash, stored_hash):
                 return identity

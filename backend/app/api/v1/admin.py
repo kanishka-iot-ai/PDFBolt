@@ -149,3 +149,114 @@ async def check_admin_session(
         "valid": True,
         "client_ip": get_client_ip(request)
     }
+
+
+def _require_admin(authorization: str = Header(default=""), x_admin_token: str = Header(default="", alias="X-Admin-Token")):
+    token = ""
+    if authorization.startswith("Bearer "):
+        token = authorization[7:].strip()
+    elif x_admin_token:
+        token = x_admin_token.strip()
+
+    if not token or not verify_admin_token(token):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail={"code": "UNAUTHORIZED_ADMIN", "message": "Admin authorization token is missing or invalid."}
+        )
+    return True
+
+
+from backend.app.core.security import partner_registry
+from typing import Optional
+
+class CreateKeyPayload(BaseModel):
+    name: str
+    tier: str = "pro"
+    rate_limit: Optional[int] = 300
+    allowed_features: List[str] = ["*"]
+    key_prefix: str = "pdfbolt_live_"
+
+
+@router.get("/keys", summary="List all registered client API keys")
+async def list_registered_keys(
+    authorization: str = Header(default=""),
+    x_admin_token: str = Header(default="", alias="X-Admin-Token")
+):
+    _require_admin(authorization, x_admin_token)
+    keys = partner_registry.list_keys()
+    return {
+        "success": True,
+        "count": len(keys),
+        "keys": keys
+    }
+
+
+@router.post("/keys", summary="Generate & automatically activate new client API key on live server")
+async def create_and_activate_key(
+    payload: CreateKeyPayload,
+    authorization: str = Header(default=""),
+    x_admin_token: str = Header(default="", alias="X-Admin-Token")
+):
+    _require_admin(authorization, x_admin_token)
+
+    # 1. Clean partner id slug
+    clean_name = payload.name.strip() or "Client Partner"
+    partner_id = clean_name.lower().replace(" ", "_")
+    partner_id = "".join(c for c in partner_id if c.isalnum() or c == "_")
+    if not partner_id:
+        partner_id = f"partner_{int(time.time())}"
+
+    # Append timestamp if conflict
+    if any(k.get("partner_id") == partner_id for k in partner_registry.list_keys()):
+        partner_id = f"{partner_id}_{int(time.time()) % 10000}"
+
+    # 2. Generate 256-bit cryptographically secure key
+    prefix = payload.key_prefix if payload.key_prefix in ["pdfbolt_live_", "pdfbolt_test_"] else "pdfbolt_live_"
+    random_bytes = secrets.token_urlsafe(24)
+    raw_key = f"{prefix}{random_bytes}"
+
+    # 3. Rate limit selection
+    rate_limit = payload.rate_limit
+    if not rate_limit:
+        rate_limit = 120 if payload.tier == "standard" else 300 if payload.tier == "pro" else 1000
+
+    # 4. Features
+    features = payload.allowed_features if (payload.allowed_features and len(payload.allowed_features) > 0) else ["*"]
+
+    # 5. Automatically activate in server memory and persistent disk (Zero Render interaction needed!)
+    identity = partner_registry.register_key(
+        partner_id=partner_id,
+        raw_key=raw_key,
+        name=clean_name,
+        tier=payload.tier,
+        rate_limit=rate_limit,
+        allowed_features=features
+    )
+
+    logger.info(f"Auto-activated client API key for '{clean_name}' (ID: {partner_id}, Features: {features})")
+
+    return {
+        "success": True,
+        "activated_live": True,
+        "partner_id": partner_id,
+        "key": raw_key,
+        "name": clean_name,
+        "tier": payload.tier,
+        "rate_limit": rate_limit,
+        "allowed_features": features,
+        "created_at": identity.created_at
+    }
+
+
+@router.delete("/keys/{partner_id}", summary="Revoke a client API key immediately")
+async def revoke_client_key(
+    partner_id: str,
+    authorization: str = Header(default=""),
+    x_admin_token: str = Header(default="", alias="X-Admin-Token")
+):
+    _require_admin(authorization, x_admin_token)
+    deleted = partner_registry.delete_key(partner_id)
+    if not deleted:
+        raise HTTPException(status_code=404, detail="Partner key not found.")
+    logger.info(f"Revoked client API key: {partner_id}")
+    return {"success": True, "message": f"Partner key '{partner_id}' has been revoked immediately."}

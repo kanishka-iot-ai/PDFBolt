@@ -1,13 +1,17 @@
 /**
- * PDFBolt Web & Client SDK v1.0.0
+ * PDFBolt Web & Client SDK v1.1.0
  * Universal client library and drop-in embeddable widget for PDFBolt Processing API.
  * https://pdfbolt.in
  * 
- * Usage 1: Drop-in Embeddable Widget (Zero-Code for websites & WordPress)
+ * Usage 1: Drop-in Embeddable Widget with Dropdown Tool Selector
+ * <div data-pdfbolt-tool="dropdown" data-pdfbolt-key="YOUR_API_KEY"></div>
+ * <script src="https://pdfbolt.in/sdk/pdfbolt.js" async></script>
+ * 
+ * Usage 2: Single Tool Widget (e.g. Compress or Word to PDF)
  * <div data-pdfbolt-tool="compress" data-pdfbolt-key="YOUR_API_KEY"></div>
  * <script src="https://pdfbolt.in/sdk/pdfbolt.js" async></script>
  * 
- * Usage 2: Programmatic JavaScript / TypeScript
+ * Usage 3: Programmatic JavaScript / TypeScript
  * const pdfbolt = new PDFBolt({ apiKey: "YOUR_API_KEY" });
  * const blob = await pdfbolt.compress(file, { targetKb: 100 });
  */
@@ -112,7 +116,7 @@
       if (!res.ok) {
         let errData;
         try { errData = await res.json(); } catch (_) { errData = { message: res.statusText }; }
-        throw new Error(errData.detail || errData.message || `Conversion Error (${res.status})`);
+        throw new Error(errData.detail?.message || errData.detail || errData.message || `Conversion Error (${res.status})`);
       }
 
       const blob = await res.blob();
@@ -268,9 +272,6 @@
     // ------------------------------------------------------------------------
     // Static Utilities
     // ------------------------------------------------------------------------
-    /**
-     * Triggers instant browser download of any Blob.
-     */
     static downloadBlob(blob, filename) {
       const fname = filename || blob.filename || 'download.pdf';
       const url = URL.createObjectURL(blob);
@@ -284,13 +285,8 @@
     }
 
     // ------------------------------------------------------------------------
-    // Drop-in Embeddable Web Widget
+    // Drop-in Embeddable Web Widget with Dropdown Support
     // ------------------------------------------------------------------------
-    /**
-     * Mounts an interactive PDF processing widget into any DOM element.
-     * @param {string|HTMLElement} target - CSS selector or element
-     * @param {Object} config - { apiKey, tool: 'compress'|'merge'|'word-to-pdf', ... }
-     */
     static mount(target, config = {}) {
       const el = typeof target === 'string' ? document.querySelector(target) : target;
       if (!el) {
@@ -299,23 +295,24 @@
       }
 
       const apiKey = config.apiKey || el.getAttribute('data-pdfbolt-key') || '';
-      const tool = (config.tool || el.getAttribute('data-pdfbolt-tool') || 'compress').toLowerCase();
+      let initialTool = (config.tool || el.getAttribute('data-pdfbolt-tool') || 'dropdown').toLowerCase();
       const theme = config.theme || el.getAttribute('data-pdfbolt-theme') || 'light';
       const targetKb = config.targetKb || el.getAttribute('data-pdfbolt-target-kb');
 
-      const toolTitles = {
-        'compress': 'Compress PDF File',
-        'merge': 'Merge Multiple PDFs',
-        'word-to-pdf': 'Word to PDF Converter',
-        'pdf-to-word': 'PDF to Word Converter',
-        'excel-to-pdf': 'Excel to PDF Converter',
-        'ppt-to-pdf': 'PowerPoint to PDF Converter',
-        'protect': 'Protect PDF with Password',
-        'ocr': 'OCR Searchable PDF'
-      };
+      const toolOptions = [
+        { id: 'compress', name: 'Compress PDF', title: 'Compress PDF File', multi: false },
+        { id: 'merge', name: 'Merge PDFs', title: 'Merge Multiple PDFs', multi: true },
+        { id: 'word-to-pdf', name: 'Word to PDF', title: 'Word (.docx/.doc) to PDF', multi: false },
+        { id: 'pdf-to-word', name: 'PDF to Word', title: 'PDF to Word (.docx)', multi: false },
+        { id: 'excel-to-pdf', name: 'Excel to PDF', title: 'Excel (.xlsx) to PDF', multi: false },
+        { id: 'ppt-to-pdf', name: 'PowerPoint to PDF', title: 'PowerPoint (.pptx) to PDF', multi: false },
+        { id: 'jpg-to-pdf', name: 'Images to PDF', title: 'Images (JPG/PNG) to PDF', multi: true },
+        { id: 'ocr', name: 'OCR Searchable PDF', title: 'OCR Scanned PDF', multi: false },
+        { id: 'protect', name: 'Protect PDF', title: 'Password Protect PDF', multi: false }
+      ];
 
-      const title = config.title || toolTitles[tool] || 'Process Document with PDFBolt';
-      const isMulti = tool === 'merge' || tool === 'jpg-to-pdf';
+      const isDropdownMode = initialTool === 'dropdown' || initialTool === 'all' || initialTool === 'multi';
+      let activeToolId = isDropdownMode ? 'compress' : initialTool;
 
       const client = new PDFBolt({ apiKey, baseUrl: config.baseUrl });
 
@@ -324,7 +321,7 @@
           font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
           border: 2px dashed #3b82f6;
           border-radius: 16px;
-          padding: 28px 20px;
+          padding: 24px 20px;
           text-align: center;
           background: ${theme === 'dark' ? '#0f172a' : '#f8fafc'};
           color: ${theme === 'dark' ? '#f1f5f9' : '#1e293b'};
@@ -333,15 +330,41 @@
           box-sizing: border-box;
           transition: all 0.2s ease;
         ">
-          <div style="margin-bottom: 14px;">
-            <svg style="width: 44px; height: 44px; color: #2563eb; margin: 0 auto;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <!-- Dropdown Tool Selector (If in dropdown/all mode) -->
+          ${isDropdownMode ? `
+            <div style="margin-bottom: 16px; text-align: left;">
+              <label style="display: block; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; opacity: 0.8;">Select PDF Tool:</label>
+              <select class="pdfbolt-tool-dropdown" style="
+                width: 100%;
+                padding: 10px 14px;
+                font-size: 14px;
+                font-weight: 600;
+                border-radius: 10px;
+                border: 1px solid ${theme === 'dark' ? '#334155' : '#cbd5e1'};
+                background: ${theme === 'dark' ? '#1e293b' : '#ffffff'};
+                color: ${theme === 'dark' ? '#f8fafc' : '#0f172a'};
+                outline: none;
+                cursor: pointer;
+              ">
+                ${toolOptions.map(t => `<option value="${t.id}" ${t.id === activeToolId ? 'selected' : ''}>${t.name}</option>`).join('')}
+              </select>
+            </div>
+          ` : ''}
+
+          <div style="margin-bottom: 12px;">
+            <svg style="width: 40px; height: 40px; color: #2563eb; margin: 0 auto;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
             </svg>
           </div>
-          <h3 style="margin: 0 0 6px 0; font-size: 19px; font-weight: 700; color: #1e40af;">${title}</h3>
-          <p style="margin: 0 0 16px 0; font-size: 13.5px; opacity: 0.8;">Drag & drop your ${isMulti ? 'files' : 'file'} here, or click to browse</p>
           
-          <input type="file" class="pdfbolt-file-input" ${isMulti ? 'multiple' : ''} style="display: none;" />
+          <h3 class="pdfbolt-title" style="margin: 0 0 6px 0; font-size: 18px; font-weight: 700; color: #1e40af;">
+            ${(toolOptions.find(t => t.id === activeToolId) || {}).title || 'Process Document'}
+          </h3>
+          <p class="pdfbolt-subtext" style="margin: 0 0 16px 0; font-size: 13px; opacity: 0.8;">
+            Drag & drop your files here, or click to choose
+          </p>
+          
+          <input type="file" class="pdfbolt-file-input" style="display: none;" />
           
           <button type="button" class="pdfbolt-browse-btn" style="
             background: #2563eb;
@@ -354,7 +377,7 @@
             cursor: pointer;
             box-shadow: 0 4px 6px -1px rgba(37,99,235,0.25);
             transition: background 0.15s ease;
-          ">Choose ${isMulti ? 'Files' : 'File'}</button>
+          ">Choose File</button>
           
           <div class="pdfbolt-status" style="margin-top: 14px; font-size: 14px; font-weight: 500; display: none;"></div>
           
@@ -379,14 +402,39 @@
       `;
 
       const container = el.querySelector('.pdfbolt-widget');
+      const dropdown = el.querySelector('.pdfbolt-tool-dropdown');
+      const titleEl = el.querySelector('.pdfbolt-title');
+      const subtextEl = el.querySelector('.pdfbolt-subtext');
       const fileInput = el.querySelector('.pdfbolt-file-input');
       const browseBtn = el.querySelector('.pdfbolt-browse-btn');
       const statusDiv = el.querySelector('.pdfbolt-status');
       const downloadBtn = el.querySelector('.pdfbolt-download-btn');
 
+      function updateToolUI(toolId) {
+        activeToolId = toolId;
+        const cur = toolOptions.find(t => t.id === toolId) || toolOptions[0];
+        titleEl.textContent = cur.title;
+        subtextEl.textContent = `Drag & drop your ${cur.multi ? 'files' : 'file'} here, or click to choose`;
+        browseBtn.textContent = `Choose ${cur.multi ? 'Files' : 'File'}`;
+        if (cur.multi) {
+          fileInput.setAttribute('multiple', 'multiple');
+        } else {
+          fileInput.removeAttribute('multiple');
+        }
+        statusDiv.style.display = 'none';
+        downloadBtn.style.display = 'none';
+        browseBtn.style.display = 'inline-block';
+      }
+
+      if (dropdown) {
+        dropdown.addEventListener('change', (e) => {
+          updateToolUI(e.target.value);
+        });
+      }
+      updateToolUI(activeToolId);
+
       browseBtn.addEventListener('click', () => fileInput.click());
 
-      // Drag & drop highlight
       container.addEventListener('dragover', (e) => {
         e.preventDefault();
         container.style.borderColor = '#1d4ed8';
@@ -420,20 +468,24 @@
 
         try {
           let outputBlob;
-          if (tool === 'compress') {
+          if (activeToolId === 'compress') {
             outputBlob = await client.compress(files[0], { targetKb: targetKb ? parseInt(targetKb, 10) : null });
-          } else if (tool === 'merge') {
+          } else if (activeToolId === 'merge') {
             outputBlob = await client.merge(Array.from(files));
-          } else if (tool === 'word-to-pdf') {
+          } else if (activeToolId === 'word-to-pdf') {
             outputBlob = await client.wordToPdf(files[0]);
-          } else if (tool === 'pdf-to-word') {
+          } else if (activeToolId === 'pdf-to-word') {
             outputBlob = await client.pdfToWord(files[0]);
-          } else if (tool === 'excel-to-pdf') {
+          } else if (activeToolId === 'excel-to-pdf') {
             outputBlob = await client.excelToPdf(files[0]);
-          } else if (tool === 'ppt-to-pdf') {
+          } else if (activeToolId === 'ppt-to-pdf') {
             outputBlob = await client.pptToPdf(files[0]);
-          } else if (tool === 'ocr') {
+          } else if (activeToolId === 'jpg-to-pdf') {
+            outputBlob = await client.jpgToPdf(Array.from(files));
+          } else if (activeToolId === 'ocr') {
             outputBlob = await client.ocr(files[0]);
+          } else if (activeToolId === 'protect') {
+            outputBlob = await client.protect(files[0], 'PDFBoltSecure123');
           } else {
             outputBlob = await client.compress(files[0]);
           }
@@ -460,16 +512,12 @@
       }
     }
 
-    // ------------------------------------------------------------------------
-    // Auto-Mount on Page Load
-    // ------------------------------------------------------------------------
     static autoInit() {
       const widgets = document.querySelectorAll('[data-pdfbolt-tool], [data-pdfbolt-key]');
       widgets.forEach(w => PDFBolt.mount(w));
     }
   }
 
-  // Auto-run if embedded in browser
   if (typeof window !== 'undefined' && typeof document !== 'undefined') {
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', () => PDFBolt.autoInit());

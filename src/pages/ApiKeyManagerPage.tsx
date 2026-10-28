@@ -2,21 +2,39 @@ import React, { useState, useEffect } from 'react';
 import { 
   Key, Lock, ShieldCheck, Check, Copy, Trash2, Eye, EyeOff, 
   RefreshCw, Zap, Code, Terminal, Globe, AlertCircle, CheckCircle2, 
-  LogOut, Send, ExternalLink, ShieldAlert, Loader2
+  LogOut, Send, ExternalLink, ShieldAlert, Loader2, CheckSquare, Square,
+  Layers, Sliders, ChevronDown
 } from 'lucide-react';
 
-interface SavedApiKey {
-  id: string;
-  key: string;
-  partnerName: string;
-  tier: 'standard' | 'pro' | 'enterprise' | 'custom';
-  rateLimit: number;
-  createdAt: string;
+interface ServerApiKey {
+  partner_id: string;
+  name: string;
+  tier: string;
+  rate_limit: number;
+  allowed_features: string[];
+  created_at: string;
+  key_preview?: string;
+  key?: string;
 }
 
 const API_BASE_URL = 'https://pdfbolt-api.onrender.com';
 const STORAGE_TOKEN_KEY = 'pdfbolt_admin_session_token_v1';
-const STORAGE_VAULT_KEY = 'pdfbolt_vault_keys_v1';
+
+const ALL_AVAILABLE_FEATURES = [
+  { id: 'compress', label: 'Compress PDF', category: 'Optimization' },
+  { id: 'merge', label: 'Merge Multiple PDFs', category: 'Organization' },
+  { id: 'split', label: 'Split & Extract Pages', category: 'Organization' },
+  { id: 'word_to_pdf', label: 'Word to PDF (.docx)', category: 'Conversion' },
+  { id: 'pdf_to_word', label: 'PDF to Word (.docx)', category: 'Conversion' },
+  { id: 'excel_to_pdf', label: 'Excel to PDF (.xlsx)', category: 'Conversion' },
+  { id: 'ppt_to_pdf', label: 'PowerPoint to PDF (.pptx)', category: 'Conversion' },
+  { id: 'jpg_to_pdf', label: 'Images to PDF (JPG/PNG)', category: 'Conversion' },
+  { id: 'pdf_to_jpg', label: 'PDF to Images (JPG)', category: 'Conversion' },
+  { id: 'ocr', label: 'OCR Searchable PDF', category: 'Intelligence' },
+  { id: 'protect', label: 'Protect & Unlock PDF', category: 'Security' },
+  { id: 'redact', label: 'Redact Sensitive Data', category: 'Security' },
+  { id: 'analyze', label: 'Document Forensics & Metadata', category: 'Inspection' },
+];
 
 export const ApiKeyManagerPage: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
@@ -24,22 +42,26 @@ export const ApiKeyManagerPage: React.FC<{ darkMode: boolean }> = ({ darkMode })
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [authError, setAuthError] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  const [isCheckingSession, setIsCheckingSession] = useState<boolean>(true);
+  const [adminToken, setAdminToken] = useState<string>('');
 
   // Generator form state
   const [partnerName, setPartnerName] = useState<string>('');
-  const [tier, setTier] = useState<'standard' | 'pro' | 'enterprise' | 'custom'>('pro');
-  const [customRateLimit, setCustomRateLimit] = useState<number>(300);
+  const [tier, setTier] = useState<'standard' | 'pro' | 'enterprise'>('pro');
   const [keyPrefix, setKeyPrefix] = useState<'pdfbolt_live_' | 'pdfbolt_test_'>('pdfbolt_live_');
   
-  // Newly generated key
-  const [generatedKey, setGeneratedKey] = useState<SavedApiKey | null>(null);
-  const [copiedSection, setCopiedSection] = useState<string>('');
-  const [activeTab, setActiveTab] = useState<'embed' | 'render' | 'js' | 'python' | 'curl'>('embed');
+  // Feature scope selection
+  const [featurePreset, setFeaturePreset] = useState<'all' | 'conversions' | 'compress' | 'security' | 'custom'>('all');
+  const [selectedFeatures, setSelectedFeatures] = useState<string[]>(['*']);
 
-  // Vault state
-  const [savedKeys, setSavedKeys] = useState<SavedApiKey[]>([]);
-  const [pingStatus, setPingStatus] = useState<{ [keyId: string]: string }>({});
+  // Newly generated key
+  const [generatedKey, setGeneratedKey] = useState<ServerApiKey | null>(null);
+  const [copiedSection, setCopiedSection] = useState<string>('');
+  const [activeTab, setActiveTab] = useState<'dropdown_embed' | 'single_embed' | 'js' | 'python' | 'curl'>('dropdown_embed');
+
+  // Server Keys Vault
+  const [serverKeys, setServerKeys] = useState<ServerApiKey[]>([]);
+  const [isLoadingKeys, setIsLoadingKeys] = useState<boolean>(false);
+  const [pingStatus, setPingStatus] = useState<{ [partnerId: string]: string }>({});
 
   // Check cryptographic server-side session on mount
   useEffect(() => {
@@ -61,6 +83,8 @@ export const ApiKeyManagerPage: React.FC<{ darkMode: boolean }> = ({ darkMode })
       .then(data => {
         if (data.valid) {
           setIsAuthenticated(true);
+          setAdminToken(savedToken);
+          fetchServerKeys(savedToken);
         } else {
           sessionStorage.removeItem(STORAGE_TOKEN_KEY);
           setIsAuthenticated(false);
@@ -69,23 +93,26 @@ export const ApiKeyManagerPage: React.FC<{ darkMode: boolean }> = ({ darkMode })
       .catch(() => {
         sessionStorage.removeItem(STORAGE_TOKEN_KEY);
         setIsAuthenticated(false);
-      })
-      .finally(() => {
-        setIsCheckingSession(false);
       });
-    } else {
-      setIsCheckingSession(false);
-    }
-
-    try {
-      const stored = localStorage.getItem(STORAGE_VAULT_KEY);
-      if (stored) {
-        setSavedKeys(JSON.parse(stored));
-      }
-    } catch (_) {
-      // ignore JSON parse error
     }
   }, []);
+
+  const fetchServerKeys = async (token: string) => {
+    setIsLoadingKeys(true);
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/v1/admin/keys`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (res.ok && data.success && Array.isArray(data.keys)) {
+        setServerKeys(data.keys);
+      }
+    } catch (_) {
+      // server connection error fallback
+    } finally {
+      setIsLoadingKeys(false);
+    }
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -105,9 +132,11 @@ export const ApiKeyManagerPage: React.FC<{ darkMode: boolean }> = ({ darkMode })
 
       if (res.ok && data.success && data.token) {
         sessionStorage.setItem(STORAGE_TOKEN_KEY, data.token);
+        setAdminToken(data.token);
         setIsAuthenticated(true);
         setAuthError('');
         setPasswordInput('');
+        fetchServerKeys(data.token);
       } else if (res.status === 429) {
         setAuthError(data.detail?.message || 'Security Lockout: Too many failed attempts. This IP address is temporarily blocked for 15 minutes.');
       } else {
@@ -125,53 +154,106 @@ export const ApiKeyManagerPage: React.FC<{ darkMode: boolean }> = ({ darkMode })
   const handleLogout = () => {
     sessionStorage.removeItem(STORAGE_TOKEN_KEY);
     setIsAuthenticated(false);
+    setAdminToken('');
     setPasswordInput('');
+    setServerKeys([]);
+    setGeneratedKey(null);
   };
 
-  const generateCryptographicKey = (prefix: string): string => {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_';
-    const randomBytes = new Uint8Array(28);
-    window.crypto.getRandomValues(randomBytes);
-    let result = '';
-    for (let i = 0; i < randomBytes.length; i++) {
-      result += chars[randomBytes[i] % chars.length];
+  // Feature presets logic
+  const handlePresetChange = (preset: 'all' | 'conversions' | 'compress' | 'security' | 'custom') => {
+    setFeaturePreset(preset);
+    if (preset === 'all') {
+      setSelectedFeatures(['*']);
+    } else if (preset === 'conversions') {
+      setSelectedFeatures(['word_to_pdf', 'pdf_to_word', 'excel_to_pdf', 'ppt_to_pdf', 'jpg_to_pdf', 'pdf_to_jpg']);
+    } else if (preset === 'compress') {
+      setSelectedFeatures(['compress']);
+    } else if (preset === 'security') {
+      setSelectedFeatures(['protect', 'redact', 'ocr']);
+    } else if (preset === 'custom') {
+      if (selectedFeatures.includes('*')) {
+        setSelectedFeatures(['compress', 'merge', 'word_to_pdf']);
+      }
     }
-    return `${prefix}${result}`;
   };
 
-  const handleCreateKey = (e: React.FormEvent) => {
+  const toggleFeature = (featId: string) => {
+    setFeaturePreset('custom');
+    if (selectedFeatures.includes(featId)) {
+      const next = selectedFeatures.filter(f => f !== featId && f !== '*');
+      setSelectedFeatures(next.length > 0 ? next : ['compress']);
+    } else {
+      const next = selectedFeatures.filter(f => f !== '*').concat(featId);
+      setSelectedFeatures(next);
+    }
+  };
+
+  const handleCreateKey = async (e: React.FormEvent) => {
     e.preventDefault();
     const finalName = partnerName.trim() || 'Client Partner';
-    const effectiveRateLimit = tier === 'standard' ? 120 : tier === 'pro' ? 300 : tier === 'enterprise' ? 1000 : customRateLimit;
-    const newKeyString = generateCryptographicKey(keyPrefix);
+    const effectiveRateLimit = tier === 'standard' ? 120 : tier === 'pro' ? 300 : 1000;
+    setIsSubmitting(true);
 
-    const newRecord: SavedApiKey = {
-      id: `key_${Date.now()}`,
-      key: newKeyString,
-      partnerName: finalName,
-      tier,
-      rateLimit: effectiveRateLimit,
-      createdAt: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
-    };
-
-    const updated = [newRecord, ...savedKeys];
-    setSavedKeys(updated);
-    setGeneratedKey(newRecord);
     try {
-      localStorage.setItem(STORAGE_VAULT_KEY, JSON.stringify(updated));
-    } catch (_) {}
+      const res = await fetch(`${API_BASE_URL}/api/v1/admin/keys`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${adminToken}`
+        },
+        body: JSON.stringify({
+          name: finalName,
+          tier,
+          rate_limit: effectiveRateLimit,
+          allowed_features: selectedFeatures,
+          key_prefix: keyPrefix
+        })
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success && data.key) {
+        const newRecord: ServerApiKey = {
+          partner_id: data.partner_id,
+          name: data.name,
+          tier: data.tier,
+          rate_limit: data.rate_limit,
+          allowed_features: data.allowed_features,
+          created_at: data.created_at,
+          key_preview: `${data.key.slice(0, 14)}...${data.key.slice(-4)}`,
+          key: data.key
+        };
+        setGeneratedKey(newRecord);
+        setServerKeys(prev => [newRecord, ...prev]);
+        setPartnerName('');
+      } else {
+        alert(data.detail?.message || 'Failed to auto-activate key on server.');
+      }
+    } catch (err: any) {
+      alert(`Error creating key: ${err.message}`);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const handleDeleteKey = (id: string) => {
-    if (confirm('Are you sure you want to delete this key record from your local vault?')) {
-      const updated = savedKeys.filter(k => k.id !== id);
-      setSavedKeys(updated);
-      try {
-        localStorage.setItem(STORAGE_VAULT_KEY, JSON.stringify(updated));
-      } catch (_) {}
-      if (generatedKey?.id === id) {
-        setGeneratedKey(null);
+  const handleDeleteKey = async (partnerId: string) => {
+    if (!confirm(`Are you sure you want to revoke and delete key '${partnerId}'? It will immediately stop working.`)) return;
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/v1/admin/keys/${partnerId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${adminToken}` }
+      });
+      if (res.ok) {
+        setServerKeys(prev => prev.filter(k => k.partner_id !== partnerId));
+        if (generatedKey?.partner_id === partnerId) {
+          setGeneratedKey(null);
+        }
+      } else {
+        alert('Could not revoke key from server.');
       }
+    } catch (err: any) {
+      alert(`Error revoking key: ${err.message}`);
     }
   };
 
@@ -181,21 +263,20 @@ export const ApiKeyManagerPage: React.FC<{ darkMode: boolean }> = ({ darkMode })
     setTimeout(() => setCopiedSection(''), 2200);
   };
 
-  const testKeyHealth = async (keyItem: SavedApiKey) => {
-    setPingStatus(prev => ({ ...prev, [keyItem.id]: 'Testing...' }));
+  const testKeyHealth = async (keyItem: ServerApiKey) => {
+    setPingStatus(prev => ({ ...prev, [keyItem.partner_id]: 'Testing...' }));
     const startTime = Date.now();
     try {
-      const res = await fetch(`${API_BASE_URL}/api/v1/health`, {
-        headers: { 'X-API-Key': keyItem.key }
-      });
+      const authHeader = keyItem.key ? { 'X-API-Key': keyItem.key } : { 'Authorization': `Bearer ${adminToken}` };
+      const res = await fetch(`${API_BASE_URL}/api/v1/health`, { headers: authHeader });
       const elapsed = Date.now() - startTime;
       if (res.ok) {
-        setPingStatus(prev => ({ ...prev, [keyItem.id]: `200 OK (${elapsed}ms)` }));
+        setPingStatus(prev => ({ ...prev, [keyItem.partner_id]: `200 OK (${elapsed}ms)` }));
       } else {
-        setPingStatus(prev => ({ ...prev, [keyItem.id]: `Error: ${res.status}` }));
+        setPingStatus(prev => ({ ...prev, [keyItem.partner_id]: `Error: ${res.status}` }));
       }
-    } catch (err: any) {
-      setPingStatus(prev => ({ ...prev, [keyItem.id]: 'Network Error' }));
+    } catch (_) {
+      setPingStatus(prev => ({ ...prev, [keyItem.partner_id]: 'Network Error' }));
     }
   };
 
@@ -217,7 +298,7 @@ export const ApiKeyManagerPage: React.FC<{ darkMode: boolean }> = ({ darkMode })
             </div>
             <h1 className="text-2xl sm:text-3xl font-black tracking-tight">API Key Management</h1>
             <p className={`mt-2 text-sm ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
-              Enter administrator password. Verification is processed server-side with anti-brute-force rate limiting and HMAC token signing.
+              Enter administrator password. Verification is processed server-side with anti-brute-force rate limiting and zero Render configuration required.
             </p>
           </div>
 
@@ -270,7 +351,7 @@ export const ApiKeyManagerPage: React.FC<{ darkMode: boolean }> = ({ darkMode })
               {isSubmitting ? (
                 <>
                   <Loader2 size={18} className="animate-spin" />
-                  <span>Verifying with Server...</span>
+                  <span>Verifying Credentials...</span>
                 </>
               ) : (
                 <>
@@ -283,7 +364,7 @@ export const ApiKeyManagerPage: React.FC<{ darkMode: boolean }> = ({ darkMode })
 
           <div className="mt-8 pt-6 border-t border-slate-200 dark:border-slate-800 text-center">
             <span className="text-xs opacity-50">
-              Protected by PDFBolt Anti-Brute-Force Shield • Max 5 Attempts per 15 Min
+              PDFBolt Anti-Brute-Force Shield • Max 5 Attempts per 15 Min
             </span>
           </div>
         </div>
@@ -291,41 +372,37 @@ export const ApiKeyManagerPage: React.FC<{ darkMode: boolean }> = ({ darkMode })
     );
   }
 
-  // Helper generators for codes
-  const partnerSlug = (generatedKey?.partnerName || 'client').toLowerCase().replace(/[^a-z0-9]/g, '_');
-  const partnerKey = generatedKey?.key || 'pdfbolt_live_YOUR_KEY';
+  // Active Key strings for exporters
+  const partnerKey = generatedKey?.key || generatedKey?.key_preview || 'pdfbolt_live_YOUR_KEY';
 
-  const embedSnippet = `<!-- 1. Drop anywhere on client website -->
+  // Exporter snippets
+  const dropdownEmbedSnippet = `<!-- 1. All-in-One Dropdown Tool Widget for Client Website -->
+<div data-pdfbolt-tool="dropdown" data-pdfbolt-key="${partnerKey}" data-pdfbolt-theme="light"></div>
+<script src="https://pdfbolt.in/sdk/pdfbolt.js" async></script>`;
+
+  const singleEmbedSnippet = `<!-- 1. Specific Tool Widget (e.g. Compress or Word to PDF) -->
 <div data-pdfbolt-tool="compress" data-pdfbolt-key="${partnerKey}"></div>
 <script src="https://pdfbolt.in/sdk/pdfbolt.js" async></script>`;
 
-  const renderJsonSnippet = JSON.stringify({
-    [partnerSlug]: {
-      key: partnerKey,
-      tier: generatedKey?.tier || 'pro',
-      rate_limit: generatedKey?.rateLimit || 300
-    }
-  }, null, 2);
-
-  const jsSnippet = `// 1. Include SDK in HTML or import in Node.js
+  const jsSdkSnippet = `// 1. Include SDK in HTML or import in Node.js
 // <script src="https://pdfbolt.in/sdk/pdfbolt.js"></script>
 
 const pdfbolt = new PDFBolt({ apiKey: "${partnerKey}" });
 
-// Example: Compress a PDF
+// Example: Compress a PDF to 100 KB
 const compressedBlob = await pdfbolt.compress(fileInput.files[0], { targetKb: 100 });
 PDFBolt.downloadBlob(compressedBlob, "compressed.pdf");`;
 
   const pythonSnippet = `import requests
 
 API_KEY = "${partnerKey}"
-url = "https://pdfbolt-api.onrender.com/api/v1/convert/word-to-pdf"
+url = "https://pdfbolt-api.onrender.com/api/v1/jobs"
 
-with open("document.docx", "rb") as f:
-    res = requests.post(url, headers={"X-API-Key": API_KEY}, files={"file": f})
+files = {"file": open("document.pdf", "rb")}
+data = {"operation": "compress", "options": '{"target_kb": 100}'}
 
-with open("output.pdf", "wb") as f:
-    f.write(res.content)`;
+res = requests.post(url, headers={"X-API-Key": API_KEY}, files=files, data=data)
+print("Result:", res.json())`;
 
   const curlSnippet = `curl -X POST "https://pdfbolt-api.onrender.com/api/v1/convert/word-to-pdf" \\
   -H "X-API-Key: ${partnerKey}" \\
@@ -345,11 +422,11 @@ with open("output.pdf", "wb") as f:
         }`}>
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 mb-2 border border-emerald-500/20">
-              <ShieldCheck size={14} /> Cryptographically Verified Session
+              <ShieldCheck size={14} /> Zero-Render Auto-Activation Portal
             </div>
             <h1 className="text-2xl sm:text-3xl font-black tracking-tight">API Key & Client Integration Portal</h1>
             <p className={`mt-1 text-sm ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
-              Generate live client credentials, configure rate limits, and export plug-and-play SDK snippets.
+              Keys are automatically registered and activated on the live server. Choose allowed features and export ready-to-run dropdown widgets.
             </p>
           </div>
 
@@ -379,16 +456,16 @@ with open("output.pdf", "wb") as f:
         {/* Generator & Exporter Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           
-          {/* Left Form: Key Generator (5 Cols) */}
-          <div className={`lg:col-span-5 p-6 sm:p-8 rounded-3xl border shadow-xl flex flex-col justify-between ${
+          {/* Left Form: Key Generator (6 Cols) */}
+          <div className={`lg:col-span-6 p-6 sm:p-8 rounded-3xl border shadow-xl flex flex-col justify-between ${
             darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
           }`}>
             <div>
-              <div className="flex items-center gap-2 text-amber-500 mb-4 font-bold text-sm uppercase tracking-wider">
-                <Zap size={18} />
-                <span>Create New Partner Key</span>
+              <div className="flex items-center gap-2 text-amber-500 mb-3 font-bold text-xs uppercase tracking-wider">
+                <Zap size={16} />
+                <span>Automated Server Key Generation</span>
               </div>
-              <h2 className="text-xl font-bold tracking-tight mb-6">Generate Client Access Key</h2>
+              <h2 className="text-xl font-bold tracking-tight mb-5">Create & Activate Partner Key</h2>
 
               <form onSubmit={handleCreateKey} className="space-y-5">
                 <div>
@@ -399,7 +476,7 @@ with open("output.pdf", "wb") as f:
                     type="text"
                     value={partnerName}
                     onChange={(e) => setPartnerName(e.target.value)}
-                    placeholder="e.g. Acme FinTech, LawFirm Portal"
+                    placeholder="e.g. Acme FinTech, Exam Portal, Legal Firm"
                     required
                     className={`w-full px-4 py-3 rounded-xl text-sm font-medium border outline-none transition-all ${
                       darkMode ? 'bg-slate-800 border-slate-700 text-white focus:border-amber-400' : 'bg-slate-50 border-slate-300 text-slate-900 focus:border-amber-500'
@@ -409,13 +486,13 @@ with open("output.pdf", "wb") as f:
 
                 <div>
                   <label className="block text-xs font-bold uppercase tracking-wider mb-2 opacity-80">
-                    Access Tier & Rate Limit
+                    Tier & Rate Limit
                   </label>
                   <div className="grid grid-cols-3 gap-2">
                     {[
-                      { id: 'standard', name: 'Standard', limit: '120/m' },
-                      { id: 'pro', name: 'Pro', limit: '300/m' },
-                      { id: 'enterprise', name: 'Enterprise', limit: '1000/m' }
+                      { id: 'standard', name: 'Standard', limit: '120 req/m' },
+                      { id: 'pro', name: 'Pro', limit: '300 req/m' },
+                      { id: 'enterprise', name: 'Enterprise', limit: '1000 req/m' }
                     ].map(t => (
                       <button
                         key={t.id}
@@ -436,73 +513,122 @@ with open("output.pdf", "wb") as f:
                   </div>
                 </div>
 
+                {/* FEATURE SELECTION DROPDOWN & CHECKBOXES */}
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider mb-2 opacity-80">
-                    Environment Type
-                  </label>
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="block text-xs font-bold uppercase tracking-wider opacity-80">
+                      Choose Allowed Features (Dropdown / Permissions)
+                    </label>
+                    <span className="text-[11px] font-bold text-amber-500">
+                      {selectedFeatures.includes('*') ? 'All Features (100% Access)' : `${selectedFeatures.length} Features Selected`}
+                    </span>
+                  </div>
+
+                  {/* Preset Pills */}
+                  <div className="flex flex-wrap gap-1.5 mb-3">
                     {[
-                      { id: 'pdfbolt_live_', label: 'Live Production' },
-                      { id: 'pdfbolt_test_', label: 'Test Sandbox' }
+                      { id: 'all', label: 'All Features' },
+                      { id: 'conversions', label: 'Conversions Only' },
+                      { id: 'compress', label: 'Compress Only' },
+                      { id: 'security', label: 'Security & OCR' },
+                      { id: 'custom', label: 'Custom' }
                     ].map(p => (
                       <button
                         key={p.id}
                         type="button"
-                        onClick={() => setKeyPrefix(p.id as any)}
-                        className={`py-2.5 px-3 rounded-xl text-xs font-bold border transition-all ${
-                          keyPrefix === p.id
-                            ? 'bg-blue-600 text-white border-blue-600 shadow-md shadow-blue-500/20'
+                        onClick={() => handlePresetChange(p.id as any)}
+                        className={`px-2.5 py-1 rounded-lg text-xs font-bold border transition-all ${
+                          featurePreset === p.id
+                            ? 'bg-blue-600 text-white border-blue-600'
                             : darkMode
-                              ? 'bg-slate-800/60 border-slate-700 text-slate-300 hover:bg-slate-800'
-                              : 'bg-slate-100 border-slate-200 text-slate-700 hover:bg-slate-200'
+                              ? 'bg-slate-800 border-slate-700 text-slate-400 hover:text-white'
+                              : 'bg-slate-100 border-slate-200 text-slate-600 hover:text-slate-900'
                         }`}
                       >
                         {p.label}
                       </button>
                     ))}
                   </div>
+
+                  {/* Individual Feature Checklist */}
+                  <div className={`p-3 rounded-2xl border max-h-[160px] overflow-y-auto space-y-1.5 ${
+                    darkMode ? 'bg-slate-800/50 border-slate-700' : 'bg-slate-50 border-slate-200'
+                  }`}>
+                    {ALL_AVAILABLE_FEATURES.map(feat => {
+                      const isChecked = selectedFeatures.includes('*') || selectedFeatures.includes(feat.id);
+                      return (
+                        <div
+                          key={feat.id}
+                          onClick={() => toggleFeature(feat.id)}
+                          className={`flex items-center justify-between p-2 rounded-xl text-xs font-medium cursor-pointer transition-colors ${
+                            isChecked 
+                              ? darkMode ? 'bg-blue-600/20 text-blue-300' : 'bg-blue-50 text-blue-700 font-semibold'
+                              : 'hover:bg-slate-500/10 opacity-70'
+                          }`}
+                        >
+                          <div className="flex items-center gap-2">
+                            {isChecked ? <CheckSquare size={14} className="text-blue-500" /> : <Square size={14} className="opacity-40" />}
+                            <span>{feat.label}</span>
+                          </div>
+                          <span className="text-[10px] opacity-60 uppercase">{feat.category}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
 
                 <button
                   type="submit"
-                  className="w-full mt-4 py-3.5 px-6 rounded-xl font-bold text-sm bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-slate-950 shadow-lg shadow-amber-500/20 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+                  disabled={isSubmitting}
+                  className="w-full mt-2 py-3.5 px-6 rounded-xl font-bold text-sm bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-slate-950 shadow-lg shadow-amber-500/20 active:scale-[0.98] disabled:opacity-50 transition-all flex items-center justify-center gap-2"
                 >
-                  <Key size={18} />
-                  <span>Generate New API Key</span>
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 size={18} className="animate-spin" />
+                      <span>Activating Key on Live Server...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Zap size={18} />
+                      <span>Generate & Activate API Key</span>
+                    </>
+                  )}
                 </button>
               </form>
             </div>
 
-            <div className="mt-6 pt-6 border-t border-slate-200 dark:border-slate-800 text-xs opacity-60">
-              Generated keys use 256-bit cryptographically secure pseudorandom entropy and are immediately ready for production use.
+            <div className="mt-4 pt-4 border-t border-slate-200 dark:border-slate-800 text-[11px] opacity-60 flex items-center gap-1.5">
+              <CheckCircle2 size={13} className="text-emerald-500 shrink-0" />
+              <span>Zero-Render: Key activates in live server memory immediately without touching dashboard.</span>
             </div>
           </div>
 
-          {/* Right Area: Generated Key Display & Client Code Exporters (7 Cols) */}
-          <div className={`lg:col-span-7 p-6 sm:p-8 rounded-3xl border shadow-xl flex flex-col justify-between ${
+          {/* Right Area: Generated Key Display & Client Code Exporters (6 Cols) */}
+          <div className={`lg:col-span-6 p-6 sm:p-8 rounded-3xl border shadow-xl flex flex-col justify-between ${
             darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
           }`}>
             <div>
               <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2 text-blue-500 font-bold text-sm uppercase tracking-wider">
-                  <Code size={18} />
-                  <span>Client Deployment Code</span>
+                <div className="flex items-center gap-2 text-blue-500 font-bold text-xs uppercase tracking-wider">
+                  <Code size={16} />
+                  <span>Client Dropdown & Embed Code</span>
                 </div>
 
                 {generatedKey && (
                   <span className="text-xs px-2.5 py-1 rounded-full font-bold bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
-                    Ready for {generatedKey.partnerName}
+                    Active for {generatedKey.name}
                   </span>
                 )}
               </div>
 
               {/* Active Key Display Banner */}
-              <div className={`p-4 rounded-2xl border mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 ${
+              <div className={`p-4 rounded-2xl border mb-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 ${
                 darkMode ? 'bg-slate-950/80 border-slate-800' : 'bg-slate-50 border-slate-200'
               }`}>
                 <div className="overflow-hidden w-full">
-                  <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">
-                    Active Client API Key
+                  <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1 flex items-center gap-1.5">
+                    <span>Generated Client API Key</span>
+                    <span className="text-[10px] px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-400 font-mono">LIVE ACTIVE</span>
                   </div>
                   <div className="font-mono text-sm sm:text-base font-bold text-amber-500 truncate">
                     {partnerKey}
@@ -522,8 +648,8 @@ with open("output.pdf", "wb") as f:
               {/* Code Snippet Tabs */}
               <div className="flex items-center gap-1 border-b border-slate-200 dark:border-slate-800 pb-3 mb-4 overflow-x-auto">
                 {[
-                  { id: 'embed', label: '2-Line Website Embed' },
-                  { id: 'render', label: 'Render Config JSON' },
+                  { id: 'dropdown_embed', label: 'Multi-Tool Dropdown Embed' },
+                  { id: 'single_embed', label: 'Single Tool Embed' },
                   { id: 'js', label: 'JavaScript SDK' },
                   { id: 'python', label: 'Python' },
                   { id: 'curl', label: 'cURL' }
@@ -550,9 +676,9 @@ with open("output.pdf", "wb") as f:
                   darkMode ? 'bg-slate-950 border-slate-800 text-slate-300' : 'bg-slate-900 border-slate-800 text-slate-200'
                 }`}>
                   <code>
-                    {activeTab === 'embed' && embedSnippet}
-                    {activeTab === 'render' && renderJsonSnippet}
-                    {activeTab === 'js' && jsSnippet}
+                    {activeTab === 'dropdown_embed' && dropdownEmbedSnippet}
+                    {activeTab === 'single_embed' && singleEmbedSnippet}
+                    {activeTab === 'js' && jsSdkSnippet}
                     {activeTab === 'python' && pythonSnippet}
                     {activeTab === 'curl' && curlSnippet}
                   </code>
@@ -561,9 +687,9 @@ with open("output.pdf", "wb") as f:
                 <button
                   onClick={() => {
                     const textToCopy = 
-                      activeTab === 'embed' ? embedSnippet :
-                      activeTab === 'render' ? renderJsonSnippet :
-                      activeTab === 'js' ? jsSnippet :
+                      activeTab === 'dropdown_embed' ? dropdownEmbedSnippet :
+                      activeTab === 'single_embed' ? singleEmbedSnippet :
+                      activeTab === 'js' ? jsSdkSnippet :
                       activeTab === 'python' ? pythonSnippet : curlSnippet;
                     copyToClipboard(textToCopy, activeTab);
                   }}
@@ -575,41 +701,43 @@ with open("output.pdf", "wb") as f:
               </div>
             </div>
 
-            {/* Step-by-Step Deployment Instructions */}
-            <div className={`mt-6 p-4 rounded-2xl border text-xs space-y-1.5 ${
-              darkMode ? 'bg-slate-800/40 border-slate-800 text-slate-300' : 'bg-slate-50 border-slate-200 text-slate-600'
+            {/* Instant Hand-off Card */}
+            <div className={`mt-5 p-4 rounded-2xl border text-xs space-y-1 ${
+              darkMode ? 'bg-emerald-950/20 border-emerald-900/40 text-emerald-300' : 'bg-emerald-50 border-emerald-200 text-emerald-800'
             }`}>
-              <div className="font-bold text-slate-900 dark:text-white mb-1 flex items-center gap-1.5">
+              <div className="font-bold flex items-center gap-1.5">
                 <CheckCircle2 size={14} className="text-emerald-500" />
-                <span>How to Activate on Live Render Backend:</span>
+                <span>Zero Server Friction Guaranteed:</span>
               </div>
-              <p>1. Copy the <strong>Render Config JSON</strong> above.</p>
-              <p>2. Open <a href="https://dashboard.render.com" target="_blank" rel="noreferrer" className="text-blue-500 underline">dashboard.render.com</a> &rarr; <strong>pdfbolt-api</strong> &rarr; <strong>Environment</strong>.</p>
-              <p>3. Update <strong>PARTNER_API_KEYS</strong> with this JSON & click <strong>Save Changes</strong>.</p>
-              <p>4. Send the <strong>2-Line Website Embed</strong> snippet to your client!</p>
+              <p>Just copy the <strong>Multi-Tool Dropdown Embed</strong> code and send it to your client. Their website visitors will immediately see an interactive dropdown menu to pick and process any PDF tool!</p>
             </div>
           </div>
         </div>
 
-        {/* Vault: Generated Keys History Table */}
+        {/* Server Active Keys Vault Table */}
         <div className={`p-6 sm:p-8 rounded-3xl border shadow-xl ${
           darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
         }`}>
-          <div className="flex items-center justify-between mb-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
             <div>
-              <h3 className="text-lg font-bold tracking-tight">Active Client Keys Vault</h3>
+              <h3 className="text-lg font-bold tracking-tight">Live Server Active Keys</h3>
               <p className={`text-xs ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
-                Local registry of keys issued to clients on this administrative device.
+                Dynamically active partner keys stored directly in server memory and persistent storage.
               </p>
             </div>
-            <span className="text-xs font-bold px-3 py-1 rounded-full bg-slate-200 dark:bg-slate-800">
-              {savedKeys.length} Registered Keys
-            </span>
+            
+            <button
+              onClick={() => fetchServerKeys(adminToken)}
+              className="px-3.5 py-1.5 rounded-xl text-xs font-bold border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors inline-flex items-center gap-1.5 self-start sm:self-auto"
+            >
+              <RefreshCw size={13} className={isLoadingKeys ? 'animate-spin' : ''} />
+              <span>Refresh Keys</span>
+            </button>
           </div>
 
-          {savedKeys.length === 0 ? (
+          {serverKeys.length === 0 ? (
             <div className="py-12 text-center opacity-50 text-sm">
-              No keys generated yet. Use the form above to create your first client API key.
+              {isLoadingKeys ? 'Loading registered keys from server...' : 'No partner keys registered yet. Use the form above to activate your first key!'}
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -617,32 +745,42 @@ with open("output.pdf", "wb") as f:
                 <thead>
                   <tr className={`border-b ${darkMode ? 'border-slate-800 text-slate-400' : 'border-slate-200 text-slate-500'}`}>
                     <th className="pb-3 font-bold uppercase tracking-wider">Client / Partner</th>
-                    <th className="pb-3 font-bold uppercase tracking-wider">API Key</th>
-                    <th className="pb-3 font-bold uppercase tracking-wider">Tier / Rate Limit</th>
+                    <th className="pb-3 font-bold uppercase tracking-wider">Key Preview</th>
+                    <th className="pb-3 font-bold uppercase tracking-wider">Tier / Rate</th>
+                    <th className="pb-3 font-bold uppercase tracking-wider">Allowed Features</th>
                     <th className="pb-3 font-bold uppercase tracking-wider">Created</th>
                     <th className="pb-3 font-bold uppercase tracking-wider text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                  {savedKeys.map((item) => (
-                    <tr key={item.id} className="hover:bg-slate-500/5 transition-colors">
+                  {serverKeys.map((item) => (
+                    <tr key={item.partner_id} className="hover:bg-slate-500/5 transition-colors">
                       <td className="py-4 font-bold text-slate-900 dark:text-white">
-                        {item.partnerName}
+                        {item.name}
                       </td>
                       <td className="py-4 font-mono font-bold text-amber-500">
-                        {item.key.slice(0, 16)}...{item.key.slice(-6)}
+                        {item.key_preview || (item.key ? `${item.key.slice(0, 14)}...` : 'Active')}
                       </td>
                       <td className="py-4">
-                        <span className={`inline-block px-2.5 py-0.5 rounded-full font-bold text-[11px] ${
+                        <span className={`inline-block px-2.5 py-0.5 rounded-full font-bold text-[10px] ${
                           item.tier === 'enterprise' ? 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20' :
                           item.tier === 'pro' ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20' :
                           'bg-slate-500/10 text-slate-600 dark:text-slate-400 border border-slate-500/20'
                         }`}>
-                          {item.tier.toUpperCase()} ({item.rateLimit} req/min)
+                          {item.tier.toUpperCase()} ({item.rate_limit} req/m)
                         </span>
                       </td>
+                      <td className="py-4">
+                        <div className="max-w-[180px] truncate" title={item.allowed_features.join(', ')}>
+                          {item.allowed_features.includes('*') ? (
+                            <span className="text-emerald-500 font-bold">All Features (Full Suite)</span>
+                          ) : (
+                            <span className="opacity-80">{item.allowed_features.join(', ')}</span>
+                          )}
+                        </div>
+                      </td>
                       <td className="py-4 opacity-70">
-                        {item.createdAt}
+                        {item.created_at}
                       </td>
                       <td className="py-4 text-right space-x-2">
                         <button
@@ -650,24 +788,26 @@ with open("output.pdf", "wb") as f:
                           onClick={() => testKeyHealth(item)}
                           className="px-2.5 py-1 rounded-lg font-bold border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                         >
-                          {pingStatus[item.id] || 'Test Ping'}
+                          {pingStatus[item.partner_id] || 'Test Ping'}
                         </button>
+                        {item.key && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setGeneratedKey(item);
+                              copyToClipboard(item.key!, item.partner_id);
+                            }}
+                            className="px-2.5 py-1 rounded-lg font-bold bg-amber-500 hover:bg-amber-600 text-slate-950 transition-colors inline-flex items-center gap-1"
+                          >
+                            {copiedSection === item.partner_id ? <Check size={12} /> : <Copy size={12} />}
+                            <span>{copiedSection === item.partner_id ? 'Copied' : 'Select'}</span>
+                          </button>
+                        )}
                         <button
                           type="button"
-                          onClick={() => {
-                            setGeneratedKey(item);
-                            copyToClipboard(item.key, item.id);
-                          }}
-                          className="px-2.5 py-1 rounded-lg font-bold bg-amber-500 hover:bg-amber-600 text-slate-950 transition-colors inline-flex items-center gap-1"
-                        >
-                          {copiedSection === item.id ? <Check size={12} /> : <Copy size={12} />}
-                          <span>{copiedSection === item.id ? 'Copied' : 'Select & Copy'}</span>
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleDeleteKey(item.id)}
+                          onClick={() => handleDeleteKey(item.partner_id)}
                           className="px-2 py-1 rounded-lg text-red-500 hover:bg-red-500/10 transition-colors"
-                          title="Delete from local vault"
+                          title="Revoke and delete key from server"
                         >
                           <Trash2 size={14} />
                         </button>
