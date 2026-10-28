@@ -2286,7 +2286,7 @@ def generate_prerendered_pages():
         for sec in tp.get("sections", []):
             paragraphs_html = "".join([f"<p style='margin-bottom: 12px; color: #334155; line-height: 1.65;'>{p}</p>" for p in sec.get("paragraphs", [])])
             sections_html += f"""
-            <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; margin-bottom: 32px;">
+            <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; margin-bottom: 32px;" itemscope itemtype="https://schema.org/Table">
               <h2 style="font-size: 1.35rem; font-weight: 800; color: #0f172a; margin: 0 0 16px 0;">{sec['heading']}</h2>
               {paragraphs_html}
             </div>

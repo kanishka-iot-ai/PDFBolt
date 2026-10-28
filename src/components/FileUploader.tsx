@@ -204,7 +204,7 @@ const FileUploader: React.FC<FileUploaderProps> = ({
         <button
           type="button"
           onClick={() => fileInputRef.current?.click()}
-          className="w-full max-w-sm py-5 sm:py-6 px-8 bg-[#e53935] hover:bg-[#d32f2f] text-white font-black text-xl sm:text-2xl uppercase tracking-wider rounded-2xl shadow-2xl hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-3 cursor-pointer"
+          className="w-full max-w-sm py-5 sm:py-6 px-8 bg-[#e53935] hover:bg-[#d32f2f] text-white font-black text-xl sm:text-2xl uppercase tracking-wider rounded-2xl shadow-2xl hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-3 cursor-pointer focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-red-400 focus-visible:ring-offset-2"
         >
           <Upload size={26} className="shrink-0" />
           <span>Select {formatBadge} {multiple ? 'files' : 'file'}</span>

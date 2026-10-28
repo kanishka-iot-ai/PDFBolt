@@ -249,6 +249,11 @@ const Home: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
         )}
 
         {/* Primary Tools Grid */}
+        <div className="flex items-center justify-between mb-4">
+          <h2 className={`text-xl sm:text-2xl font-black ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+            {activeCategory === 'all' ? 'All Online PDF Tools' : `${activeCategory.charAt(0).toUpperCase() + activeCategory.slice(1)} Tools`}
+          </h2>
+        </div>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5">
           {filteredTools.map(tool => (
             <ToolCard key={tool.id} tool={tool} darkMode={darkMode} />

@@ -250,7 +250,7 @@ TARGETED_PAGES = [
     {
         "path": "compress-pdf-to-20kb",
         "h1": "Compress PDF to 20KB Online",
-        "title": "Compress PDF to 20KB Online Free (Exact Size & Govt Portal Preset) | PDFBolt",
+        "title": "Compress PDF to 20KB Free (SSC Signature Ceiling) | PDFBolt",
         "description": "Compress PDF to 20KB online free without losing readability. Exact size calibration for SSC, UPSC, IBPS, and state recruitment exam portals. 100% private in-browser.",
         "subtitle": "Reduce PDF file size to under 20KB for signatures, thumb impressions, and portal requirements with local browser privacy.",
         "quick_answer": "To compress a PDF to 20KB: 1. Drag and drop your PDF into PDFBolt. 2. Extreme compression is pre-selected with exact 19.9KB ceiling calibration. 3. Click 'Compress PDF' to download your lightweight file under 20KB instantly.",
@@ -310,7 +310,7 @@ TARGETED_PAGES = [
     {
         "path": "compress-pdf-to-50kb",
         "h1": "Compress PDF to 50KB Online",
-        "title": "Compress PDF to 50KB Online Free (Exact Size & Govt Portal Preset) | PDFBolt",
+        "title": "Compress PDF to 50KB Free (Exact Size & Portal Ready) | PDFBolt",
         "description": "Compress PDF to 50KB online free without losing readability. Exact size calibration for passport photos, SSC, UPSC, and banking portal uploads. 100% private in-browser.",
         "subtitle": "Shrink PDF documents to under 50KB for SSC, UPSC, banking, and university portal submissions.",
         "quick_answer": "To compress a PDF to 50KB: 1. Upload your PDF file. 2. The 50KB ceiling preset is automatically loaded. 3. Optionally enable Grayscale for scanned certificates. 4. Click 'Compress PDF' and download your verified sub-50KB document in seconds.",
@@ -436,7 +436,7 @@ TARGETED_PAGES = [
     {
         "path": "compress-pdf-to-200kb",
         "h1": "Compress PDF to 200KB Online",
-        "title": "Compress PDF to 200KB Online Free (Exact Size & Govt Portal Preset) | PDFBolt",
+        "title": "Compress PDF to 200KB Free (UPSC & Portal Ready) | PDFBolt",
         "description": "Compress PDF to 200KB online for free with exact target size. Perfect for NTA NEET, JEE Main, UPSC CSE, and SSC application documents with zero server uploads.",
         "subtitle": "Shrink multi-page marksheets, contracts, and certificates to under 200KB with sharp readability.",
         "quick_answer": "To compress a PDF to 200KB: 1. Upload your file. 2. The 200KB target ceiling is pre-selected. 3. Click 'Compress PDF' to download your high-clarity sub-200KB document.",
