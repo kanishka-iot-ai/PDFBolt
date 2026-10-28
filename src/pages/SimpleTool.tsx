@@ -819,7 +819,6 @@ const SimpleTool: React.FC<SimpleToolProps> = ({ title, mode, darkMode, notify, 
             accept={getAcceptAttribute(mode, isImageTool)}
             onFilesSelected={handle}
             darkMode={darkMode}
-            allowFolder={mode === 'compress'}
             warning={ramWarning}
             onClearWarning={() => setRamWarning(null)}
           />

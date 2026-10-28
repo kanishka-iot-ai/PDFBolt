@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { Upload, X, AlertTriangle, AlertCircle, ShieldCheck, Folder } from 'lucide-react';
+import { Upload, X, AlertTriangle, AlertCircle, ShieldCheck } from 'lucide-react';
 import { HumanError } from '../utils/fileValidation';
 
 interface FileUploaderProps {
@@ -8,7 +8,6 @@ interface FileUploaderProps {
   multiple?: boolean;
   maxSizeMB?: number;
   darkMode: boolean;
-  allowFolder?: boolean;
   error?: HumanError | string | null;
   warning?: string | null;
   onClearError?: () => void;
@@ -21,7 +20,6 @@ const FileUploader: React.FC<FileUploaderProps> = ({
   multiple = true,
   maxSizeMB = 100,
   darkMode,
-  allowFolder = true,
   error,
   warning,
   onClearError,
@@ -29,7 +27,6 @@ const FileUploader: React.FC<FileUploaderProps> = ({
 }) => {
   const [isDragging, setIsDragging] = React.useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const folderInputRef = useRef<HTMLInputElement>(null);
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -194,18 +191,6 @@ const FileUploader: React.FC<FileUploaderProps> = ({
         multiple={multiple}
         className="hidden"
       />
-      <input
-        type="file"
-        id="pdf-folder-upload-input"
-        name="pdfFolderUpload"
-        ref={folderInputRef}
-        onChange={handleFileInput}
-        // @ts-ignore
-        webkitdirectory="true"
-        directory=""
-        multiple
-        className="hidden"
-      />
 
       {/* Clean Drag Area & Primary Select Button */}
       <div
@@ -232,16 +217,6 @@ const FileUploader: React.FC<FileUploaderProps> = ({
         <p className="mt-2 text-[11px] sm:text-xs text-slate-600 dark:text-slate-400 max-w-sm text-center">
           ⚡ In-browser processing: Recommended &lt;80MB on mobile, &lt;250MB on desktop to preserve device RAM.
         </p>
-
-        {allowFolder && multiple && (
-          <button
-            type="button"
-            onClick={() => folderInputRef.current?.click()}
-            className="mt-2 text-xs font-bold text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 underline cursor-pointer flex items-center gap-1"
-          >
-            <Folder size={13} /> Select entire folder
-          </button>
-        )}
       </div>
     </div>
   );
