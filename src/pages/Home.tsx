@@ -91,7 +91,7 @@ const Home: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
           darkMode ? 'border-slate-800 bg-slate-950' : 'border-slate-100 bg-slate-50/80'
         }`}
       >
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[320px] sm:w-[540px] h-[160px] sm:h-[200px] bg-yellow-500/10 blur-[70px] sm:blur-[90px] rounded-full pointer-events-none"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-100/50 via-transparent to-transparent dark:from-slate-800/25 dark:via-transparent pointer-events-none" />
 
         <div className="max-w-4xl mx-auto px-4 sm:px-6 relative z-10">
           {/* Top Security & Privacy Badge */}

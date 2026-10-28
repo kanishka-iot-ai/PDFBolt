@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import {
   Camera, Upload, FileText, Download, Plus, Trash2, Zap,
-  CheckCircle2, RefreshCw, Sparkles, ShieldCheck, Lock, Eye,
+  CheckCircle2, RefreshCw, ShieldCheck, Lock, Eye,
   ArrowRight, Sliders, AlertTriangle, Layers, ChevronLeft
 } from 'lucide-react';
 import FileUploader from '../components/FileUploader';
@@ -339,7 +339,7 @@ const HandwritingTool: React.FC<HandwritingToolProps> = ({ darkMode, notify }) =
       {/* Hero Header */}
       <div className="text-center max-w-3xl mx-auto space-y-4">
         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 font-black text-xs uppercase tracking-widest">
-          <Sparkles size={14} /> AI-Assisted Document Scanner V2
+          <FileText size={14} /> Optical Document Scanner & OCR
         </div>
         <h1 className={`text-4xl sm:text-5xl font-black tracking-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>
           Convert Handwriting to <br className="hidden sm:inline" />
@@ -502,7 +502,7 @@ const HandwritingTool: React.FC<HandwritingToolProps> = ({ darkMode, notify }) =
                         className="rounded accent-yellow-500 w-4 h-4"
                       />
                       <span className="font-bold text-sm">
-                        AI-Enhanced Recognition (Cloud Multi-Modal)
+                        Enhanced Multi-Pass Neural OCR (Cloud Processing)
                       </span>
                     </label>
                     {isAiEnhanced && (
@@ -514,7 +514,7 @@ const HandwritingTool: React.FC<HandwritingToolProps> = ({ darkMode, notify }) =
 
                   <p className="text-xs text-slate-400">
                     {isAiEnhanced
-                      ? 'AI Enhanced Recognition temporarily sends selected images to our processing server (15-min auto-deletion policy enforced).'
+                      ? 'Enhanced Multi-Pass Neural OCR temporarily sends selected images to our processing server (15-min auto-deletion policy enforced).'
                       : '100% In-Browser WebAssembly OCR. Zero uploads to any server.'}
                   </p>
                 </div>
@@ -524,7 +524,7 @@ const HandwritingTool: React.FC<HandwritingToolProps> = ({ darkMode, notify }) =
                   onClick={handleStartConversion}
                   className="w-full md:w-auto px-10 py-4 bg-yellow-500 hover:bg-yellow-400 text-slate-950 font-black text-sm uppercase tracking-wider rounded-2xl shadow-xl transition-all flex items-center justify-center gap-2 transform hover:-translate-y-0.5"
                 >
-                  <Sparkles size={18} /> Convert to Computer Text ({pages.length} Pages)
+                  <ArrowRight size={18} /> Convert to Computer Text ({pages.length} Pages)
                 </button>
               </div>
             </div>

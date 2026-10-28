@@ -905,9 +905,9 @@ CANONICAL_TOOLS = [
     },
     {
         "path": "analyze-pdf",
-        "title": "AI PDF Analyzer & Document Intelligence | PDFBolt",
+        "title": "PDF Document Inspector & Deck Builder | PDFBolt",
         "description": "Extract executive summaries, key findings, topics, and auto-generate 10-slide PowerPoint presentations from any PDF document.",
-        "h1": "AI PDF Analyzer & Document Intelligence",
+        "h1": "PDF Document Inspector & Analysis Engine",
         "subtitle": "Analyze structural metadata, extract topics, generate executive summaries, and build presentations from any PDF.",
         "quick_answer": "To analyze a PDF: 1. Select your source PDF document. 2. Inspect instant executive summary, word counts, and topics. 3. Export to PowerPoint, Word, or Excel.",
         "features": [

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
-  Sparkles, CheckCircle2, AlertCircle, Copy, Check, RotateCcw,
-  Wand2, ShieldCheck, ChevronLeft, ChevronRight, RefreshCw, ZoomIn, ZoomOut
+  FileText, CheckCircle2, AlertCircle, Copy, Check, RotateCcw,
+  ShieldCheck, ChevronLeft, ChevronRight, RefreshCw, ZoomIn, ZoomOut
 } from 'lucide-react';
 import { HandwritingPage } from '../../types/handwriting';
 import { enhanceTranscriptionAPI } from '../../services/handwritingService';
@@ -208,7 +208,7 @@ const TranscriptionEditor: React.FC<TranscriptionEditorProps> = ({
                 className="px-2.5 py-1 bg-yellow-500/10 hover:bg-yellow-500/20 text-yellow-600 dark:text-yellow-400 text-xs font-bold rounded-lg transition-colors flex items-center gap-1 disabled:opacity-40"
                 title="Correct obvious alphanumeric OCR mistakes"
               >
-                <Wand2 size={13} /> Fix OCR Errors
+                <Check size={13} /> Clean Text Errors
               </button>
               <button
                 onClick={() => handleEnhanceAction('improve_recognition')}
@@ -216,7 +216,7 @@ const TranscriptionEditor: React.FC<TranscriptionEditorProps> = ({
                 className="px-2.5 py-1 bg-blue-500/10 hover:bg-blue-500/20 text-blue-600 dark:text-blue-400 text-xs font-bold rounded-lg transition-colors flex items-center gap-1 disabled:opacity-40"
                 title="Format paragraphs and lists cleanly"
               >
-                <Sparkles size={13} /> Structure with AI
+                <FileText size={13} /> Format Structure
               </button>
               <button
                 onClick={handleCopy}

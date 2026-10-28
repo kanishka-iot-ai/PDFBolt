@@ -62,7 +62,7 @@ const Footer: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
         <nav aria-label="Core PDF Tools">
           <p className={`font-black uppercase text-xs tracking-widest mb-4 ${darkMode ? 'text-slate-200' : 'text-slate-900'}`}>PDF Tools</p>
           <ul className="space-y-2 text-xs font-semibold">
-            <li><Link to="/analyze-pdf/" className="text-yellow-700 dark:text-yellow-400 font-bold hover:underline">✨ AI PDF Analyzer</Link></li>
+            <li><Link to="/analyze-pdf/" className="text-yellow-700 dark:text-yellow-400 font-bold hover:underline">PDF Document Inspector</Link></li>
             <li><Link to="/merge-pdf/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Merge PDF</Link></li>
             <li><Link to="/split-pdf/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Split PDF</Link></li>
             <li><Link to="/compress-pdf/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Compress PDF</Link></li>

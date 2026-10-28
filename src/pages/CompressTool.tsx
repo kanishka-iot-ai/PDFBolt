@@ -9,7 +9,6 @@ import AdSlot from '../components/AdSlot';
 import { NotifySystem } from '../types';
 import { useActiveWork } from '../context/ActiveWorkContext';
 import { 
-  Sparkles, 
   FileText, 
   Sliders, 
   CheckCircle2, 
@@ -310,10 +309,10 @@ const CompressTool: React.FC<CompressToolProps> = ({ darkMode, notify }) => {
             <div className={`p-5 rounded-2xl border flex items-start gap-3.5 ${
               darkMode ? 'bg-yellow-950/20 border-yellow-500/30 text-yellow-200' : 'bg-yellow-50/80 border-yellow-200 text-yellow-900'
             }`}>
-              <Sparkles className="w-5 h-5 text-yellow-500 flex-shrink-0 mt-0.5" />
+              <Sliders className="w-5 h-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" />
               <div className="text-xs leading-relaxed">
                 <span className="font-black uppercase tracking-wider block mb-0.5">
-                  AI Recommendation: {stats.recommendedProfile.toUpperCase()} (Expected Reduction: {stats.expectedReductionPercent})
+                  Smart Profile Recommendation: {stats.recommendedProfile.toUpperCase()} (Estimated Reduction: {stats.expectedReductionPercent})
                 </span>
                 {stats.recommendationReason}
               </div>

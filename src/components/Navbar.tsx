@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   Moon, Sun, FileText, Menu, X, Volume2, VolumeX, ChevronDown,
-  ArrowRight, Sparkles, Calculator, Home, AlertTriangle, Heart
+  ArrowRight, FileSearch, ShieldCheck, Calculator, Home, AlertTriangle, Heart
 } from 'lucide-react';
 import { TOOLS, getIcon } from '../constants';
 import { useActiveWork } from '../context/ActiveWorkContext';
@@ -186,8 +186,8 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
                               }}
                               className={`group flex items-center gap-2 p-2 rounded-lg transition-colors ${darkMode ? 'hover:bg-slate-800 text-slate-300' : 'hover:bg-white text-slate-700'}`}
                             >
-                              <Sparkles size={16} className="text-yellow-500" />
-                              <span className="text-xs font-bold">AI PDF Analyzer</span>
+                              <FileSearch size={16} className="text-yellow-600 dark:text-yellow-400" />
+                              <span className="text-xs font-bold">PDF Inspector</span>
                             </Link>
                           </li>
                           <li>
@@ -225,7 +225,7 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
                               }}
                               className={`group flex items-center gap-2 p-2 rounded-lg transition-colors ${darkMode ? 'hover:bg-slate-800 text-slate-300' : 'hover:bg-white text-slate-700'}`}
                             >
-                              <Sparkles size={16} className="text-emerald-500" />
+                              <ShieldCheck size={16} className="text-emerald-500" />
                               <span className="text-xs font-bold">Privacy Comparison</span>
                             </Link>
                           </li>
@@ -249,8 +249,8 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
             </div>
             
             <NavLink to="/analyze-pdf/">
-              <span className="inline-flex items-center gap-1 text-yellow-700 dark:text-yellow-400 font-extrabold">
-                <Sparkles size={14} /> PDF Analyzer
+              <span className="inline-flex items-center gap-1.5 text-yellow-700 dark:text-yellow-400 font-extrabold">
+                <FileSearch size={14} /> PDF Inspector
               </span>
             </NavLink>
 
@@ -342,7 +342,7 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
               }} 
               className="block font-bold text-sm"
             >
-              ✨ PDF Analyzer
+              🔍 PDF Inspector
             </Link>
             <Link 
               to="/guides/" 

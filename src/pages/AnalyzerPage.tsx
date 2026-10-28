@@ -3,7 +3,7 @@ import { Helmet } from 'react-helmet-async';
 import { analyzePdfDocument, buildPresentationFromAnalysis, askDocumentQuestion, DocumentAnalysis } from '../services/analyzerService';
 import { pdfToWord, pdfToExcel } from '../services/conversionService';
 import FileUploader from '../components/FileUploader';
-import { FileText, Sparkles, Presentation, Table, CheckCircle2, Download, MessageSquare, Clock, Layers, Hash, Send, RefreshCw } from 'lucide-react';
+import { FileText, FileSearch, Presentation, Table, CheckCircle2, Download, MessageSquare, Clock, Layers, Hash, Send, RefreshCw, Image as ImageIcon } from 'lucide-react';
 import { saveAs } from 'file-saver';
 import { NotifySystem } from '../types';
 import AdSlot from '../components/AdSlot';
@@ -151,7 +151,7 @@ ${analysis.keyFindings.map((kf, i) => `${i + 1}. ${kf}`).join('\n')}
   return (
     <div className="animate-fadeIn pb-24">
       <Helmet>
-        <title>AI PDF Analyzer & Multi-Output Builder | PDFBolt</title>
+        <title>PDF Document Inspector & Deck Builder | PDFBolt</title>
         <meta name="description" content="Deep structural PDF intelligence: Extract word counts, tables, topics, executive summaries, interactive Q&A, and 1-click generation of PPTX presentations and Word reports." />
         <link rel="canonical" href="https://pdfbolt.in/analyze-pdf/" />
       </Helmet>
@@ -160,10 +160,10 @@ ${analysis.keyFindings.map((kf, i) => `${i + 1}. ${kf}`).join('\n')}
       <section className={`py-14 border-b ${darkMode ? 'border-slate-800 bg-slate-900/40' : 'border-slate-100 bg-slate-50/70'}`}>
         <div className="max-w-5xl mx-auto px-6 text-center">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 font-black text-xs uppercase tracking-widest mb-4">
-            <Sparkles size={14} /> PDF Intelligence + Creation Engine
+            <FileSearch size={14} /> PDF Document Inspector & Analysis Engine
           </div>
           <h1 className={`text-3xl md:text-5xl font-black mb-4 tracking-tight leading-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>
-            AI PDF Analyzer & Multi-Output Builder
+            PDF Document Inspector & Deck Builder
           </h1>
           <p className={`text-base md:text-lg max-w-2xl mx-auto ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
             Understand any PDF instantly. Extract structure, topics, and key insights—then transform it into presentations, reports, or spreadsheets with a single click.
@@ -224,7 +224,7 @@ ${analysis.keyFindings.map((kf, i) => `${i + 1}. ${kf}`).join('\n')}
                 { label: 'Words', val: analysis.wordCount.toLocaleString(), icon: <FileText size={18} className="text-blue-600 dark:text-blue-400" /> },
                 { label: 'Read Time', val: `~${analysis.estimatedReadTimeMinutes} min`, icon: <Clock size={18} className="text-emerald-600 dark:text-emerald-400" /> },
                 { label: 'Tables Detected', val: analysis.tableCount, icon: <Table size={18} className="text-purple-600 dark:text-purple-400" /> },
-                { label: 'Images', val: analysis.imageCount, icon: <Sparkles size={18} className="text-amber-600 dark:text-amber-400" /> },
+                { label: 'Images', val: analysis.imageCount, icon: <ImageIcon size={18} className="text-amber-600 dark:text-amber-400" /> },
                 { label: 'Characters', val: analysis.characterCount.toLocaleString(), icon: <Hash size={18} className="text-rose-600 dark:text-rose-400" /> },
               ].map((m) => (
                 <div key={m.label} className={`p-5 rounded-2xl border ${darkMode ? 'bg-slate-800/40 border-slate-700' : 'bg-white border-slate-200 shadow-sm'}`}>
@@ -251,7 +251,7 @@ ${analysis.keyFindings.map((kf, i) => `${i + 1}. ${kf}`).join('\n')}
               {/* Summary (7 cols) */}
               <div className={`lg:col-span-7 p-8 rounded-3xl border space-y-6 ${darkMode ? 'bg-slate-800/40 border-slate-700' : 'bg-white border-slate-200 shadow-sm'}`}>
                 <h3 className={`text-lg font-black flex items-center gap-2 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
-                  <Sparkles className="text-yellow-500" size={20} /> Executive Summary
+                  <FileText className="text-yellow-600 dark:text-yellow-400" size={20} /> Document Executive Summary
                 </h3>
                 <p className={`text-sm leading-relaxed ${darkMode ? 'text-slate-300' : 'text-slate-700'}`}>
                   {analysis.executiveSummary}
@@ -356,7 +356,7 @@ ${analysis.keyFindings.map((kf, i) => `${i + 1}. ${kf}`).join('\n')}
             <div className={`p-8 rounded-3xl border space-y-6 ${darkMode ? 'bg-slate-800/40 border-slate-700' : 'bg-white border-slate-200 shadow-sm'}`}>
               <div>
                 <h3 className={`text-xl font-black flex items-center gap-2 mb-1 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
-                  <MessageSquare className="text-yellow-600 dark:text-yellow-400" size={22} /> Ask Anything About This PDF
+                  <MessageSquare className="text-yellow-600 dark:text-yellow-400" size={22} /> Search & Query Document Contents
                 </h3>
                 <p className={`text-xs ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
                   Query tables, specific page figures, or request summaries directly from the text stream.
