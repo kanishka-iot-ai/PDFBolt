@@ -1,15 +1,62 @@
-# Stage 1: Build
-FROM node:18-alpine as builder
+FROM python:3.11-slim AS base
 WORKDIR /app
-COPY package*.json ./
-RUN npm install
-RUN apk add --no-cache python3
-COPY . .
-RUN npm run build
 
-# Stage 2: Serve
-FROM nginx:alpine
-COPY --from=builder /app/dist /usr/share/nginx/html
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+# Install all required system binaries for Ghostscript, QPDF, Tesseract, Poppler, OpenCV
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ghostscript \
+    qpdf \
+    tesseract-ocr \
+    tesseract-ocr-eng \
+    poppler-utils \
+    libreoffice \
+    libreoffice-writer \
+    libreoffice-calc \
+    libreoffice-impress \
+    imagemagick \
+    libmagic1 \
+    fonts-liberation \
+    fonts-dejavu \
+    fontconfig \
+    curl \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Suppress pip root user warnings during container build
+ENV PIP_ROOT_USER_ACTION=ignore
+ENV PIP_DISABLE_PIP_VERSION_CHECK=1
+
+# Non-root user (security requirement) with writable fontconfig cache
+RUN groupadd -r pdfbolt && \
+    useradd -r -g pdfbolt -u 1001 -m -d /home/pdfbolt pdfbolt && \
+    mkdir -p /tmp/pdfbolt /var/cache/fontconfig /home/pdfbolt/.cache/fontconfig && \
+    chown -R pdfbolt:pdfbolt /tmp/pdfbolt /var/cache/fontconfig /home/pdfbolt && \
+    chmod -R 777 /var/cache/fontconfig /tmp/pdfbolt && \
+    chown -R pdfbolt:pdfbolt /app && \
+    fc-cache -fv
+
+COPY backend/requirements.txt requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY --chown=pdfbolt:pdfbolt backend/ ./backend/
+
+USER pdfbolt
+
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONPATH=/app
+ENV TEMP_DIR=/tmp/pdfbolt
+ENV XDG_CACHE_HOME=/home/pdfbolt/.cache
+ENV STORAGE_BACKEND=local
+ENV QUEUE_BACKEND=local
+ENV PYTHONWARNINGS="ignore"
+ENV PORT=10000
+
+# Memory Optimization for 512MB RAM Containers (Render Free Tier)
+ENV MALLOC_ARENA_MAX=2
+ENV PYTHONMALLOC=malloc
+
+EXPOSE 10000 8000
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD curl -f http://localhost:${PORT:-10000}/health || exit 1
+
+CMD ["sh", "-c", "uvicorn backend.app.main:app --host 0.0.0.0 --port ${PORT:-10000}"]

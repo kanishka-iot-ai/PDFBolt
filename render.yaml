@@ -348,4 +348,8 @@ services:
         value: "900"
       - key: RENDER_EXTERNAL_URL
         value: https://pdfbolt-api.onrender.com
+      - key: MALLOC_ARENA_MAX
+        value: "2"
+      - key: PYTHONMALLOC
+        value: "malloc"
 

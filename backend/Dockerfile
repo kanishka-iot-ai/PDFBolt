@@ -9,6 +9,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     tesseract-ocr-eng \
     poppler-utils \
     libreoffice \
+    libreoffice-writer \
+    libreoffice-calc \
+    libreoffice-impress \
     imagemagick \
     libmagic1 \
     fonts-liberation \
@@ -34,11 +37,12 @@ RUN groupadd -r pdfbolt && \
 COPY requirements.txt requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY --chown=pdfbolt:pdfbolt . .
+COPY --chown=pdfbolt:pdfbolt . /app/backend/
 
 USER pdfbolt
 
 ENV PYTHONUNBUFFERED=1
+ENV PYTHONPATH=/app
 ENV TEMP_DIR=/tmp/pdfbolt
 ENV XDG_CACHE_HOME=/home/pdfbolt/.cache
 ENV STORAGE_BACKEND=local
@@ -46,9 +50,13 @@ ENV QUEUE_BACKEND=local
 ENV PYTHONWARNINGS="ignore"
 ENV PORT=10000
 
+# Memory Optimization for 512MB RAM Containers (Render Free Tier)
+ENV MALLOC_ARENA_MAX=2
+ENV PYTHONMALLOC=malloc
+
 EXPOSE 10000 8000
 
-HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
     CMD curl -f http://localhost:${PORT:-10000}/health || exit 1
 
 CMD ["sh", "-c", "uvicorn backend.app.main:app --host 0.0.0.0 --port ${PORT:-10000}"]
