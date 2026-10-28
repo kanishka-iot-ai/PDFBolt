@@ -2438,7 +2438,7 @@ def generate_prerendered_pages():
     # Categorized Tools HTML for Homepage
     def build_tool_card(t):
         return f'''
-        <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between; transition: all 0.2s ease;">
+        <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between">
           <div>
             <h3 style="font-size: 1.15rem; font-weight: 800; color: #0f172a; margin: 0 0 8px 0;">
               <a href="/{t['path']}/" style="color: #0f172a; text-decoration: none;">{t['h1']}</a>

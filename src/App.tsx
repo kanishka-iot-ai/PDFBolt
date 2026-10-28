@@ -185,7 +185,7 @@ const SEOManager: React.FC = () => {
     }
     canonicalLink.href = canonicalUrl;
 
-    window.scrollTo(0, 0);
+    if (window.scrollY > 0) window.scrollTo(0, 0);
   }, [location]);
 
   return null;

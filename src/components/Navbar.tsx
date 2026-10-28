@@ -114,8 +114,8 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
             <img 
               src="/pdfbolt-logo.webp" 
               alt="PDFBolt" 
-              width="124"
-              height="100"
+              width="98"
+              height="80"
               loading="eager"
               decoding="async"
               {...({ fetchpriority: "high" } as any)}

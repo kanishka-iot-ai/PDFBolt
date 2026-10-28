@@ -77,7 +77,7 @@ const ToolCard: React.FC<ToolCardProps> = ({ tool, darkMode, compact = false }) 
       className="tool-card-link block h-full group outline-none focus-visible:ring-2 focus-visible:ring-yellow-500 focus-visible:ring-offset-2 rounded-2xl transition-transform duration-150 hover:-translate-y-0.5 active:translate-y-0"
     >
       <div
-        className={`h-full p-4 sm:p-5 md:p-6 flex flex-col justify-between rounded-2xl border transition-all duration-150 ${categoryStyle} ${
+        className={`h-full p-4 sm:p-5 md:p-6 flex flex-col justify-between rounded-2xl border transition-colors duration-150 ${categoryStyle} ${
           darkMode
             ? 'bg-slate-900/70 border-slate-800 text-white'
             : 'bg-white border-slate-200 text-slate-900 shadow-sm'
