@@ -137,8 +137,10 @@
 /guides/pdf-compress-kaise-kare  /guides/pdf-compress-kaise-kare/  301
 /guides/jpg-ko-pdf-kaise-banaye  /guides/jpg-ko-pdf-kaise-banaye/  301
 # Developer / Admin Key Portal
-/api-keys  /api-keys/  301
-/developer/keys  /developer/keys/  301
+/api-keys  /index.html  200
+/api-keys/  /index.html  200
+/developer/keys  /index.html  200
+/developer/keys/  /index.html  200
 
 # SPA catch-all fallback
 /*  /index.html  200
