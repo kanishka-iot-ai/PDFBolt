@@ -50,6 +50,7 @@ const AboutPage = lazy(() => import('./pages/StaticPages').then(m => ({ default:
 const ContactPage = lazy(() => import('./pages/StaticPages').then(m => ({ default: m.ContactPage })));
 const CookiesPage = lazy(() => import('./pages/StaticPages').then(m => ({ default: m.CookiesPage })));
 const OfflineModePage = lazy(() => import('./pages/StaticPages').then(m => ({ default: m.OfflineModePage })));
+const ApiKeyManagerPage = lazy(() => import('./pages/ApiKeyManagerPage').then(m => ({ default: m.ApiKeyManagerPage })));
 
 // Loading Fallback
 const PageLoader = () => (
@@ -151,7 +152,10 @@ const SEOManager: React.FC = () => {
       description = "Download free sample PDF files for testing: multi-page documents, tables, scanned receipts, and slides ready for testing PDF conversion and editing tools.";
     } else if (pathNorm === '/contact') {
       title = "Contact Customer Care | PDFBolt";
-    } else if (pathNorm !== '/' && !pathNorm.startsWith('/guides') && !pathNorm.startsWith('/encyclopedia') && !pathNorm.startsWith('/student-pdf') && !pathNorm.startsWith('/business-pdf') && !pathNorm.startsWith('/developer-pdf') && !pathNorm.startsWith('/privacy') && !pathNorm.startsWith('/terms') && !pathNorm.startsWith('/about') && !pathNorm.startsWith('/cookies') && !pathNorm.startsWith('/offline') && !pathNorm.startsWith('/tutorials') && !pathNorm.startsWith('/qr-success') && !pathNorm.startsWith('/s/')) {
+    } else if (pathNorm.startsWith('/api-keys') || pathNorm.startsWith('/developer/keys')) {
+      title = "API Key Management Portal | PDFBolt";
+      description = "Administrative portal for generating and managing client API keys.";
+    } else if (pathNorm !== '/' && !pathNorm.startsWith('/guides') && !pathNorm.startsWith('/encyclopedia') && !pathNorm.startsWith('/student-pdf') && !pathNorm.startsWith('/business-pdf') && !pathNorm.startsWith('/developer-pdf') && !pathNorm.startsWith('/privacy') && !pathNorm.startsWith('/terms') && !pathNorm.startsWith('/about') && !pathNorm.startsWith('/cookies') && !pathNorm.startsWith('/offline') && !pathNorm.startsWith('/tutorials') && !pathNorm.startsWith('/qr-success') && !pathNorm.startsWith('/s/') && !pathNorm.startsWith('/api-keys') && !pathNorm.startsWith('/developer/keys')) {
       title = "404: Page Not Found | PDFBolt";
       description = "The requested page does not exist or has been relocated.";
     }
@@ -362,6 +366,10 @@ const MainLayout: React.FC<MainLayoutProps> = ({ darkMode, setDarkMode, soundEna
             <Route path="/offline-mode" element={<OfflineModePage darkMode={darkMode} />} />
             <Route path="/offline" element={<Navigate to="/offline-mode/" replace />} />
             <Route path="/tutorials" element={<TutorialsPage darkMode={darkMode} />} />
+            <Route path="/api-keys" element={<ApiKeyManagerPage darkMode={darkMode} />} />
+            <Route path="/api-keys/" element={<ApiKeyManagerPage darkMode={darkMode} />} />
+            <Route path="/developer/keys" element={<ApiKeyManagerPage darkMode={darkMode} />} />
+            <Route path="/developer/keys/" element={<ApiKeyManagerPage darkMode={darkMode} />} />
             <Route path="/qr-success" element={<QRSuccess darkMode={darkMode} />} />
             <Route path="/s/:shareId" element={<QRSuccess darkMode={darkMode} />} />
 
