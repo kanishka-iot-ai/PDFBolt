@@ -4,7 +4,7 @@ import tempfile
 from pathlib import Path
 from typing import Optional
 import httpx
-from fastapi import APIRouter, UploadFile, File, HTTPException, BackgroundTasks, status
+from fastapi import APIRouter, UploadFile, File, HTTPException, BackgroundTasks, status, Depends
 from fastapi.responses import FileResponse, Response
 from pypdf import PdfReader
 
@@ -25,6 +25,7 @@ except ImportError:
 
 from backend.app.core.logging import logger
 from backend.app.core.errors import PDFBoltError
+from backend.app.core.security import verify_partner_api_key, PartnerIdentity
 
 router = APIRouter(prefix="/convert", tags=["Document Conversion"])
 
@@ -54,7 +55,7 @@ def cleanup_temp_dir(dir_path: str):
 # 1. WORD TO PDF (Gotenberg HTTP Stream + Headless LibreOffice Fallback)
 # ---------------------------------------------------------------------------
 @router.post("/word-to-pdf", summary="Convert DOCX/DOC to PDF with exact margins & fonts")
-async def convert_word_to_pdf(file: UploadFile = File(...)):
+async def convert_word_to_pdf(file: UploadFile = File(...), caller: PartnerIdentity = Depends(verify_partner_api_key)):
     filename = file.filename or "document.docx"
     ext = Path(filename).suffix.lower()
 

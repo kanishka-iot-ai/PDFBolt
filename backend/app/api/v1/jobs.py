@@ -2,10 +2,10 @@ import os
 import json
 from typing import Optional, List
 from pathlib import Path
-from fastapi import APIRouter, UploadFile, File, Form, HTTPException, BackgroundTasks, Query
+from fastapi import APIRouter, UploadFile, File, Form, HTTPException, BackgroundTasks, Query, Depends
 from fastapi.responses import FileResponse, Response
 from backend.app.core.errors import PDFBoltError
-from backend.app.core.security import sanitize_filename
+from backend.app.core.security import sanitize_filename, verify_partner_api_key, PartnerIdentity
 from backend.app.services.job_service import job_service
 from backend.app.services.job_manager import job_manager
 from backend.app.services.cleanup_service import cleanup_service
@@ -38,7 +38,8 @@ async def create_and_process_job(
     options: Optional[str] = Form(default=None),
     settings: Optional[str] = Form(default=None),
     file: Optional[UploadFile] = File(default=None),
-    files: Optional[List[UploadFile]] = File(default=None)
+    files: Optional[List[UploadFile]] = File(default=None),
+    caller: PartnerIdentity = Depends(verify_partner_api_key)
 ):
     """
     Submits a PDF document processing job through the strict 20-step verification pipeline.
@@ -67,6 +68,9 @@ async def create_and_process_job(
         uploads=upload_list,
         options=options_dict
     )
+    if caller.is_authenticated_partner and hasattr(job, "metrics") and isinstance(job.metrics, dict):
+        job.metrics["partner_id"] = caller.partner_id
+        job.metrics["tier"] = caller.tier
 
     # Format response compatible with frontend & API spec
     return {

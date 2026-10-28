@@ -3,8 +3,13 @@ import re
 import uuid
 import time
 import zipfile
+import hashlib
+import secrets
 from pathlib import Path
-from typing import Dict, Optional, Set
+from dataclasses import dataclass
+from typing import Dict, Optional, Set, Any
+from fastapi import Request, HTTPException, Header, status
+from backend.app.config import settings
 from backend.app.core.errors import PDFBoltError
 
 ALLOWED_MIME_TYPES: Set[str] = {
@@ -140,28 +145,168 @@ def validate_file_size(size_bytes: int, max_bytes: int) -> None:
 
 
 class RateLimiter:
-    """Simple in-memory sliding window rate limiter."""
+    """Simple in-memory sliding window rate limiter with per-client tier support."""
     def __init__(self, requests_per_minute: int = 60):
         self.requests_per_minute = requests_per_minute
         self.requests: Dict[str, list[float]] = {}
 
-    def check_rate_limit(self, client_ip: str) -> bool:
+    def check_rate_limit(self, identifier: str, limit: Optional[int] = None) -> bool:
+        max_requests = limit if limit is not None else self.requests_per_minute
         now = time.time()
         window_start = now - 60.0
 
-        if client_ip not in self.requests:
-            self.requests[client_ip] = []
+        if identifier not in self.requests:
+            self.requests[identifier] = []
 
         # Remove requests older than 1 minute
-        self.requests[client_ip] = [
-            t for t in self.requests[client_ip] if t > window_start
+        self.requests[identifier] = [
+            t for t in self.requests[identifier] if t > window_start
         ]
 
-        if len(self.requests[client_ip]) >= self.requests_per_minute:
+        if len(self.requests[identifier]) >= max_requests:
             return False
 
-        self.requests[client_ip].append(now)
+        self.requests[identifier].append(now)
         return True
 
 
 rate_limiter = RateLimiter(requests_per_minute=60)
+
+
+@dataclass
+class PartnerIdentity:
+    partner_id: str
+    name: str
+    tier: str
+    rate_limit_per_minute: int
+    is_authenticated_partner: bool
+
+
+def hash_api_key(raw_key: str) -> str:
+    """Computes SHA-256 digest of API key for secure lookup and constant-time check."""
+    return hashlib.sha256(raw_key.strip().encode("utf-8")).hexdigest()
+
+
+class PartnerKeyRegistry:
+    def __init__(self):
+        self._key_hash_map: Dict[str, PartnerIdentity] = {}
+        self.reload_keys()
+
+    def reload_keys(self):
+        """Loads and pre-hashes configured partner keys into memory on startup."""
+        self._key_hash_map.clear()
+        raw_map = settings.PARTNER_API_KEYS if isinstance(settings.PARTNER_API_KEYS, dict) else {}
+        
+        for pid, pdata in raw_map.items():
+            if isinstance(pdata, str):
+                raw_key = pdata
+                tier = "standard"
+                rate_limit = settings.PARTNER_DEFAULT_RATE_LIMIT
+            elif isinstance(pdata, dict):
+                raw_key = pdata.get("key", "")
+                tier = pdata.get("tier", "standard")
+                rate_limit = pdata.get("rate_limit", settings.PARTNER_DEFAULT_RATE_LIMIT)
+            else:
+                continue
+
+            if raw_key:
+                khash = hash_api_key(raw_key)
+                self._key_hash_map[khash] = PartnerIdentity(
+                    partner_id=pid,
+                    name=pid.replace("_", " ").title(),
+                    tier=tier,
+                    rate_limit_per_minute=rate_limit,
+                    is_authenticated_partner=True
+                )
+
+    def authenticate_key(self, raw_key: Optional[str]) -> Optional[PartnerIdentity]:
+        if not raw_key:
+            return None
+        candidate_hash = hash_api_key(raw_key)
+        
+        # Constant-time comparison across registered key digests
+        for stored_hash, identity in self._key_hash_map.items():
+            if secrets.compare_digest(candidate_hash, stored_hash):
+                return identity
+        return None
+
+
+partner_registry = PartnerKeyRegistry()
+
+
+def verify_partner_api_key(
+    request: Request,
+    x_api_key: Optional[str] = Header(default=None, alias="X-API-Key"),
+    authorization: Optional[str] = Header(default=None)
+) -> PartnerIdentity:
+    """
+    Dual-Gate Client Authenticator for FastAPI routes:
+    1. Extracts API key from 'X-API-Key' or 'Authorization: Bearer <key>'.
+    2. If key provided: validates via constant-time comparison against partner registry.
+       If invalid -> raises 401 Unauthorized.
+    3. If no key provided:
+       - If request Origin/Referer matches CORS_ORIGINS or internal loopback -> returns Web/Guest identity.
+       - If external request and REQUIRE_API_KEY_FOR_EXTERNAL=True -> raises 401 Unauthorized.
+       - Otherwise returns standard Web/Guest identity (ensuring 100% backward compatibility for tests and web app).
+    """
+    raw_key: Optional[str] = None
+    
+    # 1. Check Authorization Bearer header
+    if authorization:
+        if authorization.lower().startswith("bearer "):
+            raw_key = authorization[7:].strip()
+        elif not authorization.lower().startswith("basic "):
+            raw_key = authorization.strip()
+
+    # 2. Check X-API-Key header fallback
+    if not raw_key and x_api_key:
+        raw_key = x_api_key.strip()
+
+    if raw_key:
+        if not partner_registry._key_hash_map and settings.PARTNER_API_KEYS:
+            partner_registry.reload_keys()
+
+        partner = partner_registry.authenticate_key(raw_key)
+        if not partner:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail={
+                    "code": "INVALID_API_KEY",
+                    "message": "The provided API key is invalid or inactive.",
+                    "suggestion": "Check your X-API-Key or Authorization: Bearer <key> header."
+                }
+            )
+        request.state.partner = partner
+        return partner
+
+    # 3. No API key provided: Check First-Party Web Origin & Referer
+    origin = request.headers.get("origin") or request.headers.get("referer") or ""
+    is_trusted_origin = False
+    if origin:
+        for allowed in settings.CORS_ORIGINS:
+            if origin.rstrip("/").startswith(allowed.rstrip("/")):
+                is_trusted_origin = True
+                break
+
+    # If strict external enforcement is enabled and request is not from trusted web app
+    if settings.REQUIRE_API_KEY_FOR_EXTERNAL and not is_trusted_origin:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail={
+                "code": "API_KEY_REQUIRED",
+                "message": "External API calls require an authenticated API key.",
+                "suggestion": "Pass your partner key via 'X-API-Key' or 'Authorization: Bearer <key>'."
+            }
+        )
+
+    # 4. Standard Guest / Web Client (Existing frontend & pytest suites)
+    guest = PartnerIdentity(
+        partner_id="public_web",
+        name="PDFBolt Web User",
+        tier="public",
+        rate_limit_per_minute=settings.RATE_LIMIT_PER_MINUTE,
+        is_authenticated_partner=False
+    )
+    request.state.partner = guest
+    return guest
+

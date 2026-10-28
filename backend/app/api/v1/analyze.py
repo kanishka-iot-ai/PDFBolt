@@ -1,8 +1,9 @@
 import uuid
 from pathlib import Path
-from fastapi import APIRouter, UploadFile, File
+from fastapi import APIRouter, UploadFile, File, Depends
 from backend.app.config import settings
 from backend.app.core.errors import PDFBoltError
+from backend.app.core.security import verify_partner_api_key, PartnerIdentity
 from backend.app.services.file_service import file_service
 from backend.app.processors.analyzer import AnalyzerProcessor
 
@@ -10,7 +11,7 @@ router = APIRouter(prefix="/analyze", tags=["Analyzer"])
 
 
 @router.post("")
-async def analyze_document(file: UploadFile = File(...)):
+async def analyze_document(file: UploadFile = File(...), caller: PartnerIdentity = Depends(verify_partner_api_key)):
     """Deep structural PDF document inspection and intelligence extraction."""
     if not file:
         raise PDFBoltError("NO_FILES_PROVIDED", "No PDF file provided for analysis.")

@@ -26,7 +26,7 @@ from fastapi.responses import JSONResponse, Response
 
 from backend.app.config import settings
 from backend.app.core.errors import PDFBoltError, PDFProcessingException, pdf_exception_handler, generic_exception_handler
-from backend.app.core.security import rate_limiter
+from backend.app.core.security import rate_limiter, partner_registry
 from backend.app.core.logging import logger
 from backend.app.api.v1.router import api_v1_router
 from backend.app.api.v1.health import router as root_health_router
@@ -133,6 +133,23 @@ async def security_and_timing_middleware(request: Request, call_next):
     if request.method == "HEAD":
         return Response(status_code=200)
 
+    # Partner identity resolution & rate limit quota allocation
+    raw_key = None
+    auth_header = request.headers.get("Authorization")
+    if auth_header and auth_header.lower().startswith("bearer "):
+        raw_key = auth_header[7:].strip()
+    if not raw_key:
+        raw_key = request.headers.get("X-API-Key")
+
+    partner = partner_registry.authenticate_key(raw_key) if raw_key else None
+    if partner:
+        request.state.partner = partner
+        rate_id = f"partner:{partner.partner_id}"
+        rate_limit = partner.rate_limit_per_minute
+    else:
+        rate_id = f"ip:{client_ip}"
+        rate_limit = settings.RATE_LIMIT_PER_MINUTE
+
     # Rate limiting check for processing routes
     rate_limited_prefixes = (
         "/api/v1/jobs",
@@ -143,7 +160,7 @@ async def security_and_timing_middleware(request: Request, call_next):
         "/api/v1/handwriting",
     )
     if request.url.path.startswith(rate_limited_prefixes):
-        if not rate_limiter.check_rate_limit(client_ip):
+        if not rate_limiter.check_rate_limit(rate_id, limit=rate_limit):
             return JSONResponse(
                 status_code=429,
                 content={
@@ -151,7 +168,7 @@ async def security_and_timing_middleware(request: Request, call_next):
                     "error": {
                         "code": "RATE_LIMITED",
                         "message": "Too many requests. Please slow down and try again.",
-                        "suggestion": "Wait 60 seconds before submitting further jobs."
+                        "suggestion": f"Your current limit is {rate_limit} requests/minute. Wait 60 seconds before submitting further jobs."
                     }
                 }
             )

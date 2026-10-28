@@ -1,6 +1,6 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import field_validator
-from typing import List, Union
+from typing import List, Union, Dict, Any, Optional
 import json
 import os
 
@@ -13,6 +13,11 @@ class Settings(BaseSettings):
     API_ADMIN_KEY: str = ""
     PORT: int = 8000
     HOST: str = "0.0.0.0"
+
+    # Partner & B2B Collaboration API Keys
+    PARTNER_API_KEYS: Union[str, Dict[str, Any], List[str]] = {}
+    REQUIRE_API_KEY_FOR_EXTERNAL: bool = False
+    PARTNER_DEFAULT_RATE_LIMIT: int = 120
 
     # CORS (Strict production origins; no wildcard *)
     CORS_ORIGINS: Union[str, List[str]] = [
@@ -37,6 +42,34 @@ class Settings(BaseSettings):
                     pass
             return [i.strip() for i in v.split(",") if i.strip()]
         return v
+
+    @field_validator("PARTNER_API_KEYS", mode="after")
+    @classmethod
+    def assemble_partner_keys(cls, v: Union[str, Dict[str, Any], List[str]]) -> Dict[str, Any]:
+        if isinstance(v, str):
+            v = v.strip()
+            if not v:
+                return {}
+            if v.startswith("{") and v.endswith("}"):
+                try:
+                    parsed = json.loads(v)
+                    if isinstance(parsed, dict):
+                        return parsed
+                except Exception:
+                    pass
+            if v.startswith("[") and v.endswith("]"):
+                try:
+                    parsed = json.loads(v)
+                    if isinstance(parsed, list):
+                        return {f"partner_{i+1}": {"key": str(k).strip(), "tier": "standard"} for i, k in enumerate(parsed) if str(k).strip()}
+                except Exception:
+                    pass
+            return {f"partner_{i+1}": {"key": k.strip(), "tier": "standard"} for i, k in enumerate(v.split(",")) if k.strip()}
+        elif isinstance(v, list):
+            return {f"partner_{i+1}": {"key": str(k).strip(), "tier": "standard"} for i, k in enumerate(v) if str(k).strip()}
+        elif isinstance(v, dict):
+            return v
+        return {}
 
     # File & Security Limits
     MAX_UPLOAD_SIZE_BYTES: int = 100 * 1024 * 1024  # 100 MB
