@@ -34,6 +34,7 @@ export const API_BASE_URL = rawHost.endsWith('/api/v1')
   ? rawHost.replace(/\/$/, '') 
   : `${rawHost.replace(/\/$/, '')}/api/v1`;
 const API_ORIGIN = API_BASE_URL.replace(/\/api\/v1\/?$/, '');
+export const INTERNAL_CLIENT_TOKEN = 'pdfbolt_app_internal_v1_secure';
 
 function resolveApiUrl(pathOrUrl?: string, fallback?: string): string {
   const value = pathOrUrl || fallback || '';
@@ -148,6 +149,9 @@ class ApiClient {
         }
         response = await fetch(`${this.baseUrl}/jobs`, {
           method: 'POST',
+          headers: {
+            'X-PDFBolt-Client-Token': INTERNAL_CLIENT_TOKEN,
+          },
           body: formData,
           signal: AbortSignal.timeout(90000) // 90s to accommodate Render container spin-up + conversion
         });
@@ -220,6 +224,9 @@ class ApiClient {
 
     const response = await fetch(`${this.baseUrl}/redact/scan`, {
       method: 'POST',
+      headers: {
+        'X-PDFBolt-Client-Token': INTERNAL_CLIENT_TOKEN,
+      },
       body: formData,
       signal: AbortSignal.timeout(20000)
     });
@@ -245,6 +252,9 @@ class ApiClient {
 
     const response = await fetch(`${this.baseUrl}/jobs`, {
       method: 'POST',
+      headers: {
+        'X-PDFBolt-Client-Token': INTERNAL_CLIENT_TOKEN,
+      },
       body: formData,
       signal: AbortSignal.timeout(45000)
     });
@@ -289,6 +299,9 @@ class ApiClient {
 
     const response = await fetch(`${this.baseUrl}/jobs`, {
       method: 'POST',
+      headers: {
+        'X-PDFBolt-Client-Token': INTERNAL_CLIENT_TOKEN,
+      },
       body: formData,
       signal: AbortSignal.timeout(45000)
     });
@@ -330,6 +343,9 @@ class ApiClient {
 
     const response = await fetch(`${this.baseUrl}/analyze`, {
       method: 'POST',
+      headers: {
+        'X-PDFBolt-Client-Token': INTERNAL_CLIENT_TOKEN,
+      },
       body: formData,
     });
 

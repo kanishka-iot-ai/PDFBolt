@@ -5,9 +5,11 @@ import time
 import zipfile
 import hashlib
 import secrets
+import ipaddress
 from pathlib import Path
 from dataclasses import dataclass
-from typing import Dict, Optional, Set, Any
+from typing import Dict, Optional, Set, Any, List
+from collections import OrderedDict
 from fastapi import Request, HTTPException, Header, status
 from backend.app.config import settings
 from backend.app.core.errors import PDFBoltError
@@ -144,24 +146,73 @@ def validate_file_size(size_bytes: int, max_bytes: int) -> None:
         raise PDFBoltError("FILE_TOO_LARGE")
 
 
+def get_client_ip(request: Request) -> str:
+    """
+    Safely resolves client IP behind reverse proxies (Render, Cloudflare, Nginx).
+    Prioritizes CF-Connecting-IP, True-Client-IP, and leftmost valid X-Forwarded-For IP.
+    """
+    cf_ip = request.headers.get("CF-Connecting-IP")
+    if cf_ip:
+        candidate = cf_ip.strip()
+        try:
+            ipaddress.ip_address(candidate)
+            return candidate
+        except ValueError:
+            pass
+
+    true_ip = request.headers.get("True-Client-IP")
+    if true_ip:
+        candidate = true_ip.strip()
+        try:
+            ipaddress.ip_address(candidate)
+            return candidate
+        except ValueError:
+            pass
+
+    xff = request.headers.get("X-Forwarded-For")
+    if xff:
+        parts = [p.strip() for p in xff.split(",") if p.strip()]
+        if parts:
+            candidate = parts[0]
+            try:
+                ipaddress.ip_address(candidate)
+                return candidate
+            except ValueError:
+                pass
+
+    if request.client and request.client.host:
+        return request.client.host
+
+    return "127.0.0.1"
+
+
 class RateLimiter:
-    """Simple in-memory sliding window rate limiter with per-client tier support."""
-    def __init__(self, requests_per_minute: int = 60):
+    """
+    Memory-bounded sliding-window rate limiter with LRU eviction and auto-purge.
+    Prevents memory exhaustion attacks (DoS) from unbounded unique client IPs.
+    """
+    def __init__(self, requests_per_minute: int = 60, max_entries: int = 20000):
         self.requests_per_minute = requests_per_minute
-        self.requests: Dict[str, list[float]] = {}
+        self.max_entries = max_entries
+        self.requests: OrderedDict[str, list[float]] = OrderedDict()
+        self._last_purge: float = time.time()
 
     def check_rate_limit(self, identifier: str, limit: Optional[int] = None) -> bool:
         max_requests = limit if limit is not None else self.requests_per_minute
         now = time.time()
         window_start = now - 60.0
 
-        if identifier not in self.requests:
-            self.requests[identifier] = []
+        # Periodic cleanup of expired entries every 60 seconds
+        if now - self._last_purge > 60.0:
+            self._purge_stale_entries(now)
 
-        # Remove requests older than 1 minute
-        self.requests[identifier] = [
-            t for t in self.requests[identifier] if t > window_start
-        ]
+        if identifier in self.requests:
+            self.requests.move_to_end(identifier)
+            self.requests[identifier] = [t for t in self.requests[identifier] if t > window_start]
+        else:
+            if len(self.requests) >= self.max_entries:
+                self.requests.popitem(last=False)
+            self.requests[identifier] = []
 
         if len(self.requests[identifier]) >= max_requests:
             return False
@@ -169,8 +220,15 @@ class RateLimiter:
         self.requests[identifier].append(now)
         return True
 
+    def _purge_stale_entries(self, now: float):
+        self._last_purge = now
+        cutoff = now - 60.0
+        keys_to_remove = [k for k, timestamps in self.requests.items() if not timestamps or timestamps[-1] <= cutoff]
+        for k in keys_to_remove:
+            self.requests.pop(k, None)
 
-rate_limiter = RateLimiter(requests_per_minute=60)
+
+rate_limiter = RateLimiter(requests_per_minute=60, max_entries=getattr(settings, "MAX_RATE_LIMITER_ENTRIES", 20000))
 
 
 @dataclass
@@ -237,17 +295,18 @@ partner_registry = PartnerKeyRegistry()
 def verify_partner_api_key(
     request: Request,
     x_api_key: Optional[str] = Header(default=None, alias="X-API-Key"),
-    authorization: Optional[str] = Header(default=None)
+    authorization: Optional[str] = Header(default=None),
+    x_internal_token: Optional[str] = Header(default=None, alias="X-PDFBolt-Client-Token"),
 ) -> PartnerIdentity:
     """
-    Dual-Gate Client Authenticator for FastAPI routes:
+    Hardened Multi-Factor Client Authenticator:
     1. Extracts API key from 'X-API-Key' or 'Authorization: Bearer <key>'.
     2. If key provided: validates via constant-time comparison against partner registry.
        If invalid -> raises 401 Unauthorized.
     3. If no key provided:
-       - If request Origin/Referer matches CORS_ORIGINS or internal loopback -> returns Web/Guest identity.
+       - Validates first-party web app via Origin/Referer matching, Fetch Metadata, or internal token.
        - If external request and REQUIRE_API_KEY_FOR_EXTERNAL=True -> raises 401 Unauthorized.
-       - Otherwise returns standard Web/Guest identity (ensuring 100% backward compatibility for tests and web app).
+       - Otherwise returns standard Web/Guest identity (ensuring 100% backward compatibility).
     """
     raw_key: Optional[str] = None
     
@@ -279,7 +338,7 @@ def verify_partner_api_key(
         request.state.partner = partner
         return partner
 
-    # 3. No API key provided: Check First-Party Web Origin & Referer
+    # 3. No API key provided: Check First-Party Web Origin & Referer & Client Handshake
     origin = request.headers.get("origin") or request.headers.get("referer") or ""
     is_trusted_origin = False
     if origin:
@@ -288,8 +347,20 @@ def verify_partner_api_key(
                 is_trusted_origin = True
                 break
 
-    # If strict external enforcement is enabled and request is not from trusted web app
-    if settings.REQUIRE_API_KEY_FOR_EXTERNAL and not is_trusted_origin:
+    # Defense-in-depth: Validate Fetch Metadata (Sec-Fetch-Site) and internal token
+    sec_fetch_site = request.headers.get("sec-fetch-site", "").lower()
+    is_valid_fetch_site = sec_fetch_site in ("same-origin", "same-site", "none")
+
+    configured_internal_token = getattr(settings, "FRONTEND_INTERNAL_TOKEN", "")
+    is_valid_internal_token = False
+    if configured_internal_token and x_internal_token:
+        is_valid_internal_token = secrets.compare_digest(x_internal_token.strip(), configured_internal_token)
+
+    # A verified web client has a trusted origin PLUS either valid fetch metadata or internal client token
+    is_verified_web_client = is_trusted_origin and (is_valid_fetch_site or is_valid_internal_token or not settings.REQUIRE_API_KEY_FOR_EXTERNAL)
+
+    # If strict external enforcement is enabled and request is not a verified web client
+    if settings.REQUIRE_API_KEY_FOR_EXTERNAL and not is_verified_web_client:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail={

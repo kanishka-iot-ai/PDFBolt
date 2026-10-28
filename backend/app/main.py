@@ -26,7 +26,7 @@ from fastapi.responses import JSONResponse, Response
 
 from backend.app.config import settings
 from backend.app.core.errors import PDFBoltError, PDFProcessingException, pdf_exception_handler, generic_exception_handler
-from backend.app.core.security import rate_limiter, partner_registry
+from backend.app.core.security import rate_limiter, partner_registry, get_client_ip
 from backend.app.core.logging import logger
 from backend.app.api.v1.router import api_v1_router
 from backend.app.api.v1.health import router as root_health_router
@@ -114,20 +114,32 @@ app = FastAPI(
     openapi_url=None if is_production else "/openapi.json"
 )
 
-# CORS Middleware
+# CORS Middleware (Hardened with strict methods, headers & 24h preflight caching)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.CORS_ORIGINS,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD"],
+    allow_headers=[
+        "Authorization",
+        "Content-Type",
+        "X-API-Key",
+        "X-PDFBolt-Client-Token",
+        "Sec-Fetch-Site",
+        "Sec-Fetch-Mode",
+        "Sec-Fetch-Dest",
+        "Accept",
+        "Origin",
+    ],
+    expose_headers=["X-Process-Time-Ms", "Content-Disposition", "X-Robots-Tag"],
+    max_age=settings.CORS_MAX_AGE_SECONDS,
 )
 
 
 # Rate Limiting & Access Logging Middleware
 @app.middleware("http")
 async def security_and_timing_middleware(request: Request, call_next):
-    client_ip = request.client.host if request.client else "127.0.0.1"
+    client_ip = get_client_ip(request)
 
     # Fast-path for Render container port detection probe (HEAD /)
     if request.method == "HEAD":
