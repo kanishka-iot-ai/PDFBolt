@@ -16,7 +16,7 @@ class Settings(BaseSettings):
 
     # Partner & B2B Collaboration API Keys
     PARTNER_API_KEYS: Union[str, Dict[str, Any], List[str]] = {}
-    REQUIRE_API_KEY_FOR_EXTERNAL: bool = True
+    REQUIRE_API_KEY_FOR_EXTERNAL: bool = False
     ENABLE_API_DOCS: bool = True
     ADMIN_PORTAL_PASSWORD: str = "Kkds@cuchd.in"
     ADMIN_TOKEN_SECRET: str = "pdfbolt_admin_hmac_secret_key_8849f2b901a" 

@@ -232,10 +232,11 @@ async def convert_excel_to_pdf(file: UploadFile = File(...)):
     file_bytes = await file.read()
     output_filename = f"{Path(filename).stem}.pdf"
 
-    # Local Headless LibreOffice Conversion
+    # Local Headless LibreOffice Conversion with High-Fidelity Python Fallback
     temp_dir = tempfile.mkdtemp(prefix="libreoffice_excel_conv_")
     input_path = os.path.join(temp_dir, filename)
     output_path = os.path.join(temp_dir, output_filename)
+    profile_dir = tempfile.mkdtemp(prefix="lo_prof_api_")
 
     with open(input_path, "wb") as f:
         f.write(file_bytes)
@@ -243,19 +244,53 @@ async def convert_excel_to_pdf(file: UploadFile = File(...)):
     try:
         import subprocess
         # Search for soffice / libreoffice binary
-        soffice_bin = shutil.which("soffice") or shutil.which("libreoffice") or "libreoffice"
-        cmd = [
-            soffice_bin,
-            "--headless",
-            "--convert-to",
-            "pdf",
-            input_path,
-            "--outdir",
-            temp_dir
-        ]
-        subprocess.run(cmd, check=True, timeout=120, capture_output=True)
+        soffice_bin = shutil.which("soffice") or shutil.which("libreoffice")
+        if not soffice_bin:
+            for wp in [
+                r"C:\Program Files\LibreOffice\program\soffice.exe",
+                r"C:\Program Files\LibreOffice\program\libreoffice.exe",
+                r"C:\Program Files (x86)\LibreOffice\program\soffice.exe",
+                r"C:\Program Files (x86)\LibreOffice\program\libreoffice.exe",
+            ]:
+                if os.path.exists(wp):
+                    soffice_bin = wp
+                    break
 
-        if not os.path.exists(output_path) or os.path.getsize(output_path) == 0:
+        converted = False
+        if soffice_bin:
+            try:
+                profile_url = Path(profile_dir).as_uri()
+                cmd = [
+                    soffice_bin,
+                    f"-env:UserInstallation={profile_url}",
+                    "--headless",
+                    "--convert-to",
+                    "pdf",
+                    "--outdir",
+                    temp_dir,
+                    input_path
+                ]
+                subprocess.run(cmd, check=True, timeout=120, capture_output=True)
+
+                if os.path.exists(output_path) and os.path.getsize(output_path) > 0:
+                    converted = True
+                else:
+                    candidates = [
+                        os.path.join(temp_dir, f) for f in os.listdir(temp_dir)
+                        if f.endswith(".pdf") and os.path.getsize(os.path.join(temp_dir, f)) > 0
+                    ]
+                    if candidates:
+                        output_path = candidates[0]
+                        converted = True
+            except Exception as lo_err:
+                logger.warning(f"LibreOffice convert API failed, falling back to python engine: {lo_err}")
+
+        if not converted:
+            from backend.app.processors.excel_to_pdf import ExcelToPdfProcessor
+            processor = ExcelToPdfProcessor(job_id=str(uuid.uuid4()), temp_dir=Path(temp_dir), output_dir=Path(temp_dir))
+            converted = processor._convert_python_native(Path(input_path), Path(output_path))
+
+        if not converted or not os.path.exists(output_path) or os.path.getsize(output_path) == 0:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Excel to PDF conversion produced no output."
@@ -269,6 +304,8 @@ async def convert_excel_to_pdf(file: UploadFile = File(...)):
             media_type="application/pdf",
             headers={"Content-Disposition": f'attachment; filename="{output_filename}"'}
         )
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"Local LibreOffice Excel conversion error: {e}")
         raise HTTPException(
@@ -276,5 +313,6 @@ async def convert_excel_to_pdf(file: UploadFile = File(...)):
             detail=f"Excel to PDF conversion failed: {str(e)}"
         )
     finally:
+        shutil.rmtree(profile_dir, ignore_errors=True)
         cleanup_temp_dir(temp_dir)
 

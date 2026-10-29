@@ -51,3 +51,21 @@ def test_excel_to_pdf_process_bytes(tmp_path):
     assert len(pdf_bytes) > 0
     assert filename.endswith(".pdf")
     assert metrics["format"] == "pdf"
+
+
+def test_csv_to_pdf_conversion(tmp_path):
+    """INVARIANT: Generates valid PDF from CSV file."""
+    csv_path = tmp_path / "students_list.csv"
+    with open(csv_path, "w", encoding="utf-8") as f:
+        f.write("Roll No,Student Name,Branch,Status\n")
+        f.write("22101,John Doe,CSE,Approved\n")
+        f.write("22102,Jane Smith,IT,Pending\n")
+
+    processor = ExcelToPdfProcessor(job_id="test_csv2pdf", work_dir=tmp_path)
+    result = processor.run([csv_path], {})
+
+    assert result.status == "COMPLETED"
+    assert result.output_path.exists()
+    assert result.output_path.stat().st_size > 0
+    page_count = validate_pdf_output(result.output_path)
+    assert page_count >= 1

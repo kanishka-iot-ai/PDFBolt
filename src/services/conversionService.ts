@@ -84,6 +84,114 @@ export async function wordToPdf(file: File): Promise<Uint8Array> {
  * Method: ExcelJS -> HTML Table -> Canvas (html2canvas) -> PDF (jspdf)
  */
 export async function excelToPdf(file: File): Promise<Uint8Array> {
+  const fileName = file.name.toLowerCase();
+
+  // If CSV file, handle natively via lightweight CSV parser
+  if (fileName.endsWith('.csv')) {
+    const text = await file.text();
+    const rows = text.split(/\r?\n/).filter(r => r.trim().length > 0).map(r => {
+      const cells: string[] = [];
+      let inQuote = false;
+      let curr = '';
+      for (let i = 0; i < r.length; i++) {
+        const ch = r[i];
+        if (ch === '"') {
+          inQuote = !inQuote;
+        } else if (ch === ',' && !inQuote) {
+          cells.push(curr.trim());
+          curr = '';
+        } else {
+          curr += ch;
+        }
+      }
+      cells.push(curr.trim());
+      return cells;
+    });
+
+    if (rows.length === 0) {
+      throw new Error("CSV file contains no readable data.");
+    }
+
+    const html2canvas = (await import('html2canvas')).default;
+    const jsPDF = (await import('jspdf')).default;
+    const maxCols = Math.max(...rows.map(r => r.length));
+    const isLandscape = maxCols > 6;
+    const pdf = new jsPDF(isLandscape ? 'l' : 'p', 'mm', 'a4');
+    const pdfWidth = isLandscape ? 297 : 210;
+    const pdfHeight = isLandscape ? 210 : 297;
+
+    const container = document.createElement('div');
+    container.style.position = 'fixed';
+    container.style.top = '0';
+    container.style.left = '0';
+    container.style.visibility = 'hidden';
+    container.style.zIndex = '-9999';
+    container.style.width = isLandscape ? '1200px' : '900px';
+    container.style.backgroundColor = 'white';
+    container.style.padding = '24px';
+    container.style.color = '#0f172a';
+
+    const heading = document.createElement('h2');
+    heading.textContent = file.name.replace(/\.[^/.]+$/, '');
+    heading.style.font = '700 18px Arial, sans-serif';
+    heading.style.margin = '0 0 12px 0';
+    container.appendChild(heading);
+
+    const table = document.createElement('table');
+    table.style.borderCollapse = 'collapse';
+    table.style.width = '100%';
+    table.style.font = '12px Arial, sans-serif';
+
+    rows.forEach((rowCells, rIdx) => {
+      const tr = document.createElement('tr');
+      rowCells.forEach(cellVal => {
+        const el = rIdx === 0 ? document.createElement('th') : document.createElement('td');
+        el.textContent = cellVal;
+        el.style.border = '1px solid #cbd5e1';
+        el.style.padding = '6px 8px';
+        el.style.textAlign = 'left';
+        el.style.backgroundColor = rIdx === 0 ? '#f1f5f9' : (rIdx % 2 === 0 ? '#f8fafc' : '#ffffff');
+        tr.appendChild(el);
+      });
+      table.appendChild(tr);
+    });
+    container.appendChild(table);
+    document.body.appendChild(container);
+
+    try {
+      const canvas = await html2canvas(container, { scale: 2 } as any);
+      const imgData = canvas.toDataURL('image/png');
+      const imgProps = (pdf as any).getImageProperties(imgData);
+      const imgHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+      let heightLeft = imgHeight;
+      let position = 0;
+
+      pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
+      heightLeft -= pdfHeight;
+
+      while (heightLeft > 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
+        heightLeft -= pdfHeight;
+      }
+
+      return new Uint8Array(pdf.output('arraybuffer'));
+    } finally {
+      if (container && container.parentNode) {
+        container.parentNode.removeChild(container);
+      }
+    }
+  }
+
+  // Handle XLSX (and warn if legacy XLS reaches client fallback)
+  if (fileName.endsWith('.xls')) {
+    throw new Error(
+      "Legacy binary Excel (.xls) files are converted on our cloud engine via headless LibreOffice. Please check that the PDFBolt cloud backend is connected or re-save the file as .xlsx."
+    );
+  }
+
   const ExcelJS = (await import('exceljs')).default;
   const html2canvas = (await import('html2canvas')).default;
   const jsPDF = (await import('jspdf')).default;
@@ -92,14 +200,18 @@ export async function excelToPdf(file: File): Promise<Uint8Array> {
   const workbook = new ExcelJS.Workbook();
   await workbook.xlsx.load(arrayBuffer);
 
-  const pdf = new jsPDF('p', 'mm', 'a4');
-  const pdfWidth = 210;
-  const pdfHeight = 297;
   const worksheets = workbook.worksheets.filter(sheet => sheet.actualRowCount > 0);
 
   if (worksheets.length === 0) {
     throw new Error("No readable worksheets found in this Excel file.");
   }
+
+  // Check if any sheet is wide (has more than 6 columns) to optimize layout orientation
+  const maxColsOverall = Math.max(...worksheets.map(s => s.columnCount || 0));
+  const isLandscape = maxColsOverall > 6;
+  const pdf = new jsPDF(isLandscape ? 'l' : 'p', 'mm', 'a4');
+  const pdfWidth = isLandscape ? 297 : 210;
+  const pdfHeight = isLandscape ? 210 : 297;
 
   for (let i = 0; i < worksheets.length; i++) {
     const worksheet = worksheets[i];
@@ -109,10 +221,10 @@ export async function excelToPdf(file: File): Promise<Uint8Array> {
     container.style.left = '0';
     container.style.visibility = 'hidden';
     container.style.zIndex = '-9999';
-    container.style.width = '1000px';
+    container.style.width = isLandscape ? '1200px' : '950px';
     container.style.backgroundColor = 'white';
     container.style.padding = '20px';
-    container.style.color = 'black';
+    container.style.color = '#0f172a';
 
     const heading = document.createElement('h2');
     heading.textContent = worksheet.name;
@@ -125,23 +237,32 @@ export async function excelToPdf(file: File): Promise<Uint8Array> {
     table.style.width = '100%';
     table.style.font = '12px Arial, sans-serif';
 
+    let rowIndex = 0;
     worksheet.eachRow({ includeEmpty: false }, row => {
       const tr = document.createElement('tr');
       row.eachCell({ includeEmpty: true }, cell => {
-        const td = document.createElement('td');
+        const td = rowIndex === 0 ? document.createElement('th') : document.createElement('td');
         td.textContent = String(cell.text || cell.value || '');
-        td.style.border = '1px solid #d1d5db';
+        td.style.border = '1px solid #cbd5e1';
         td.style.padding = '6px 8px';
         td.style.verticalAlign = 'top';
+        td.style.textAlign = 'left';
+        if (rowIndex === 0) {
+          td.style.backgroundColor = '#f1f5f9';
+          td.style.fontWeight = 'bold';
+        } else if (rowIndex % 2 === 0) {
+          td.style.backgroundColor = '#f8fafc';
+        }
         tr.appendChild(td);
       });
       table.appendChild(tr);
+      rowIndex++;
     });
 
     container.appendChild(table);
 
     const style = document.createElement('style');
-    style.innerHTML = `td { min-width: 80px; } tr:nth-child(even) { background: #f8fafc; }`;
+    style.innerHTML = `td, th { min-width: 60px; word-break: break-word; }`;
     container.appendChild(style);
 
     document.body.appendChild(container);
@@ -161,7 +282,7 @@ export async function excelToPdf(file: File): Promise<Uint8Array> {
       pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
       heightLeft -= pdfHeight;
 
-      while (heightLeft >= 0) {
+      while (heightLeft > 0) {
         position = heightLeft - imgHeight;
         pdf.addPage();
         pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);

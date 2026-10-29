@@ -1,6 +1,7 @@
 import os
 import shutil
 import subprocess
+import tempfile
 from pathlib import Path
 from typing import Any, Dict, Optional, List
 
@@ -15,7 +16,7 @@ class ExcelToPdfProcessor(BaseProcessor):
     Direct Excel (.xlsx/.xls/.ods/.csv) -> PDF Conversion Engine using LibreOffice.
     Executes headless LibreOffice conversion to generate pixel-perfect, native PDFs
     preserving cell merges, fonts, tables, formulas, and chart layouts, with
-    high-fidelity native Python fallback.
+    high-fidelity native Python fallback (openpyxl, xlrd, csv, reportlab).
     """
 
     operation = "excel-to-pdf"
@@ -40,15 +41,14 @@ class ExcelToPdfProcessor(BaseProcessor):
         return None
 
     def _convert_python_native(self, input_path: Path, output_path: Path) -> bool:
-        """High-fidelity native Excel to PDF fallback using openpyxl & ReportLab."""
+        """High-fidelity native Excel/XLS/CSV to PDF fallback using openpyxl, xlrd, csv and ReportLab."""
         try:
-            import openpyxl
+            import csv
             from reportlab.lib.pagesizes import letter, landscape
             from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
             from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
             from reportlab.lib import colors
 
-            wb = openpyxl.load_workbook(str(input_path), data_only=True)
             doc = SimpleDocTemplate(
                 str(output_path),
                 pagesize=landscape(letter),
@@ -76,42 +76,122 @@ class ExcelToPdfProcessor(BaseProcessor):
             )
 
             elements = []
+            ext = input_path.suffix.lower()
 
-            for sheet_name in wb.sheetnames:
-                sheet = wb[sheet_name]
-                if sheet.max_row == 0 or sheet.max_column == 0:
-                    continue
+            if ext == ".xls":
+                try:
+                    import xlrd
+                    book = xlrd.open_workbook(str(input_path))
+                    for sheet_name in book.sheet_names():
+                        sheet = book.sheet_by_name(sheet_name)
+                        if sheet.nrows == 0 or sheet.ncols == 0:
+                            continue
 
-                elements.append(Paragraph(f"<b>Sheet: {sheet_name}</b>", title_style))
-                elements.append(Spacer(1, 6))
+                        elements.append(Paragraph(f"<b>Sheet: {sheet_name}</b>", title_style))
+                        elements.append(Spacer(1, 6))
 
-                table_data: List[List[Any]] = []
-                max_cols = min(sheet.max_column, 25)
-                max_rows = min(sheet.max_row, 500)
+                        table_data: List[List[Any]] = []
+                        max_cols = min(sheet.ncols, 25)
+                        max_rows = min(sheet.nrows, 500)
 
-                for r in range(1, max_rows + 1):
-                    row_cells = []
-                    for c in range(1, max_cols + 1):
-                        val = sheet.cell(row=r, column=c).value
-                        val_str = "" if val is None else str(val)
-                        row_cells.append(Paragraph(val_str, cell_style))
-                    table_data.append(row_cells)
+                        for r in range(max_rows):
+                            row_cells = []
+                            for c in range(max_cols):
+                                val = sheet.cell_value(r, c)
+                                val_str = "" if val is None else str(val)
+                                row_cells.append(Paragraph(val_str, cell_style))
+                            table_data.append(row_cells)
 
-                if table_data:
-                    col_width = (doc.width) / max(1, max_cols)
-                    t = Table(table_data, colWidths=[col_width] * max_cols)
-                    t.setStyle(TableStyle([
-                        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#f1f5f9")),
-                        ('TEXTCOLOR', (0, 0), (-1, 0), colors.HexColor("#0f172a")),
-                        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-                        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
-                        ('INNERGRID', (0, 0), (-1, -1), 0.5, colors.HexColor("#cbd5e1")),
-                        ('BOX', (0, 0), (-1, -1), 1, colors.HexColor("#94a3b8")),
-                        ('TOPPADDING', (0, 0), (-1, -1), 3),
-                        ('BOTTOMPADDING', (0, 0), (-1, -1), 3),
-                    ]))
-                    elements.append(t)
-                    elements.append(Spacer(1, 15))
+                        if table_data:
+                            col_width = (doc.width) / max(1, max_cols)
+                            t = Table(table_data, colWidths=[col_width] * max_cols)
+                            t.setStyle(TableStyle([
+                                ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#f1f5f9")),
+                                ('TEXTCOLOR', (0, 0), (-1, 0), colors.HexColor("#0f172a")),
+                                ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+                                ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+                                ('INNERGRID', (0, 0), (-1, -1), 0.5, colors.HexColor("#cbd5e1")),
+                                ('BOX', (0, 0), (-1, -1), 1, colors.HexColor("#94a3b8")),
+                                ('TOPPADDING', (0, 0), (-1, -1), 3),
+                                ('BOTTOMPADDING', (0, 0), (-1, -1), 3),
+                            ]))
+                            elements.append(t)
+                            elements.append(Spacer(1, 15))
+                except Exception as ex_xls:
+                    logger.warning(f"xlrd parsing error: {ex_xls}")
+
+            elif ext == ".csv":
+                with open(str(input_path), "r", encoding="utf-8", errors="replace") as cf:
+                    reader = list(csv.reader(cf))
+                    if reader:
+                        elements.append(Paragraph("<b>CSV Spreadsheet</b>", title_style))
+                        elements.append(Spacer(1, 6))
+                        table_data = []
+                        max_cols = min(max(len(row) for row in reader), 25)
+                        max_rows = min(len(reader), 500)
+                        for r in range(max_rows):
+                            row = reader[r]
+                            row_cells = []
+                            for c in range(max_cols):
+                                val_str = str(row[c]) if c < len(row) else ""
+                                row_cells.append(Paragraph(val_str, cell_style))
+                            table_data.append(row_cells)
+
+                        if table_data:
+                            col_width = (doc.width) / max(1, max_cols)
+                            t = Table(table_data, colWidths=[col_width] * max_cols)
+                            t.setStyle(TableStyle([
+                                ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#f1f5f9")),
+                                ('TEXTCOLOR', (0, 0), (-1, 0), colors.HexColor("#0f172a")),
+                                ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+                                ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+                                ('INNERGRID', (0, 0), (-1, -1), 0.5, colors.HexColor("#cbd5e1")),
+                                ('BOX', (0, 0), (-1, -1), 1, colors.HexColor("#94a3b8")),
+                                ('TOPPADDING', (0, 0), (-1, -1), 3),
+                                ('BOTTOMPADDING', (0, 0), (-1, -1), 3),
+                            ]))
+                            elements.append(t)
+                            elements.append(Spacer(1, 15))
+
+            else:
+                # Default XLSX
+                import openpyxl
+                wb = openpyxl.load_workbook(str(input_path), data_only=True)
+                for sheet_name in wb.sheetnames:
+                    sheet = wb[sheet_name]
+                    if sheet.max_row == 0 or sheet.max_column == 0:
+                        continue
+
+                    elements.append(Paragraph(f"<b>Sheet: {sheet_name}</b>", title_style))
+                    elements.append(Spacer(1, 6))
+
+                    table_data: List[List[Any]] = []
+                    max_cols = min(sheet.max_column, 25)
+                    max_rows = min(sheet.max_row, 500)
+
+                    for r in range(1, max_rows + 1):
+                        row_cells = []
+                        for c in range(1, max_cols + 1):
+                            val = sheet.cell(row=r, column=c).value
+                            val_str = "" if val is None else str(val)
+                            row_cells.append(Paragraph(val_str, cell_style))
+                        table_data.append(row_cells)
+
+                    if table_data:
+                        col_width = (doc.width) / max(1, max_cols)
+                        t = Table(table_data, colWidths=[col_width] * max_cols)
+                        t.setStyle(TableStyle([
+                            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#f1f5f9")),
+                            ('TEXTCOLOR', (0, 0), (-1, 0), colors.HexColor("#0f172a")),
+                            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+                            ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+                            ('INNERGRID', (0, 0), (-1, -1), 0.5, colors.HexColor("#cbd5e1")),
+                            ('BOX', (0, 0), (-1, -1), 1, colors.HexColor("#94a3b8")),
+                            ('TOPPADDING', (0, 0), (-1, -1), 3),
+                            ('BOTTOMPADDING', (0, 0), (-1, -1), 3),
+                        ]))
+                        elements.append(t)
+                        elements.append(Spacer(1, 15))
 
             if not elements:
                 return False
@@ -141,25 +221,38 @@ class ExcelToPdfProcessor(BaseProcessor):
         converted = False
 
         if libreoffice_bin:
-            # Exact command from specification:
-            # soffice -env:UserInstallation=file://... --headless --convert-to pdf "{excel_filename}" --outdir "{output_dir}"
-            profile_dir = "/tmp/libreoffice_profile" if os.name != 'nt' else str(output_dir / ".lo_profile")
+            # Isolated profile directory per job to prevent concurrency lock collision
+            profile_dir = tempfile.mkdtemp(prefix=f"lo_prof_{self.job_id}_")
+            profile_url = Path(profile_dir).as_uri()
+
+            # Exact headless command with --outdir preceding input_file:
+            # libreoffice -env:UserInstallation=file://... --headless --convert-to pdf --outdir <dir> <input_file>
             cmd = [
                 libreoffice_bin,
-                f"-env:UserInstallation=file://{profile_dir}",
+                f"-env:UserInstallation={profile_url}",
                 "--headless",
                 "--convert-to",
                 "pdf",
-                str(input_path),
                 "--outdir",
-                str(output_dir)
+                str(output_dir),
+                str(input_path)
             ]
 
             try:
-                logger.info(f"Starting conversion of '{input_path}' to '{output_pdf}' using LibreOffice: {' '.join(cmd)}")
+                cmd_str = " ".join(cmd)
+                logger.info(f"Starting conversion of '{input_path}' to '{output_pdf}' using LibreOffice: {cmd_str}")
                 res = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
 
                 generated_pdf = output_dir / f"{input_path.stem}.pdf"
+                if not (generated_pdf.exists() and generated_pdf.stat().st_size > 0):
+                    # Check for any .pdf generated in output_dir that is not output_pdf yet
+                    pdf_candidates = [
+                        p for p in output_dir.glob("*.pdf")
+                        if p.resolve() != output_pdf.resolve() and p.stat().st_size > 0
+                    ]
+                    if pdf_candidates:
+                        generated_pdf = pdf_candidates[0]
+
                 if generated_pdf.exists() and generated_pdf.stat().st_size > 0:
                     if generated_pdf.resolve() != output_pdf.resolve():
                         try:
@@ -169,9 +262,11 @@ class ExcelToPdfProcessor(BaseProcessor):
                     converted = True
                     logger.info(f"Conversion successful! PDF saved as '{output_pdf}'")
                 else:
-                    logger.warning(f"LibreOffice command executed, but output PDF not found. Stderr: {res.stderr}")
+                    logger.warning(f"LibreOffice command executed, but output PDF not found. Returncode: {res.returncode}, Stderr: {res.stderr}")
             except Exception as e:
                 logger.warning(f"LibreOffice Excel conversion failed, trying fallback: {e}")
+            finally:
+                shutil.rmtree(profile_dir, ignore_errors=True)
 
         # Fallback to native python generator if LibreOffice not available or failed
         if not converted:
