@@ -1,6 +1,6 @@
 import io
 from pathlib import Path
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Tuple
 from pypdf import PdfReader, PdfWriter
 from reportlab.pdfgen import canvas
 from reportlab.lib import colors
@@ -14,16 +14,22 @@ class PageNumbersProcessor(BaseProcessor):
     input_formats = [".pdf"]
     output_format = ".pdf"
 
-    def _generate_number_overlay(self, width: float, height: float, text: str, options: Dict[str, Any]) -> io.BytesIO:
+    def _generate_number_overlay_bytes(
+        self,
+        width: float,
+        height: float,
+        text: str,
+        font_size: float,
+        margin: float,
+        position: str,
+        color_obj: Any
+    ) -> bytes:
+        """Generates serialized PDF overlay bytes for a given page label and styling."""
         packet = io.BytesIO()
         can = canvas.Canvas(packet, pagesize=(width, height))
 
-        font_size = float(options.get("font_size") or options.get("fontSize") or 10)
-        margin = float(options.get("margin") or 36) # 0.5 inch = 36 pt
-        position = str(options.get("position") or "bottom-center").lower()
-
         can.setFont("Helvetica", font_size)
-        can.setFillColor(colors.HexColor(str(options.get("color") or "#333333")))
+        can.setFillColor(color_obj)
 
         if position == "top-left":
             can.drawString(margin, height - margin, text)
@@ -40,7 +46,7 @@ class PageNumbersProcessor(BaseProcessor):
 
         can.save()
         packet.seek(0)
-        return packet
+        return packet.getvalue()
 
     def process(self, input_files: Any, options: Any = None) -> Any:
         if isinstance(input_files, (bytes, bytearray)):
@@ -53,10 +59,21 @@ class PageNumbersProcessor(BaseProcessor):
         reader = PdfReader(str(input_pdf), strict=False)
         total_pages = len(reader.pages)
 
+        # Pre-resolve constant styling parameters outside the loop
         start_num = int(opts.get("start_number") or opts.get("start") or 1)
         prefix = str(opts.get("prefix") or "")
         include_total = opts.get("include_total", True)
         format_style = str(opts.get("format") or opts.get("style") or "page_x_of_y").lower()
+        font_size = float(opts.get("font_size") or opts.get("fontSize") or 10)
+        margin = float(opts.get("margin") or 36) # 0.5 inch = 36 pt
+        position = str(opts.get("position") or "bottom-center").lower()
+        color_str = str(opts.get("color") or "#333333")
+        color_obj = colors.HexColor(color_str)
+
+        # Bounded overlay cache (scoped per job to guarantee complete tenant safety)
+        overlay_cache: Dict[Tuple[float, float, str, float, float, str, str], bytes] = {}
+        cache_hits = 0
+        cache_misses = 0
 
         writer = PdfWriter()
         for idx, page in enumerate(reader.pages):
@@ -68,12 +85,26 @@ class PageNumbersProcessor(BaseProcessor):
                 p_text = prefix if prefix else ("Page " if "page" in format_style else "")
                 label = f"{p_text}{current_num}"
 
-            width = float(page.mediabox.width)
-            height = float(page.mediabox.height)
+            raw_w = float(page.mediabox.width)
+            raw_h = float(page.mediabox.height)
+            w_norm = round(raw_w, 2)
+            h_norm = round(raw_h, 2)
 
-            num_buf = self._generate_number_overlay(width, height, label, opts)
+            # Strategy B: Comprehensive cache key containing page label, normalized dimensions, and styling
+            cache_key = (w_norm, h_norm, label, font_size, margin, position, color_str)
 
-            num_reader = PdfReader(num_buf)
+            if cache_key in overlay_cache:
+                overlay_bytes = overlay_cache[cache_key]
+                cache_hits += 1
+            else:
+                overlay_bytes = self._generate_number_overlay_bytes(
+                    w_norm, h_norm, label, font_size, margin, position, color_obj
+                )
+                if len(overlay_cache) < 500:  # Bounded cache capacity
+                    overlay_cache[cache_key] = overlay_bytes
+                cache_misses += 1
+
+            num_reader = PdfReader(io.BytesIO(overlay_bytes))
             page.merge_page(num_reader.pages[0])
             writer.add_page(page)
 
@@ -87,10 +118,19 @@ class PageNumbersProcessor(BaseProcessor):
             output_path.unlink(missing_ok=True)
             raise OutputValidationError(f"Page numbers altered page count: expected {total_pages}, got {actual_pages}.")
 
+        self.metrics = {
+            "format": "pdf",
+            "quality_status": "passed",
+            "quality_score": 100,
+            "status": "success",
+            "pages": total_pages,
+            "overlay_generations": cache_misses,
+            "overlay_cache_hits": cache_hits
+        }
+
         return output_path
 
     def process_bytes(self, content: bytes, filename: str) -> tuple[bytes, str, Dict[str, Any]]:
-        import io
         temp_in = self.temp_dir / "in.pdf"
         with open(temp_in, "wb") as f:
             f.write(content)
@@ -98,8 +138,9 @@ class PageNumbersProcessor(BaseProcessor):
         with open(out_path, "rb") as f:
             out_bytes = f.read()
 
-        return out_bytes, "numbered_document.pdf", {
-            "original_size_bytes": len(content),
-            "output_size_bytes": len(out_bytes),
-            "quality_status": "passed"
-        }
+        metrics = dict(getattr(self, "metrics", {}))
+        metrics["original_size_bytes"] = len(content)
+        metrics["output_size_bytes"] = len(out_bytes)
+        metrics["quality_status"] = "passed"
+
+        return out_bytes, "numbered_document.pdf", metrics

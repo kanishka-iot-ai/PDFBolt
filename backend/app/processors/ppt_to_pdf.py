@@ -1,6 +1,7 @@
 import os
 import shutil
 import subprocess
+import tempfile
 from pathlib import Path
 from typing import Any, Dict, Optional
 
@@ -154,31 +155,63 @@ class PptToPdfProcessor(BaseProcessor):
 
         if conv_info:
             conv_type, conv_bin = conv_info
-            try:
-                if conv_type == "unoconv":
-                    # unoconv -f pdf -o '{output_pdf_filename}' '{input_ppt_filename}'
+            if conv_type == "unoconv":
+                try:
                     cmd = [conv_bin, "-f", "pdf", "-o", str(output_pdf), str(input_path)]
                     logger.info(f"Converting '{input_path}' to PDF with unoconv: {' '.join(cmd)}")
                     res = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
-                else:
-                    # libreoffice -env:UserInstallation=file://... --headless --convert-to pdf "{input_ppt_filename}" --outdir "{output_dir}"
-                    profile_dir = "/tmp/libreoffice_profile" if os.name != 'nt' else str(output_dir / ".lo_profile")
-                    cmd = [conv_bin, f"-env:UserInstallation=file://{profile_dir}", "--headless", "--convert-to", "pdf", str(input_path), "--outdir", str(output_dir)]
-                    logger.info(f"Converting '{input_path}' to PDF with LibreOffice: {' '.join(cmd)}")
+                    if output_pdf.exists() and output_pdf.stat().st_size > 0:
+                        converted = True
+                        logger.info(f"unoconv conversion successful! Saved as '{output_pdf}'")
+                except Exception as e:
+                    logger.warning(f"unoconv conversion failed: {e}")
+            else:
+                # Isolated profile directory per job to eliminate concurrency lock collisions
+                profile_dir = tempfile.mkdtemp(prefix=f"lo_prof_{self.job_id}_")
+                profile_url = Path(profile_dir).as_uri()
+
+                # Exact headless command with --outdir preceding input_file:
+                # libreoffice -env:UserInstallation=file://... --headless --convert-to pdf --outdir <dir> <input_file>
+                cmd = [
+                    conv_bin,
+                    f"-env:UserInstallation={profile_url}",
+                    "--headless",
+                    "--convert-to",
+                    "pdf",
+                    "--outdir",
+                    str(output_dir),
+                    str(input_path)
+                ]
+
+                try:
+                    cmd_str = " ".join(cmd)
+                    logger.info(f"Converting '{input_path}' to PDF with LibreOffice: {cmd_str}")
                     res = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
+
                     generated_pdf = output_dir / f"{input_path.stem}.pdf"
+                    if not (generated_pdf.exists() and generated_pdf.stat().st_size > 0):
+                        # Check for any .pdf generated in output_dir that is not output_pdf yet
+                        pdf_candidates = [
+                            p for p in output_dir.glob("*.pdf")
+                            if p.resolve() != output_pdf.resolve() and p.stat().st_size > 0
+                        ]
+                        if pdf_candidates:
+                            generated_pdf = pdf_candidates[0]
+
                     if generated_pdf.exists() and generated_pdf.stat().st_size > 0:
                         if generated_pdf.resolve() != output_pdf.resolve():
                             try:
                                 os.replace(str(generated_pdf), str(output_pdf))
                             except Exception:
                                 shutil.copy(str(generated_pdf), str(output_pdf))
-
-                if output_pdf.exists() and output_pdf.stat().st_size > 0:
-                    converted = True
-                    logger.info(f"Conversion successful! PDF saved as '{output_pdf}'")
-            except Exception as e:
-                logger.warning(f"External unoconv/libreoffice conversion failed: {e}")
+                        converted = True
+                        logger.info(f"Conversion successful! PDF saved as '{output_pdf}'")
+                    else:
+                        logger.warning(f"LibreOffice command executed, but output PDF not found. Returncode: {res.returncode}, Stderr: {res.stderr}")
+                except Exception as e:
+                    logger.warning(f"External LibreOffice PPT conversion failed: {e}")
+                finally:
+                    shutil.rmtree(profile_dir, ignore_errors=True)
 
         # Native Python fallback if unoconv/libreoffice not available or failed
         if not converted:

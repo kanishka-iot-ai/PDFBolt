@@ -1,6 +1,6 @@
 import io
 from pathlib import Path
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Tuple
 from pypdf import PdfReader, PdfWriter
 from reportlab.pdfgen import canvas
 from reportlab.lib import colors
@@ -23,7 +23,8 @@ class WatermarkProcessor(BaseProcessor):
             return colors.Color(r, g, b, alpha=opacity)
         return colors.Color(0.5, 0.5, 0.5, alpha=opacity)
 
-    def _generate_watermark_page(self, width: float, height: float, text: str, options: Dict[str, Any]) -> io.BytesIO:
+    def _generate_watermark_bytes(self, width: float, height: float, text: str, options: Dict[str, Any]) -> bytes:
+        """Generates serialized PDF overlay bytes for a given page dimension and styling."""
         packet = io.BytesIO()
         can = canvas.Canvas(packet, pagesize=(width, height))
 
@@ -56,7 +57,7 @@ class WatermarkProcessor(BaseProcessor):
         can.restoreState()
         can.save()
         packet.seek(0)
-        return packet
+        return packet.getvalue()
 
     def process(self, input_files: Any, options: Any = None) -> Any:
         if isinstance(input_files, (bytes, bytearray)):
@@ -69,18 +70,40 @@ class WatermarkProcessor(BaseProcessor):
         reader = PdfReader(str(input_pdf), strict=False)
         total_pages = len(reader.pages)
 
-        watermark_text = opts.get("text") or opts.get("watermark") or "CONFIDENTIAL"
+        watermark_text = str(opts.get("text") or opts.get("watermark") or "CONFIDENTIAL")
+        font_size = float(opts.get("font_size") or opts.get("fontSize") or 48)
+        opacity = float(opts.get("opacity") or 0.3)
+        color_hex = str(opts.get("color") or "#718096")
+        rotation = float(opts.get("rotation") or 45)
+        position = str(opts.get("position") or "center").lower()
+
+        # Bounded overlay cache (scoped per job to guarantee complete tenant & memory safety)
+        overlay_cache: Dict[Tuple[float, float, str, float, float, str, float, str], bytes] = {}
+        cache_hits = 0
+        cache_misses = 0
 
         writer = PdfWriter()
         for page in reader.pages:
-            width = float(page.mediabox.width)
-            height = float(page.mediabox.height)
+            raw_w = float(page.mediabox.width)
+            raw_h = float(page.mediabox.height)
+            # Normalize float dimensions to 2 decimal places to prevent representation jitter
+            w_norm = round(raw_w, 2)
+            h_norm = round(raw_h, 2)
 
-            wm_buf = self._generate_watermark_page(width, height, watermark_text, opts)
-            wm_reader = PdfReader(wm_buf)
+            cache_key = (w_norm, h_norm, watermark_text, font_size, opacity, color_hex, rotation, position)
+
+            if cache_key in overlay_cache:
+                overlay_bytes = overlay_cache[cache_key]
+                cache_hits += 1
+            else:
+                overlay_bytes = self._generate_watermark_bytes(w_norm, h_norm, watermark_text, opts)
+                if len(overlay_cache) < 100:  # Bounded cache capacity
+                    overlay_cache[cache_key] = overlay_bytes
+                cache_misses += 1
+
+            wm_reader = PdfReader(io.BytesIO(overlay_bytes))
             page.merge_page(wm_reader.pages[0])
             writer.add_page(page)
-
 
         output_path = self.output_dir / f"{self.job_id}.pdf"
         with open(output_path, "wb") as f:
@@ -92,10 +115,19 @@ class WatermarkProcessor(BaseProcessor):
             output_path.unlink(missing_ok=True)
             raise OutputValidationError(f"Watermark altered page count: expected {total_pages}, got {actual_pages}.")
 
+        self.metrics = {
+            "format": "pdf",
+            "quality_status": "passed",
+            "quality_score": 100,
+            "status": "success",
+            "pages": total_pages,
+            "overlay_generations": cache_misses,
+            "overlay_cache_hits": cache_hits
+        }
+
         return output_path
 
     def process_bytes(self, content: bytes, filename: str) -> tuple[bytes, str, Dict[str, Any]]:
-        import io
         temp_in = self.temp_dir / "in.pdf"
         with open(temp_in, "wb") as f:
             f.write(content)
@@ -103,8 +135,9 @@ class WatermarkProcessor(BaseProcessor):
         with open(out_path, "rb") as f:
             out_bytes = f.read()
 
-        return out_bytes, "watermarked_document.pdf", {
-            "original_size_bytes": len(content),
-            "output_size_bytes": len(out_bytes),
-            "quality_status": "passed"
-        }
+        metrics = dict(getattr(self, "metrics", {}))
+        metrics["original_size_bytes"] = len(content)
+        metrics["output_size_bytes"] = len(out_bytes)
+        metrics["quality_status"] = "passed"
+
+        return out_bytes, "watermarked_document.pdf", metrics

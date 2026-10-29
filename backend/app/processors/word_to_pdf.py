@@ -1,6 +1,7 @@
 import os
 import shutil
 import subprocess
+import tempfile
 from pathlib import Path
 from typing import Any, Dict, Optional, List
 
@@ -158,25 +159,39 @@ class WordToPdfProcessor(BaseProcessor):
         converted = False
 
         if libreoffice_bin:
-            # Exact command: libreoffice -env:UserInstallation=file://... --headless --convert-to pdf "{input_filename}" --outdir "{output_dir}"
-            profile_dir = "/tmp/libreoffice_profile" if os.name != 'nt' else str(output_dir / ".lo_profile")
+            # Isolated profile directory per job to eliminate concurrency lock collisions
+            profile_dir = tempfile.mkdtemp(prefix=f"lo_prof_{self.job_id}_")
+            profile_url = Path(profile_dir).as_uri()
+
+            # Exact headless command with --outdir preceding input_file:
+            # libreoffice -env:UserInstallation=file://... --headless --convert-to pdf --outdir <dir> <input_file>
             cmd = [
                 libreoffice_bin,
-                f"-env:UserInstallation=file://{profile_dir}",
+                f"-env:UserInstallation={profile_url}",
                 "--headless",
                 "--convert-to",
                 "pdf",
-                str(input_path),
                 "--outdir",
-                str(output_dir)
+                str(output_dir),
+                str(input_path)
             ]
 
             try:
-                logger.info(f"Converting '{input_path}' to PDF with LibreOffice: {' '.join(cmd)}")
+                cmd_str = " ".join(cmd)
+                logger.info(f"Converting '{input_path}' to PDF with LibreOffice: {cmd_str}")
                 res = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
 
-                # LibreOffice outputs to '{stem}.pdf' in the outdir
+                # Check expected output PDF
                 generated_pdf = output_dir / f"{input_path.stem}.pdf"
+                if not (generated_pdf.exists() and generated_pdf.stat().st_size > 0):
+                    # Check for any .pdf generated in output_dir that is not output_pdf yet
+                    pdf_candidates = [
+                        p for p in output_dir.glob("*.pdf")
+                        if p.resolve() != output_pdf.resolve() and p.stat().st_size > 0
+                    ]
+                    if pdf_candidates:
+                        generated_pdf = pdf_candidates[0]
+
                 if generated_pdf.exists() and generated_pdf.stat().st_size > 0:
                     if generated_pdf.resolve() != output_pdf.resolve():
                         try:
@@ -186,9 +201,11 @@ class WordToPdfProcessor(BaseProcessor):
                     converted = True
                     logger.info(f"Conversion successful! PDF saved as '{output_pdf}'")
                 else:
-                    logger.warning(f"LibreOffice command executed, but output PDF not found. Stderr: {res.stderr}")
+                    logger.warning(f"LibreOffice command executed, but output PDF not found. Returncode: {res.returncode}, Stderr: {res.stderr}")
             except Exception as e:
                 logger.warning(f"LibreOffice Word conversion failed, trying fallback: {e}")
+            finally:
+                shutil.rmtree(profile_dir, ignore_errors=True)
 
         # Try docx2pdf if libreoffice is not found or fails
         if not converted:
