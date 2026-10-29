@@ -260,6 +260,15 @@ class JobService:
             job.error_message = pe.message
             cleanup_service.delete_job_files(job_id)
             raise
+        except asyncio.CancelledError:
+            logger.warning(f"Job {job_id} task was cancelled. Aborting processor and cleaning workspace.")
+            job.status = JobStatus.FAILED
+            job.error_code = "JOB_CANCELLED"
+            job.error_message = "Processing request was cancelled."
+            if 'processor' in locals() and hasattr(processor, "cancel"):
+                processor.cancel()
+            cleanup_service.delete_job_files(job_id)
+            raise
         except Exception as e:
             job.status = JobStatus.FAILED
             job.error_code = "PROCESSING_FAILED"

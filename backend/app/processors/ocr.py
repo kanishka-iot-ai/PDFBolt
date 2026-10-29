@@ -178,6 +178,7 @@ class OcrProcessor(BaseProcessor):
 
         writer = PdfWriter()
         pdf_doc = None  # Single document context across all pages
+        packets_to_close: List[io.BytesIO] = []
 
         pages_ocred = 0
         pages_skipped = 0
@@ -186,6 +187,10 @@ class OcrProcessor(BaseProcessor):
         with _OCR_THREAD_SEMAPHORE:
             try:
                 for idx, page in enumerate(reader.pages):
+                    if getattr(self, "is_cancelled", None) and self.is_cancelled.is_set():
+                        logger.info(f"OCR job {self.job_id} cancelled. Halting page loop.")
+                        break
+
                     existing_text = page.extract_text() or ""
                     width = float(page.mediabox.width)
                     height = float(page.mediabox.height)
@@ -212,11 +217,21 @@ class OcrProcessor(BaseProcessor):
                             effective_dpi = max(72, int(target_dpi * scale))
                             logger.info(f"Dynamically clamped OCR DPI from {target_dpi} to {effective_dpi} on page {idx+1}")
 
-                        pil_img = plumb_page.to_image(resolution=effective_dpi).original
-                        ocr_text = self._ocr_image_to_text(pil_img, lang, timeout=per_page_timeout)
+                        page_img = plumb_page.to_image(resolution=effective_dpi)
+                        pil_img = page_img.original
+                        try:
+                            ocr_text = self._ocr_image_to_text(pil_img, lang, timeout=per_page_timeout)
+                        finally:
+                            try:
+                                pil_img.close()
+                            except Exception:
+                                pass
+                            del pil_img
+                            del page_img
 
                         if ocr_text.strip():
                             packet = io.BytesIO()
+                            packets_to_close.append(packet)
                             can = canvas.Canvas(packet, pagesize=(width, height))
                             # Make text transparent / invisible over existing pixels
                             can.setFillColor(colors.Color(0, 0, 0, alpha=0.01))
@@ -232,17 +247,30 @@ class OcrProcessor(BaseProcessor):
                             overlay_reader = PdfReader(packet)
                             page.merge_page(overlay_reader.pages[0])
                             pages_ocred += 1
+
+                        # Periodically collect unreferenced page bitmaps during long multi-page scans
+                        if (idx + 1) % 5 == 0:
+                            import gc
+                            gc.collect()
                     except Exception as e:
                         logger.warning(f"OCR page {idx+1} processing note: {e}")
 
                     writer.add_page(page)
 
             finally:
+                for p in packets_to_close:
+                    try:
+                        p.close()
+                    except Exception:
+                        pass
                 if pdf_doc is not None:
                     try:
                         pdf_doc.close()
                     except Exception:
                         pass
+
+        if getattr(self, "is_cancelled", None) and self.is_cancelled.is_set():
+            raise PDFBoltError("JOB_CANCELLED", f"Job {self.job_id} was cancelled before completion.")
 
         output_path = self.output_dir / f"{self.job_id}.pdf"
         with open(output_path, "wb") as f:

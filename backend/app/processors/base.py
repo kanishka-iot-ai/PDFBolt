@@ -2,6 +2,7 @@ import uuid
 import time
 import shutil
 import tempfile
+import threading
 from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import List, Dict, Any, Optional, Union, Tuple
@@ -46,6 +47,7 @@ class BaseProcessor(ABC):
             self.work_dir = Path(work_dir)
 
         self.settings = settings or {}
+        self.is_cancelled = threading.Event()
 
         self.input_dir = self.work_dir / "input"
         self.output_dir = self.work_dir / "output"
@@ -116,6 +118,10 @@ class BaseProcessor(ABC):
     def _validate_output(self, path: Path) -> None:
         """Validate output file is real, correct, and non-empty."""
         validate_output_file(path, self.output_format)
+
+    def cancel(self) -> None:
+        """Signals the processor to abort ongoing iterative work safely."""
+        self.is_cancelled.set()
 
     def cleanup(self) -> None:
         """Delete work directory. Called by cleanup service."""

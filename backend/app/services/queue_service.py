@@ -58,6 +58,13 @@ class LocalQueueService(QueueService):
     async def retry(self, job_id: str) -> None:
         job = self._inflight.pop(job_id, None)
         if job:
+            retries = job.get("retry_count", 0) + 1
+            job["retry_count"] = retries
+            max_retries = 3
+            if retries > max_retries:
+                logger.error(f"Job {job_id} exceeded max retries ({max_retries}). Moving to dead-letter.")
+                await self.dead_letter(job_id, f"Exceeded maximum retries ({max_retries})")
+                return
             await self._queue.put(job)
             self._queue.task_done()
 
