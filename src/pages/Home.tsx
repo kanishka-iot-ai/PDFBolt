@@ -169,6 +169,35 @@ const Home: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
               </span>
             </div>
           </div>
+          {/* Featured on Launchstag Badge */}
+          <div className="mt-3.5 flex items-center justify-center">
+            <a 
+              href="https://launchstag.com/p/pdfbolt" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="inline-flex items-center transition-transform hover:scale-105"
+              aria-label="Featured on Launchstag"
+            >
+              <img 
+                src="https://launchstag.com/badge-light.svg" 
+                alt="Featured on Launchstag" 
+                width="198" 
+                height="62" 
+                loading="lazy" 
+                decoding="async" 
+                className={`${darkMode ? 'hidden' : 'block'} h-8 sm:h-9 w-auto object-contain`} 
+              />
+              <img 
+                src="https://launchstag.com/badge-dark.svg" 
+                alt="Featured on Launchstag" 
+                width="198" 
+                height="62" 
+                loading="lazy" 
+                decoding="async" 
+                className={`${darkMode ? 'block' : 'hidden'} h-8 sm:h-9 w-auto object-contain`} 
+              />
+            </a>
+          </div>
         </div>
       </section>
 

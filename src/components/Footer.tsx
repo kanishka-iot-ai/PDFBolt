@@ -56,6 +56,34 @@ const Footer: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
               ★ Trustpilot
             </a>
           </div>
+          <div className="mt-3.5">
+            <a 
+              href="https://launchstag.com/p/pdfbolt" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="inline-flex items-center transition-transform hover:scale-105"
+              aria-label="Featured on Launchstag"
+            >
+              <img 
+                src="https://launchstag.com/badge-light.svg" 
+                alt="Featured on Launchstag" 
+                width="198" 
+                height="62" 
+                loading="lazy" 
+                decoding="async" 
+                className={`${darkMode ? 'hidden' : 'block'} h-9 w-auto object-contain`} 
+              />
+              <img 
+                src="https://launchstag.com/badge-dark.svg" 
+                alt="Featured on Launchstag" 
+                width="198" 
+                height="62" 
+                loading="lazy" 
+                decoding="async" 
+                className={`${darkMode ? 'block' : 'hidden'} h-9 w-auto object-contain`} 
+              />
+            </a>
+          </div>
         </div>
 
         {/* Col 2: Core PDF Tools */}
