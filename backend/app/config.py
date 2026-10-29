@@ -86,6 +86,15 @@ class Settings(BaseSettings):
     JOB_FAST_PATH_MAX_INPUT_BYTES: int = 5 * 1024 * 1024
     JOB_MAX_CONCURRENT_WORKERS: int = max(2, (os.cpu_count() or 2))
 
+    # OCR Engine Resource & Concurrency Controls
+    OCR_MAX_CONCURRENT_WORKERS: int = max(1, min(2, (os.cpu_count() or 2) // 2))
+    OCR_MAX_PAGE_LIMIT: int = 100
+    OCR_PER_PAGE_TIMEOUT_SECONDS: int = 30
+    OCR_EXECUTION_TIMEOUT_SECONDS: int = 120
+    OCR_MAX_INPUT_SIZE_BYTES: int = 50 * 1024 * 1024  # 50 MB
+    OCR_MAX_IMAGE_PIXELS: int = 25_000_000             # 25 MP safe raster ceiling
+    OCR_DEFAULT_DPI: int = 150
+
     # Storage & Temporary Document Retention Policy
     STORAGE_BACKEND: str = "local"  # 'local', 'azure', or 'gcs'
     LOCAL_STORAGE_DIR: str = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "storage"))

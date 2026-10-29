@@ -145,6 +145,7 @@ class JobService:
     def __init__(self):
         self.jobs: Dict[str, Job] = {}
         self._worker_semaphore = asyncio.Semaphore(settings.JOB_MAX_CONCURRENT_WORKERS)
+        self._ocr_semaphore = asyncio.Semaphore(getattr(settings, 'OCR_MAX_CONCURRENT_WORKERS', 2))
 
     def get_job(self, job_id: str) -> Optional[Job]:
         return self.jobs.get(job_id)
@@ -212,8 +213,13 @@ class JobService:
 
             # Step 11: Execute processor in bounded non-blocking worker thread
             processor = processor_cls(job_id=job_id, work_dir=work_dir, settings=options)
-            async with self._worker_semaphore:
-                result: JobResult = await asyncio.to_thread(processor.run, input_paths, options)
+            if op_key in ('ocr', 'ocr_pdf', 'ocr-pdf'):
+                async with self._worker_semaphore:
+                    async with self._ocr_semaphore:
+                        result: JobResult = await asyncio.to_thread(processor.run, input_paths, options)
+            else:
+                async with self._worker_semaphore:
+                    result: JobResult = await asyncio.to_thread(processor.run, input_paths, options)
 
             # Step 15 & 16: Record output metadata
             job.status = JobStatus.COMPLETED
