@@ -4,6 +4,7 @@ import { useParams, Link } from 'react-router-dom';
 import { ENCYCLOPEDIA, TOOLS } from '../constants';
 import { Clock, CheckCircle2, ArrowRight, Layers, Sparkles, BookOpen } from 'lucide-react';
 import AdSlot from '../components/AdSlot';
+import AdsterraBanner from '../components/AdsterraBanner';
 
 interface EncyclopediaDetailPageProps {
   darkMode: boolean;
@@ -159,6 +160,7 @@ const EncyclopediaDetailPage: React.FC<EncyclopediaDetailPageProps> = ({ darkMod
 
         {/* Non-Intrusive Sponsored Slot */}
         <AdSlot placement="ENCYCLOPEDIA_BOTTOM" />
+        <AdsterraBanner format="responsive" className="my-6" />
 
         {/* Related Articles */}
         <section className="pt-12 border-t border-slate-200 dark:border-slate-800">

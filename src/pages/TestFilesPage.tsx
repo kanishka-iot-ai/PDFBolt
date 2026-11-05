@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import AdsterraBanner from '../components/AdsterraBanner';
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
 import { SAMPLE_TEST_FILES, TOOLS } from '../constants';
@@ -146,6 +147,11 @@ const TestFilesPage: React.FC<TestFilesPageProps> = ({ darkMode }) => {
               </button>
             </div>
           ))}
+        </div>
+
+        {/* Non-Intrusive Sponsored Slot */}
+        <div className="max-w-4xl mx-auto my-10 flex justify-center">
+          <AdsterraBanner format="responsive" />
         </div>
       </section>
     </div>

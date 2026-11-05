@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { ShieldCheck, Lock, Zap, CheckCircle2, ArrowRight, Laptop, Server, EyeOff, HardDrive, Cpu } from 'lucide-react';
 import { TOOLS } from '../constants';
 import AdSlot from '../components/AdSlot';
+import AdsterraBanner from '../components/AdsterraBanner';
 
 interface NoUploadToolsPageProps {
   darkMode: boolean;
@@ -67,8 +68,9 @@ const NoUploadToolsPage: React.FC<NoUploadToolsPageProps> = ({ darkMode }) => {
       </div>
 
       {/* Ad Placement */}
-      <div className="max-w-4xl mx-auto px-4 my-6 flex justify-center">
+      <div className="max-w-4xl mx-auto px-4 my-6 flex flex-col items-center justify-center">
         <AdSlot placement="TOOL_CONTENT_BOTTOM" className="w-full flex justify-center" />
+        <AdsterraBanner format="responsive" className="my-2" />
       </div>
 
       {/* Architecture Comparison: Cloud Upload vs PDFBolt WebAssembly */}

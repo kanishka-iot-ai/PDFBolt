@@ -8,6 +8,7 @@ import { validateFiles, ALLOWED_MIME_TYPES, MAX_FILE_SIZE } from '../utils/fileV
 import { useActiveWork } from '../context/ActiveWorkContext';
 import PDFThumbnail from '../components/PDFThumbnail';
 import AdSlot from '../components/AdSlot';
+import AdsterraBanner from '../components/AdsterraBanner';
 
 export interface MergeToolProps {
   darkMode: boolean;
@@ -353,6 +354,12 @@ const MergeTool: React.FC<MergeToolProps> = ({ darkMode, notify, customHint, all
           >
             <FileText size={16} /> Process Another Merge
           </button>
+
+          {/* Non-Intrusive Result Screen Sponsored Slot (Far below download button) */}
+          <div className="w-full pt-4 border-t border-slate-200 dark:border-slate-800">
+            <AdSlot placement="RESULT_BOTTOM" />
+            <AdsterraBanner format="responsive" className="mt-3" />
+          </div>
         </div>
       )}
 

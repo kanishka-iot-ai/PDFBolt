@@ -8,6 +8,7 @@ import MergeTool from './MergeTool';
 import EditTool from './EditTool';
 import { NotifySystem } from '../types';
 import AdSlot from '../components/AdSlot';
+import AdsterraBanner from '../components/AdsterraBanner';
 
 interface TargetedCompressPageProps {
   pageSlug?: string;
@@ -169,8 +170,9 @@ const TargetedCompressPage: React.FC<TargetedCompressPageProps> = ({ pageSlug: p
       </div>
 
       {/* Ad Placement */}
-      <div className="max-w-4xl mx-auto px-4 my-6 flex justify-center">
+      <div className="max-w-4xl mx-auto px-4 my-6 flex flex-col items-center justify-center">
         <AdSlot placement="TOOL_CONTENT_BOTTOM" className="w-full flex justify-center" />
+        <AdsterraBanner format="responsive" className="my-2" />
       </div>
 
       {/* Quick Summary Banner */}

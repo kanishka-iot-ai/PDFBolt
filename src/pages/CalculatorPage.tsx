@@ -3,6 +3,7 @@ import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
 import { Calculator, Sparkles, ArrowRight, ShieldCheck, CheckCircle2, Sliders, FileText } from 'lucide-react';
 import AdSlot from '../components/AdSlot';
+import AdsterraBanner from '../components/AdsterraBanner';
 import { ToolType } from '../types';
 
 interface CalculatorPageProps {
@@ -236,8 +237,9 @@ const CalculatorPage: React.FC<CalculatorPageProps> = ({ darkMode }) => {
           </div>
 
           {/* Non-Intrusive Sponsored Slot */}
-          <div className="mt-8">
+          <div className="mt-8 flex flex-col items-center">
             <AdSlot placement="CALCULATOR_BOTTOM" />
+            <AdsterraBanner format="responsive" className="my-4" />
           </div>
 
         </div>

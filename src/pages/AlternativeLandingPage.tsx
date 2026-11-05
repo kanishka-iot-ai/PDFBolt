@@ -3,6 +3,7 @@ import { Helmet } from 'react-helmet-async';
 import { Link, useParams } from 'react-router-dom';
 import { ShieldCheck, CheckCircle2, XCircle, ArrowRight, Zap, Award, Sparkles, HelpCircle } from 'lucide-react';
 import AdSlot from '../components/AdSlot';
+import AdsterraBanner from '../components/AdsterraBanner';
 
 interface CompetitorData {
   slug: string;
@@ -190,8 +191,9 @@ const AlternativeLandingPage: React.FC<{ darkMode: boolean; defaultCompetitor?: 
       </div>
 
       {/* Ad Slot */}
-      <div className="max-w-4xl mx-auto px-4 my-6 flex justify-center">
+      <div className="max-w-4xl mx-auto px-4 my-6 flex flex-col items-center justify-center">
         <AdSlot placement="TOOL_CONTENT_BOTTOM" className="w-full flex justify-center" />
+        <AdsterraBanner format="responsive" className="my-2" />
       </div>
 
       {/* Quick Launch Cards for Top Tools */}

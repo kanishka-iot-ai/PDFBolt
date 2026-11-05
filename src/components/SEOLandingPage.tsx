@@ -4,6 +4,7 @@ import { ShieldCheck, Clock, UserX, HelpCircle, CheckCircle, ArrowRight, BookOpe
 import { TOOLS, GUIDES, getIcon } from '../constants';
 import { Link, useLocation } from 'react-router-dom';
 import AdSlot from './AdSlot';
+import AdsterraBanner from './AdsterraBanner';
 import { useActiveWork } from '../context/ActiveWorkContext';
 
 interface SEOLandingPageProps {
@@ -142,8 +143,9 @@ const SEOLandingPage: React.FC<SEOLandingPageProps> = ({ tool: toolProp, toolId,
 
       {/* 3. NON-INTRUSIVE HIGH-VISIBILITY AD PLACEMENT (Only on landing dropzone page) */}
       {!hasActiveWork && (
-        <div className="max-w-4xl mx-auto px-4 w-full my-2 shrink-0 flex justify-center">
+        <div className="max-w-4xl mx-auto px-4 w-full my-2 shrink-0 flex flex-col items-center justify-center">
           <AdSlot placement="TOOL_CONTENT_BOTTOM" className="w-full flex justify-center" />
+          <AdsterraBanner format="responsive" className="my-2" />
         </div>
       )}
 
