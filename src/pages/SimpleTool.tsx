@@ -17,6 +17,7 @@ import ProgressBar from '../components/ProgressBar';
 import { validateFiles, validateOutputIntegrity, ALLOWED_MIME_TYPES, MAX_FILE_SIZE } from '../utils/fileValidation';
 import { apiClient } from '../services/apiClient';
 import AdSlot from '../components/AdSlot';
+import AdsterraBanner from '../components/AdsterraBanner';
 import { useActiveWork } from '../context/ActiveWorkContext';
 import PDFThumbnail from '../components/PDFThumbnail';
 
@@ -1762,6 +1763,7 @@ const SimpleTool: React.FC<SimpleToolProps> = ({ title, mode, darkMode, notify, 
 
               {/* Non-Intrusive Result Screen Sponsored Slot (Far below download button) */}
               <AdSlot placement="RESULT_BOTTOM" />
+              <AdsterraBanner format="responsive" className="mt-4 mb-2" />
 
             </div>
           )}

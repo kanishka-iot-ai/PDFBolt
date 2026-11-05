@@ -4,6 +4,7 @@ import { TOOLS } from '../constants';
 import { ToolType, ToolMetadata } from '../types';
 import ToolCard from '../components/ToolCard';
 import AdSlot from '../components/AdSlot';
+import AdsterraBanner from '../components/AdsterraBanner';
 import {
   Edit3,
   Repeat,
@@ -358,6 +359,7 @@ const Home: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
       {/* Non-Intrusive Sponsored Slot */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <AdSlot placement="HOME_CONTENT" className="my-10" />
+        <AdsterraBanner format="responsive" className="my-6" />
       </div>
 
       {/* 4. EDUCATIONAL GUIDES & KNOWLEDGE HUB */}
