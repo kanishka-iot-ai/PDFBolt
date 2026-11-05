@@ -29,11 +29,12 @@ const Footer: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
             <img 
               src="/pdfbolt-logo.webp" 
               alt="PDFBolt" 
-              width="98"
-              height="80"
+              width="49"
+              height="40"
               loading="lazy"
               decoding="async"
-              className="h-10 w-auto object-contain transition-transform duration-300 group-hover:scale-105" 
+              className="h-10 w-[49px] object-contain shrink-0 transition-transform duration-300 group-hover:scale-105" 
+              style={{ aspectRatio: '98/80' }}
             />
           </Link>
           <p className="text-xs font-medium leading-relaxed mb-6">

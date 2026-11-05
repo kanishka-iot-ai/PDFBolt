@@ -40,8 +40,8 @@ const POPULAR_TOOL_IDS: ToolType[] = [
 
 const Home: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeCategory, setActiveCategory] = useState<string>('popular');
-  const [showAllTools, setShowAllTools] = useState(false);
+  const [activeCategory, setActiveCategory] = useState<string>('all');
+  const [showAllTools, setShowAllTools] = useState(true);
 
   const categories = [
     { id: 'popular', title: 'Popular Tools', icon: <Flame size={16} /> },

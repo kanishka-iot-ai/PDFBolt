@@ -1,0 +1,71 @@
+{
+  "version": "1.0",
+  "name": "PDFBolt",
+  "description": "Free, privacy-first, in-browser PDF suite powered by WebAssembly. Process, merge, split, compress, edit, convert, and protect PDF files locally on your device with zero server uploads.",
+  "url": "https://pdfbolt.in",
+  "capabilities": [
+    {
+      "name": "merge-pdf",
+      "description": "Merge multiple PDF files into a single unified document with custom page reordering.",
+      "url": "https://pdfbolt.in/merge-pdf/",
+      "method": "client-side",
+      "input_types": ["application/pdf"]
+    },
+    {
+      "name": "split-pdf",
+      "description": "Split a PDF into individual pages or extract custom page ranges.",
+      "url": "https://pdfbolt.in/split-pdf/",
+      "method": "client-side",
+      "input_types": ["application/pdf"]
+    },
+    {
+      "name": "compress-pdf",
+      "description": "Compress and optimize PDF file sizes while preserving visual clarity.",
+      "url": "https://pdfbolt.in/compress-pdf/",
+      "method": "client-side",
+      "input_types": ["application/pdf"]
+    },
+    {
+      "name": "pdf-to-word",
+      "description": "Convert PDF documents to editable Microsoft Word (.docx) files.",
+      "url": "https://pdfbolt.in/pdf-to-word/",
+      "method": "client-side",
+      "input_types": ["application/pdf"]
+    },
+    {
+      "name": "word-to-pdf",
+      "description": "Convert Microsoft Word (.docx) documents to PDF.",
+      "url": "https://pdfbolt.in/word-to-pdf/",
+      "method": "client-side",
+      "input_types": ["application/vnd.openxmlformats-officedocument.wordprocessingml.document"]
+    },
+    {
+      "name": "edit-pdf",
+      "description": "Edit, annotate, draw, and add text or signatures to PDF documents.",
+      "url": "https://pdfbolt.in/edit-pdf/",
+      "method": "client-side",
+      "input_types": ["application/pdf"]
+    },
+    {
+      "name": "protect-pdf",
+      "description": "Encrypt PDF files with AES-128 / AES-256 passwords.",
+      "url": "https://pdfbolt.in/protect-pdf/",
+      "method": "client-side",
+      "input_types": ["application/pdf"]
+    },
+    {
+      "name": "unlock-pdf",
+      "description": "Remove password restrictions and decrypt protected PDFs.",
+      "url": "https://pdfbolt.in/unlock-pdf/",
+      "method": "client-side",
+      "input_types": ["application/pdf"]
+    },
+    {
+      "name": "ocr-pdf",
+      "description": "Extract text from scanned PDFs and images using in-browser OCR.",
+      "url": "https://pdfbolt.in/ocr-pdf/",
+      "method": "client-side",
+      "input_types": ["application/pdf", "image/png", "image/jpeg"]
+    }
+  ]
+}

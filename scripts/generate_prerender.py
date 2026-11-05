@@ -2435,20 +2435,30 @@ def generate_prerendered_pages():
     home_desc = "Use 25+ free online PDF tools to merge, compress, split, convert, edit and protect PDFs. 100% private in-browser WebAssembly processing with zero server uploads."
     home_canonical = f"{CANONICAL_DOMAIN}/"
 
-    # Categorized Tools HTML for Homepage
+    # Categorized Tools HTML for Homepage (Matching ToolCard.tsx for 0.00 CLS)
     def build_tool_card(t):
         return f'''
-        <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between">
-          <div>
-            <h3 style="font-size: 1.15rem; font-weight: 800; color: #0f172a; margin: 0 0 8px 0;">
-              <a href="/{t['path']}/" style="color: #0f172a; text-decoration: none;">{t['h1']}</a>
-            </h3>
-            <p style="margin: 0 0 12px 0; color: #475569; font-size: 0.9rem; line-height: 1.5;">{t['description']}</p>
+        <a href="/{t['path']}/" class="tool-card-link block h-full group outline-none rounded-2xl transition-transform duration-150 hover:-translate-y-0.5" style="text-decoration: none;">
+          <div class="h-full p-4 sm:p-5 md:p-6 flex flex-col justify-between rounded-2xl border bg-white border-slate-200 text-slate-900 shadow-sm transition-colors duration-150">
+            <div>
+              <div class="flex items-center justify-between mb-3 sm:mb-4">
+                <div class="p-2.5 sm:p-3 rounded-xl border text-yellow-600 bg-yellow-500/10 border-yellow-500/20 font-bold text-sm">
+                  ⚡
+                </div>
+              </div>
+              <h3 class="text-sm sm:text-base md:text-lg font-bold mb-1 text-slate-900 leading-snug">
+                {t['h1']}
+              </h3>
+              <p class="text-xs sm:text-sm text-slate-500 line-clamp-2 leading-relaxed">
+                {t['description']}
+              </p>
+            </div>
+            <div class="pt-3 mt-3 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-yellow-700">
+              <span>Open Tool</span>
+              <span>&rarr;</span>
+            </div>
           </div>
-          <a href="/{t['path']}/" style="display: inline-flex; align-items: center; gap: 4px; font-weight: 700; font-size: 0.85rem; color: #b45309; text-decoration: none;">
-            Open Tool &rarr;
-          </a>
-        </div>
+        </a>
         '''
 
     tools_grid_html = "".join([build_tool_card(t) for t in CANONICAL_TOOLS])
@@ -2469,44 +2479,43 @@ def generate_prerendered_pages():
     home_body_content = f'''
     <div style="max-width: 1100px; margin: 0 auto; padding: 32px 20px; font-family: system-ui, -apple-system, sans-serif; line-height: 1.65; color: #1e293b;">
       
-      <!-- Hero Section -->
-      <header style="text-align: center; margin-bottom: 48px; padding-bottom: 32px; border-bottom: 1px solid #e2e8f0;">
-        <div style="display: inline-block; padding: 4px 14px; background: #fef3c7; color: #92400e; font-size: 0.75rem; font-weight: 800; border-radius: 9999px; text-transform: uppercase; margin-bottom: 16px; border: 1px solid #fde68a;">
-          ★ Professional PDF Toolkit
+      <!-- Hero Section (Pixel-identical to Home.tsx for 0.00 CLS) -->
+      <section class="relative overflow-hidden pt-5 pb-5 sm:pt-7 sm:pb-7 text-center border-b border-slate-100 bg-slate-50/80 mb-6">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 relative z-10">
+          <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-700 font-bold text-[11px] uppercase tracking-wider mb-2.5">
+            <span>🛡️ 100% In-Browser &bull; Files Never Leave Your Device</span>
+          </div>
+          <h1 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black tracking-tight mb-2 leading-tight text-slate-900">
+            Free Online PDF Tools for Every Task
+          </h1>
+          <p class="text-xs sm:text-sm md:text-base max-w-xl mx-auto mb-3.5 font-normal leading-relaxed text-slate-600">
+            Merge, compress, split, convert, edit and protect PDFs online. Fast, private and zero file limits.
+          </p>
+          <div class="flex flex-wrap items-center justify-center gap-2 sm:gap-3 text-xs">
+            <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[11px] sm:text-xs font-semibold bg-white border-slate-200 text-slate-700 shadow-sm">
+              <span><strong>100% Private:</strong> In-Browser</span>
+            </div>
+            <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[11px] sm:text-xs font-semibold bg-white border-slate-200 text-slate-700 shadow-sm">
+              <span><strong>Zero Uploads:</strong> Device Only</span>
+            </div>
+            <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[11px] sm:text-xs font-semibold bg-white border-slate-200 text-slate-700 shadow-sm">
+              <span><strong>25+ Tools:</strong> Full Suite</span>
+            </div>
+            <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[11px] sm:text-xs font-semibold bg-white border-slate-200 text-slate-700 shadow-sm">
+              <span><strong>Fast &amp; Free:</strong> No Signup</span>
+            </div>
+          </div>
         </div>
-        <h1 style="font-size: 2.85rem; font-weight: 900; color: #0f172a; margin: 0 0 16px 0; line-height: 1.18; letter-spacing: -0.02em;">
-          Free Online PDF Tools for Every Task
-        </h1>
-        <p style="font-size: 1.25rem; color: #475569; margin: 0 auto; max-width: 820px; line-height: 1.6;">
-          Merge, compress, split, convert, edit, and protect PDF files directly inside your web browser. 100% private, client-side WebAssembly execution with zero server uploads and anonymous site analytics only.
-        </p>
+      </section>
 
-        <!-- Trust Badges -->
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-top: 36px; text-align: left;">
-          <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 18px;">
-            <div style="font-weight: 800; font-size: 1rem; color: #0f172a; margin-bottom: 4px;">🔒 100% In-Browser Privacy</div>
-            <p style="margin: 0; font-size: 0.85rem; color: #475569;">All PDF manipulations execute inside your device RAM using WebAssembly. Files never touch any remote server.</p>
-          </div>
-          <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 18px;">
-            <div style="font-weight: 800; font-size: 1rem; color: #0f172a; margin-bottom: 4px;">⚡ Instant Zero-Upload Speed</div>
-            <p style="margin: 0; font-size: 0.85rem; color: #475569;">Skip heavy file upload and download wait times. Process documents locally with device-level CPU acceleration.</p>
-          </div>
-          <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 18px;">
-            <div style="font-weight: 800; font-size: 1rem; color: #0f172a; margin-bottom: 4px;">✨ Free & Unlimited Usage</div>
-            <p style="margin: 0; font-size: 0.85rem; color: #475569;">No subscriptions, no mandatory user accounts, no watermarks, and no artificial daily document caps.</p>
-          </div>
+      <!-- Complete Tools Directory Grid (Pixel-identical to Home.tsx grid) -->
+      <section class="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-xl sm:text-2xl font-black text-slate-900">
+            All Online PDF Tools
+          </h2>
         </div>
-      </header>
-
-      <!-- Complete Tools Directory Grid -->
-      <section style="margin-bottom: 48px;">
-        <div style="display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 24px; border-bottom: 2px solid #0f172a; padding-bottom: 12px;">
-          <div>
-            <h2 style="font-size: 1.75rem; font-weight: 900; color: #0f172a; margin: 0 0 6px 0;">All Core PDF Tools (25+)</h2>
-            <p style="margin: 0; color: #475569; font-size: 0.95rem;">Select any PDF utility below to begin processing documents locally with absolute privacy.</p>
-          </div>
-        </div>
-        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px;">
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5">
           {tools_grid_html}
         </div>
       </section>

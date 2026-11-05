@@ -114,12 +114,13 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
             <img 
               src="/pdfbolt-logo.webp" 
               alt="PDFBolt" 
-              width="98"
-              height="80"
+              width="49"
+              height="40"
               loading="eager"
               decoding="async"
               {...({ fetchpriority: "high" } as any)}
-              className="h-9 md:h-10 w-auto object-contain transition-transform duration-300 group-hover:scale-105" 
+              className="h-9 w-[44px] md:h-10 md:w-[49px] object-contain shrink-0 transition-transform duration-300 group-hover:scale-105" 
+              style={{ aspectRatio: '98/80' }}
             />
           </Link>
           

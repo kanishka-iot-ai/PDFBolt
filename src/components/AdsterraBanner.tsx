@@ -106,7 +106,7 @@ const AdsterraIframeSlot: React.FC<{
     const scriptUrl = resolveScriptUrl(adKey, scriptDomain, isNative);
 
     if (isNative) {
-      // Adsterra Native Banner script format
+      // Adsterra Native Banner script format (Deferred to eliminate blocking & chain latency)
       return `<!DOCTYPE html>
 <html lang="en">
   <head>
@@ -124,13 +124,27 @@ const AdsterraIframeSlot: React.FC<{
     </style>
   </head>
   <body>
-    <script async="async" data-cfasync="false" src="${scriptUrl}"><\/script>
     <div id="container-${adKey}"></div>
+    <script type="text/javascript">
+      function loadNative() {
+        var s = document.createElement('script');
+        s.async = true;
+        s.setAttribute('data-cfasync', 'false');
+        s.src = '${scriptUrl}';
+        s.onerror = function() { console.debug('[Adsterra] Native ad unavailable.'); };
+        document.body.appendChild(s);
+      }
+      if (document.readyState === 'complete') {
+        setTimeout(loadNative, 100);
+      } else {
+        window.addEventListener('load', function() { setTimeout(loadNative, 200); });
+      }
+    <\/script>
   </body>
 </html>`;
     }
 
-    // Standard Display Banner format (Adsterra Bauval / AtOptions)
+    // Standard Display Banner format (Adsterra Bauval / AtOptions - Deferred to avoid critical chain & 402 bot errors)
     return `<!DOCTYPE html>
 <html lang="en">
   <head>
@@ -151,15 +165,26 @@ const AdsterraIframeSlot: React.FC<{
   </head>
   <body>
     <script type="text/javascript">
-      atOptions = {
-        'key' : '${adKey}',
-        'format' : 'iframe',
-        'height' : ${height},
-        'width' : ${typeof width === 'number' ? width : 728},
-        'params' : {}
-      };
+      function loadDisplayAd() {
+        window.atOptions = {
+          'key' : '${adKey}',
+          'format' : 'iframe',
+          'height' : ${height},
+          'width' : ${typeof width === 'number' ? width : 728},
+          'params' : {}
+        };
+        var s = document.createElement('script');
+        s.src = '${scriptUrl}';
+        s.async = true;
+        s.onerror = function() { console.debug('[Adsterra] Display ad unavailable.'); };
+        document.body.appendChild(s);
+      }
+      if (document.readyState === 'complete') {
+        setTimeout(loadDisplayAd, 100);
+      } else {
+        window.addEventListener('load', function() { setTimeout(loadDisplayAd, 200); });
+      }
     <\/script>
-    <script src="${scriptUrl}"><\/script>
   </body>
 </html>`;
   }, [width, height, adKey, scriptDomain, isNative]);
