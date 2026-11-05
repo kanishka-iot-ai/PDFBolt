@@ -864,11 +864,11 @@ const SimpleTool: React.FC<SimpleToolProps> = ({ title, mode, darkMode, notify, 
   return (
     <div className="w-full h-full text-center animate-fadeIn">
       {!file && multiFiles.length === 0 ? (
-        <div className="max-w-4xl mx-auto px-4 py-8 space-y-6">
+        <div className="max-w-4xl mx-auto px-2 sm:px-4 py-2 sm:py-3 space-y-3">
           {targetSizeHint && (
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-amber-500/15 border border-amber-500/30 text-amber-900 dark:text-amber-300 text-xs font-black uppercase tracking-wider shadow-sm">
-              <Target size={15} className="text-amber-600 dark:text-amber-400" />
-              <span>Target Upload Spec: {targetSizeHint}</span>
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-800 dark:text-amber-300 text-xs font-semibold">
+              <Target size={13} className="text-amber-600 dark:text-amber-400 shrink-0" />
+              <span>Target Ceiling: {targetSizeHint}</span>
             </div>
           )}
           <FileUploader

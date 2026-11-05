@@ -1,8 +1,7 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Link, useParams } from 'react-router-dom';
-import { Target } from 'lucide-react';
-import { ALL_LANDING_PAGES, LandingPageContent } from '../data/landingPages';
+import { ALL_LANDING_PAGES } from '../data/landingPages';
 import SimpleTool from './SimpleTool';
 import MergeTool from './MergeTool';
 import EditTool from './EditTool';
@@ -15,6 +14,28 @@ interface TargetedCompressPageProps {
   darkMode: boolean;
   notify: NotifySystem;
 }
+
+const SIZE_PRESETS = [
+  { label: '20 KB', href: '/compress-pdf-to-20kb/' },
+  { label: '50 KB', href: '/compress-pdf-to-50kb/' },
+  { label: '100 KB', href: '/compress-pdf-to-100kb/' },
+  { label: '200 KB', href: '/compress-pdf-to-200kb/' },
+  { label: '300 KB', href: '/compress-pdf-to-300kb/' },
+  { label: '500 KB', href: '/compress-pdf-to-500kb/' },
+  { label: '1 MB', href: '/compress-pdf-to-1mb/' },
+  { label: '2 MB', href: '/compress-pdf-to-2mb/' }
+];
+
+const PORTAL_PRESETS = [
+  { label: 'SSC CGL / CHSL', href: '/compress-pdf-for-ssc/' },
+  { label: 'UPSC OTR', href: '/compress-pdf-for-upsc/' },
+  { label: 'NEET Exam', href: '/compress-pdf-for-neet/' },
+  { label: 'JEE Main', href: '/compress-pdf-for-jee/' },
+  { label: 'IBPS Bank', href: '/compress-pdf-for-ibps/' },
+  { label: 'RRB Railway', href: '/compress-pdf-for-rrb/' },
+  { label: 'Aadhaar + PAN', href: '/merge-aadhaar-and-pan-card/' },
+  { label: 'All Govt Portals', href: '/pdf-size-reducer-for-government-portal/' }
+];
 
 const TargetedCompressPage: React.FC<TargetedCompressPageProps> = ({ pageSlug: propSlug, darkMode, notify }) => {
   const params = useParams<{ slug?: string }>();
@@ -77,7 +98,7 @@ const TargetedCompressPage: React.FC<TargetedCompressPageProps> = ({ pageSlug: p
   };
 
   return (
-    <div className="animate-fadeIn min-h-screen pb-20">
+    <div className="animate-fadeIn min-h-screen pb-12">
       <Helmet>
         <title>{page.seoTitle}</title>
         <meta name="description" content={page.metaDescription} />
@@ -91,10 +112,10 @@ const TargetedCompressPage: React.FC<TargetedCompressPageProps> = ({ pageSlug: p
         <script type="application/ld+json">{JSON.stringify(breadcrumbSchema)}</script>
       </Helmet>
 
-      {/* Top Breadcrumbs & Hero Header */}
-      <div className={`pt-8 pb-6 border-b ${darkMode ? 'border-slate-800 bg-slate-900/50' : 'border-slate-100 bg-slate-50'}`}>
+      {/* Top Breadcrumbs & Hero Header (Ultra-Compact for Instant Viewport Visibility) */}
+      <div className={`pt-4 pb-3 sm:pt-5 sm:pb-3.5 border-b ${darkMode ? 'border-slate-800 bg-slate-900/50' : 'border-slate-100 bg-slate-50'}`}>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
-          <nav aria-label="Breadcrumb" className="flex justify-center items-center gap-2 text-xs font-semibold mb-3 text-slate-500">
+          <nav aria-label="Breadcrumb" className="flex justify-center items-center gap-2 text-xs font-semibold mb-1.5 text-slate-500">
             <Link to="/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Home</Link>
             <span>/</span>
             <Link to="/tools/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">PDF Tools</Link>
@@ -102,158 +123,135 @@ const TargetedCompressPage: React.FC<TargetedCompressPageProps> = ({ pageSlug: p
             <span className="text-yellow-700 dark:text-yellow-400 font-bold">{page.h1}</span>
           </nav>
 
-          
-
-          <h1 className={`text-3xl sm:text-4xl md:text-5xl font-black mb-3 tracking-tight leading-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+          <h1 className={`text-2xl sm:text-3xl md:text-4xl font-extrabold mb-1.5 tracking-tight leading-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>
             {page.h1}
           </h1>
-          <p className={`text-sm sm:text-base max-w-2xl mx-auto font-medium ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+          <p className={`text-xs sm:text-sm max-w-2xl mx-auto font-normal ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
             {page.subtitle}
           </p>
         </div>
       </div>
 
-      {/* Interactive Tool Above The Fold */}
-      <div className="max-w-5xl mx-auto px-4 py-8">
-        <div className={`p-4 sm:p-6 rounded-3xl border shadow-xl ${darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
-          {page.toolType === 'compress' && (
-            <SimpleTool
-              title={page.h1}
-              mode="compress"
-              darkMode={darkMode}
-              notify={notify}
-              initialCompressionLevel={page.presetLevel}
-              targetSizeHint={page.targetSizeHint}
-            />
-          )}
-
-          {page.toolType === 'merge' && (
-            <MergeTool
-              darkMode={darkMode}
-              notify={notify}
-              customHint={page.customHint}
-              allowImages={page.slug === 'merge-aadhaar-and-pan-card' || page.slug.includes('merge')}
-            />
-          )}
-
-          {page.toolType === 'jpg2pdf' && (
-            <SimpleTool
-              title={page.h1}
-              mode="jpg2pdf"
-              darkMode={darkMode}
-              notify={notify}
-              targetSizeHint={page.targetSizeHint}
-            />
-          )}
-
-          {page.toolType === 'pdf2jpg' && (
-            <SimpleTool
-              title={page.h1}
-              mode="pdf2jpg"
-              darkMode={darkMode}
-              notify={notify}
-              targetSizeHint={page.targetSizeHint}
-            />
-          )}
-
-          {page.toolType === 'edit' && (
-            <EditTool
-              darkMode={darkMode}
-              notify={notify}
-            />
-          )}
-        </div>
-      </div>
-
-      {/* Target Presets & Portal Navigator */}
-      <div className="max-w-5xl mx-auto px-4 mt-8">
-        <div className={`p-6 sm:p-7 rounded-3xl border ${darkMode ? 'bg-slate-900/60 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-5 pb-3 border-b border-slate-200 dark:border-slate-800">
-            <div>
-              <p className="text-[11px] font-black uppercase tracking-wider text-slate-400">Target Presets & Portal Standards</p>
-              <h2 className={`text-base sm:text-lg font-bold ${darkMode ? 'text-white' : 'text-slate-900'}`}>Need a Different File Size or Portal Target?</h2>
+      {/* Interactive Tool Container with Integrated Preset Switcher (Zero Scroll) */}
+      <div className="max-w-4xl mx-auto px-3 sm:px-4 py-3 sm:py-4">
+        <div className={`rounded-2xl sm:rounded-3xl border shadow-lg overflow-hidden transition-all ${
+          darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+        }`}>
+          {/* Integrated Size & Portal Preset Rail */}
+          <div className={`px-3 sm:px-5 py-2.5 sm:py-3 border-b flex flex-col gap-2 ${
+            darkMode ? 'bg-slate-900/90 border-slate-800' : 'bg-slate-50/90 border-slate-100'
+          }`}>
+            {/* Row 1: Target Size Presets */}
+            <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5">
+              <span className="text-[10px] sm:text-[11px] font-bold tracking-wider uppercase text-slate-400 dark:text-slate-500 shrink-0">
+                Target Size:
+              </span>
+              <div className="flex items-center gap-1.5 flex-nowrap shrink-0">
+                {SIZE_PRESETS.map(link => {
+                  const isActive = link.href.replace(/\/$/, '') === `/${page.slug}`;
+                  return (
+                    <Link
+                      key={link.href}
+                      to={link.href}
+                      className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all ${
+                        isActive
+                          ? 'bg-amber-400 text-slate-950 font-black shadow-xs ring-1 ring-amber-500/50'
+                          : darkMode
+                            ? 'bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white'
+                            : 'bg-white text-slate-700 border border-slate-200 hover:border-slate-300 hover:bg-slate-100 shadow-2xs'
+                      }`}
+                    >
+                      {link.label}
+                    </Link>
+                  );
+                })}
+              </div>
             </div>
-            <span className="text-xs text-slate-500 font-medium">Click to switch tool preset</span>
-          </div>
 
-          {/* Group 1: By Target File Size */}
-          <div className="mb-4">
-            <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-2">
-              File Size Targets
-            </span>
-            <div className="flex flex-wrap gap-2">
-              {[
-                { label: '20 KB', href: '/compress-pdf-to-20kb/' },
-                { label: '50 KB', href: '/compress-pdf-to-50kb/' },
-                { label: '100 KB', href: '/compress-pdf-to-100kb/' },
-                { label: '200 KB', href: '/compress-pdf-to-200kb/' },
-                { label: '300 KB', href: '/compress-pdf-to-300kb/' },
-                { label: '500 KB', href: '/compress-pdf-to-500kb/' },
-                { label: '1 MB', href: '/compress-pdf-to-1mb/' },
-                { label: '2 MB', href: '/compress-pdf-to-2mb/' }
-              ].map(link => {
-                const isActive = link.href.replace(/\/$/, '') === `/${page.slug}`;
-                return (
-                  <Link
-                    key={link.href}
-                    to={link.href}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all border ${
-                      isActive
-                        ? 'bg-yellow-500 text-slate-950 border-yellow-500 shadow-sm font-black'
-                        : darkMode
-                          ? 'bg-slate-800 border-slate-700 text-slate-300 hover:border-yellow-500'
-                          : 'bg-white border-slate-200 text-slate-700 hover:border-yellow-500 shadow-xs'
-                    }`}
-                  >
-                    {link.label}
-                  </Link>
-                );
-              })}
+            {/* Row 2: Exam & Portal Shortcuts */}
+            <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5 border-t border-slate-200/50 dark:border-slate-800/50 pt-1.5">
+              <span className="text-[10px] sm:text-[11px] font-bold tracking-wider uppercase text-slate-400 dark:text-slate-500 shrink-0">
+                Portals:
+              </span>
+              <div className="flex items-center gap-1.5 flex-nowrap shrink-0">
+                {PORTAL_PRESETS.map(link => {
+                  const isActive = link.href.replace(/\/$/, '') === `/${page.slug}`;
+                  return (
+                    <Link
+                      key={link.href}
+                      to={link.href}
+                      className={`px-2 py-0.5 rounded-md text-[11px] font-medium transition-all ${
+                        isActive
+                          ? 'bg-amber-400 text-slate-950 font-bold shadow-xs'
+                          : darkMode
+                            ? 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
+                            : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100 border border-transparent hover:border-slate-200'
+                      }`}
+                    >
+                      {link.label}
+                    </Link>
+                  );
+                })}
+              </div>
             </div>
           </div>
 
-          {/* Group 2: By Government & Exam Portals */}
-          <div>
-            <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-2">
-              Government & Exam Portals
-            </span>
-            <div className="flex flex-wrap gap-2">
-              {[
-                { label: 'SSC CGL / CHSL', href: '/compress-pdf-for-ssc/' },
-                { label: 'UPSC OTR', href: '/compress-pdf-for-upsc/' },
-                { label: 'NEET Exam', href: '/compress-pdf-for-neet/' },
-                { label: 'JEE Main', href: '/compress-pdf-for-jee/' },
-                { label: 'IBPS Bank', href: '/compress-pdf-for-ibps/' },
-                { label: 'RRB Railway', href: '/compress-pdf-for-rrb/' },
-                { label: 'Aadhaar + PAN Merge', href: '/merge-aadhaar-and-pan-card/' },
-                { label: 'All Govt Portals', href: '/pdf-size-reducer-for-government-portal/' }
-              ].map(link => {
-                const isActive = link.href.replace(/\/$/, '') === `/${page.slug}`;
-                return (
-                  <Link
-                    key={link.href}
-                    to={link.href}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all border ${
-                      isActive
-                        ? 'bg-yellow-500 text-slate-950 border-yellow-500 shadow-sm font-black'
-                        : darkMode
-                          ? 'bg-slate-800 border-slate-700 text-slate-300 hover:border-yellow-500'
-                          : 'bg-white border-slate-200 text-slate-700 hover:border-yellow-500 shadow-xs'
-                    }`}
-                  >
-                    {link.label}
-                  </Link>
-                );
-              })}
-            </div>
+          {/* Tool Workspace Area */}
+          <div className="p-3 sm:p-5">
+            {page.toolType === 'compress' && (
+              <SimpleTool
+                title={page.h1}
+                mode="compress"
+                darkMode={darkMode}
+                notify={notify}
+                initialCompressionLevel={page.presetLevel}
+                targetSizeHint={page.targetSizeHint}
+              />
+            )}
+
+            {page.toolType === 'merge' && (
+              <MergeTool
+                darkMode={darkMode}
+                notify={notify}
+                customHint={page.customHint}
+                allowImages={page.slug === 'merge-aadhaar-and-pan-card' || page.slug.includes('merge')}
+              />
+            )}
+
+            {page.toolType === 'jpg2pdf' && (
+              <SimpleTool
+                title={page.h1}
+                mode="jpg2pdf"
+                darkMode={darkMode}
+                notify={notify}
+                targetSizeHint={page.targetSizeHint}
+              />
+            )}
+
+            {page.toolType === 'pdf2jpg' && (
+              <SimpleTool
+                title={page.h1}
+                mode="pdf2jpg"
+                darkMode={darkMode}
+                notify={notify}
+                targetSizeHint={page.targetSizeHint}
+              />
+            )}
+
+            {page.toolType === 'edit' && (
+              <EditTool
+                darkMode={darkMode}
+                notify={notify}
+              />
+            )}
           </div>
         </div>
       </div>
 
-      {/* Ad Placement */}
-      <div className="max-w-4xl mx-auto px-4 my-8 flex flex-col items-center justify-center">
+      {/* Sponsored Ad Banner (Directly Beneath Tool, 100% Above The Fold) */}
+      <div className="max-w-4xl mx-auto px-4 mt-2 mb-4 flex flex-col items-center justify-center">
         <AdSlot placement="TOOL_CONTENT_BOTTOM" className="w-full flex justify-center" />
-        <AdsterraBanner format="responsive" className="my-2" />
+        <AdsterraBanner format="responsive" className="my-1" />
       </div>
     </div>
   );

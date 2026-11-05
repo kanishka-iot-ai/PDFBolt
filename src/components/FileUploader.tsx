@@ -197,24 +197,24 @@ const FileUploader: React.FC<FileUploaderProps> = ({
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
-        className={`w-full p-4 sm:p-6 rounded-3xl transition-all duration-200 flex flex-col items-center justify-center ${
+        className={`w-full py-2 px-3 sm:py-3 sm:px-4 rounded-2xl transition-all duration-200 flex flex-col items-center justify-center ${
           isDragging ? 'bg-red-500/10 border-2 border-dashed border-red-500 scale-[1.02]' : ''
         }`}
       >
         <button
           type="button"
           onClick={() => fileInputRef.current?.click()}
-          className="w-full max-w-sm py-5 sm:py-6 px-8 bg-[#e53935] hover:bg-[#d32f2f] text-white font-black text-xl sm:text-2xl uppercase tracking-wider rounded-2xl shadow-2xl hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-3 cursor-pointer focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-red-400 focus-visible:ring-offset-2"
+          className="w-full max-w-sm py-4 sm:py-4.5 px-6 sm:px-8 bg-[#e53935] hover:bg-[#d32f2f] text-white font-black text-lg sm:text-xl uppercase tracking-wider rounded-2xl shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2.5 cursor-pointer focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-red-400 focus-visible:ring-offset-2"
         >
-          <Upload size={26} className="shrink-0" />
+          <Upload size={24} className="shrink-0" />
           <span>Select {formatBadge} {multiple ? 'files' : 'file'}</span>
         </button>
 
-        <p className="mt-3 text-xs sm:text-sm font-semibold text-slate-600 dark:text-slate-400">
+        <p className="mt-2 text-xs sm:text-sm font-semibold text-slate-600 dark:text-slate-400">
           or drop {formatBadge} here
         </p>
 
-        <p className="mt-2 text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 max-w-sm text-center inline-flex items-center justify-center gap-1.5">
+        <p className="mt-1.5 text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 max-w-sm text-center inline-flex items-center justify-center gap-1.5">
           <ShieldCheck size={14} className="text-emerald-500 shrink-0 inline" />
           <span>100% Private — Files are processed locally in your browser and never leave your device.</span>
         </p>
