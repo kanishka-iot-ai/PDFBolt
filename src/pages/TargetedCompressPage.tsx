@@ -1,7 +1,7 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Link, useParams } from 'react-router-dom';
-import { ShieldCheck, CheckCircle2, Target, ArrowRight, HelpCircle, FileText, AlertCircle, Sparkles } from 'lucide-react';
+import { Target } from 'lucide-react';
 import { ALL_LANDING_PAGES, LandingPageContent } from '../data/landingPages';
 import SimpleTool from './SimpleTool';
 import MergeTool from './MergeTool';
@@ -173,133 +173,6 @@ const TargetedCompressPage: React.FC<TargetedCompressPageProps> = ({ pageSlug: p
       <div className="max-w-4xl mx-auto px-4 my-6 flex flex-col items-center justify-center">
         <AdSlot placement="TOOL_CONTENT_BOTTOM" className="w-full flex justify-center" />
         <AdsterraBanner format="responsive" className="my-2" />
-      </div>
-
-      {/* Quick Summary Banner */}
-      <div className="max-w-4xl mx-auto px-4 mb-10">
-        <div className={`p-6 rounded-2xl border ${darkMode ? 'bg-amber-950/20 border-amber-900/40 text-amber-200' : 'bg-amber-50/80 border-amber-200 text-amber-900'}`}>
-          <div className="flex items-start gap-3">
-            <Sparkles size={20} className="shrink-0 mt-0.5 text-amber-600 dark:text-amber-400" />
-            <div>
-              <p className="font-black text-xs uppercase tracking-wider mb-1">Quick Answer & Intent</p>
-              <p className="text-sm font-medium leading-relaxed">{page.quickAnswer}</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Portal Specifications Table (If applicable, e.g. for SSC, UPSC, NEET, JEE) */}
-      {page.portalSpecs && page.portalSpecs.length > 0 && (
-        <div className="max-w-4xl mx-auto px-4 mb-12">
-          <div className={`p-6 sm:p-8 rounded-3xl border shadow-sm ${darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
-            <div className="flex items-center gap-2 mb-4">
-              <FileText className="text-yellow-600 dark:text-yellow-400" size={20} />
-              <h2 className={`text-xl sm:text-2xl font-black ${darkMode ? 'text-white' : 'text-slate-900'}`}>
-                Official Portal Document Specifications
-              </h2>
-            </div>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mb-6">
-              Always confirm file boundaries with the official exam notification before submitting.
-            </p>
-
-            <div className="overflow-x-auto rounded-2xl border border-slate-200 dark:border-slate-800">
-              <table className="w-full text-left text-xs sm:text-sm">
-                <thead className={darkMode ? 'bg-slate-800 text-slate-200' : 'bg-slate-100 text-slate-800'}>
-                  <tr>
-                    <th className="p-3.5 font-black">Document Type</th>
-                    <th className="p-3.5 font-black">Mandatory Size</th>
-                    <th className="p-3.5 font-black">Format</th>
-                    <th className="p-3.5 font-black">Requirements</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
-                  {page.portalSpecs.map((spec, i) => (
-                    <tr key={i} className={i % 2 === 0 ? (darkMode ? 'bg-slate-900/40' : 'bg-white') : (darkMode ? 'bg-slate-800/30' : 'bg-slate-50/50')}>
-                      <td className="p-3.5 font-bold text-slate-900 dark:text-white">{spec.name}</td>
-                      <td className="p-3.5 font-black text-amber-700 dark:text-amber-400">{spec.allowedSize}</td>
-                      <td className="p-3.5 font-semibold text-slate-600 dark:text-slate-300">{spec.allowedFormat}</td>
-                      <td className="p-3.5 text-slate-500 dark:text-slate-400 text-xs">{spec.notes}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Step-by-Step Instructions */}
-      <div className="max-w-4xl mx-auto px-4 mb-12">
-        <div className={`p-6 sm:p-8 rounded-3xl border shadow-sm ${darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
-          <h2 className={`text-xl sm:text-2xl font-black mb-6 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
-            How to {page.h1} (3 Easy Steps)
-          </h2>
-          <div className="grid sm:grid-cols-3 gap-6">
-            {page.steps.map((s, idx) => (
-              <div key={idx} className={`p-5 rounded-2xl border ${darkMode ? 'bg-slate-800/60 border-slate-700' : 'bg-slate-50 border-slate-200'}`}>
-                <div className="w-8 h-8 rounded-xl bg-yellow-500 text-slate-950 font-black text-sm flex items-center justify-center mb-3">
-                  {idx + 1}
-                </div>
-                <h3 className={`font-bold text-sm mb-1.5 ${darkMode ? 'text-white' : 'text-slate-900'}`}>{s.name}</h3>
-                <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">{s.text}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Detailed Technical Sections */}
-      <div className="max-w-4xl mx-auto px-4 space-y-8 mb-12">
-        {page.sections.map((sec, idx) => (
-          <div key={idx} className={`p-6 sm:p-8 rounded-3xl border shadow-sm ${darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
-            <h2 className={`text-xl sm:text-2xl font-black mb-4 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
-              {sec.heading}
-            </h2>
-            <div className="space-y-3 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
-              {sec.paragraphs.map((p, pIdx) => (
-                <p key={pIdx}>{p}</p>
-              ))}
-            </div>
-
-            {sec.tips && sec.tips.length > 0 && (
-              <div className={`mt-6 p-4 rounded-xl border ${darkMode ? 'bg-slate-800/80 border-slate-700' : 'bg-slate-100 border-slate-200'}`}>
-                <p className="font-black text-xs uppercase tracking-wider mb-2 text-slate-900 dark:text-white">Pro Tips for Portal Submissions</p>
-                <ul className="space-y-1.5 text-xs text-slate-600 dark:text-slate-400">
-                  {sec.tips.map((t, tIdx) => (
-                    <li key={tIdx} className="flex items-start gap-2">
-                      <CheckCircle2 size={14} className="text-emerald-500 shrink-0 mt-0.5" />
-                      <span>{t}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
-
-      {/* Rich FAQs Section */}
-      <div className="max-w-4xl mx-auto px-4 mb-12">
-        <div className={`p-6 sm:p-8 rounded-3xl border shadow-sm ${darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
-          <div className="flex items-center gap-2 mb-6">
-            <HelpCircle className="text-yellow-600 dark:text-yellow-400" size={20} />
-            <h2 className={`text-xl sm:text-2xl font-black ${darkMode ? 'text-white' : 'text-slate-900'}`}>
-              Frequently Asked Questions
-            </h2>
-          </div>
-          <div className="space-y-4">
-            {page.faqs.map((faq, idx) => (
-              <div key={idx} className={`p-5 rounded-2xl border ${darkMode ? 'bg-slate-800/40 border-slate-700' : 'bg-slate-50 border-slate-200'}`}>
-                <h3 className={`font-bold text-sm mb-2 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
-                  {faq.q}
-                </h3>
-                <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                  {faq.a}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
       </div>
 
       {/* Internal Linking & Quick Size Switcher */}

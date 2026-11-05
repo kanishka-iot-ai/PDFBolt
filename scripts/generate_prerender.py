@@ -2482,29 +2482,12 @@ def generate_prerendered_pages():
       <!-- Hero Section (Pixel-identical to Home.tsx for 0.00 CLS) -->
       <section class="relative overflow-hidden pt-5 pb-5 sm:pt-7 sm:pb-7 text-center border-b border-slate-100 bg-slate-50/80 mb-6">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 relative z-10">
-          <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-700 font-bold text-[11px] uppercase tracking-wider mb-2.5">
-            <span>🛡️ 100% In-Browser &bull; Files Never Leave Your Device</span>
-          </div>
           <h1 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black tracking-tight mb-2 leading-tight text-slate-900">
             Free Online PDF Tools for Every Task
           </h1>
           <p class="text-xs sm:text-sm md:text-base max-w-xl mx-auto mb-3.5 font-normal leading-relaxed text-slate-600">
             Merge, compress, split, convert, edit and protect PDFs online. Fast, private and zero file limits.
           </p>
-          <div class="flex flex-wrap items-center justify-center gap-2 sm:gap-3 text-xs">
-            <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[11px] sm:text-xs font-semibold bg-white border-slate-200 text-slate-700 shadow-sm">
-              <span><strong>100% Private:</strong> In-Browser</span>
-            </div>
-            <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[11px] sm:text-xs font-semibold bg-white border-slate-200 text-slate-700 shadow-sm">
-              <span><strong>Zero Uploads:</strong> Device Only</span>
-            </div>
-            <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[11px] sm:text-xs font-semibold bg-white border-slate-200 text-slate-700 shadow-sm">
-              <span><strong>25+ Tools:</strong> Full Suite</span>
-            </div>
-            <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[11px] sm:text-xs font-semibold bg-white border-slate-200 text-slate-700 shadow-sm">
-              <span><strong>Fast &amp; Free:</strong> No Signup</span>
-            </div>
-          </div>
         </div>
       </section>
 
