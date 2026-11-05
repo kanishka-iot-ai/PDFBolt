@@ -19,6 +19,14 @@ describe('AdsterraBanner Component', () => {
     expect(iframe.srcdoc).toContain("key' : 'test_key_12345'");
   });
 
+  it('renders native banner format correctly with container ID in iframe', () => {
+    render(<AdsterraBanner format="native" customKey="test_native_key_999" />);
+    const iframe = screen.getByTitle('Advertisement Native Banner') as HTMLIFrameElement;
+    expect(iframe).toBeInTheDocument();
+    expect(iframe.srcdoc).toContain('container-test_native_key_999');
+    expect(iframe.srcdoc).toContain('test_native_key_999/invoke.js');
+  });
+
   it('renders responsive desktop and mobile containers when keys are provided', () => {
     render(
       <AdsterraBanner

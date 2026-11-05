@@ -1,6 +1,13 @@
 import React, { useMemo } from 'react';
 
-export type AdsterraFormat = '728x90' | '300x250' | '468x60' | '160x600' | '320x50' | 'responsive';
+export type AdsterraFormat =
+  | '728x90'
+  | '300x250'
+  | '468x60'
+  | '160x600'
+  | '320x50'
+  | 'native'
+  | 'responsive';
 
 export interface AdsterraBannerProps {
   format?: AdsterraFormat;
@@ -11,7 +18,7 @@ export interface AdsterraBannerProps {
 }
 
 interface FormatDimensions {
-  width: number;
+  width: number | string;
   height: number;
   envKeyName: string;
 }
@@ -42,21 +49,53 @@ const FORMAT_CONFIG: Record<Exclude<AdsterraFormat, 'responsive'>, FormatDimensi
     height: 50,
     envKeyName: 'VITE_ADSTERRA_320X50_KEY',
   },
+  'native': {
+    width: '100%',
+    height: 200,
+    envKeyName: 'VITE_ADSTERRA_NATIVE_KEY',
+  },
 };
 
 /**
  * Single isolated Adsterra Iframe Unit
- * Renders Adsterra atOptions script inside an isolated srcDoc iframe
- * to avoid global namespace collision on window.atOptions and prevent memory leaks in React SPAs.
+ * Renders Adsterra scripts inside an isolated srcDoc iframe
+ * to avoid global namespace collision and prevent memory leaks in React SPAs.
  */
 const AdsterraIframeSlot: React.FC<{
-  width: number;
+  width: number | string;
   height: number;
   adKey: string;
   scriptDomain: string;
+  isNative?: boolean;
   className?: string;
-}> = ({ width, height, adKey, scriptDomain, className = '' }) => {
+}> = ({ width, height, adKey, scriptDomain, isNative = false, className = '' }) => {
   const iframeSrcDoc = useMemo(() => {
+    if (isNative) {
+      // Adsterra Native Banner script format
+      return `<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+      *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body {
+        width: 100%;
+        min-height: 100%;
+        overflow: hidden;
+        background: transparent;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      }
+    </style>
+  </head>
+  <body>
+    <script async="async" data-cfasync="false" src="//${scriptDomain}/${adKey}/invoke.js"><\/script>
+    <div id="container-${adKey}"></div>
+  </body>
+</html>`;
+    }
+
+    // Standard Display Banner format
     return `<!DOCTYPE html>
 <html lang="en">
   <head>
@@ -81,36 +120,38 @@ const AdsterraIframeSlot: React.FC<{
         'key' : '${adKey}',
         'format' : 'iframe',
         'height' : ${height},
-        'width' : ${width},
+        'width' : ${typeof width === 'number' ? width : 728},
         'params' : {}
       };
-    </script>
-    <script type="text/javascript" src="//${scriptDomain}/${adKey}/invoke.js"></script>
+    <\/script>
+    <script type="text/javascript" src="//${scriptDomain}/${adKey}/invoke.js"><\/script>
   </body>
 </html>`;
-  }, [width, height, adKey, scriptDomain]);
+  }, [width, height, adKey, scriptDomain, isNative]);
+
+  const widthStyle = typeof width === 'number' ? `${width}px` : width;
 
   return (
     <div
       className={`overflow-hidden flex items-center justify-center ${className}`}
       style={{
         width: '100%',
-        maxWidth: `${width}px`,
+        maxWidth: typeof width === 'number' ? `${width}px` : '100%',
         height: `${height}px`,
         minHeight: `${height}px`,
       }}
     >
       <iframe
-        title={`Advertisement ${width}x${height}`}
+        title={`Advertisement ${isNative ? 'Native Banner' : `${width}x${height}`}`}
         srcDoc={iframeSrcDoc}
-        width={width}
+        width={typeof width === 'number' ? width : '100%'}
         height={height}
         scrolling="no"
         frameBorder="0"
         loading="lazy"
-        className="border-0 overflow-hidden block mx-auto"
+        className="border-0 overflow-hidden block mx-auto w-full"
         style={{
-          width: `${width}px`,
+          width: widthStyle,
           height: `${height}px`,
           maxWidth: '100%',
         }}
@@ -121,11 +162,12 @@ const AdsterraIframeSlot: React.FC<{
 
 /**
  * Production-ready Adsterra Banner Ad Component:
+ * - Supports Display Banners and Native Recommendation Banners.
  * - Pre-allocated container dimensions to strictly eliminate Cumulative Layout Shift (CLS).
- * - Sandboxed/isolated iframe preventing atOptions global collisions in React 18/19 SPAs.
+ * - Sandboxed/isolated iframe preventing global namespace collisions in React 18/19 SPAs.
  * - Supports responsive auto-switching (728x90 desktop / 300x250 mobile).
  * - Subtle styling matching PDFBolt's design system with discreet "Sponsored" pill.
- * - Collapses gracefully in production when keys are missing; displays helpful dev placeholder in dev mode.
+ * - Collapses gracefully in production when keys are missing.
  */
 export const AdsterraBanner: React.FC<AdsterraBannerProps> = ({
   format = 'responsive',
@@ -167,7 +209,7 @@ export const AdsterraBanner: React.FC<AdsterraBannerProps> = ({
         <aside
           className={`w-full max-w-4xl mx-auto my-6 px-4 py-3 rounded-2xl border-2 border-dashed border-amber-300/60 dark:border-amber-700/60 bg-amber-50/40 dark:bg-amber-950/20 text-center transition-all ${className}`}
           style={{
-            minHeight: format === '300x250' ? '250px' : '90px',
+            minHeight: format === 'native' ? '200px' : format === '300x250' ? '250px' : '90px',
             ...style,
           }}
           aria-label="Adsterra Placeholder"
@@ -181,8 +223,12 @@ export const AdsterraBanner: React.FC<AdsterraBannerProps> = ({
               <strong className="text-amber-600 dark:text-amber-300">{format}</strong>.
             </span>
             <span className="text-[10px] text-slate-500 mt-1">
-              Add <code className="bg-slate-200 dark:bg-slate-800 px-1 py-0.5 rounded">VITE_ADSTERRA_728X90_KEY</code> or{' '}
-              <code className="bg-slate-200 dark:bg-slate-800 px-1 py-0.5 rounded">VITE_ADSTERRA_300X250_KEY</code> in <code className="font-mono">.env</code> to activate live ads.
+              {format === 'native' ? (
+                <>Add <code className="bg-slate-200 dark:bg-slate-800 px-1 py-0.5 rounded">VITE_ADSTERRA_NATIVE_KEY</code> in <code className="font-mono">.env</code> to activate.</>
+              ) : (
+                <>Add <code className="bg-slate-200 dark:bg-slate-800 px-1 py-0.5 rounded">VITE_ADSTERRA_728X90_KEY</code> or{' '}
+                <code className="bg-slate-200 dark:bg-slate-800 px-1 py-0.5 rounded">VITE_ADSTERRA_300X250_KEY</code> in <code className="font-mono">.env</code> to activate.</>
+              )}
             </span>
           </div>
         </aside>
@@ -251,6 +297,7 @@ export const AdsterraBanner: React.FC<AdsterraBannerProps> = ({
             height={FORMAT_CONFIG[format].height}
             adKey={singleKey}
             scriptDomain={scriptDomain}
+            isNative={format === 'native'}
           />
         </div>
       )}
