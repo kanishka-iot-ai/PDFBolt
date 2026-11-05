@@ -102,11 +102,7 @@ const TargetedCompressPage: React.FC<TargetedCompressPageProps> = ({ pageSlug: p
             <span className="text-yellow-700 dark:text-yellow-400 font-bold">{page.h1}</span>
           </nav>
 
-          {page.targetSizeHint && (
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/15 text-amber-900 dark:text-amber-300 font-black text-[11px] uppercase tracking-widest mb-3 border border-amber-600/30">
-              <Target size={14} /> {page.targetSizeHint}
-            </div>
-          )}
+          
 
           <h1 className={`text-3xl sm:text-4xl md:text-5xl font-black mb-3 tracking-tight leading-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>
             {page.h1}
@@ -169,51 +165,95 @@ const TargetedCompressPage: React.FC<TargetedCompressPageProps> = ({ pageSlug: p
         </div>
       </div>
 
-      {/* Ad Placement */}
-      <div className="max-w-4xl mx-auto px-4 my-6 flex flex-col items-center justify-center">
-        <AdSlot placement="TOOL_CONTENT_BOTTOM" className="w-full flex justify-center" />
-        <AdsterraBanner format="responsive" className="my-2" />
-      </div>
+      {/* Target Presets & Portal Navigator */}
+      <div className="max-w-5xl mx-auto px-4 mt-8">
+        <div className={`p-6 sm:p-7 rounded-3xl border ${darkMode ? 'bg-slate-900/60 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-5 pb-3 border-b border-slate-200 dark:border-slate-800">
+            <div>
+              <p className="text-[11px] font-black uppercase tracking-wider text-slate-400">Target Presets & Portal Standards</p>
+              <h2 className={`text-base sm:text-lg font-bold ${darkMode ? 'text-white' : 'text-slate-900'}`}>Need a Different File Size or Portal Target?</h2>
+            </div>
+            <span className="text-xs text-slate-500 font-medium">Click to switch tool preset</span>
+          </div>
 
-      {/* Internal Linking & Quick Size Switcher */}
-      <div className="max-w-4xl mx-auto px-4">
-        <div className={`p-6 sm:p-8 rounded-3xl border text-center ${darkMode ? 'bg-slate-900/60 border-slate-800' : 'bg-slate-100 border-slate-200'}`}>
-          <p className="text-xs font-black uppercase tracking-wider mb-2 text-slate-500">Explore More Targeted PDF Tools</p>
-          <h2 className={`text-lg sm:text-xl font-bold mb-4 ${darkMode ? 'text-white' : 'text-slate-900'}`}>Need a Different File Size or Portal Target?</h2>
-          <div className="flex flex-wrap justify-center gap-2">
-            {[
-              { label: '20 KB', href: '/compress-pdf-to-20kb/' },
-              { label: '50 KB', href: '/compress-pdf-to-50kb/' },
-              { label: '100 KB', href: '/compress-pdf-to-100kb/' },
-              { label: '200 KB', href: '/compress-pdf-to-200kb/' },
-              { label: '300 KB', href: '/compress-pdf-to-300kb/' },
-              { label: '500 KB', href: '/compress-pdf-to-500kb/' },
-              { label: '1 MB', href: '/compress-pdf-to-1mb/' },
-              { label: '2 MB', href: '/compress-pdf-to-2mb/' },
-              { label: 'SSC CGL/CHSL', href: '/compress-pdf-for-ssc/' },
-              { label: 'UPSC OTR', href: '/compress-pdf-for-upsc/' },
-              { label: 'NEET Exam', href: '/compress-pdf-for-neet/' },
-              { label: 'JEE Main', href: '/compress-pdf-for-jee/' },
-              { label: 'IBPS Bank', href: '/compress-pdf-for-ibps/' },
-              { label: 'Aadhaar + PAN Merge', href: '/merge-aadhaar-and-pan-card/' },
-              { label: 'Govt Portals', href: '/pdf-size-reducer-for-government-portal/' }
-            ].map(link => (
-              <Link
-                key={link.href}
-                to={link.href}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all border ${
-                  link.href.replace(/\/$/, '') === `/${page.slug}`
-                    ? 'bg-yellow-500 text-slate-950 border-yellow-500'
-                    : darkMode
-                      ? 'bg-slate-800 border-slate-700 text-slate-300 hover:border-slate-600'
-                      : 'bg-white border-slate-200 text-slate-700 hover:border-slate-300'
-                }`}
-              >
-                {link.label}
-              </Link>
-            ))}
+          {/* Group 1: By Target File Size */}
+          <div className="mb-4">
+            <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-2">
+              File Size Targets
+            </span>
+            <div className="flex flex-wrap gap-2">
+              {[
+                { label: '20 KB', href: '/compress-pdf-to-20kb/' },
+                { label: '50 KB', href: '/compress-pdf-to-50kb/' },
+                { label: '100 KB', href: '/compress-pdf-to-100kb/' },
+                { label: '200 KB', href: '/compress-pdf-to-200kb/' },
+                { label: '300 KB', href: '/compress-pdf-to-300kb/' },
+                { label: '500 KB', href: '/compress-pdf-to-500kb/' },
+                { label: '1 MB', href: '/compress-pdf-to-1mb/' },
+                { label: '2 MB', href: '/compress-pdf-to-2mb/' }
+              ].map(link => {
+                const isActive = link.href.replace(/\/$/, '') === `/${page.slug}`;
+                return (
+                  <Link
+                    key={link.href}
+                    to={link.href}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all border ${
+                      isActive
+                        ? 'bg-yellow-500 text-slate-950 border-yellow-500 shadow-sm font-black'
+                        : darkMode
+                          ? 'bg-slate-800 border-slate-700 text-slate-300 hover:border-yellow-500'
+                          : 'bg-white border-slate-200 text-slate-700 hover:border-yellow-500 shadow-xs'
+                    }`}
+                  >
+                    {link.label}
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Group 2: By Government & Exam Portals */}
+          <div>
+            <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-2">
+              Government & Exam Portals
+            </span>
+            <div className="flex flex-wrap gap-2">
+              {[
+                { label: 'SSC CGL / CHSL', href: '/compress-pdf-for-ssc/' },
+                { label: 'UPSC OTR', href: '/compress-pdf-for-upsc/' },
+                { label: 'NEET Exam', href: '/compress-pdf-for-neet/' },
+                { label: 'JEE Main', href: '/compress-pdf-for-jee/' },
+                { label: 'IBPS Bank', href: '/compress-pdf-for-ibps/' },
+                { label: 'RRB Railway', href: '/compress-pdf-for-rrb/' },
+                { label: 'Aadhaar + PAN Merge', href: '/merge-aadhaar-and-pan-card/' },
+                { label: 'All Govt Portals', href: '/pdf-size-reducer-for-government-portal/' }
+              ].map(link => {
+                const isActive = link.href.replace(/\/$/, '') === `/${page.slug}`;
+                return (
+                  <Link
+                    key={link.href}
+                    to={link.href}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all border ${
+                      isActive
+                        ? 'bg-yellow-500 text-slate-950 border-yellow-500 shadow-sm font-black'
+                        : darkMode
+                          ? 'bg-slate-800 border-slate-700 text-slate-300 hover:border-yellow-500'
+                          : 'bg-white border-slate-200 text-slate-700 hover:border-yellow-500 shadow-xs'
+                    }`}
+                  >
+                    {link.label}
+                  </Link>
+                );
+              })}
+            </div>
           </div>
         </div>
+      </div>
+
+      {/* Ad Placement */}
+      <div className="max-w-4xl mx-auto px-4 my-8 flex flex-col items-center justify-center">
+        <AdSlot placement="TOOL_CONTENT_BOTTOM" className="w-full flex justify-center" />
+        <AdsterraBanner format="responsive" className="my-2" />
       </div>
     </div>
   );
