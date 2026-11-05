@@ -10,6 +10,7 @@ import { NotifySystem } from '../types';
 import { validateFiles, ALLOWED_MIME_TYPES, MAX_FILE_SIZE } from '../utils/fileValidation';
 import { API_BASE_URL } from '../services/apiClient';
 import { useActiveWork } from '../context/ActiveWorkContext';
+import AdsterraBanner from '../components/AdsterraBanner';
 
 interface QRToolProps {
   darkMode: boolean;
@@ -466,6 +467,11 @@ const QRTool: React.FC<QRToolProps> = ({ darkMode, notify }) => {
                     >
                       <RefreshCw size={14} /> Share Another Document
                     </button>
+
+                    {/* Non-Intrusive Sponsored Slot */}
+                    <div className="pt-4 border-t border-slate-100 dark:border-slate-700/60 flex flex-col items-center justify-center">
+                      <AdsterraBanner format="responsive" showLabel={true} />
+                    </div>
                   </div>
                 </div>
               )}

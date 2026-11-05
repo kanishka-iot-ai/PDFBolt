@@ -288,7 +288,7 @@ const MergeTool: React.FC<MergeToolProps> = ({ darkMode, notify, customHint, all
             </div>
 
             {/* Sidebar Options Body */}
-            <div className="p-6 overflow-y-auto flex-grow space-y-4">
+            <div className="p-6 overflow-y-auto flex-grow space-y-4 flex flex-col">
               <div className="p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 space-y-2">
                 <p className="text-xs font-bold text-slate-700 dark:text-slate-300">
                   Merge Sequence
@@ -300,6 +300,11 @@ const MergeTool: React.FC<MergeToolProps> = ({ darkMode, notify, customHint, all
 
               <div className="p-4 rounded-xl bg-yellow-500/10 border border-yellow-500/30 text-xs font-bold text-yellow-800 dark:text-yellow-300">
                 📄 {files.length} document{files.length > 1 ? 's' : ''} queued for merge
+              </div>
+
+              {/* Non-Intrusive Active Workspace Sponsored Slot */}
+              <div className="mt-auto pt-6 border-t border-slate-100 dark:border-slate-700/60 flex flex-col items-center justify-center shrink-0">
+                <AdsterraBanner format="300x250" showLabel={true} />
               </div>
             </div>
 

@@ -7,6 +7,7 @@ import { FileText, FileSearch, Presentation, Table, CheckCircle2, Download, Mess
 import { saveAs } from 'file-saver';
 import { NotifySystem } from '../types';
 import AdSlot from '../components/AdSlot';
+import AdsterraBanner from '../components/AdsterraBanner';
 import { useActiveWork } from '../context/ActiveWorkContext';
 
 interface AnalyzerPageProps {
@@ -423,6 +424,7 @@ ${analysis.keyFindings.map((kf, i) => `${i + 1}. ${kf}`).join('\n')}
 
             {/* Non-Intrusive Result Screen Sponsored Slot (Far below analysis actions) */}
             <AdSlot placement="RESULT_BOTTOM" />
+            <AdsterraBanner format="responsive" className="mt-4 mb-2" />
           </div>
         )}
       </div>

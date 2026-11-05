@@ -6,6 +6,7 @@ import { formatFileSize, validateOutputIntegrity, validateFile, ALLOWED_MIME_TYP
 import { saveAs } from 'file-saver';
 import { apiClient } from '../services/apiClient';
 import AdSlot from '../components/AdSlot';
+import AdsterraBanner from '../components/AdsterraBanner';
 import { NotifySystem } from '../types';
 import { useActiveWork } from '../context/ActiveWorkContext';
 import { 
@@ -466,6 +467,11 @@ const CompressTool: React.FC<CompressToolProps> = ({ darkMode, notify }) => {
               </div>
             </div>
 
+            {/* Non-Intrusive Active Workspace Sponsored Slot */}
+            <div className="my-6 flex flex-col items-center justify-center">
+              <AdsterraBanner format="responsive" showLabel={true} />
+            </div>
+
             {/* Compress Action */}
             <div>
               {processing ? (
@@ -578,6 +584,7 @@ const CompressTool: React.FC<CompressToolProps> = ({ darkMode, notify }) => {
 
             {/* Non-Intrusive Result Screen Sponsored Slot (Far below download button) */}
             <AdSlot placement="RESULT_BOTTOM" />
+            <AdsterraBanner format="responsive" className="mt-4" />
 
             {/* Quality Comparison Modal */}
             {showPreviewModal && result.previewOriginalDataUrl && result.previewCompressedDataUrl && (

@@ -1045,7 +1045,7 @@ const SimpleTool: React.FC<SimpleToolProps> = ({ title, mode, darkMode, notify, 
             </div>
 
             {/* Sidebar Options Body */}
-            <div className="p-6 overflow-y-auto flex-grow space-y-4">
+            <div className="p-6 overflow-y-auto flex-grow space-y-4 flex flex-col">
               {/* PDF to Word OCR Options */}
               {mode === 'pdf2word' && (
                 <div className="space-y-3">
@@ -1605,6 +1605,11 @@ const SimpleTool: React.FC<SimpleToolProps> = ({ title, mode, darkMode, notify, 
                   </div>
                 </div>
               )}
+
+              {/* Non-Intrusive Active Workspace Sponsored Slot */}
+              <div className="mt-auto pt-6 border-t border-slate-100 dark:border-slate-700/60 flex flex-col items-center justify-center shrink-0">
+                <AdsterraBanner format="300x250" showLabel={true} />
+              </div>
             </div>
 
             {/* Sidebar Bottom CTA Action Button */}
