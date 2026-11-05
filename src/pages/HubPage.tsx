@@ -47,12 +47,9 @@ const HubPage: React.FC<HubPageProps> = ({ darkMode }) => {
       {/* Hero Header */}
       <section className={`py-16 border-b ${darkMode ? 'border-slate-800 bg-slate-900/40' : 'border-slate-100 bg-slate-50/70'}`}>
         <div className="max-w-6xl mx-auto px-6 text-center">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 font-black text-xs uppercase tracking-widest mb-4">
-            <Sparkles size={14} /> The Complete PDF Toolkit
-          </div>
           <h1 className={`text-4xl md:text-6xl font-black mb-6 tracking-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>
             Every PDF Tool You Need. <br className="hidden md:inline" />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 to-amber-500">100% Free & Private.</span>
+            <span className="text-yellow-600 dark:text-yellow-400">100% Free & Private.</span>
           </h1>
           <p className={`text-lg md:text-xl max-w-3xl mx-auto mb-10 ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
             Convert, organize, secure, and edit documents directly inside your browser. No files are ever sent to a remote server.

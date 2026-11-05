@@ -7,25 +7,9 @@ import { ArrowRight } from 'lucide-react';
 // Stable pure functions — defined outside component so they never re-allocate on render
 const getCategoryStyles = (category: string, darkMode: boolean): string => {
   if (darkMode) {
-    switch (category) {
-      case 'edit': return 'hover:border-red-500/40 hover:bg-slate-900/90';
-      case 'convert-to': return 'hover:border-blue-500/40 hover:bg-slate-900/90';
-      case 'convert-from': return 'hover:border-green-500/40 hover:bg-slate-900/90';
-      case 'security': return 'hover:border-orange-500/40 hover:bg-slate-900/90';
-      case 'utilities':
-      case 'extra': return 'hover:border-yellow-500/40 hover:bg-slate-900/90';
-      default: return 'hover:border-yellow-500/40 hover:bg-slate-900/90';
-    }
+    return 'hover:border-slate-600 hover:bg-slate-800/80';
   } else {
-    switch (category) {
-      case 'edit': return 'hover:border-red-400 hover:shadow-lg hover:shadow-red-500/5';
-      case 'convert-to': return 'hover:border-blue-400 hover:shadow-lg hover:shadow-blue-500/5';
-      case 'convert-from': return 'hover:border-green-400 hover:shadow-lg hover:shadow-green-500/5';
-      case 'security': return 'hover:border-orange-400 hover:shadow-lg hover:shadow-orange-500/5';
-      case 'utilities':
-      case 'extra': return 'hover:border-yellow-400 hover:shadow-lg hover:shadow-yellow-500/5';
-      default: return 'hover:border-yellow-400 hover:shadow-lg hover:shadow-yellow-500/5';
-    }
+    return 'hover:border-slate-300 hover:shadow-md';
   }
 };
 
@@ -58,7 +42,7 @@ interface ToolCardProps {
 }
 
 const ToolCard: React.FC<ToolCardProps> = ({ tool, darkMode, compact = false }) => {
-  const isCore = ['merge', 'split', 'compress'].includes(tool.id);
+  
   const targetPath = tool.canonicalPath || tool.path;
   const categoryStyle = getCategoryStyles(tool.category, darkMode);
   const iconStyle = getIconStyles(tool.category);
@@ -95,17 +79,7 @@ const ToolCard: React.FC<ToolCardProps> = ({ tool, darkMode, compact = false }) 
               })()}
             </div>
 
-            {isCore && !compact && (
-              <span
-                className={`inline-flex items-center text-[10px] font-mono font-semibold uppercase tracking-wider px-2 py-0.5 rounded border ${
-                  darkMode
-                    ? 'bg-slate-800 text-slate-300 border-slate-700'
-                    : 'bg-slate-100 text-slate-700 border-slate-200'
-                }`}
-              >
-                Core Utility
-              </span>
-            )}
+
           </div>
 
           {/* Tool Title */}

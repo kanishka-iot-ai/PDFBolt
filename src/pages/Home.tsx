@@ -10,6 +10,10 @@ import {
   Repeat,
   Shield,
   ShieldCheck,
+  GraduationCap,
+  Briefcase,
+  BookOpen,
+  Target,
   Settings,
   FileText,
   Search,
@@ -95,11 +99,6 @@ const Home: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
         <div className="absolute inset-0 bg-gradient-to-b from-slate-100/50 via-transparent to-transparent dark:from-slate-800/25 dark:via-transparent pointer-events-none" />
 
         <div className="max-w-4xl mx-auto px-4 sm:px-6 relative z-10">
-          {/* Top Security & Privacy Badge */}
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 dark:bg-emerald-500/20 border border-emerald-500/30 text-emerald-700 dark:text-emerald-400 font-bold text-[11px] uppercase tracking-wider mb-2.5">
-            <ShieldCheck size={13} className="text-emerald-500" />
-            <span>100% In-Browser &bull; Files Never Leave Your Device</span>
-          </div>
 
           {/* Primary H1 */}
           <h1
@@ -119,57 +118,7 @@ const Home: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
             Merge, compress, split, convert, edit and protect PDFs online. Fast, private and zero file limits.
           </p>
 
-          {/* Front-Line 4 Trust Pillars Strip (Instantly visible above the fold) */}
-          <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 text-xs">
-            <div
-              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[11px] sm:text-xs font-semibold ${
-                darkMode
-                  ? 'bg-slate-900/80 border-slate-800 text-slate-300'
-                  : 'bg-white border-slate-200 text-slate-700 shadow-sm'
-              }`}
-            >
-              <Shield size={13} className="text-emerald-500 shrink-0" />
-              <span>
-                <strong className="font-bold text-slate-900 dark:text-white">100% Private:</strong> In-Browser
-              </span>
-            </div>
-            <div
-              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[11px] sm:text-xs font-semibold ${
-                darkMode
-                  ? 'bg-slate-900/80 border-slate-800 text-slate-300'
-                  : 'bg-white border-slate-200 text-slate-700 shadow-sm'
-              }`}
-            >
-              <Lock size={13} className="text-blue-500 shrink-0" />
-              <span>
-                <strong className="font-bold text-slate-900 dark:text-white">Zero Uploads:</strong> Device Only
-              </span>
-            </div>
-            <div
-              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[11px] sm:text-xs font-semibold ${
-                darkMode
-                  ? 'bg-slate-900/80 border-slate-800 text-slate-300'
-                  : 'bg-white border-slate-200 text-slate-700 shadow-sm'
-              }`}
-            >
-              <FileText size={13} className="text-purple-500 shrink-0" />
-              <span>
-                <strong className="font-bold text-slate-900 dark:text-white">25+ Tools:</strong> Full Suite
-              </span>
-            </div>
-            <div
-              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[11px] sm:text-xs font-semibold ${
-                darkMode
-                  ? 'bg-slate-900/80 border-slate-800 text-slate-300'
-                  : 'bg-white border-slate-200 text-slate-700 shadow-sm'
-              }`}
-            >
-              <Zap size={13} className="text-amber-500 shrink-0" />
-              <span>
-                <strong className="font-bold text-slate-900 dark:text-white">Fast &amp; Free:</strong> No Signup
-              </span>
-            </div>
-          </div>
+          
         </div>
       </section>
 
@@ -463,8 +412,9 @@ const Home: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
                 darkMode ? 'bg-slate-800/30 border-slate-800' : 'bg-white border-slate-200 shadow-sm'
               }`}
             >
-              <h3 className={`font-bold text-base mb-1 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
-                🎓 Student PDF Suite
+              <h3 className={`font-bold text-base mb-1 flex items-center gap-2 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+                <GraduationCap size={18} className="text-yellow-600 dark:text-yellow-400 shrink-0" />
+                <span>Student PDF Suite</span>
               </h3>
               <p className={`text-xs ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
                 Merge lecture slides, compress lab reports, and convert handwritten notes.
@@ -477,8 +427,9 @@ const Home: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
                 darkMode ? 'bg-slate-800/30 border-slate-800' : 'bg-white border-slate-200 shadow-sm'
               }`}
             >
-              <h3 className={`font-bold text-base mb-1 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
-                💼 Business & Legal Toolkit
+              <h3 className={`font-bold text-base mb-1 flex items-center gap-2 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+                <Briefcase size={18} className="text-yellow-600 dark:text-yellow-400 shrink-0" />
+                <span>Business & Legal Toolkit</span>
               </h3>
               <p className={`text-xs ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
                 Sign NDAs, redact sensitive data, password protect contracts, and OCR invoices.
@@ -491,8 +442,9 @@ const Home: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
                 darkMode ? 'bg-slate-800/30 border-slate-800' : 'bg-white border-slate-200 shadow-sm'
               }`}
             >
-              <h3 className={`font-bold text-base mb-1 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
-                📖 PDF Encyclopedia
+              <h3 className={`font-bold text-base mb-1 flex items-center gap-2 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+                <BookOpen size={18} className="text-yellow-600 dark:text-yellow-400 shrink-0" />
+                <span>PDF Encyclopedia</span>
               </h3>
               <p className={`text-xs ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
                 Deep technical dives into PDF/A archiving standards, OCR engines, and font rendering.
@@ -503,8 +455,9 @@ const Home: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
           {/* Targeted Compression & Exam Upload Quick Discovery */}
           <div className={`mt-8 p-6 rounded-2xl border ${darkMode ? 'bg-slate-800/20 border-slate-800' : 'bg-slate-50/80 border-slate-200'}`}>
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
-              <h3 className={`text-sm font-black uppercase tracking-wider ${darkMode ? 'text-white' : 'text-slate-900'}`}>
-                🎯 Exact Size Targets & Official Exam Uploads
+              <h3 className={`text-sm font-black uppercase tracking-wider flex items-center gap-2 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+                <Target size={16} className="text-yellow-600 dark:text-yellow-400 shrink-0" />
+                <span>Exact Size Targets & Official Exam Uploads</span>
               </h3>
               <Link to="/no-upload-pdf-tools/" className="text-xs font-bold text-yellow-700 dark:text-yellow-400 hover:underline">
                 View All No-Upload Tools &rarr;

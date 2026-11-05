@@ -5,6 +5,7 @@ interface PDFThumbnailProps {
   file: File;
   className?: string;
   alt?: string;
+  pageNumber?: number;
   onPageCount?: (pages: number) => void;
 }
 
@@ -15,7 +16,7 @@ const pageCountCache = new Map<string, number>();
 // Worker URL set once at module level — not on every render
 let _workerSet = false;
 
-const PDFThumbnail: React.FC<PDFThumbnailProps> = ({ file, className = '', alt = 'PDF Preview', onPageCount }) => {
+const PDFThumbnail: React.FC<PDFThumbnailProps> = ({ file, className = '', alt = 'PDF Preview', pageNumber = 1, onPageCount }) => {
   const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -89,7 +90,8 @@ const PDFThumbnail: React.FC<PDFThumbnailProps> = ({ file, className = '', alt =
           pageCountCache.set(cacheKey, numPages);
           if (onPageCount) onPageCount(numPages);
 
-          const page = await pdf.getPage(1);
+          const targetPageNum = Math.min(Math.max(1, pageNumber), numPages);
+          const page = await pdf.getPage(targetPageNum);
           if (!active) { pdf.destroy(); return; }
 
           const viewport = page.getViewport({ scale: 1.5 });
@@ -133,7 +135,7 @@ const PDFThumbnail: React.FC<PDFThumbnailProps> = ({ file, className = '', alt =
       active = false;
       isMounted.current = false;
     };
-  }, [file]);
+  }, [file, pageNumber]);
 
   if (loading) {
     return (

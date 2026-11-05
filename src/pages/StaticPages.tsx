@@ -2,9 +2,11 @@ import React, { useState, useEffect, useRef } from 'react';
 import { 
   ShieldCheck, Lock, Globe, Mail, Headphones, Clock, Send, 
   CheckCircle2, Zap, FileText, User, Award, Cpu, Server, 
-  Check, ArrowRight, ExternalLink, AlertCircle, Sparkles, Eye, Key, Cookie
+  Check, ArrowRight, ExternalLink, AlertCircle, Sparkles, Eye, Key, Cookie,
+  HelpCircle, Wrench, Briefcase, ZapOff
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 
 const PageLayout: React.FC<{ 
   title: string; 
@@ -17,6 +19,10 @@ const PageLayout: React.FC<{
   maxWidth?: string;
 }> = ({ title, subtitle, lastUpdated, badge, badgeIcon, children, darkMode, maxWidth = 'max-w-5xl' }) => (
   <div className="animate-fadeIn py-12 sm:py-20">
+    <Helmet>
+      <title>{`${title} | PDFBolt`}</title>
+      {subtitle && <meta name="description" content={subtitle} />}
+    </Helmet>
     {/* Hero Header */}
     <div className={`border-b ${darkMode ? 'border-slate-800 bg-slate-950/60' : 'border-slate-100 bg-slate-50/80'} py-12 sm:py-16 mb-12`}>
       <div className={`${maxWidth} mx-auto px-4 sm:px-6`}>
@@ -68,12 +74,12 @@ export const ContactPage: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
     setTimeout(() => setCopied(false), 2500);
   };
 
-  const topics = [
-    { label: 'General Support', icon: '❓' },
-    { label: 'Bug Report', icon: '🛠️' },
-    { label: 'Feature Request', icon: '💡' },
-    { label: 'Privacy & Security', icon: '🔒' },
-    { label: 'Business Inquiry', icon: '💼' }
+  const topics: { label: string; icon: React.ReactNode }[] = [
+    { label: 'General Support', icon: <HelpCircle size={14} className="shrink-0" /> },
+    { label: 'Bug Report', icon: <Wrench size={14} className="shrink-0" /> },
+    { label: 'Feature Request', icon: <Sparkles size={14} className="shrink-0" /> },
+    { label: 'Privacy & Security', icon: <ShieldCheck size={14} className="shrink-0" /> },
+    { label: 'Business Inquiry', icon: <Briefcase size={14} className="shrink-0" /> }
   ];
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -149,6 +155,10 @@ ${message}`)}`;
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 py-16 sm:py-24 animate-fadeIn">
+      <Helmet>
+        <title>Contact Us & Support Desk | PDFBolt</title>
+        <meta name="description" content="Get in touch with the PDFBolt team for general inquiries, bug reports, feature requests, or privacy questions." />
+      </Helmet>
       <div className="grid lg:grid-cols-12 gap-12 lg:gap-16 items-start">
         {/* Left Column: Direct Info & Quick Copy */}
         <div className="lg:col-span-5 space-y-6">
@@ -1122,7 +1132,7 @@ export const OfflineModePage: React.FC<{ darkMode: boolean }> = ({ darkMode }) =
                   ? 'bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-500/30' 
                   : 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30'
               }`}>
-                {isOffline ? '⚡ Currently Offline' : '🌐 Online & Ready'}
+                {isOffline ? <span className="inline-flex items-center gap-1.5"><ZapOff size={13} className="text-amber-500 shrink-0" /> Currently Offline</span> : <span className="inline-flex items-center gap-1.5"><Globe size={13} className="text-emerald-500 shrink-0" /> Online & Ready</span>}
               </span>
             </div>
           </div>

@@ -10,7 +10,7 @@ import { ocrPdf, ocrPdfToSearchablePdf } from '../services/ocrService';
 import { pptToPdf, pdfToPpt } from '../services/pptService';
 import { redactPdf, repairPdf } from '../services/sanitizeService';
 import { comparePdfDocuments } from '../services/compareService';
-import { FileText, Download, CheckCircle2, Settings2, Eye, EyeOff, X, Image as ImageIcon, Lock, Zap, ArrowRight, Trash2, Plus, Copy, Check, AlertCircle, Target, ShieldCheck } from 'lucide-react';
+import { FileText, Download, CheckCircle2, Settings2, Eye, EyeOff, X, Image as ImageIcon, Lock, Zap, ArrowRight, Trash2, Plus, Copy, Check, AlertCircle, Target, ShieldCheck, AlertTriangle } from 'lucide-react';
 import { NotifySystem } from '../types';
 
 import ProgressBar from '../components/ProgressBar';
@@ -97,6 +97,51 @@ export interface SimpleToolProps {
   initialCompressionLevel?: string;
   targetSizeHint?: string;
 }
+
+// Page range selection utilities for visual page grid
+const parseSelectionToSet = (rangeStr: string, total: number): Set<number> => {
+  const set = new Set<number>();
+  if (!rangeStr.trim()) return set;
+  const parts = rangeStr.split(/[\s,]+/);
+  for (const part of parts) {
+    if (!part) continue;
+    if (part.includes('-')) {
+      const [startStr, endStr] = part.split('-');
+      const start = parseInt(startStr, 10);
+      const end = parseInt(endStr, 10);
+      if (!isNaN(start) && !isNaN(end)) {
+        const from = Math.max(1, Math.min(start, end));
+        const to = Math.min(total, Math.max(start, end));
+        for (let i = from; i <= to; i++) set.add(i);
+      }
+    } else {
+      const p = parseInt(part, 10);
+      if (!isNaN(p) && p >= 1 && p <= total) set.add(p);
+    }
+  }
+  return set;
+};
+
+const formatSetToRange = (set: Set<number>): string => {
+  if (set.size === 0) return '';
+  const sorted = Array.from(set).sort((a, b) => a - b);
+  const ranges: string[] = [];
+  let start = sorted[0];
+  let prev = start;
+
+  for (let i = 1; i < sorted.length; i++) {
+    const cur = sorted[i];
+    if (cur === prev + 1) {
+      prev = cur;
+    } else {
+      ranges.push(start === prev ? `${start}` : `${start}-${prev}`);
+      start = cur;
+      prev = cur;
+    }
+  }
+  ranges.push(start === prev ? `${start}` : `${start}-${prev}`);
+  return ranges.join(', ');
+};
 
 const SimpleTool: React.FC<SimpleToolProps> = ({ title, mode, darkMode, notify, initialCompressionLevel, targetSizeHint }) => {
   const { setHasActiveWork } = useActiveWork();
@@ -196,6 +241,17 @@ const SimpleTool: React.FC<SimpleToolProps> = ({ title, mode, darkMode, notify, 
 
   const isImageTool = mode === 'jpg2pdf';
   const needsPassword = ['protect', 'unlock'].includes(mode);
+  const togglePageInSelection = (pageNum: number, total: number) => {
+    const currentSet = parseSelectionToSet(pageInput, total);
+    if (currentSet.has(pageNum)) {
+      currentSet.delete(pageNum);
+    } else {
+      currentSet.add(pageNum);
+    }
+    const newRange = formatSetToRange(currentSet);
+    setPageInput(newRange);
+    setInputError(null);
+  };
   const isSignTool = mode === 'sign';
   const needsPageInput = ['split', 'delete-pages', 'organize'].includes(mode);
   const resultMeta = RESULT_META[resultKind];
@@ -874,7 +930,7 @@ const SimpleTool: React.FC<SimpleToolProps> = ({ title, mode, darkMode, notify, 
             {/* RAM Advisory Notice in Workspace */}
             {ramWarning && (
               <div className="w-full max-w-4xl mx-auto mb-3 p-3 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800 text-amber-900 dark:text-amber-200 text-xs flex items-center justify-between gap-3 animate-slideDown">
-                <span className="font-medium">⚠️ {ramWarning}</span>
+                <span className="font-medium inline-flex items-center gap-1.5"><AlertTriangle size={15} className="text-amber-600 dark:text-amber-400 shrink-0" /> <span>{ramWarning}</span></span>
                 <button
                   type="button"
                   onClick={() => setRamWarning(null)}
@@ -892,14 +948,55 @@ const SimpleTool: React.FC<SimpleToolProps> = ({ title, mode, darkMode, notify, 
 
             {/* Canvas Center Stage */}
             <div className="flex-grow flex flex-col items-center justify-center my-auto py-4">
-              {/* Single Document Card */}
-              {file && !isImageTool && mode !== 'compare' && (
-                <div className="flex flex-col items-center">
-                  {/* Floating Pill Badge on top: Size & Page count */}
-                  <div className="mb-2 px-3 py-0.5 rounded-full bg-slate-500/80 text-white text-[10px] font-bold shadow-sm tracking-wide">
-                    {formatBytes(file.size)}{pageCount ? ` - ${pageCount} pages` : ''}
+              {/* Split PDF Multi-Page Interactive Grid */}
+              {file && mode === 'split' && pageCount && pageCount > 1 ? (
+                <div className="w-full max-w-5xl mx-auto flex flex-col items-center">
+                  {/* Document summary header */}
+                  <div className="w-full flex items-center justify-between mb-3 px-2">
+                    <p className="text-xs font-bold text-slate-700 dark:text-slate-300 truncate max-w-md">
+                      {file.name} <span className="text-slate-400 font-normal">({formatBytes(file.size)} • {pageCount} pages)</span>
+                    </p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 font-medium hidden sm:block">
+                      Click pages to toggle extraction
+                    </p>
                   </div>
 
+                  {/* Responsive Thumbnail Grid */}
+                  <div className="w-full grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 max-h-[min(56vh,500px)] overflow-y-auto p-2">
+                    {Array.from({ length: pageCount }, (_, idx) => {
+                      const pageNum = idx + 1;
+                      const selectedSet = parseSelectionToSet(pageInput, pageCount);
+                      const isSelected = selectedSet.has(pageNum);
+                      return (
+                        <div
+                          key={pageNum}
+                          onClick={() => togglePageInSelection(pageNum, pageCount)}
+                          className={`relative group cursor-pointer rounded-xl border-2 transition-all p-2 flex flex-col items-center ${
+                            isSelected
+                              ? 'border-[#e53935] bg-red-50/50 dark:bg-red-950/20 shadow-md ring-2 ring-red-400/30'
+                              : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-slate-400 shadow-sm'
+                          }`}
+                        >
+                          <div className="w-full aspect-[1/1.414] rounded-lg overflow-hidden bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-800 flex items-center justify-center">
+                            <PDFThumbnail file={file} pageNumber={pageNum} className="w-full h-full object-contain" alt={`Page ${pageNum}`} />
+                          </div>
+                          <div className="mt-2 flex items-center justify-between w-full px-1">
+                            <span className={`text-xs font-bold ${isSelected ? 'text-[#e53935] font-black' : 'text-slate-600 dark:text-slate-400'}`}>
+                              Page {pageNum}
+                            </span>
+                            <span className={`w-4 h-4 rounded flex items-center justify-center text-[10px] font-black ${
+                              isSelected ? 'bg-[#e53935] text-white' : 'border border-slate-300 dark:border-slate-600 text-transparent'
+                            }`}>
+                              ✓
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              ) : file && !isImageTool && mode !== 'compare' && (
+                <div className="flex flex-col items-center">
                   {/* Clean White A4 Paper Card (Adaptive & Ad-Safe) */}
                   <div className="relative group">
                     <div className="w-40 sm:w-48 md:w-52 bg-white dark:bg-slate-800 rounded-xl border border-slate-200/90 dark:border-slate-700 shadow-xl hover:shadow-2xl transition-all duration-200 p-2 flex flex-col items-center">
@@ -908,9 +1005,12 @@ const SimpleTool: React.FC<SimpleToolProps> = ({ title, mode, darkMode, notify, 
                         <PDFThumbnail file={file} className="w-full h-full object-contain" alt={file.name} onPageCount={setPageCount} />
                       </div>
 
-                      {/* File Name Label */}
-                      <p className="mt-1.5 text-xs font-semibold text-slate-700 dark:text-slate-200 truncate max-w-full text-center px-1" title={file.name}>
+                      {/* File Name Label & Metadata */}
+                      <p className="mt-2 text-xs font-semibold text-slate-700 dark:text-slate-200 truncate max-w-full text-center px-1" title={file.name}>
                         {file.name}
+                      </p>
+                      <p className="text-[10px] font-medium text-slate-500 dark:text-slate-400 text-center">
+                        {formatBytes(file.size)}{pageCount ? ` • ${pageCount} page${pageCount > 1 ? 's' : ''}` : ''}
                       </p>
                     </div>
 
@@ -1197,13 +1297,55 @@ const SimpleTool: React.FC<SimpleToolProps> = ({ title, mode, darkMode, notify, 
                       <span>{inputError}</span>
                     </div>
                   ) : (
-                    <p className="text-[11px] text-slate-400">
-                      {mode === 'split'
-                        ? 'Extract specific pages or page ranges into a new PDF (e.g. 1-3, 5).'
-                        : mode === 'delete-pages'
-                        ? 'Enter page numbers or ranges to delete (e.g. 2-4 or 1, 3).'
-                        : 'Enter new page order separated by commas (e.g. 3,1,2).'}
-                    </p>
+                    <div className="space-y-2">
+                      <p className="text-[11px] text-slate-400">
+                        {mode === 'split'
+                          ? 'Extract specific pages or page ranges into a new PDF (e.g. 1-3, 5).'
+                          : mode === 'delete-pages'
+                          ? 'Enter page numbers or ranges to delete (e.g. 2-4 or 1, 3).'
+                          : 'Enter new page order separated by commas (e.g. 3,1,2).'}
+                      </p>
+                      {mode === 'split' && pageCount && pageCount > 1 && (
+                        <div className="flex flex-wrap gap-1.5 pt-1">
+                          <button
+                            type="button"
+                            onClick={() => { setPageInput(`1-${pageCount}`); setInputError(null); }}
+                            className="px-2.5 py-1 text-[11px] font-bold rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:border-yellow-500"
+                          >
+                            All ({pageCount})
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const evens = Array.from({ length: pageCount }, (_, i) => i + 1).filter(n => n % 2 === 0);
+                              setPageInput(formatSetToRange(new Set(evens)));
+                              setInputError(null);
+                            }}
+                            className="px-2.5 py-1 text-[11px] font-bold rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:border-yellow-500"
+                          >
+                            Even Pages
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const odds = Array.from({ length: pageCount }, (_, i) => i + 1).filter(n => n % 2 !== 0);
+                              setPageInput(formatSetToRange(new Set(odds)));
+                              setInputError(null);
+                            }}
+                            className="px-2.5 py-1 text-[11px] font-bold rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:border-yellow-500"
+                          >
+                            Odd Pages
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => { setPageInput(''); setInputError(null); }}
+                            className="px-2.5 py-1 text-[11px] font-bold rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-500 hover:border-red-400"
+                          >
+                            Clear
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   )}
                 </div>
               )}

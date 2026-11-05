@@ -171,7 +171,7 @@ const MergeTool: React.FC<MergeToolProps> = ({ darkMode, notify, customHint, all
             {/* RAM Advisory Notice */}
             {ramWarning && (
               <div className="w-full max-w-4xl mx-auto mb-3 p-3 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800 text-amber-900 dark:text-amber-200 text-xs flex items-center justify-between gap-3 animate-slideDown">
-                <span className="font-medium">⚠️ {ramWarning}</span>
+                <span className="font-medium inline-flex items-center gap-1.5"><AlertTriangle size={15} className="text-amber-600 dark:text-amber-400 shrink-0" /> <span>{ramWarning}</span></span>
                 <button
                   type="button"
                   onClick={() => setRamWarning(null)}
@@ -200,10 +200,7 @@ const MergeTool: React.FC<MergeToolProps> = ({ darkMode, notify, customHint, all
               } gap-3 sm:gap-4 max-h-[min(52vh,460px)] overflow-y-auto p-2 w-full justify-items-center`}>
                 {files.map((f, i) => (
                   <div key={`${f.name}-${f.size}-${f.lastModified}-${i}`} className="flex flex-col items-center">
-                    {/* Top Pill Badge */}
-                    <div className="mb-1.5 px-2 py-0.5 rounded-full bg-slate-500/80 text-white text-[9px] font-bold shadow-sm">
-                      Part {i + 1}
-                    </div>
+
 
                     {/* White Paper A4 Sheet with Responsive Sizing */}
                     <div className={`relative group ${
@@ -299,7 +296,7 @@ const MergeTool: React.FC<MergeToolProps> = ({ darkMode, notify, customHint, all
               </div>
 
               <div className="p-4 rounded-xl bg-yellow-500/10 border border-yellow-500/30 text-xs font-bold text-yellow-800 dark:text-yellow-300">
-                📄 {files.length} document{files.length > 1 ? 's' : ''} queued for merge
+                {files.length} document{files.length > 1 ? 's' : ''} queued for merge
               </div>
 
               {/* Non-Intrusive Active Workspace Sponsored Slot */}

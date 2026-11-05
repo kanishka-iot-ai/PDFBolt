@@ -2,7 +2,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   Moon, Sun, FileText, Menu, X, ChevronDown,
-  ArrowRight, FileSearch, ShieldCheck, Calculator, Home, AlertTriangle, Heart
+  ArrowRight, FileSearch, ShieldCheck, Calculator, Home, AlertTriangle, Heart,
+  Wrench, BookOpen, Layers, GraduationCap, Briefcase
 } from 'lucide-react';
 import { TOOLS, getIcon } from '../constants';
 import { useActiveWork } from '../context/ActiveWorkContext';
@@ -323,9 +324,10 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
                 setIsOpen(false);
                 handleSafeNavigation(e, "/tools");
               }} 
-              className="block font-bold text-sm"
+              className="flex items-center gap-2.5 font-bold text-sm"
             >
-              🛠️ PDF Tools Hub
+              <Wrench size={16} className="text-yellow-600 dark:text-yellow-400 shrink-0" />
+              <span>PDF Tools Hub</span>
             </Link>
             <Link 
               to="/analyze-pdf/" 
@@ -333,9 +335,10 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
                 setIsOpen(false);
                 handleSafeNavigation(e, "/analyze-pdf");
               }} 
-              className="block font-bold text-sm"
+              className="flex items-center gap-2.5 font-bold text-sm"
             >
-              🔍 PDF Inspector
+              <FileSearch size={16} className="text-yellow-600 dark:text-yellow-400 shrink-0" />
+              <span>PDF Inspector</span>
             </Link>
             <Link 
               to="/guides/" 
@@ -343,9 +346,10 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
                 setIsOpen(false);
                 handleSafeNavigation(e, "/guides");
               }} 
-              className="block font-bold text-sm"
+              className="flex items-center gap-2.5 font-bold text-sm"
             >
-              📚 How-To Guides
+              <BookOpen size={16} className="text-yellow-600 dark:text-yellow-400 shrink-0" />
+              <span>How-To Guides</span>
             </Link>
             <Link 
               to="/encyclopedia/" 
@@ -353,9 +357,10 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
                 setIsOpen(false);
                 handleSafeNavigation(e, "/encyclopedia");
               }} 
-              className="block font-bold text-sm"
+              className="flex items-center gap-2.5 font-bold text-sm"
             >
-              🔬 Format Encyclopedia
+              <Layers size={16} className="text-yellow-600 dark:text-yellow-400 shrink-0" />
+              <span>Format Encyclopedia</span>
             </Link>
             <Link 
               to="/student-pdf-tools/" 
@@ -363,9 +368,10 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
                 setIsOpen(false);
                 handleSafeNavigation(e, "/student-pdf-tools");
               }} 
-              className="block font-bold text-sm"
+              className="flex items-center gap-2.5 font-bold text-sm"
             >
-              🎓 Student Workflow
+              <GraduationCap size={16} className="text-yellow-600 dark:text-yellow-400 shrink-0" />
+              <span>Student Workflow</span>
             </Link>
             <Link 
               to="/business-pdf-tools/" 
@@ -373,9 +379,10 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
                 setIsOpen(false);
                 handleSafeNavigation(e, "/business-pdf-tools");
               }} 
-              className="block font-bold text-sm"
+              className="flex items-center gap-2.5 font-bold text-sm"
             >
-              💼 Business Workflow
+              <Briefcase size={16} className="text-yellow-600 dark:text-yellow-400 shrink-0" />
+              <span>Business Workflow</span>
             </Link>
             <Link 
               to="/compare/online-pdf-tools/" 
@@ -383,9 +390,10 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
                 setIsOpen(false);
                 handleSafeNavigation(e, "/compare/online-pdf-tools");
               }} 
-              className="block font-bold text-sm"
+              className="flex items-center gap-2.5 font-bold text-sm"
             >
-              ⚖️ Privacy Comparison
+              <ShieldCheck size={16} className="text-emerald-500 shrink-0" />
+              <span>Privacy Comparison</span>
             </Link>
             <Link 
               to="/tools/pdf-size-calculator/" 
@@ -393,9 +401,10 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
                 setIsOpen(false);
                 handleSafeNavigation(e, "/tools/pdf-size-calculator");
               }} 
-              className="block font-bold text-sm"
+              className="flex items-center gap-2.5 font-bold text-sm"
             >
-              🧮 Size Calculator
+              <Calculator size={16} className="text-yellow-600 dark:text-yellow-400 shrink-0" />
+              <span>Size Calculator</span>
             </Link>
           </div>
         )}

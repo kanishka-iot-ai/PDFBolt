@@ -214,8 +214,9 @@ const FileUploader: React.FC<FileUploaderProps> = ({
           or drop {formatBadge} here
         </p>
 
-        <p className="mt-2 text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 max-w-sm text-center">
-          🔒 100% Private — Files are processed locally in your browser and never leave your device.
+        <p className="mt-2 text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 max-w-sm text-center inline-flex items-center justify-center gap-1.5">
+          <ShieldCheck size={14} className="text-emerald-500 shrink-0 inline" />
+          <span>100% Private — Files are processed locally in your browser and never leave your device.</span>
         </p>
       </div>
     </div>
