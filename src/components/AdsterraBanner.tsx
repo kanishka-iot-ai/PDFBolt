@@ -23,6 +23,10 @@ interface FormatDimensions {
   envKeyName: string;
 }
 
+const DEFAULT_728X90_KEY = '13354ccc8669e9f00c6b801f09f46212';
+const DEFAULT_300X250_KEY = 'b829e60459e206fdcb08b6bd0e342172';
+const DEFAULT_SCRIPT_BASE = 'https://bauval.org/22';
+
 const FORMAT_CONFIG: Record<Exclude<AdsterraFormat, 'responsive'>, FormatDimensions> = {
   '728x90': {
     width: 728,
@@ -57,6 +61,32 @@ const FORMAT_CONFIG: Record<Exclude<AdsterraFormat, 'responsive'>, FormatDimensi
 };
 
 /**
+ * Resolves the script URL for an Adsterra ad unit.
+ * Adapts to modern anti-adblock delivery endpoints (e.g. https://bauval.org/22/<key>)
+ * or legacy invoke.js endpoints.
+ */
+const resolveScriptUrl = (adKey: string, scriptDomain: string, isNative: boolean): string => {
+  if (isNative) {
+    if (scriptDomain.startsWith('http')) {
+      return scriptDomain.endsWith('.js')
+        ? scriptDomain
+        : `${scriptDomain.replace(/\/+$/, '')}/${adKey}/invoke.js`;
+    }
+    return `//${scriptDomain}/${adKey}/invoke.js`;
+  }
+
+  // Display banner format
+  if (scriptDomain.startsWith('http')) {
+    const clean = scriptDomain.replace(/\/+$/, '');
+    return `${clean}/${adKey}`;
+  }
+  if (scriptDomain.includes('/')) {
+    return `//${scriptDomain}/${adKey}/invoke.js`;
+  }
+  return `https://${scriptDomain}/22/${adKey}`;
+};
+
+/**
  * Single isolated Adsterra Iframe Unit
  * Renders Adsterra scripts inside an isolated srcDoc iframe
  * to avoid global namespace collision and prevent memory leaks in React SPAs.
@@ -70,6 +100,8 @@ const AdsterraIframeSlot: React.FC<{
   className?: string;
 }> = ({ width, height, adKey, scriptDomain, isNative = false, className = '' }) => {
   const iframeSrcDoc = useMemo(() => {
+    const scriptUrl = resolveScriptUrl(adKey, scriptDomain, isNative);
+
     if (isNative) {
       // Adsterra Native Banner script format
       return `<!DOCTYPE html>
@@ -89,13 +121,13 @@ const AdsterraIframeSlot: React.FC<{
     </style>
   </head>
   <body>
-    <script async="async" data-cfasync="false" src="//${scriptDomain}/${adKey}/invoke.js"><\/script>
+    <script async="async" data-cfasync="false" src="${scriptUrl}"><\/script>
     <div id="container-${adKey}"></div>
   </body>
 </html>`;
     }
 
-    // Standard Display Banner format
+    // Standard Display Banner format (Adsterra Bauval / AtOptions)
     return `<!DOCTYPE html>
 <html lang="en">
   <head>
@@ -124,7 +156,7 @@ const AdsterraIframeSlot: React.FC<{
         'params' : {}
       };
     <\/script>
-    <script type="text/javascript" src="//${scriptDomain}/${adKey}/invoke.js"><\/script>
+    <script src="${scriptUrl}"><\/script>
   </body>
 </html>`;
   }, [width, height, adKey, scriptDomain, isNative]);
@@ -162,12 +194,12 @@ const AdsterraIframeSlot: React.FC<{
 
 /**
  * Production-ready Adsterra Banner Ad Component:
+ * - Pre-configured with active Adsterra 728x90 and 300x250 ad keys.
  * - Supports Display Banners and Native Recommendation Banners.
  * - Pre-allocated container dimensions to strictly eliminate Cumulative Layout Shift (CLS).
  * - Sandboxed/isolated iframe preventing global namespace collisions in React 18/19 SPAs.
  * - Supports responsive auto-switching (728x90 desktop / 300x250 mobile).
  * - Subtle styling matching PDFBolt's design system with discreet "Sponsored" pill.
- * - Collapses gracefully in production when keys are missing.
  */
 export const AdsterraBanner: React.FC<AdsterraBannerProps> = ({
   format = 'responsive',
@@ -178,21 +210,26 @@ export const AdsterraBanner: React.FC<AdsterraBannerProps> = ({
 }) => {
   const isEnabled = import.meta.env.VITE_ADSTERRA_ENABLED !== 'false';
   const scriptDomain =
-    import.meta.env.VITE_ADSTERRA_SCRIPT_DOMAIN || 'www.highperformanceformat.com';
+    import.meta.env.VITE_ADSTERRA_SCRIPT_DOMAIN || DEFAULT_SCRIPT_BASE;
 
   const desktopKey =
     customKey ||
     import.meta.env.VITE_ADSTERRA_728X90_KEY ||
-    (format === '728x90' ? import.meta.env.VITE_ADSTERRA_BANNER_KEY : '');
+    (format === '728x90' ? import.meta.env.VITE_ADSTERRA_BANNER_KEY : '') ||
+    (format === 'responsive' || format === '728x90' ? DEFAULT_728X90_KEY : '');
+
   const mobileKey =
     customKey ||
     import.meta.env.VITE_ADSTERRA_300X250_KEY ||
-    (format === '300x250' ? import.meta.env.VITE_ADSTERRA_BANNER_KEY : '');
+    (format === '300x250' ? import.meta.env.VITE_ADSTERRA_BANNER_KEY : '') ||
+    (format === 'responsive' || format === '300x250' ? DEFAULT_300X250_KEY : '');
 
   // Resolve single format key if non-responsive
   const singleKey = useMemo(() => {
     if (customKey) return customKey;
     if (format === 'responsive') return '';
+    if (format === '728x90') return (import.meta.env.VITE_ADSTERRA_728X90_KEY as string) || DEFAULT_728X90_KEY;
+    if (format === '300x250') return (import.meta.env.VITE_ADSTERRA_300X250_KEY as string) || DEFAULT_300X250_KEY;
     const cfg = FORMAT_CONFIG[format];
     return (import.meta.env[cfg.envKeyName] as string) || '';
   }, [format, customKey]);
@@ -221,14 +258,6 @@ export const AdsterraBanner: React.FC<AdsterraBannerProps> = ({
             <span>
               Key not detected for format{' '}
               <strong className="text-amber-600 dark:text-amber-300">{format}</strong>.
-            </span>
-            <span className="text-[10px] text-slate-500 mt-1">
-              {format === 'native' ? (
-                <>Add <code className="bg-slate-200 dark:bg-slate-800 px-1 py-0.5 rounded">VITE_ADSTERRA_NATIVE_KEY</code> in <code className="font-mono">.env</code> to activate.</>
-              ) : (
-                <>Add <code className="bg-slate-200 dark:bg-slate-800 px-1 py-0.5 rounded">VITE_ADSTERRA_728X90_KEY</code> or{' '}
-                <code className="bg-slate-200 dark:bg-slate-800 px-1 py-0.5 rounded">VITE_ADSTERRA_300X250_KEY</code> in <code className="font-mono">.env</code> to activate.</>
-              )}
             </span>
           </div>
         </aside>
