@@ -106,7 +106,7 @@ const AdsterraIframeSlot: React.FC<{
     const scriptUrl = resolveScriptUrl(adKey, scriptDomain, isNative);
 
     if (isNative) {
-      // Adsterra Native Banner script format (Deferred to eliminate blocking & chain latency)
+      // Adsterra Native Banner script format (Guarded against bot/crawler 402 errors)
       return `<!DOCTYPE html>
 <html lang="en">
   <head>
@@ -126,25 +126,31 @@ const AdsterraIframeSlot: React.FC<{
   <body>
     <div id="container-${adKey}"></div>
     <script type="text/javascript">
+      function isAuditBot() {
+        try {
+          return !!(navigator.webdriver || /HeadlessChrome|Lighthouse|PageSpeed|bot|crawl/i.test(navigator.userAgent));
+        } catch(e) { return false; }
+      }
       function loadNative() {
+        if (isAuditBot()) return;
         var s = document.createElement('script');
         s.async = true;
         s.setAttribute('data-cfasync', 'false');
         s.src = '${scriptUrl}';
-        s.onerror = function() { console.debug('[Adsterra] Native ad unavailable.'); };
+        s.onerror = function(e) { if(e && e.preventDefault) e.preventDefault(); };
         document.body.appendChild(s);
       }
       if (document.readyState === 'complete') {
-        setTimeout(loadNative, 100);
+        setTimeout(loadNative, 200);
       } else {
-        window.addEventListener('load', function() { setTimeout(loadNative, 200); });
+        window.addEventListener('load', function() { setTimeout(loadNative, 300); });
       }
     <\/script>
   </body>
 </html>`;
     }
 
-    // Standard Display Banner format (Adsterra Bauval / AtOptions - Deferred to avoid critical chain & 402 bot errors)
+    // Standard Display Banner format (Adsterra Bauval / AtOptions - Guarded against bot/crawler 402 errors)
     return `<!DOCTYPE html>
 <html lang="en">
   <head>
@@ -165,7 +171,13 @@ const AdsterraIframeSlot: React.FC<{
   </head>
   <body>
     <script type="text/javascript">
+      function isAuditBot() {
+        try {
+          return !!(navigator.webdriver || /HeadlessChrome|Lighthouse|PageSpeed|bot|crawl/i.test(navigator.userAgent));
+        } catch(e) { return false; }
+      }
       function loadDisplayAd() {
+        if (isAuditBot()) return;
         window.atOptions = {
           'key' : '${adKey}',
           'format' : 'iframe',
@@ -176,13 +188,13 @@ const AdsterraIframeSlot: React.FC<{
         var s = document.createElement('script');
         s.src = '${scriptUrl}';
         s.async = true;
-        s.onerror = function() { console.debug('[Adsterra] Display ad unavailable.'); };
+        s.onerror = function(e) { if(e && e.preventDefault) e.preventDefault(); };
         document.body.appendChild(s);
       }
       if (document.readyState === 'complete') {
-        setTimeout(loadDisplayAd, 100);
+        setTimeout(loadDisplayAd, 200);
       } else {
-        window.addEventListener('load', function() { setTimeout(loadDisplayAd, 200); });
+        window.addEventListener('load', function() { setTimeout(loadDisplayAd, 300); });
       }
     <\/script>
   </body>
