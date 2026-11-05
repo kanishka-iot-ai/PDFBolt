@@ -68,7 +68,7 @@ CANONICAL_TOOLS = [
             {
                 "heading": "Flexible Page Range Extraction",
                 "paragraphs": [
-                    "Whether you need a single chapter from an academic textbook or specific invoices from a monthly accounting bundle, PDFBolt allows you to extract single pages or discontinuous ranges seamlessly."
+                    "Whether you need a single chapter from an academic textbook or specific invoices from a monthly accounting bundle, PDFBolt allows you to extract single pages or discontinuous ranges directly in your browser."
                 ]
             }
         ],
@@ -1375,7 +1375,7 @@ CANONICAL_ENCYCLOPEDIA = [
             {
                 "heading": "The Dual-Layer Searchable Architecture",
                 "paragraphs": [
-                    "A dual-layer PDF displays the original high-resolution scan to the user while placing an invisible, selectable text layer directly over the corresponding words, allowing seamless copying and Ctrl+F searching."
+                    "A dual-layer PDF displays the original high-resolution scan to the user while placing an invisible, selectable text layer directly over the corresponding words, enabling direct copying and Ctrl+F text search."
                 ]
             }
         ],
@@ -2527,7 +2527,7 @@ def generate_prerendered_pages():
           Traditional online PDF conversion portals force users to transmit confidential business records, sensitive tax filings, medical reports, and legal agreements to third-party cloud servers. This exposes your documents to cloud storage vulnerabilities, data breach risks, third-party inspection, and ISP network eavesdropping.
         </p>
         <p style="font-size: 1rem; color: #334155; line-height: 1.7; margin-bottom: 16px;">
-          PDFBolt pioneers a privacy-first paradigm. By compiling industry-standard document engines (including pdf-lib, PDF.js, and Tesseract OCR) into optimized WebAssembly and JavaScript binaries, your browser itself becomes the processing supercomputer.
+          By running open-source document engines (including pdf-lib, PDF.js, and Tesseract OCR) directly in WebAssembly, your browser processes files locally without sending data to external servers.
         </p>
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-top: 24px;">
           <div style="border-left: 3px solid #b45309; padding-left: 14px;">

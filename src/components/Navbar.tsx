@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
-  Moon, Sun, FileText, Menu, X, Volume2, VolumeX, ChevronDown,
+  Moon, Sun, FileText, Menu, X, ChevronDown,
   ArrowRight, FileSearch, ShieldCheck, Calculator, Home, AlertTriangle, Heart
 } from 'lucide-react';
 import { TOOLS, getIcon } from '../constants';
@@ -10,8 +10,8 @@ import { useActiveWork } from '../context/ActiveWorkContext';
 interface NavbarProps {
   darkMode: boolean;
   toggleDarkMode: () => void;
-  soundEnabled: boolean;
-  toggleSound: () => void;
+  soundEnabled?: boolean;
+  toggleSound?: () => void;
 }
 
 const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled, toggleSound }) => {
@@ -265,14 +265,6 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
             <div className="flex items-center gap-1.5">
               <button 
                 type="button"
-                onClick={toggleSound} 
-                aria-label={soundEnabled ? "Mute audio effects" : "Enable audio effects"}
-                className={`p-2 rounded-full transition-colors ${darkMode ? 'hover:bg-slate-800 text-slate-300' : 'hover:bg-slate-100 text-slate-700'}`}
-              >
-                {soundEnabled ? <Volume2 size={18} /> : <VolumeX size={18} />}
-              </button>
-              <button 
-                type="button"
                 onClick={toggleDarkMode} 
                 aria-label={darkMode ? "Switch to light mode" : "Switch to dark mode"}
                 className={`p-2 rounded-full transition-colors ${darkMode ? 'bg-slate-800 text-yellow-400' : 'bg-slate-100 text-slate-700'}`}
@@ -405,20 +397,6 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
             >
               🧮 Size Calculator
             </Link>
-
-            {/* Mobile Actions: Sound Toggle */}
-            <div className="pt-4 border-t border-slate-200 dark:border-slate-800 flex flex-col gap-3">
-              <button
-                type="button"
-                onClick={toggleSound}
-                className={`w-full flex items-center justify-center gap-2 text-xs font-bold px-4 py-3 rounded-xl border ${
-                  darkMode ? 'bg-slate-800 border-slate-700 text-slate-300' : 'bg-slate-100 border-slate-200 text-slate-700'
-                }`}
-              >
-                {soundEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
-                <span>{soundEnabled ? 'Sound Enabled' : 'Sound Muted'}</span>
-              </button>
-            </div>
           </div>
         )}
       </nav>

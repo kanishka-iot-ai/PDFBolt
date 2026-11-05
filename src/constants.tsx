@@ -432,7 +432,7 @@ export const TOOLS: ToolMetadata[] = [
     icon: 'Unlock',
     category: 'security',
     quickAnswer: 'To unlock a PDF: Upload your encrypted file, provide the authorized password (or use Turbo recovery for lost simple PINs), and download a permanently unlocked PDF copy.',
-    longDescription: 'Strip passwords and permission restrictions from PDFs you own. Decrypt files to allow seamless printing, copying, and editing without entering passwords every time you open them.',
+    longDescription: 'Strip passwords and permission restrictions from PDFs you own. Decrypt files to allow printing, copying, and editing without entering passwords every time you open them.',
     features: ['Instant password removal', 'High-speed multi-threaded worker recovery', 'Remove copy/print restrictions', 'Zero server access'],
     howToSteps: [
       { name: 'Upload Encrypted PDF', text: 'Choose the locked PDF file.' },
@@ -440,7 +440,7 @@ export const TOOLS: ToolMetadata[] = [
       { name: 'Download Unlocked PDF', text: 'Save the unrestricted, password-free PDF.' }
     ],
     useCases: [
-      { title: 'Remove Personal Passwords', description: 'Strip recurring passwords from bank statements and tax filings you own for seamless archiving.' },
+      { title: 'Remove Personal Passwords', description: 'Strip recurring passwords from bank statements and tax filings you own for easy archiving.' },
       { title: 'Enable Printing & Copying', description: 'Remove restrictive permission locks from documents you are authorized to edit.' }
     ],
     faqs: [
@@ -643,7 +643,7 @@ export const TOOLS: ToolMetadata[] = [
     quickAnswer: 'To organize PDF pages: Upload your document, drag thumbnail tiles to reorder pages, rotate or delete unwanted pages, and download your newly arranged PDF.',
     longDescription: 'The ultimate visual workspace for PDF page manipulation. View all pages as interactive grid thumbnails. Rearrange sections, delete blanks, duplicate key pages, and re-sequence documents.',
     useCases: [
-      { title: 'Proposal Assembly', description: 'Re-sequence cover pages, executive summaries, pricing sections, and appendices seamlessly.' },
+      { title: 'Proposal Assembly', description: 'Re-sequence cover pages, executive summaries, pricing sections, and appendices.' },
       { title: 'Audit Preparation', description: 'Arrange invoices and supporting receipts in exact chronological order.' }
     ],
     faqs: [

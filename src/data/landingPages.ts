@@ -667,7 +667,7 @@ export const EXAM_COMPRESSION_PAGES: LandingPageContent[] = [
       },
     ],
     faqs: [
-      { q: 'What happens if my JEE Main certificate is 310KB or 40KB?', a: 'The NTA portal will reject the upload with an error: \'File size must be between 50 KB and 300 KB\'. Use PDFBolt\'s Exact Target Size mode and enter 200 KB to ensure seamless acceptance.' },
+      { q: 'What happens if my JEE Main certificate is 310KB or 40KB?', a: 'The NTA portal will reject the upload with an error: \'File size must be between 50 KB and 300 KB\'. Use PDFBolt\'s Exact Target Size mode and enter 200 KB to ensure immediate acceptance.' },
       { q: 'What are the exact document specifications for JEE Main 2026–2027?', a: 'Per official NTA guidelines: Class 10 and category certificates must be PDF format between 50KB and 300KB. Photographs must be 10KB to 200KB (JPEG), and signatures must be 4KB to 30KB (JPEG).' },
       { q: 'Can I compress my category certificate on a mobile phone?', a: 'Yes! PDFBolt runs locally inside Google Chrome or Safari on Android and iPhone with zero app downloads.' },
       { q: 'Does NTA accept black-and-white scanned certificates for JEE?', a: 'Yes. Black-and-white (grayscale) scans are fully accepted provided all text, marks, roll numbers, and official signatures are sharp and legible.' },
@@ -731,7 +731,7 @@ export const EXAM_COMPRESSION_PAGES: LandingPageContent[] = [
     faqs: [
       { q: 'What are the exact document file size requirements for IBPS PO, Clerk, and SO?', a: 'Per official ibps.in guidelines: Educational marksheets and category certificates must be in PDF format between 100KB and 200KB. Hand-written declarations must be 50KB to 100KB (JPEG). Left thumb impressions must be 20KB to 50KB (JPEG). Photographs must be 20KB to 50KB, and signatures must be 10KB to 20KB.' },
       { q: 'Why does the IBPS portal say \'File size exceeds prescribed limit\'?', a: 'This happens when your scanned marksheet exceeds 200KB or declaration exceeds 100KB. Enter 150 KB (for marksheets) or 80 KB (for declarations) in PDFBolt\'s Target Size input to fix it instantly.' },
-      { q: 'Can I convert and compress my mobile camera photo of my marksheet?', a: 'Yes! PDFBolt can convert JPG photo scans into a clean PDF and compress it to under 200KB in one seamless step.' },
+      { q: 'Can I convert and compress my mobile camera photo of my marksheet?', a: 'Yes! PDFBolt can convert JPG photo scans into a clean PDF and compress it to under 200KB in a single step.' },
       { q: 'Does IBPS accept black-and-white scanned certificates?', a: 'Yes. Black-and-white (grayscale) scans are fully acceptable provided text, dates, roll numbers, and official stamps are sharp and legible.' },
       { q: 'Are my educational marksheets uploaded to any server?', a: 'No. All processing happens entirely inside your browser memory using WebAssembly. Zero files are stored or uploaded.' },
     ],
@@ -794,7 +794,7 @@ export const EXAM_COMPRESSION_PAGES: LandingPageContent[] = [
       { q: 'What are the exact document file size limits for RRB NTPC, ALP, and Group D?', a: 'Per official rrbapply.gov.in guidelines: SC/ST community certificates for free travel passes must be 50KB to 100KB in PDF. Educational qualification marksheets and category certificates must be 100KB to 200KB in PDF. Photos and signatures must be 30KB to 70KB in JPEG.' },
       { q: 'How do I compress my SC/ST certificate under 100KB for the free sleeper pass?', a: 'Select \'Exact Target Size\' and type 85 KB. This places your document right in the middle of RRB\'s 50KB–100KB bracket. If the scan is in color, enable \'Convert to Black & White\' for crisp text and smaller size.' },
       { q: 'What should I do if the RRB portal says \'File size must be between 100KB and 200KB\'?', a: 'This error occurs when uploading educational certificates. Simply enter 150 KB in PDFBolt\'s Target Size input to ensure the output lands securely inside the required range.' },
-      { q: 'Can I compress multi-page trade apprenticeship or engineering diploma marksheets?', a: 'Yes. PDFBolt handles multi-page documents seamlessly, downsampling background scanner noise while keeping marks, grades, and roll numbers crisp and verifiable.' },
+      { q: 'Can I compress multi-page trade apprenticeship or engineering diploma marksheets?', a: 'Yes. PDFBolt handles multi-page documents directly in your browser, downsampling background scanner noise while keeping marks, grades, and roll numbers crisp and verifiable.' },
       { q: 'Does PDFBolt store my railway recruitment documents on any server?', a: 'No. PDFBolt operates 100% inside your browser RAM using WebAssembly. Your documents are never uploaded to any remote server or stored in any database.' },
     ],
     relatedSlugs: ['compress-pdf-for-ssc', 'compress-pdf-for-ibps', 'compress-pdf-to-100kb', 'compress-pdf-to-200kb']
@@ -855,7 +855,7 @@ export const EXAM_COMPRESSION_PAGES: LandingPageContent[] = [
       { q: 'Why do government portals reject files that are both too large and too small?', a: 'Portals enforce an upper limit (e.g., 200KB or 300KB) to prevent server overload, and a lower limit (e.g., 20KB or 50KB) to ensure the scan is clear enough for human verification. PDFBolt targets the exact middle of the acceptable window.' },
       { q: 'How do I compress a 5MB scanned certificate down to under 200KB?', a: 'Choose \'Exact Target Size\' and enter 180 KB. If your document was scanned in color, toggle \'Convert to Black & White\' to strip background scanner noise and achieve an immediate 70% to 80% reduction.' },
       { q: 'Can I compress multi-page court affidavits and annexures for e-filing?', a: 'Yes! PDFBolt supports multi-page legal documents and briefs, compressing high-resolution page scans while keeping legal typography, seals, and judge signatures crisp.' },
-      { q: 'Does PDFBolt work on mobile phones without installing any app?', a: 'Yes. PDFBolt works seamlessly in mobile browsers (Chrome, Safari, Firefox) on Android and iPhone with zero software installation.' },
+      { q: 'Does PDFBolt work on mobile phones without installing any app?', a: 'Yes. PDFBolt runs directly in mobile browsers (Chrome, Safari, Firefox) on Android and iPhone with zero software installation.' },
       { q: 'Are my sensitive identity documents safe when using PDFBolt?', a: '100% safe. Processing takes place locally in your device RAM via WebAssembly. Your documents are never uploaded to any server.' },
     ],
     relatedSlugs: ['compress-pdf-for-ssc', 'compress-pdf-for-upsc', 'compress-pdf-to-100kb', 'compress-pdf-to-200kb']
@@ -887,7 +887,7 @@ export const WORKFLOW_PAGES: LandingPageContent[] = [
     quickAnswer: 'To merge Aadhaar and PAN card into one PDF: 1. Upload your Aadhaar (front & back) and PAN card (as photos or PDFs). 2. Drag cards to arrange the page sequence. 3. Click \'Merge PDF\' to instantly generate and download your combined, KYC-ready document with zero server upload.',
     keyHighlights: [
       'Combines Aadhaar front, Aadhaar back, and PAN card into a single organized PDF document',
-      'Accepts mobile phone photos (JPG, PNG, WebP) and official PDF scans seamlessly',
+      'Accepts mobile phone photos (JPG, PNG, WebP) and official PDF scans',
       'Auto-calibrates layout to standard A4 pages with zero quality loss',
       '100% client-side WebAssembly execution: sensitive biometric and ID numbers never leave your device',
     ],
@@ -901,7 +901,7 @@ export const WORKFLOW_PAGES: LandingPageContent[] = [
         heading: 'Why Banks, NBFCs, and Government Portals Require a Single Combined PDF',
         paragraphs: [
           'When completing Video KYC for bank accounts (SBI, HDFC, ICICI, Kotak), opening Demat trading accounts (Zerodha, Groww, AngelOne), or submitting passport supporting documents, upload interfaces typically provide only a single file upload slot labeled \'Proof of Identity (POI) & Proof of Address (POA)\'.',
-          'Uploading separate image files is rejected by the automated validator. Merging your Aadhaar card and PAN card into a single well-structured PDF ensures all required identity details are submitted in one seamless transaction.',
+          'Uploading separate image files is rejected by the automated validator. Merging your Aadhaar card and PAN card into a single well-structured PDF ensures all required identity details are submitted in a single submission.',
         ]
       },
       {
@@ -1087,7 +1087,7 @@ export const WORKFLOW_PAGES: LandingPageContent[] = [
       { q: 'What should I do if my e-Aadhaar PDF is password protected?', a: 'e-Aadhaar PDFs have a password (first 4 letters of your name in capital letters + year of birth). Unlock it first using PDFBolt\'s Unlock PDF tool in your browser, then convert the unlocked file to JPG here.' },
       { q: 'Will the UIDAI biometric QR code remain readable after converting to JPG?', a: 'Yes! PDFBolt renders the PDF at high resolution (300 DPI), ensuring that QR codes, candidate photographs, and UIDAI seals remain sharp and machine-scannable.' },
       { q: 'How can I ensure the output JPG is under 100KB for government scholarship portals?', a: 'PDFBolt optimizes JPEG compression curves automatically to produce lightweight files typically between 50KB and 150KB that easily pass portal size gates.' },
-      { q: 'Can I convert e-Aadhaar on an Android phone or iPhone?', a: 'Yes! PDFBolt works seamlessly in Google Chrome or Apple Safari on mobile devices with zero app installations.' },
+      { q: 'Can I convert e-Aadhaar on an Android phone or iPhone?', a: 'Yes! PDFBolt runs directly in Google Chrome or Apple Safari on mobile devices with zero app installations.' },
       { q: 'Are my 12-digit Aadhaar number or address sent to any server?', a: 'Never. All rasterization and conversion happens 100% inside your browser memory using client-side WebAssembly. Zero bytes leave your device.' },
     ],
     relatedSlugs: ['merge-aadhaar-and-pan-card', 'compress-pdf-for-ssc', 'jpg-to-pdf-for-exam', 'unlock-pdf']

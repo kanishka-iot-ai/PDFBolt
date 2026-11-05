@@ -131,9 +131,6 @@ const ToolCard: React.FC<ToolCardProps> = ({ tool, darkMode, compact = false }) 
             Open tool
             <ArrowRight size={13} className="transition-transform duration-150 group-hover:translate-x-1" />
           </span>
-          <span className="text-[10px] uppercase font-semibold text-slate-500 tracking-wider hidden sm:inline">
-            Free
-          </span>
         </div>
 
       </div>

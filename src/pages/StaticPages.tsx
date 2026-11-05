@@ -687,7 +687,7 @@ export const AboutPage: React.FC<{ darkMode: boolean }> = ({ darkMode }) => (
           Our Technology & Architecture
         </h2>
         <p className="text-sm sm:text-base">
-          We combine cutting-edge browser technologies with battle-tested open-source PDF parsing standards to achieve near-instant execution while maintaining absolute vector fidelity:
+          We combine modern browser WebAssembly standards with battle-tested open-source PDF parsing engines to achieve near-instant execution while maintaining absolute vector fidelity:
         </p>
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {[
@@ -1094,7 +1094,7 @@ export const OfflineModePage: React.FC<{ darkMode: boolean }> = ({ darkMode }) =
   return (
     <PageLayout
       title="Offline Mode & In-Browser Local Processing"
-      subtitle="PDFBolt is engineered with a client-side WebAssembly architecture that works seamlessly inside your browser with zero server uploads."
+      subtitle="PDFBolt is engineered with a client-side WebAssembly architecture that runs directly inside your browser with zero server uploads."
       lastUpdated="September 7, 2026"
       badge="Local WebAssembly Engine"
       badgeIcon={<Zap size={14} />}

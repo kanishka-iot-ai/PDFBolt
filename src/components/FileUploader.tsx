@@ -214,8 +214,8 @@ const FileUploader: React.FC<FileUploaderProps> = ({
           or drop {formatBadge} here
         </p>
 
-        <p className="mt-2 text-[11px] sm:text-xs text-slate-600 dark:text-slate-400 max-w-sm text-center">
-          ⚡ In-browser processing: Recommended &lt;80MB on mobile, &lt;250MB on desktop to preserve device RAM.
+        <p className="mt-2 text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 max-w-sm text-center">
+          🔒 100% Private — Files are processed locally in your browser and never leave your device.
         </p>
       </div>
     </div>
