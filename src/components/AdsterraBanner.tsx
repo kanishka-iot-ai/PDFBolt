@@ -25,6 +25,7 @@ interface FormatDimensions {
 
 const DEFAULT_728X90_KEY = '13354ccc8669e9f00c6b801f09f46212';
 const DEFAULT_300X250_KEY = 'b829e60459e206fdcb08b6bd0e342172';
+const DEFAULT_NATIVE_KEY = '26aab08ad2920bd1cefce60e5614fc1b';
 const DEFAULT_SCRIPT_BASE = 'https://bauval.org/22';
 
 const FORMAT_CONFIG: Record<Exclude<AdsterraFormat, 'responsive'>, FormatDimensions> = {
@@ -68,11 +69,13 @@ const FORMAT_CONFIG: Record<Exclude<AdsterraFormat, 'responsive'>, FormatDimensi
 const resolveScriptUrl = (adKey: string, scriptDomain: string, isNative: boolean): string => {
   if (isNative) {
     if (scriptDomain.startsWith('http')) {
-      return scriptDomain.endsWith('.js')
-        ? scriptDomain
-        : `${scriptDomain.replace(/\/+$/, '')}/${adKey}/invoke.js`;
+      const clean = scriptDomain.replace(/\/+$/, '');
+      if (clean.includes('/22')) {
+        return `${clean.replace('/22', '/21')}/${adKey}`;
+      }
+      return `${clean}/${adKey}`;
     }
-    return `//${scriptDomain}/${adKey}/invoke.js`;
+    return `https://bauval.org/21/${adKey}`;
   }
 
   // Display banner format
@@ -230,6 +233,7 @@ export const AdsterraBanner: React.FC<AdsterraBannerProps> = ({
     if (format === 'responsive') return '';
     if (format === '728x90') return (import.meta.env.VITE_ADSTERRA_728X90_KEY as string) || DEFAULT_728X90_KEY;
     if (format === '300x250') return (import.meta.env.VITE_ADSTERRA_300X250_KEY as string) || DEFAULT_300X250_KEY;
+    if (format === 'native') return (import.meta.env.VITE_ADSTERRA_NATIVE_KEY as string) || DEFAULT_NATIVE_KEY;
     const cfg = FORMAT_CONFIG[format];
     return (import.meta.env[cfg.envKeyName] as string) || '';
   }, [format, customKey]);

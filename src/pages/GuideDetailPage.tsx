@@ -244,7 +244,7 @@ const GuideDetailPage: React.FC<GuideDetailPageProps> = ({ darkMode }) => {
 
         {/* Non-Intrusive In-Content Sponsored Slot */}
         <AdSlot placement="GUIDE_IN_CONTENT" />
-        <AdsterraBanner format="responsive" className="my-8" />
+        <AdsterraBanner format="native" className="my-8" />
 
         {/* Author Bio & E-E-A-T Credibility Box */}
         <section className={`p-6 rounded-2xl border mb-12 flex flex-col sm:flex-row gap-5 items-start ${
