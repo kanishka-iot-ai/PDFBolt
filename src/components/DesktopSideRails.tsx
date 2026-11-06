@@ -23,7 +23,7 @@ export interface DesktopSideRailsProps {
  *
  * Proportional Architecture:
  * 1. Balanced Height: Fitted cleanly to the creative dimensions with zero empty white blocks.
- * 2. Responsive Breakpoint: Active on desktop screens >= 1200px (`min-[1200px]:flex`),
+ * 2. Responsive Breakpoint: Active on desktop screens >= 1200px (`lg:flex`),
  *    providing comfortable breathing space on 1280px, 1366px, 1440px, and 1920px displays.
  * 3. Graceful Mobile/Tablet Collapse: Auto-collapses cleanly on tablets and mobile (< 1200px)
  *    so the center content retains 100% full width with zero horizontal scrolling.
@@ -48,18 +48,18 @@ export const DesktopSideRails: React.FC<DesktopSideRailsProps> = ({
   }, []);
 
   return (
-    <div className={`w-full relative flex justify-center items-start ${hasActiveWork ? "px-0" : "px-2 sm:px-4 lg:px-6"} ${className}`}>
+    <div className={`w-full relative flex justify-center items-start ${hasActiveWork ? "px-0" : "px-1 sm:px-2 lg:px-4 xl:px-6"} ${className}`}>
       {/* 1. LEFT VERTICAL SPONSOR RAIL */}
       <aside
-        className={`${hasActiveWork ? "hidden" : "hidden min-[1200px]:flex"} flex-col items-center shrink-0 sticky top-[80px] z-20 transition-opacity duration-300 mr-3 xl:mr-5 2xl:mr-8 w-[160px] min-[1440px]:w-[300px]`}
+        className={`${hasActiveWork ? "hidden" : "hidden lg:flex"} flex-col items-center shrink-0 sticky top-[80px] z-20 transition-opacity duration-300 mr-2 xl:mr-4 2xl:mr-8 w-[130px] xl:w-[160px] 2xl:w-[300px]`}
         aria-label="Sponsored Advertisement (Left)"
       >
         <span className="text-[10px] font-bold tracking-widest uppercase text-slate-400 dark:text-slate-500 mb-1 select-none">
           Sponsored
         </span>
-        <div className="w-[160px] min-[1440px]:w-[300px] min-h-[140px] min-[1440px]:min-h-[254px] rounded-2xl overflow-hidden border border-slate-200/80 dark:border-slate-800 bg-white/60 dark:bg-slate-900/40 flex flex-col items-center justify-center shadow-xs">
+        <div className="w-[130px] xl:w-[160px] 2xl:w-[300px] min-h-[120px] xl:min-h-[140px] 2xl:min-h-[254px] rounded-2xl overflow-hidden border border-slate-200/80 dark:border-slate-800 bg-white/60 dark:bg-slate-900/40 flex flex-col items-center justify-center shadow-xs">
           <div className="w-full flex items-center justify-center overflow-hidden">
-            <div className={adsterraFormat === '300x250' ? 'scale-[0.533] min-[1440px]:scale-100 origin-center' : 'w-full'}>
+            <div className={adsterraFormat === '300x250' ? 'scale-[0.43] xl:scale-[0.533] 2xl:scale-100 origin-center' : 'w-full'}>
               <AdsterraBanner
                 format={adsterraFormat}
                 customKey={adsterraFormat === '300x250' ? 'b829e60459e206fdcb08b6bd0e342172' : undefined}
@@ -72,21 +72,21 @@ export const DesktopSideRails: React.FC<DesktopSideRailsProps> = ({
       </aside>
 
       {/* 2. CENTER CONTENT WORKBENCH (Tool Dropzone + Horizontal Ad) */}
-      <div className={`w-full ${hasActiveWork ? "max-w-full" : centerWidthClass} shrink-0 flex-grow transition-all`}>
+      <div className={`w-full flex-1 min-w-0 ${hasActiveWork ? "max-w-full" : centerWidthClass} shrink-0 flex-grow transition-all`}>
         {children}
       </div>
 
       {/* 3. RIGHT VERTICAL SPONSOR RAIL */}
       <aside
-        className={`${hasActiveWork ? "hidden" : "hidden min-[1200px]:flex"} flex-col items-center shrink-0 sticky top-[80px] z-20 transition-opacity duration-300 ml-3 xl:ml-5 2xl:ml-8 w-[160px] min-[1440px]:w-[300px]`}
+        className={`${hasActiveWork ? "hidden" : "hidden lg:flex"} flex-col items-center shrink-0 sticky top-[80px] z-20 transition-opacity duration-300 ml-3 xl:ml-5 2xl:ml-8 w-[130px] xl:w-[160px] 2xl:w-[300px]`}
         aria-label="Sponsored Advertisement (Right)"
       >
         <span className="text-[10px] font-bold tracking-widest uppercase text-slate-400 dark:text-slate-500 mb-1 select-none">
           Sponsored
         </span>
-        <div className="w-[160px] min-[1440px]:w-[300px] min-h-[140px] min-[1440px]:min-h-[254px] rounded-2xl overflow-hidden border border-slate-200/80 dark:border-slate-800 bg-white/60 dark:bg-slate-900/40 flex flex-col items-center justify-center shadow-xs">
+        <div className="w-[130px] xl:w-[160px] 2xl:w-[300px] min-h-[120px] xl:min-h-[140px] 2xl:min-h-[254px] rounded-2xl overflow-hidden border border-slate-200/80 dark:border-slate-800 bg-white/60 dark:bg-slate-900/40 flex flex-col items-center justify-center shadow-xs">
           <div className="w-full flex items-center justify-center overflow-hidden">
-            <div className={adsterraFormat === '300x250' ? 'scale-[0.533] min-[1440px]:scale-100 origin-center' : 'w-full'}>
+            <div className={adsterraFormat === '300x250' ? 'scale-[0.43] xl:scale-[0.533] 2xl:scale-100 origin-center' : 'w-full'}>
               <AdsterraBanner
                 format={adsterraFormat}
                 customKey={adsterraFormat === '300x250' ? 'b829e60459e206fdcb08b6bd0e342172' : undefined}

@@ -1188,7 +1188,8 @@ async function generateDocxDocument(
     ],
   });
 
-  return new Uint8Array(await Packer.toBuffer(doc));
+  const docxBlob = await Packer.toBlob(doc);
+  return new Uint8Array(await docxBlob.arrayBuffer());
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -1231,7 +1232,7 @@ function computeConversionQuality(pages: ProcessedPage[], allPageElements: DocEl
 export async function universalPdfToWord(file: File): Promise<ConversionResult> {
   const pdfjs = await getPdfjs();
   const fileBuffer = await file.arrayBuffer();
-  const pdf = await pdfjs.getDocument({ data: fileBuffer }).promise;
+  const pdf = await pdfjs.getDocument({ data: fileBuffer.slice(0) }).promise;
 
   const metadata = await extractMetadata(pdf);
   const pages = await extractAllPages(pdf);
@@ -1240,7 +1241,7 @@ export async function universalPdfToWord(file: File): Promise<ConversionResult> 
   // Run OCR on any scanned pages
   const scannedPages = pages.filter(p => p.type === 'scanned' || p.type === 'image-only');
   if (scannedPages.length > 0) {
-    const pdfForOcr = await pdfjs.getDocument({ data: fileBuffer }).promise;
+    const pdfForOcr = await pdfjs.getDocument({ data: fileBuffer.slice(0) }).promise;
     try {
       for (const scanned of scannedPages) {
         const pageIdx = pages.findIndex(p => p.num === scanned.num);

@@ -20,6 +20,8 @@ import AdSlot from '../components/AdSlot';
 import AdsterraBanner from '../components/AdsterraBanner';
 import { useActiveWork } from '../context/ActiveWorkContext';
 import PDFThumbnail from '../components/PDFThumbnail';
+import OutputPreviewModal from '../components/OutputPreviewModal';
+import FileSizeComparisonBadge from '../components/FileSizeComparisonBadge';
 
 const formatBytes = (bytes?: number) => {
   if (!bytes || bytes === 0) return '0 B';
@@ -231,6 +233,11 @@ const SimpleTool: React.FC<SimpleToolProps> = ({ title, mode, darkMode, notify, 
   const [ocrLanguage, setOcrLanguage] = useState<string>('eng');
   const [copiedOcrText, setCopiedOcrText] = useState(false);
   const [ramWarning, setRamWarning] = useState<string | null>(null);
+  const [showPreviewModal, setShowPreviewModal] = useState(false);
+  const [enableSimultaneousCompress, setEnableSimultaneousCompress] = useState(false);
+  const [simultaneousCompressLevel, setSimultaneousCompressLevel] = useState<'balanced' | 'high' | 'extreme'>('balanced');
+  const [originalSizeBytes, setOriginalSizeBytes] = useState<number>(0);
+  const [outputSizeBytes, setOutputSizeBytes] = useState<number>(0);
 
   useEffect(() => {
     // Anticipatory Warmup for Render backend when user opens office conversion tools
@@ -392,6 +399,8 @@ const SimpleTool: React.FC<SimpleToolProps> = ({ title, mode, darkMode, notify, 
       setRamWarning(null);
     }
 
+    const totalInBytes = f.reduce((sum, item) => sum + item.size, 0);
+    setOriginalSizeBytes(totalInBytes);
     if (isMultiSupported) {
       setMultiFiles(prev => [...prev, ...f].slice(0, mode === 'compare' ? 2 : 50));
       if (f.length > 0) setFile(f[0]);
@@ -826,7 +835,22 @@ const SimpleTool: React.FC<SimpleToolProps> = ({ title, mode, darkMode, notify, 
       } else {
         const meta = RESULT_META[outputKind];
         setProgress(85);
-        const blob = b instanceof Blob ? b : new Blob([b instanceof Uint8Array ? b : b] as BlobPart[], { type: meta.mime });
+        let blob = b instanceof Blob ? b : new Blob([b instanceof Uint8Array ? b : b] as BlobPart[], { type: meta.mime });
+
+        if (enableSimultaneousCompress && outputKind === 'pdf' && mode !== 'compress') {
+          try {
+            setStatusMessage("Applying simultaneous stream compression & optimization...");
+            const tempFile = new File([blob], 'output.pdf', { type: 'application/pdf' });
+            const compRes = await compressPdfAdvanced(tempFile, {
+              profile: simultaneousCompressLevel === 'extreme' ? 'extreme' : simultaneousCompressLevel === 'high' ? 'high-compression' : 'balanced'
+            });
+            blob = new Blob([compRes.compressedBytes], { type: 'application/pdf' });
+          } catch (compErr) {
+            console.warn("Simultaneous compression fallback to original conversion:", compErr);
+          }
+        }
+
+        setOutputSizeBytes(blob.size);
 
         if (blob.size === 0) {
           throw new Error("Generated file is empty. Please try again with a different configuration.");
@@ -1733,6 +1757,53 @@ const SimpleTool: React.FC<SimpleToolProps> = ({ title, mode, darkMode, notify, 
                   fileName={file?.name || `${multiFiles.length} files`}
                 />
               ) : (
+                <>
+                  {/* Optional Simultaneous Compression Option */}
+                {mode !== 'compress' && (
+                  <div className={`mb-3 p-4 rounded-2xl border text-left transition-all ${
+                    enableSimultaneousCompress 
+                      ? 'border-amber-400/80 bg-amber-50/40 dark:bg-amber-950/20 dark:border-amber-700/60' 
+                      : 'border-slate-200 dark:border-slate-700 bg-slate-50/60 dark:bg-slate-900/40'
+                  }`}>
+                    <div className="flex items-center justify-between gap-2">
+                      <label className="flex items-center gap-2 cursor-pointer select-none">
+                        <input
+                          type="checkbox"
+                          checked={enableSimultaneousCompress}
+                          onChange={(e) => setEnableSimultaneousCompress(e.target.checked)}
+                          className="w-4 h-4 text-amber-500 rounded border-slate-300 focus:ring-amber-400"
+                        />
+                        <span className="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                          <Zap size={14} className="text-amber-500" />
+                          <span>Compress & Optimize output</span>
+                        </span>
+                      </label>
+                      <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-400 shrink-0">
+                        Optional
+                      </span>
+                    </div>
+
+                    {enableSimultaneousCompress && (
+                      <div className="mt-3 pt-3 border-t border-amber-200/60 dark:border-amber-800/60 flex items-center gap-2">
+                        {(['balanced', 'high', 'extreme'] as const).map((lvl) => (
+                          <button
+                            key={lvl}
+                            type="button"
+                            onClick={() => setSimultaneousCompressLevel(lvl)}
+                            className={`flex-1 py-1.5 px-2 rounded-xl text-[11px] font-bold capitalize transition-all ${
+                              simultaneousCompressLevel === lvl
+                                ? 'bg-amber-500 text-white shadow-xs'
+                                : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300'
+                            }`}
+                          >
+                            {lvl === 'balanced' ? 'Smart' : lvl === 'high' ? 'High' : 'Max'}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 <button
                   disabled={processing || (needsPageInput && !pageInput) || (needsPassword && !password) || (isImageTool && multiFiles.length === 0) || (mode === 'compare' && multiFiles.length < 2)}
                   onClick={process}
@@ -1741,6 +1812,7 @@ const SimpleTool: React.FC<SimpleToolProps> = ({ title, mode, darkMode, notify, 
                   <span>{getActionLabel(mode, title)}</span>
                   <ArrowRight size={22} />
                 </button>
+                </>
               )}
             </div>
 
@@ -1841,27 +1913,41 @@ const SimpleTool: React.FC<SimpleToolProps> = ({ title, mode, darkMode, notify, 
                   </button>
                 </div>
               ) : (
+                <>
+                  {/* Size Comparison Badge */}
+                <FileSizeComparisonBadge
+                  originalBytes={originalSizeBytes}
+                  outputBytes={outputSizeBytes}
+                  darkMode={darkMode}
+                  isCompressed={enableSimultaneousCompress || mode === 'compress'}
+                  className="my-1"
+                />
+
                 <div className="flex flex-col sm:flex-row gap-4 w-full">
-                  {canPreviewResult && (
-                    <button onClick={() => setShowPreview(true)} className="flex-1 py-5 rounded-2xl font-black border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-100 transition-all flex items-center justify-center gap-2">
-                      <Eye size={20} /> Preview
-                    </button>
-                  )}
+                  <button 
+                    type="button"
+                    onClick={() => setShowPreviewModal(true)} 
+                    className="flex-1 py-3.5 sm:py-4 rounded-xl font-black border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all flex items-center justify-center gap-2 shadow-xs text-sm sm:text-base"
+                  >
+                    <Eye size={18} className="text-yellow-600 dark:text-yellow-400" />
+                    <span>Preview Document</span>
+                  </button>
                   <a
                     href={result}
                     download={`pdfbolt_${mode}_output.${resultMeta.extension}`}
                     onClick={() => notify.success()}
-                    className="flex-1 flex items-center justify-center gap-4 py-5 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-2xl font-black text-xl shadow-2xl hover:from-yellow-600 hover:to-orange-600 hover:scale-105 transition-all"
+                    className="flex-1 flex items-center justify-center gap-3 py-3.5 sm:py-4 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-xl font-black text-base sm:text-lg shadow-xl hover:from-yellow-600 hover:to-orange-600 hover:scale-[1.02] transition-all"
                   >
                     <Download size={24} /> Download {resultMeta.label}
                   </a>
                 </div>
+                </>
               )}
 
               {/* Process Another File CTA (Prominently directly under Download) */}
               <button
                 onClick={clearSelection}
-                className={`w-full py-4 rounded-2xl font-black text-sm uppercase tracking-wider border-2 transition-all hover:scale-[1.01] flex items-center justify-center gap-2 ${
+                className={`w-full py-3 rounded-xl font-black text-xs uppercase tracking-wider border-2 transition-all hover:scale-[1.01] flex items-center justify-center gap-2 ${
                   darkMode
                     ? 'border-slate-700 bg-slate-800 text-slate-300 hover:border-yellow-500/60 hover:text-yellow-400'
                     : 'border-slate-200 bg-slate-50 text-slate-600 hover:border-yellow-400 hover:bg-white hover:text-slate-900'
@@ -1870,9 +1956,6 @@ const SimpleTool: React.FC<SimpleToolProps> = ({ title, mode, darkMode, notify, 
                 <FileText size={16} /> Process Another File
               </button>
 
-              {/* Non-Intrusive Result Screen Sponsored Slot (Far below download button) */}
-              <AdSlot placement="RESULT_BOTTOM" />
-              <AdsterraBanner format="responsive" className="mt-4 mb-2" />
 
             </div>
           )}
@@ -1892,6 +1975,18 @@ const SimpleTool: React.FC<SimpleToolProps> = ({ title, mode, darkMode, notify, 
         </div>
       )}
 
+      {/* High-Fidelity Output Preview Modal */}
+      <OutputPreviewModal
+        isOpen={showPreviewModal}
+        onClose={() => setShowPreviewModal(false)}
+        fileUrl={typeof result === 'string' ? result : (Array.isArray(result) && result[0]?.url ? result[0].url : null)}
+        fileName={typeof result === 'string' ? `pdfbolt_${mode}_output.${resultMeta.extension}` : (Array.isArray(result) && result[0]?.name ? result[0].name : `pdfbolt_${mode}_output.zip`)}
+        fileType={resultKind}
+        downloadUrl={typeof result === 'string' ? result : (Array.isArray(result) && result[0]?.url ? result[0].url : undefined)}
+        originalSizeBytes={originalSizeBytes}
+        outputSizeBytes={outputSizeBytes}
+        darkMode={darkMode}
+      />
     </div>
   );
 };

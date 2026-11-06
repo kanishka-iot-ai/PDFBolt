@@ -94,7 +94,7 @@ export async function mergeFiles(files: File[]): Promise<Uint8Array> {
       throw new Error(`Failed to load ${f.name}: ${msg || 'unsupported file'}`);
     }
   }
-  const result = await merged.save();
+  const result = await merged.save({ useObjectStreams: true });
 
   if (result.length === 0) {
     throw new Error("Merging resulted in an empty file.");
@@ -113,7 +113,7 @@ export async function rotateFile(file: File, rotation: number): Promise<Uint8Arr
     const currentRotation = p.getRotation().angle;
     p.setRotation(degrees(currentRotation + rotation));
   });
-  return await pdf.save();
+  return await pdf.save({ useObjectStreams: true });
 }
 
 /**
@@ -136,7 +136,7 @@ export async function addPageNumbers(file: File): Promise<Uint8Array> {
       color: rgb(0.3, 0.3, 0.3)
     });
   });
-  return await pdf.save();
+  return await pdf.save({ useObjectStreams: true });
 }
 
 export interface CompressionOptions {
@@ -428,7 +428,7 @@ export async function splitPdf(file: File, range: string): Promise<Uint8Array> {
   const copiedPages = await targetPdf.copyPages(sourcePdf, finalIndices);
   copiedPages.forEach(p => targetPdf.addPage(p));
 
-  return await targetPdf.save();
+  return await targetPdf.save({ useObjectStreams: true });
 }
 
 /**
@@ -449,7 +449,7 @@ export async function deletePages(file: File, indicesStr: string): Promise<Uint8
   });
 
   if (pdf.getPageCount() === 0) throw new Error("Cannot delete all pages from a PDF.");
-  return await pdf.save();
+  return await pdf.save({ useObjectStreams: true });
 }
 
 /**
@@ -476,7 +476,7 @@ export async function reorderPages(file: File, orderStr: string): Promise<Uint8A
   copied.forEach(p => target.addPage(p));
 
   if (target.getPageCount() === 0) throw new Error('No pages in the reordered output.');
-  return await target.save();
+  return await target.save({ useObjectStreams: true });
 }
 
 /**
@@ -498,7 +498,7 @@ export async function watermarkPdf(file: File, text: string, fontSize: number = 
       rotate: degrees(45)
     });
   });
-  return await pdf.save();
+  return await pdf.save({ useObjectStreams: true });
 }
 
 
@@ -705,7 +705,7 @@ export async function imagesToPdf(files: File[], options: ImageFitOptions = { pa
     throw new Error("No supported images were added. Use JPG or PNG files.");
   }
 
-  return await pdfDoc.save();
+  return await pdfDoc.save({ useObjectStreams: true });
 }
 
 
@@ -779,5 +779,5 @@ export async function convertPdfToGrayscale(
     });
   }
 
-  return await newPdf.save();
+  return await newPdf.save({ useObjectStreams: true });
 }

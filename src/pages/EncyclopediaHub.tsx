@@ -1,3 +1,4 @@
+import DesktopSideRails from '../components/DesktopSideRails';
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
@@ -34,10 +35,12 @@ const EncyclopediaHub: React.FC<EncyclopediaHubProps> = ({ darkMode }) => {
         </div>
       </section>
 
-      {/* Sponsored Ad Banner */}
-      <div className="max-w-5xl mx-auto px-6 pt-8 pb-2 flex flex-col items-center justify-center min-h-[114px]">
-        <AdsterraBanner format="responsive" className="my-1" showLabel={true} />
-      </div>
+      {/* Balanced 3-Ad Sponsorship Rail (Left Rail + Center Horizontal + Right Rail) */}
+      <DesktopSideRails centerWidthClass="max-w-5xl" className="pt-4 pb-2">
+        <div className="w-full flex flex-col items-center justify-center min-h-[95px]">
+          <AdsterraBanner format="responsive" className="my-1" showLabel={true} />
+        </div>
+      </DesktopSideRails>
 
       {/* Articles Grid */}
       <section className="max-w-5xl mx-auto px-6 py-16">

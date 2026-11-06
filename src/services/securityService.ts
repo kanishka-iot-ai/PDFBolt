@@ -35,7 +35,7 @@ export async function protectPdf(file: File, password: string): Promise<Uint8Arr
         });
 
         // 4. Save encrypted PDF
-        return await pdfDoc.save();
+        return await pdfDoc.save({ useObjectStreams: true });
     } catch (err) {
         console.error("Encryption Error:", err);
         throw err;
@@ -56,7 +56,7 @@ export async function unlockPdf(file: File, password: string): Promise<Uint8Arra
         const pdfDoc = await PDFDocument.load(bytes, { password } as any);
 
         // Saving without calling .encrypt() permanently removes encryption
-        return await pdfDoc.save();
+        return await pdfDoc.save({ useObjectStreams: true });
     } catch (err: any) {
         const msg = (err.message || '').toLowerCase();
         if (msg.includes('password') || msg.includes('decrypt') || msg.includes('encrypted') || msg.includes('auth')) {
@@ -79,7 +79,7 @@ export async function removePermissions(file: File): Promise<Uint8Array> {
         const pageIndices = srcDoc.getPageIndices();
         const copiedPages = await pdfDoc.copyPages(srcDoc, pageIndices);
         copiedPages.forEach(page => pdfDoc.addPage(page));
-        return await pdfDoc.save();
+        return await pdfDoc.save({ useObjectStreams: true });
     } catch (err: any) {
         throw new Error("Unable to remove permissions. Document may require a user password.");
     }
@@ -154,5 +154,5 @@ export async function signPdf(
         });
     }
 
-    return await pdfDoc.save();
+    return await pdfDoc.save({ useObjectStreams: true });
 }

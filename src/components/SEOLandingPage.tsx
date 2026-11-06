@@ -109,7 +109,7 @@ const SEOLandingPage: React.FC<SEOLandingPageProps> = ({ tool: toolProp, toolId,
     .filter(Boolean);
 
   return (
-    <div className={`animate-fadeIn w-full ${hasActiveWork ? 'h-[calc(100vh-64px)] overflow-hidden bg-[#f4f5f8] dark:bg-slate-950 flex flex-col' : 'min-h-[calc(100vh-64px)] flex flex-col justify-between bg-white dark:bg-slate-900'}`}>
+    <div className={`animate-fadeIn w-full ${hasActiveWork ? 'h-[calc(100vh-64px)] overflow-hidden bg-[#f4f5f8] dark:bg-slate-950 flex flex-col' : 'min-h-[calc(100vh-64px)] lg:h-[calc(100vh-64px)] lg:max-h-[calc(100vh-64px)] lg:overflow-hidden flex flex-col justify-between bg-white dark:bg-slate-900'}`}>
       <Helmet>
         <title>{tool?.seoTitle || `${tool?.title || 'PDF Tool'} – Free & Private Online Tool | PDFBolt`}</title>
         <meta name="description" content={tool?.description} />
@@ -124,7 +124,7 @@ const SEOLandingPage: React.FC<SEOLandingPageProps> = ({ tool: toolProp, toolId,
       </Helmet>
 
       {/* 1. HERO HEADER (Always retained in DOM for SEO & A11y, visually hidden during active interaction) */}
-      <div className={hasActiveWork ? "sr-only" : `pt-6 pb-4 border-b shrink-0 ${darkMode ? 'border-slate-800 bg-slate-900/50' : 'border-slate-100 bg-slate-50'}`}>
+      <div className={hasActiveWork ? "sr-only" : `pt-3 sm:pt-4 pb-2 sm:pb-3 border-b shrink-0 ${darkMode ? 'border-slate-800 bg-slate-900/50' : 'border-slate-100 bg-slate-50'}`}>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
           {/* Breadcrumb Navigation */}
           <nav className="flex justify-center items-center gap-2 text-xs font-semibold mb-1 text-slate-500">
@@ -135,10 +135,10 @@ const SEOLandingPage: React.FC<SEOLandingPageProps> = ({ tool: toolProp, toolId,
             <span className="text-yellow-700 dark:text-yellow-400 font-bold">{tool?.title}</span>
           </nav>
 
-          <h1 className={`text-3xl sm:text-4xl md:text-5xl font-black mb-2 tracking-tight leading-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+          <h1 className={`text-2xl sm:text-3xl md:text-4xl font-black mb-1 tracking-tight leading-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>
             {tool?.title}
           </h1>
-          <p className={`text-sm sm:text-base max-w-xl mx-auto font-medium ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+          <p className={`text-xs sm:text-sm max-w-lg mx-auto font-medium line-clamp-1 sm:line-clamp-none ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
             {tool?.description}
           </p>
         </div>
@@ -151,14 +151,14 @@ const SEOLandingPage: React.FC<SEOLandingPageProps> = ({ tool: toolProp, toolId,
           centerWidthClass={hasActiveWork ? 'max-w-full' : 'max-w-4xl'}
           className={hasActiveWork ? '!px-0 w-full h-full' : 'my-auto'}
         >
-          <div className={`w-full flex flex-col items-center justify-center ${hasActiveWork ? 'h-full p-0' : 'p-2 sm:p-4'}`}>
+          <div className={`w-full flex flex-col items-center justify-center ${hasActiveWork ? 'h-full p-0' : 'p-1 sm:p-2'}`}>
             <div className="w-full h-full">
               {children}
             </div>
 
             {/* 3. CENTER HORIZONTAL AD (Frames the bottom of the workbench between the two vertical side rails) */}
             {!hasActiveWork && (
-              <div className="w-full max-w-4xl mx-auto px-4 mt-4 mb-2 shrink-0 flex flex-col items-center justify-center min-h-[114px] md:min-h-[115px]">
+              <div className="w-full max-w-4xl mx-auto px-4 mt-1.5 mb-1 shrink-0 flex flex-col items-center justify-center min-h-[90px] md:min-h-[95px]">
                 <AdsterraBanner format="responsive" className="my-1" showLabel={true} />
               </div>
             )}
@@ -168,7 +168,7 @@ const SEOLandingPage: React.FC<SEOLandingPageProps> = ({ tool: toolProp, toolId,
 
       {/* 4. RELATED PDF TOOLS (Sleek Suggestive Bottom Bar - Only on landing page) */}
       {!hasActiveWork && relatedToolsList.length > 0 && (
-        <div className={`border-t px-6 py-2.5 shrink-0 ${darkMode ? 'border-slate-800 bg-slate-900/40' : 'border-slate-100 bg-white'}`}>
+        <div className={`border-t px-4 sm:px-6 py-1.5 shrink-0 ${darkMode ? 'border-slate-800 bg-slate-900/40' : 'border-slate-100 bg-white'}`}>
           <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
             <span className="text-[11px] font-black uppercase tracking-wider text-slate-400 shrink-0 hidden sm:inline">
               Suggested Tools:

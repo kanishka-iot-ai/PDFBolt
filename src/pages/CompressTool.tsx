@@ -583,8 +583,7 @@ const CompressTool: React.FC<CompressToolProps> = ({ darkMode, notify }) => {
             </div>
 
             {/* Non-Intrusive Result Screen Sponsored Slot (Far below download button) */}
-            <AdSlot placement="RESULT_BOTTOM" />
-            <AdsterraBanner format="responsive" className="mt-4" />
+
 
             {/* Quality Comparison Modal */}
             {showPreviewModal && result.previewOriginalDataUrl && result.previewCompressedDataUrl && (

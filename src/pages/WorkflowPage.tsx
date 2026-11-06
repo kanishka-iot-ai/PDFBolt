@@ -1,3 +1,4 @@
+import DesktopSideRails from '../components/DesktopSideRails';
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useParams, Link } from 'react-router-dom';

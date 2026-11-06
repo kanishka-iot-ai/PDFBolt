@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import FileUploader from '../components/FileUploader';
-import { mergeFiles } from '../services/pdfService';
-import { FileText, Download, Trash2, ArrowUp, ArrowDown, CheckCircle2, Plus, ArrowRight, AlertTriangle, X } from 'lucide-react';
+import { mergeFiles, compressPdfAdvanced } from '../services/pdfService';
+import OutputPreviewModal from '../components/OutputPreviewModal';
+import FileSizeComparisonBadge from '../components/FileSizeComparisonBadge';
+import { FileText, Download, Trash2, ArrowUp, ArrowDown, CheckCircle2, Plus, ArrowRight, AlertTriangle, X, Eye, Zap } from 'lucide-react';
 import { NotifySystem } from '../types';
 import ProgressBar from '../components/ProgressBar';
 import { validateFiles, ALLOWED_MIME_TYPES, MAX_FILE_SIZE } from '../utils/fileValidation';
@@ -28,6 +30,11 @@ const MergeTool: React.FC<MergeToolProps> = ({ darkMode, notify, customHint, all
   const [resultKey, setResultKey] = useState(0);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [ramWarning, setRamWarning] = useState<string | null>(null);
+  const [showPreviewModal, setShowPreviewModal] = useState(false);
+  const [enableSimultaneousCompress, setEnableSimultaneousCompress] = useState(false);
+  const [simultaneousCompressLevel, setSimultaneousCompressLevel] = useState<'balanced' | 'high' | 'extreme'>('balanced');
+  const [originalSizeBytes, setOriginalSizeBytes] = useState<number>(0);
+  const [outputSizeBytes, setOutputSizeBytes] = useState<number>(0);
 
   // Sync active work state
   useEffect(() => {
@@ -72,6 +79,7 @@ const MergeTool: React.FC<MergeToolProps> = ({ darkMode, notify, customHint, all
     }
 
     setFiles(p => [...p, ...nf]);
+    setOriginalSizeBytes(p => p + nf.reduce((acc, f) => acc + f.size, 0));
     notify.upload();
     setResult(null);
     setProgress(0);
@@ -97,14 +105,26 @@ const MergeTool: React.FC<MergeToolProps> = ({ darkMode, notify, customHint, all
     setProcessingStatus('processing');
     try {
       setProgress(30);
-      const b = await mergeFiles(files);
+      const totalInput = files.reduce((acc, f) => acc + f.size, 0);
+      setOriginalSizeBytes(totalInput);
+      let b = await mergeFiles(files);
 
       if (b.length === 0) {
         throw new Error("Merge produced an empty file.");
       }
 
-      setProgress(80);
+      if (enableSimultaneousCompress) {
+        setProgress(70);
+        const tempFile = new File([b as any], 'merged.pdf', { type: 'application/pdf' });
+        const comp = await compressPdfAdvanced(tempFile, {
+          profile: simultaneousCompressLevel === 'extreme' ? 'extreme' : simultaneousCompressLevel === 'high' ? 'high-compression' : 'balanced'
+        });
+        b = comp.compressedBytes;
+      }
+
+      setProgress(90);
       const blob = new Blob([b] as BlobPart[], { type: 'application/pdf' });
+      setOutputSizeBytes(blob.size);
 
       if (result) {
         URL.revokeObjectURL(result);
@@ -146,7 +166,7 @@ const MergeTool: React.FC<MergeToolProps> = ({ darkMode, notify, customHint, all
       )}
 
       {files.length === 0 ? (
-        <div className="max-w-4xl mx-auto px-4 py-8 space-y-6">
+        <div className="max-w-4xl mx-auto px-2 sm:px-4 py-2 sm:py-3 space-y-3">
           {customHint && (
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-amber-500/15 border border-amber-500/30 text-amber-900 dark:text-amber-300 text-xs font-black uppercase tracking-wider shadow-sm">
               <CheckCircle2 size={15} className="text-amber-600 dark:text-amber-400" />
@@ -299,6 +319,50 @@ const MergeTool: React.FC<MergeToolProps> = ({ darkMode, notify, customHint, all
                 {files.length} document{files.length > 1 ? 's' : ''} queued for merge
               </div>
 
+              {/* Optional Simultaneous Compression Option */}
+              <div className={`p-4 rounded-2xl border text-left transition-all ${
+                enableSimultaneousCompress 
+                  ? 'border-amber-400/80 bg-amber-50/40 dark:bg-amber-950/20 dark:border-amber-700/60' 
+                  : 'border-slate-200 dark:border-slate-700 bg-slate-50/60 dark:bg-slate-900/40'
+              }`}>
+                <div className="flex items-center justify-between gap-2">
+                  <label className="flex items-center gap-2 cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      checked={enableSimultaneousCompress}
+                      onChange={(e) => setEnableSimultaneousCompress(e.target.checked)}
+                      className="w-4 h-4 text-amber-500 rounded border-slate-300 focus:ring-amber-400"
+                    />
+                    <span className="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                      <Zap size={14} className="text-amber-500" />
+                      <span>Compress & Optimize output</span>
+                    </span>
+                  </label>
+                  <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-400 shrink-0">
+                    Optional
+                  </span>
+                </div>
+
+                {enableSimultaneousCompress && (
+                  <div className="mt-3 pt-3 border-t border-amber-200/60 dark:border-amber-800/60 flex items-center gap-2">
+                    {(['balanced', 'high', 'extreme'] as const).map((lvl) => (
+                      <button
+                        key={lvl}
+                        type="button"
+                        onClick={() => setSimultaneousCompressLevel(lvl)}
+                        className={`flex-1 py-1.5 px-2 rounded-xl text-[11px] font-bold capitalize transition-all ${
+                          simultaneousCompressLevel === lvl
+                            ? 'bg-amber-500 text-white shadow-xs'
+                            : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300'
+                        }`}
+                      >
+                        {lvl === 'balanced' ? 'Smart' : lvl === 'high' ? 'High' : 'Max'}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
               {/* Non-Intrusive Active Workspace Sponsored Slot */}
               <div className="mt-auto pt-6 border-t border-slate-100 dark:border-slate-700/60 flex flex-col items-center justify-center shrink-0">
                 <AdsterraBanner format="300x250" showLabel={true} />
@@ -337,18 +401,38 @@ const MergeTool: React.FC<MergeToolProps> = ({ darkMode, notify, customHint, all
             <CheckCircle2 size={32} />
             <span className="text-2xl">Merge Ready</span>
           </div>
-          <a
-            href={result}
-            download="merged_pdfbolt.pdf"
-            onClick={() => notify.success()}
-            className="w-full py-5 bg-[#e53935] hover:bg-[#d32f2f] text-white rounded-2xl font-black text-xl shadow-2xl hover:scale-105 transition-all flex items-center justify-center gap-3"
-          >
-            <Download size={24} /> Download Merged PDF
-          </a>
+
+          {/* Size Comparison Badge */}
+          <FileSizeComparisonBadge
+            originalBytes={originalSizeBytes}
+            outputBytes={outputSizeBytes}
+            darkMode={darkMode}
+            isCompressed={enableSimultaneousCompress}
+            className="my-1"
+          />
+
+          <div className="flex flex-col sm:flex-row gap-3 w-full">
+            <button
+              type="button"
+              onClick={() => setShowPreviewModal(true)}
+              className="flex-1 py-4 sm:py-5 border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-900 dark:text-white rounded-2xl font-black text-lg shadow-sm transition-all flex items-center justify-center gap-2"
+            >
+              <Eye size={20} className="text-yellow-600 dark:text-yellow-400" />
+              <span>Preview Merged PDF</span>
+            </button>
+            <a
+              href={result}
+              download="merged_pdfbolt.pdf"
+              onClick={() => notify.success()}
+              className="flex-1 py-4 sm:py-5 bg-[#e53935] hover:bg-[#d32f2f] text-white rounded-2xl font-black text-xl shadow-2xl hover:scale-105 transition-all flex items-center justify-center gap-3"
+            >
+              <Download size={24} /> Download Merged PDF
+            </a>
+          </div>
           <button
             type="button"
             onClick={() => { setFiles([]); setResult(null); }}
-            className={`w-full py-4 rounded-2xl font-black text-sm uppercase tracking-wider border-2 transition-all hover:scale-[1.01] flex items-center justify-center gap-2 ${
+            className={`w-full py-3 rounded-xl font-black text-xs uppercase tracking-wider border-2 transition-all hover:scale-[1.01] flex items-center justify-center gap-2 ${
               darkMode
                 ? 'border-slate-700 bg-slate-800 text-slate-300 hover:border-yellow-500/60 hover:text-yellow-400'
                 : 'border-slate-200 bg-slate-50 text-slate-600 hover:border-yellow-400 hover:bg-white hover:text-slate-900'
@@ -357,11 +441,7 @@ const MergeTool: React.FC<MergeToolProps> = ({ darkMode, notify, customHint, all
             <FileText size={16} /> Process Another Merge
           </button>
 
-          {/* Non-Intrusive Result Screen Sponsored Slot (Far below download button) */}
-          <div className="w-full pt-4 border-t border-slate-200 dark:border-slate-800">
-            <AdSlot placement="RESULT_BOTTOM" />
-            <AdsterraBanner format="responsive" className="mt-3" />
-          </div>
+
         </div>
       )}
 
@@ -380,6 +460,19 @@ const MergeTool: React.FC<MergeToolProps> = ({ darkMode, notify, customHint, all
             e.target.value = '';
           }
         }}
+      />
+
+      {/* Universal Output Preview Modal */}
+      <OutputPreviewModal
+        isOpen={showPreviewModal}
+        onClose={() => setShowPreviewModal(false)}
+        fileUrl={result}
+        fileName="merged_pdfbolt.pdf"
+        fileType="pdf"
+        downloadUrl={result || undefined}
+        originalSizeBytes={originalSizeBytes}
+        outputSizeBytes={outputSizeBytes}
+        darkMode={darkMode}
       />
     </div>
   );

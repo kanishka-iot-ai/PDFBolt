@@ -1,3 +1,4 @@
+import DesktopSideRails from '../components/DesktopSideRails';
 import React, { useState, useMemo } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
@@ -152,10 +153,10 @@ const HubPage: React.FC<HubPageProps> = ({ darkMode }) => {
         </div>
       </section>
 
-      {/* Non-Intrusive Sponsored Slot: Persona to Tool Grid Transition */}
-      <div className="max-w-7xl mx-auto px-6 my-4">
+      {/* Balanced 3-Ad Sponsorship Rail (Left Rail + Center Horizontal + Right Rail) */}
+      <DesktopSideRails centerWidthClass="max-w-7xl" className="my-4">
         <div 
-          className={`w-full flex flex-col items-center justify-center rounded-2xl border min-h-[114px] md:min-h-[115px] p-2 transition-all ${
+          className={`w-full flex flex-col items-center justify-center rounded-2xl border min-h-[95px] p-2 transition-all ${
             darkMode ? 'bg-slate-900/40 border-slate-800' : 'bg-slate-50/60 border-slate-200/80'
           }`}
           aria-label="Sponsored Advertisement"
@@ -165,7 +166,7 @@ const HubPage: React.FC<HubPageProps> = ({ darkMode }) => {
           </span>
           <AdsterraBanner format="responsive" className="my-1" showLabel={false} />
         </div>
-      </div>
+      </DesktopSideRails>
 
       {/* Tools Grid */}
       <section className="max-w-7xl mx-auto px-6 py-6">
