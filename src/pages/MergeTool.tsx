@@ -295,17 +295,17 @@ const MergeTool: React.FC<MergeToolProps> = ({ darkMode, notify, customHint, all
           </div>
 
           {/* RIGHT SIDEBAR CONTROL PANEL */}
-          <div className="w-full lg:w-80 xl:w-96 bg-white dark:bg-slate-800 border-t lg:border-t-0 lg:border-l border-slate-200 dark:border-slate-700 flex flex-col justify-between shrink-0 shadow-2xl z-20">
+          <div className="w-full lg:w-80 xl:w-96 h-full max-h-full min-h-0 bg-white dark:bg-slate-800 border-t lg:border-t-0 lg:border-l border-slate-200 dark:border-slate-700 flex flex-col shrink-0 shadow-2xl z-20">
             
             {/* Sidebar Title */}
-            <div className="p-6 pb-4 border-b border-slate-100 dark:border-slate-700/60">
+            <div className="p-4 sm:p-5 pb-3 sm:pb-4 border-b border-slate-100 dark:border-slate-700/60 shrink-0">
               <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
                 Merge PDF
               </h2>
             </div>
 
             {/* Sidebar Options Body */}
-            <div className="p-6 overflow-y-auto flex-grow space-y-4 flex flex-col">
+            <div className="p-4 sm:p-5 overflow-y-auto flex-1 min-h-0 space-y-3.5 flex flex-col">
               <div className="p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 space-y-2">
                 <p className="text-xs font-bold text-slate-700 dark:text-slate-300">
                   Merge Sequence
@@ -364,13 +364,13 @@ const MergeTool: React.FC<MergeToolProps> = ({ darkMode, notify, customHint, all
               </div>
 
               {/* Non-Intrusive Active Workspace Sponsored Slot */}
-              <div className="mt-auto pt-6 border-t border-slate-100 dark:border-slate-700/60 flex flex-col items-center justify-center shrink-0">
+              <div className="mt-auto pt-4 border-t border-slate-100 dark:border-slate-700/60 flex flex-col items-center justify-center shrink-0">
                 <AdsterraBanner format="300x250" showLabel={true} />
               </div>
             </div>
 
             {/* Sidebar Bottom CTA Action Button */}
-            <div className="p-6 pt-4 border-t border-slate-100 dark:border-slate-700/60 bg-white dark:bg-slate-800">
+            <div className="p-4 sm:p-5 pt-3 sm:pt-4 border-t border-slate-100 dark:border-slate-700/60 bg-white dark:bg-slate-800 shrink-0 sticky bottom-0 z-10">
               {processing ? (
                 <ProgressBar
                   progress={progress}
@@ -384,7 +384,7 @@ const MergeTool: React.FC<MergeToolProps> = ({ darkMode, notify, customHint, all
                   type="button"
                   disabled={processing || files.length < 2}
                   onClick={process}
-                  className="w-full py-4 sm:py-5 bg-[#e53935] hover:bg-[#d32f2f] text-white font-black text-lg uppercase tracking-wider rounded-xl shadow-xl hover:shadow-2xl transition-all flex items-center justify-center gap-3 transform hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-30 cursor-pointer"
+                  className="w-full py-3.5 sm:py-4 bg-[#e53935] hover:bg-[#d32f2f] text-white font-black text-base sm:text-lg uppercase tracking-wider rounded-xl shadow-xl hover:shadow-2xl transition-all flex items-center justify-center gap-2.5 transform hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-30 cursor-pointer"
                 >
                   <span>Merge {files.length} Files</span>
                   <ArrowRight size={22} />

@@ -48,7 +48,7 @@ export const DesktopSideRails: React.FC<DesktopSideRailsProps> = ({
   }, []);
 
   return (
-    <div className={`w-full relative flex justify-center items-start ${hasActiveWork ? "px-0" : "px-1 sm:px-2 lg:px-4 xl:px-6"} ${className}`}>
+    <div className={`w-full relative flex justify-center items-start ${hasActiveWork ? "px-0 h-full" : "px-1 sm:px-2 lg:px-4 xl:px-6"} ${className}`}>
       {/* 1. LEFT VERTICAL SPONSOR RAIL */}
       <aside
         className={`${hasActiveWork ? "hidden" : "hidden lg:flex"} flex-col items-center shrink-0 sticky top-[80px] z-20 transition-opacity duration-300 mr-2 xl:mr-4 2xl:mr-8 w-[130px] xl:w-[160px] 2xl:w-[300px]`}
@@ -72,7 +72,7 @@ export const DesktopSideRails: React.FC<DesktopSideRailsProps> = ({
       </aside>
 
       {/* 2. CENTER CONTENT WORKBENCH (Tool Dropzone + Horizontal Ad) */}
-      <div className={`w-full flex-1 min-w-0 ${hasActiveWork ? "max-w-full" : centerWidthClass} shrink-0 flex-grow transition-all`}>
+      <div className={`w-full flex-1 min-w-0 ${hasActiveWork ? "max-w-full h-full" : centerWidthClass} shrink-0 flex-grow transition-all`}>
         {children}
       </div>
 

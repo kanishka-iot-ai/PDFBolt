@@ -1121,17 +1121,17 @@ const SimpleTool: React.FC<SimpleToolProps> = ({ title, mode, darkMode, notify, 
           </div>
 
           {/* RIGHT SIDEBAR CONTROL PANEL */}
-          <div className="w-full lg:w-80 xl:w-96 bg-white dark:bg-slate-800 border-t lg:border-t-0 lg:border-l border-slate-200 dark:border-slate-700 flex flex-col justify-between shrink-0 shadow-2xl z-20">
+          <div className="w-full lg:w-80 xl:w-96 h-full max-h-full min-h-0 bg-white dark:bg-slate-800 border-t lg:border-t-0 lg:border-l border-slate-200 dark:border-slate-700 flex flex-col shrink-0 shadow-2xl z-20">
             
             {/* Sidebar Title */}
-            <div className="p-6 pb-4 border-b border-slate-100 dark:border-slate-700/60">
+            <div className="p-4 sm:p-5 pb-3 sm:pb-4 border-b border-slate-100 dark:border-slate-700/60 shrink-0">
               <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
                 {title}
               </h2>
             </div>
 
             {/* Sidebar Options Body */}
-            <div className="p-6 overflow-y-auto flex-grow space-y-4 flex flex-col">
+            <div className="p-4 sm:p-5 overflow-y-auto flex-1 min-h-0 space-y-3.5 flex flex-col">
               {/* PDF to Word OCR Options */}
               {mode === 'pdf2word' && (
                 <div className="space-y-3">
@@ -1734,14 +1734,60 @@ const SimpleTool: React.FC<SimpleToolProps> = ({ title, mode, darkMode, notify, 
                 </div>
               )}
 
+              {/* Optional Simultaneous Compression Option */}
+              {mode !== 'compress' && (
+                <div className={`p-3.5 rounded-2xl border text-left transition-all ${
+                  enableSimultaneousCompress 
+                    ? 'border-amber-400/80 bg-amber-50/40 dark:bg-amber-950/20 dark:border-amber-700/60' 
+                    : 'border-slate-200 dark:border-slate-700 bg-slate-50/60 dark:bg-slate-900/40'
+                }`}>
+                  <div className="flex items-center justify-between gap-2">
+                    <label className="flex items-center gap-2 cursor-pointer select-none">
+                      <input
+                        type="checkbox"
+                        checked={enableSimultaneousCompress}
+                        onChange={(e) => setEnableSimultaneousCompress(e.target.checked)}
+                        className="w-4 h-4 text-amber-500 rounded border-slate-300 focus:ring-amber-400"
+                      />
+                      <span className="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                        <Zap size={14} className="text-amber-500" />
+                        <span>Compress & Optimize output</span>
+                      </span>
+                    </label>
+                    <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-400 shrink-0">
+                      Optional
+                    </span>
+                  </div>
+
+                  {enableSimultaneousCompress && (
+                    <div className="mt-2.5 pt-2.5 border-t border-amber-200/60 dark:border-amber-800/60 flex items-center gap-2">
+                      {(['balanced', 'high', 'extreme'] as const).map((lvl) => (
+                        <button
+                          key={lvl}
+                          type="button"
+                          onClick={() => setSimultaneousCompressLevel(lvl)}
+                          className={`flex-1 py-1.5 px-2 rounded-xl text-[11px] font-bold capitalize transition-all ${
+                            simultaneousCompressLevel === lvl
+                              ? 'bg-amber-500 text-white shadow-xs'
+                              : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300'
+                          }`}
+                        >
+                          {lvl === 'balanced' ? 'Smart' : lvl === 'high' ? 'High' : 'Max'}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
               {/* Non-Intrusive Active Workspace Sponsored Slot */}
-              <div className="mt-auto pt-6 border-t border-slate-100 dark:border-slate-700/60 flex flex-col items-center justify-center shrink-0">
+              <div className="mt-auto pt-4 border-t border-slate-100 dark:border-slate-700/60 flex flex-col items-center justify-center shrink-0">
                 <AdsterraBanner format="300x250" showLabel={true} />
               </div>
             </div>
 
             {/* Sidebar Bottom CTA Action Button */}
-            <div className="p-6 pt-4 border-t border-slate-100 dark:border-slate-700/60 bg-white dark:bg-slate-800">
+            <div className="p-4 sm:p-5 pt-3 sm:pt-4 border-t border-slate-100 dark:border-slate-700/60 bg-white dark:bg-slate-800 shrink-0 sticky bottom-0 z-10">
               {inputError && !needsPageInput && !needsPassword && (
                 <div className="mb-3 p-3 rounded-xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 text-xs font-bold text-red-600 dark:text-red-300 flex items-center gap-2 animate-fadeIn">
                   <AlertCircle size={16} className="shrink-0" />
@@ -1757,62 +1803,14 @@ const SimpleTool: React.FC<SimpleToolProps> = ({ title, mode, darkMode, notify, 
                   fileName={file?.name || `${multiFiles.length} files`}
                 />
               ) : (
-                <>
-                  {/* Optional Simultaneous Compression Option */}
-                {mode !== 'compress' && (
-                  <div className={`mb-3 p-4 rounded-2xl border text-left transition-all ${
-                    enableSimultaneousCompress 
-                      ? 'border-amber-400/80 bg-amber-50/40 dark:bg-amber-950/20 dark:border-amber-700/60' 
-                      : 'border-slate-200 dark:border-slate-700 bg-slate-50/60 dark:bg-slate-900/40'
-                  }`}>
-                    <div className="flex items-center justify-between gap-2">
-                      <label className="flex items-center gap-2 cursor-pointer select-none">
-                        <input
-                          type="checkbox"
-                          checked={enableSimultaneousCompress}
-                          onChange={(e) => setEnableSimultaneousCompress(e.target.checked)}
-                          className="w-4 h-4 text-amber-500 rounded border-slate-300 focus:ring-amber-400"
-                        />
-                        <span className="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
-                          <Zap size={14} className="text-amber-500" />
-                          <span>Compress & Optimize output</span>
-                        </span>
-                      </label>
-                      <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-400 shrink-0">
-                        Optional
-                      </span>
-                    </div>
-
-                    {enableSimultaneousCompress && (
-                      <div className="mt-3 pt-3 border-t border-amber-200/60 dark:border-amber-800/60 flex items-center gap-2">
-                        {(['balanced', 'high', 'extreme'] as const).map((lvl) => (
-                          <button
-                            key={lvl}
-                            type="button"
-                            onClick={() => setSimultaneousCompressLevel(lvl)}
-                            className={`flex-1 py-1.5 px-2 rounded-xl text-[11px] font-bold capitalize transition-all ${
-                              simultaneousCompressLevel === lvl
-                                ? 'bg-amber-500 text-white shadow-xs'
-                                : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300'
-                            }`}
-                          >
-                            {lvl === 'balanced' ? 'Smart' : lvl === 'high' ? 'High' : 'Max'}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                )}
-
                 <button
                   disabled={processing || (needsPageInput && !pageInput) || (needsPassword && !password) || (isImageTool && multiFiles.length === 0) || (mode === 'compare' && multiFiles.length < 2)}
                   onClick={process}
-                  className="w-full py-4 sm:py-5 bg-[#e53935] hover:bg-[#d32f2f] text-white font-black text-lg uppercase tracking-wider rounded-xl shadow-xl hover:shadow-2xl transition-all flex items-center justify-center gap-3 transform hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-30 cursor-pointer"
+                  className="w-full py-3.5 sm:py-4 bg-[#e53935] hover:bg-[#d32f2f] text-white font-black text-base sm:text-lg uppercase tracking-wider rounded-xl shadow-xl hover:shadow-2xl transition-all flex items-center justify-center gap-2.5 transform hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-30 cursor-pointer"
                 >
                   <span>{getActionLabel(mode, title)}</span>
                   <ArrowRight size={22} />
                 </button>
-                </>
               )}
             </div>
 
