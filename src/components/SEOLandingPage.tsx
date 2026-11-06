@@ -5,6 +5,7 @@ import { TOOLS, GUIDES, getIcon } from '../constants';
 import { Link, useLocation } from 'react-router-dom';
 import AdSlot from './AdSlot';
 import AdsterraBanner from './AdsterraBanner';
+import DesktopSideRails from './DesktopSideRails';
 import { useActiveWork } from '../context/ActiveWorkContext';
 
 interface SEOLandingPageProps {
@@ -143,17 +144,25 @@ const SEOLandingPage: React.FC<SEOLandingPageProps> = ({ tool: toolProp, toolId,
         </div>
       </div>
 
-      {/* 2. THE WORKING INTERACTIVE TOOL (Full space when active, centered when landing) */}
-      <div className={hasActiveWork ? "w-full h-full flex-grow overflow-hidden" : "flex-grow flex items-center justify-center p-4 sm:p-6 my-auto"}>
-        {children}
-      </div>
-
-      {/* 3. NON-INTRUSIVE HIGH-VISIBILITY AD PLACEMENT (Only on landing dropzone page) */}
-      {!hasActiveWork && (
-        <div className="max-w-4xl mx-auto px-4 w-full my-2 shrink-0 flex flex-col items-center justify-center">
-          <AdSlot placement="TOOL_CONTENT_BOTTOM" className="w-full flex justify-center" />
-          <AdsterraBanner format="responsive" className="my-2" />
+      {/* 2. THE WORKING INTERACTIVE TOOL (Full space when active, flanked with zero-CLS side rails when landing) */}
+      {hasActiveWork ? (
+        <div className="w-full h-full flex-grow overflow-hidden">
+          {children}
         </div>
+      ) : (
+        <DesktopSideRails hasActiveWork={hasActiveWork} centerWidthClass="max-w-4xl" className="my-auto">
+          <div className="flex-grow flex flex-col items-center justify-center p-2 sm:p-4 w-full">
+            <div className="w-full">
+              {children}
+            </div>
+
+            {/* 3. NON-INTRUSIVE HIGH-VISIBILITY AD PLACEMENT (Only on landing dropzone page) */}
+            <div className="w-full max-w-4xl mx-auto px-4 my-2 shrink-0 flex flex-col items-center justify-center min-h-[114px] md:min-h-[115px]">
+              <AdSlot placement="TOOL_CONTENT_BOTTOM" className="w-full flex justify-center" />
+              <AdsterraBanner format="responsive" className="my-2" />
+            </div>
+          </div>
+        </DesktopSideRails>
       )}
 
       {/* 4. RELATED PDF TOOLS (Sleek Suggestive Bottom Bar - Only on landing page) */}

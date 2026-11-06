@@ -158,6 +158,45 @@ export const AD_PLACEMENTS = {
     minHeightDesktop: '115px',
     minHeightMobile: '110px',
     label: 'Advertisement'
+  },
+  // Desktop Left & Right Vertical Side Rails (160x600 Wide Skyscraper)
+  TOOL_SIDE_RAIL_LEFT: {
+    name: 'Tool Desktop Side Rail (Left)',
+    defaultSlotId: import.meta.env.VITE_ADSENSE_SLOT_SIDE_RAIL_LEFT || '',
+    format: 'vertical',
+    responsive: false,
+    minHeightDesktop: '600px',
+    minHeightMobile: '0px',
+    label: 'Advertisement'
+  },
+  TOOL_SIDE_RAIL_RIGHT: {
+    name: 'Tool Desktop Side Rail (Right)',
+    defaultSlotId: import.meta.env.VITE_ADSENSE_SLOT_SIDE_RAIL_RIGHT || '',
+    format: 'vertical',
+    responsive: false,
+    minHeightDesktop: '600px',
+    minHeightMobile: '0px',
+    label: 'Advertisement'
+  },
+  // PDF Inspector Mid-Report Sponsored Slot
+  INSPECTOR_MID: {
+    name: 'PDF Inspector Mid-Report',
+    defaultSlotId: import.meta.env.VITE_ADSENSE_SLOT_INSPECTOR_MID || import.meta.env.VITE_ADSENSE_SLOT_RESULT_BOTTOM || '',
+    format: 'auto',
+    responsive: true,
+    minHeightDesktop: '115px',
+    minHeightMobile: '110px',
+    label: 'Advertisement'
+  },
+  // Persona Workflow Transition Sponsored Slot
+  WORKFLOW_TRANSITION: {
+    name: 'Workflow Transition',
+    defaultSlotId: import.meta.env.VITE_ADSENSE_SLOT_WORKFLOW || import.meta.env.VITE_ADSENSE_SLOT_HOME_CONTENT || '',
+    format: 'auto',
+    responsive: true,
+    minHeightDesktop: '115px',
+    minHeightMobile: '110px',
+    label: 'Advertisement'
   }
 } as const satisfies Record<string, AdPlacementConfig>;
 

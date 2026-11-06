@@ -8,6 +8,7 @@ import { saveAs } from 'file-saver';
 import { NotifySystem } from '../types';
 import AdSlot from '../components/AdSlot';
 import AdsterraBanner from '../components/AdsterraBanner';
+import DesktopSideRails from '../components/DesktopSideRails';
 import { useActiveWork } from '../context/ActiveWorkContext';
 
 interface AnalyzerPageProps {
@@ -172,26 +173,28 @@ ${analysis.keyFindings.map((kf, i) => `${i + 1}. ${kf}`).join('\n')}
       {/* Main Content Area */}
       <div className="max-w-6xl mx-auto px-6 py-12">
         {!analysis && (
-          <div className="max-w-2xl mx-auto">
-            {analyzing ? (
-              <div className={`p-16 rounded-[2rem] border text-center ${darkMode ? 'bg-slate-800/50 border-slate-700' : 'bg-white border-slate-200 shadow-xl'}`}>
-                <div className="w-14 h-14 border-4 border-yellow-500 border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
-                <h2 className={`text-2xl font-black mb-2 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
-                  Analyzing Document Structure...
-                </h2>
-                <p className="text-xs text-slate-500 dark:text-slate-400 max-w-md mx-auto">
-                  Extracting text streams, tabular grids, image operators, and page statistics...
-                </p>
-              </div>
-            ) : (
-              <FileUploader
-                onFilesSelected={handleFilesSelected}
-                accept=".pdf"
-                multiple={false}
-                darkMode={darkMode}
-              />
-            )}
-          </div>
+          <DesktopSideRails centerWidthClass="max-w-2xl">
+            <div className="w-full">
+              {analyzing ? (
+                <div className={`p-16 rounded-[2rem] border text-center ${darkMode ? 'bg-slate-800/50 border-slate-700' : 'bg-white border-slate-200 shadow-xl'}`}>
+                  <div className="w-14 h-14 border-4 border-yellow-500 border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
+                  <h2 className={`text-2xl font-black mb-2 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+                    Analyzing Document Structure...
+                  </h2>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 max-w-md mx-auto">
+                    Extracting text streams, tabular grids, image operators, and page statistics...
+                  </p>
+                </div>
+              ) : (
+                <FileUploader
+                  onFilesSelected={handleFilesSelected}
+                  accept=".pdf"
+                  multiple={false}
+                  darkMode={darkMode}
+                />
+              )}
+            </div>
+          </DesktopSideRails>
         )}
 
         {analysis && (
@@ -350,6 +353,20 @@ ${analysis.keyFindings.map((kf, i) => `${i + 1}. ${kf}`).join('\n')}
               </div>
             </div>
 
+            {/* Non-Intrusive Mid-Report Sponsored Transition */}
+            <div 
+              className={`w-full flex flex-col items-center justify-center rounded-2xl border min-h-[114px] md:min-h-[115px] p-2 transition-all ${
+                darkMode ? 'bg-slate-900/40 border-slate-800' : 'bg-slate-50/60 border-slate-200/80'
+              }`}
+              aria-label="Sponsored Advertisement"
+            >
+              <span className="text-[10px] font-bold tracking-widest uppercase text-slate-400 dark:text-slate-500 mb-1 select-none">
+                Sponsored
+              </span>
+              <AdSlot placement="INSPECTOR_MID" className="w-full flex justify-center" />
+              <AdsterraBanner format="responsive" className="my-1" />
+            </div>
+
             {/* Interactive Ask-PDF Section */}
             <div className={`p-8 rounded-3xl border space-y-6 ${darkMode ? 'bg-slate-800/40 border-slate-700' : 'bg-white border-slate-200 shadow-sm'}`}>
               <div>
@@ -419,9 +436,19 @@ ${analysis.keyFindings.map((kf, i) => `${i + 1}. ${kf}`).join('\n')}
               </form>
             </div>
 
-            {/* Non-Intrusive Result Screen Sponsored Slot (Far below analysis actions) */}
-            <AdSlot placement="RESULT_BOTTOM" />
-            <AdsterraBanner format="responsive" className="mt-4 mb-2" />
+            {/* Non-Intrusive Result Screen Sponsored Slot (Far below analysis actions, Zero-CLS Container) */}
+            <div 
+              className={`w-full flex flex-col items-center justify-center rounded-2xl border min-h-[114px] md:min-h-[115px] p-2 transition-all mt-8 ${
+                darkMode ? 'bg-slate-900/40 border-slate-800' : 'bg-slate-50/60 border-slate-200/80'
+              }`}
+              aria-label="Sponsored Advertisement"
+            >
+              <span className="text-[10px] font-bold tracking-widest uppercase text-slate-400 dark:text-slate-500 mb-1 select-none">
+                Sponsored
+              </span>
+              <AdSlot placement="RESULT_BOTTOM" className="w-full flex justify-center" />
+              <AdsterraBanner format="responsive" className="my-1" />
+            </div>
           </div>
         )}
       </div>

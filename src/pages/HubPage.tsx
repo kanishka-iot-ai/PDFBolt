@@ -179,8 +179,37 @@ const HubPage: React.FC<HubPageProps> = ({ darkMode }) => {
 
         {filteredTools.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {filteredTools.map((tool) => (
-              <ToolCard key={tool.id} tool={tool} darkMode={darkMode} />
+            {filteredTools.map((tool, idx) => (
+              <React.Fragment key={tool.id}>
+                {idx === 7 && (
+                  <div
+                    className={`group relative p-6 rounded-2xl border transition-all flex flex-col justify-between overflow-hidden ${
+                      darkMode
+                        ? 'bg-slate-900/40 border-slate-800 hover:border-yellow-500/40'
+                        : 'bg-white border-slate-200 hover:border-yellow-500/40 shadow-xs'
+                    }`}
+                  >
+                    <div>
+                      <div className="flex items-center justify-between mb-4">
+                        <span className="text-[10px] font-bold uppercase tracking-widest px-2.5 py-0.5 rounded-full bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 border border-yellow-500/20">
+                          Sponsored
+                        </span>
+                        <Sparkles size={14} className="text-yellow-500" />
+                      </div>
+                      <h3 className={`text-base font-bold mb-1.5 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+                        Cloud Document Suite
+                      </h3>
+                      <p className={`text-xs leading-relaxed ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+                        Fast, secure file management solutions verified for professional and enterprise teams.
+                      </p>
+                    </div>
+                    <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800">
+                      <AdSlot placement="TOOL_CONTENT_BOTTOM" className="w-full" showLabel={false} />
+                    </div>
+                  </div>
+                )}
+                <ToolCard tool={tool} darkMode={darkMode} />
+              </React.Fragment>
             ))}
           </div>
         ) : (
@@ -307,6 +336,22 @@ const HubPage: React.FC<HubPageProps> = ({ darkMode }) => {
           </div>
         </div>
       </section>
+
+      {/* Non-Intrusive Sponsored Slot: Portals to Calculator Transition */}
+      <div className="max-w-7xl mx-auto px-6 my-6">
+        <div 
+          className={`w-full flex flex-col items-center justify-center rounded-2xl border min-h-[114px] md:min-h-[115px] p-2 transition-all ${
+            darkMode ? 'bg-slate-900/40 border-slate-800' : 'bg-slate-50/60 border-slate-200/80'
+          }`}
+          aria-label="Sponsored Advertisement"
+        >
+          <span className="text-[10px] font-bold tracking-widest uppercase text-slate-400 dark:text-slate-500 mb-1 select-none">
+            Sponsored
+          </span>
+          <AdSlot placement="HUB_CONTENT" className="w-full flex justify-center" />
+          <AdsterraBanner format="responsive" className="my-1" />
+        </div>
+      </div>
 
       {/* Calculators & Utilities Section */}
       <section className="max-w-7xl mx-auto px-6 pt-12">

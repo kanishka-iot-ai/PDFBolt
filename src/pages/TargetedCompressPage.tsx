@@ -8,6 +8,7 @@ import EditTool from './EditTool';
 import { NotifySystem } from '../types';
 import AdSlot from '../components/AdSlot';
 import AdsterraBanner from '../components/AdsterraBanner';
+import DesktopSideRails from '../components/DesktopSideRails';
 
 interface TargetedCompressPageProps {
   pageSlug?: string;
@@ -139,8 +140,10 @@ const TargetedCompressPage: React.FC<TargetedCompressPageProps> = ({ pageSlug: p
         </div>
       </div>
 
-      {/* Interactive Tool Container with Integrated Preset Switcher (Zero Scroll) */}
-      <div className="max-w-4xl mx-auto px-3 sm:px-4 py-3 sm:py-4">
+      {/* Interactive Tool Container with Integrated Preset Switcher & Zero-CLS Side Rails */}
+      <DesktopSideRails centerWidthClass="max-w-4xl" className="py-2">
+        <div className="w-full">
+          <div className="w-full px-1 sm:px-2 py-2">
         <div className={`rounded-2xl sm:rounded-3xl border shadow-lg overflow-hidden transition-all ${
           darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
         }`}>
@@ -256,10 +259,12 @@ const TargetedCompressPage: React.FC<TargetedCompressPageProps> = ({ pageSlug: p
       </div>
 
       {/* Sponsored Ad Banner (Directly Beneath Tool, 100% Above The Fold, Zero-CLS Container) */}
-      <div className="max-w-4xl mx-auto px-4 mt-2 mb-4 flex flex-col items-center justify-center min-h-[110px] md:min-h-[115px]">
-        <AdSlot placement="TOOL_CONTENT_BOTTOM" className="w-full flex justify-center" />
-        <AdsterraBanner format="responsive" className="my-1" />
-      </div>
+          <div className="w-full max-w-4xl mx-auto px-2 mt-4 mb-2 flex flex-col items-center justify-center min-h-[110px] md:min-h-[115px]">
+            <AdSlot placement="TOOL_CONTENT_BOTTOM" className="w-full flex justify-center" />
+            <AdsterraBanner format="responsive" className="my-1" />
+          </div>
+        </div>
+      </DesktopSideRails>
 
       {/* Editorial Content & Knowledge Base (Rendered in DOM for Complete Googlebot Indexing) */}
       <div className="max-w-4xl mx-auto px-4 mt-12 space-y-8 text-left">

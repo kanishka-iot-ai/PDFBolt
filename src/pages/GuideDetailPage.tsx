@@ -111,7 +111,9 @@ const GuideDetailPage: React.FC<GuideDetailPageProps> = ({ darkMode }) => {
       </Helmet>
 
       {/* Hero Header */}
-      <article className="max-w-4xl mx-auto px-6 pt-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-8 lg:pt-12 lg:grid lg:grid-cols-12 lg:gap-8 items-start">
+        {/* Main Article Column */}
+        <article className="lg:col-span-8 max-w-4xl">
         {/* Breadcrumb Navigation */}
         <nav className="flex items-center gap-2 text-xs font-semibold mb-6 text-slate-500">
           <Link to="/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Home</Link>
@@ -315,7 +317,72 @@ const GuideDetailPage: React.FC<GuideDetailPageProps> = ({ darkMode }) => {
 
           </div>
         </section>
-      </article>
+        </article>
+
+        {/* Sticky Editorial Sidebar (Desktop Only) */}
+        <aside className="hidden lg:flex lg:col-span-4 flex-col gap-6 sticky top-24 self-start">
+          {/* High-RPM Sticky Ad Slot */}
+          <div 
+            className={`w-full flex flex-col items-center justify-center rounded-2xl border p-4 transition-all min-h-[280px] ${
+              darkMode ? 'bg-slate-900/40 border-slate-800' : 'bg-slate-50/60 border-slate-200/80'
+            }`}
+            aria-label="Sponsored Advertisement"
+          >
+            <span className="text-[10px] font-bold tracking-widest uppercase text-slate-400 dark:text-slate-500 mb-2 select-none">
+              Sponsored
+            </span>
+            <AdSlot placement="GUIDE_SIDEBAR" className="w-full flex justify-center" />
+            <AdsterraBanner format="300x250" className="my-1" />
+          </div>
+
+          {/* Official Tool Quick Launch Card */}
+          {tool && (
+            <div className={`p-6 rounded-2xl border transition-all ${
+              darkMode ? 'bg-slate-900/60 border-slate-800' : 'bg-white border-slate-200 shadow-xs'
+            }`}>
+              <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-yellow-700 dark:text-yellow-400 mb-2">
+                <Sparkles size={14} /> Quick Tool Launch
+              </div>
+              <h3 className={`text-base font-bold mb-1.5 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+                {tool.title}
+              </h3>
+              <p className={`text-xs leading-relaxed mb-4 ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+                Process your documents locally in your browser with zero limits.
+              </p>
+              <Link
+                to={tool.canonicalPath || tool.path}
+                className="w-full py-2.5 bg-yellow-500 hover:bg-yellow-400 text-slate-950 font-bold text-xs rounded-xl shadow-xs transition-all flex items-center justify-center gap-1.5"
+              >
+                Launch Tool <ArrowRight size={14} />
+              </Link>
+            </div>
+          )}
+
+          {/* Quick Related Navigation */}
+          {relatedGuidesList.length > 0 && (
+            <div className={`p-6 rounded-2xl border ${
+              darkMode ? 'bg-slate-900/40 border-slate-800' : 'bg-slate-50/60 border-slate-200/80'
+            }`}>
+              <h3 className={`text-xs font-black uppercase tracking-wider mb-3.5 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+                Popular Guides in Category
+              </h3>
+              <div className="space-y-3">
+                {relatedGuidesList.slice(0, 3).map(rg => rg && (
+                  <Link
+                    key={rg.slug}
+                    to={`/guides/${rg.slug}`}
+                    className={`block text-xs font-semibold hover:underline transition-colors ${
+                      darkMode ? 'text-slate-300 hover:text-yellow-400' : 'text-slate-700 hover:text-yellow-700'
+                    }`}
+                  >
+                    • {rg.title}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
+        </aside>
+      </div>
     </div>
   );
 };
