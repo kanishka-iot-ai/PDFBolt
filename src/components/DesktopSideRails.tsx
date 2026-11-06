@@ -1,7 +1,6 @@
 import React, { useMemo } from 'react';
 import AdSlot from './AdSlot';
 import AdsterraBanner from './AdsterraBanner';
-import { isAdsEnabled, getAdSenseClient } from '../config/adsenseConfig';
 
 export interface DesktopSideRailsProps {
   children: React.ReactNode;
@@ -20,17 +19,19 @@ export interface DesktopSideRailsProps {
 /**
  * DesktopSideRails
  * ----------------
- * Places non-intrusive 160x600 Sticky Wide Skyscraper ad units in the left and right
- * desktop gutters outside the central tool container.
+ * Places proportional vertical sponsor ad units in the left and right desktop gutters,
+ * creating a balanced 3-ad layout (Left Vertical + Center Horizontal + Right Vertical).
  *
- * Professional UX & Monetization Architecture:
- * 1. Zero Empty White Box: Container is 100% borderless, transparent, and shadow-free.
- *    If an ad is blocked, unfilled, or missing, it collapses to pure natural whitespace.
- * 2. Breakpoint Calibration: Active strictly on wide displays (min-[1440px]) and tall displays
- *    (viewport height > 780px). Completely suppressed on standard 1366x768 laptops and tablets.
- * 3. Mutual Exclusivity: Flanks the tool without boxing it in. No hardcoded floating labels
- *    when ads are not loaded.
- * 4. Active Work Guard: Instantly fades out when user begins editing/interacting.
+ * Proportional Architecture:
+ * 1. Balanced Height: Sized to ~380px-420px to match the vertical height of the central
+ *    tool dropzone + horizontal ad, achieving visual equilibrium.
+ * 2. Responsive Breakpoint: Active on desktop screens >= 1200px (`min-[1200px]:flex`),
+ *    providing comfortable breathing space on 1280px, 1366px, 1440px, and 1920px displays.
+ * 3. Graceful Mobile/Tablet Collapse: Auto-collapses cleanly on tablets and mobile (< 1200px)
+ *    so the center content retains 100% full width with zero horizontal scrolling.
+ * 4. Dual Network Waterfall: Delivers Google AdSense vertical display units with
+ *    Adsterra fallback, ensuring reliable ad fill.
+ * 5. Active Work Guard: Instantly fades out when user begins drawing or editing.
  */
 export const DesktopSideRails: React.FC<DesktopSideRailsProps> = ({
   children,
@@ -40,78 +41,82 @@ export const DesktopSideRails: React.FC<DesktopSideRailsProps> = ({
   rightSlot,
   className = ''
 }) => {
-  // Check if rail ads are enabled & configured
-  const hasRailAds = useMemo(() => {
-    const hasAdSense = isAdsEnabled() && Boolean(getAdSenseClient());
-    const hasAdsterra160x600 =
-      import.meta.env.VITE_ADSTERRA_ENABLED !== 'false' &&
-      Boolean(import.meta.env.VITE_ADSTERRA_160X600_KEY);
-    return hasAdSense || hasAdsterra160x600;
+  // Check if dedicated 160x600 key exists, otherwise use verified 300x250 key
+  const adsterraFormat = useMemo<'160x600' | '300x250'>(() => {
+    const k160 = import.meta.env.VITE_ADSTERRA_160X600_KEY;
+    const k300 = import.meta.env.VITE_ADSTERRA_300X250_KEY;
+    if (k160 && k160 !== k300 && k160.trim() !== '') {
+      return '160x600';
+    }
+    return '300x250';
   }, []);
 
-  // If no 160x600 credentials exist across networks, render children cleanly without gutters
-  if (!hasRailAds) {
-    return (
-      <div className={`w-full relative flex justify-center items-start px-2 sm:px-4 lg:px-6 ${className}`}>
-        <div className={`w-full ${centerWidthClass} shrink-0 flex-grow transition-all`}>
-          {children}
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className={`w-full relative flex justify-center items-start px-2 sm:px-4 lg:px-6 2xl:px-8 ${className}`}>
-      {/* 1. LEFT SKYSCRAPER RAIL */}
+    <div className={`w-full relative flex justify-center items-start px-2 sm:px-4 lg:px-6 ${className}`}>
+      {/* 1. LEFT VERTICAL SPONSOR RAIL */}
       <aside
-        className={`hidden min-[1440px]:flex flex-col items-center shrink-0 sticky top-[80px] z-20 transition-opacity duration-300 mr-4 xl:mr-6 2xl:mr-10 [@media(max-height:780px)]:!hidden ${
+        className={`hidden min-[1200px]:flex flex-col items-center shrink-0 sticky top-[80px] z-20 transition-opacity duration-300 mr-3 xl:mr-5 2xl:mr-8 w-[160px] min-[1440px]:w-[300px] ${
           hasActiveWork ? 'opacity-0 pointer-events-none' : 'opacity-100'
         }`}
-        style={{ width: '160px', minHeight: '600px' }}
         aria-label="Sponsored Advertisement (Left)"
       >
-        <div className="w-[160px] min-h-[600px] bg-transparent border-0 shadow-none flex flex-col items-center justify-start overflow-hidden">
+        <span className="text-[10px] font-bold tracking-widest uppercase text-slate-400 dark:text-slate-500 mb-1 select-none">
+          Sponsored
+        </span>
+        <div className="w-[160px] min-[1440px]:w-[300px] h-[380px] sm:h-[400px] md:h-[420px] rounded-2xl overflow-hidden border border-slate-200/80 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30 flex flex-col items-center justify-center shadow-xs">
           <AdSlot
             placement="TOOL_SIDE_RAIL_LEFT"
             slot={leftSlot}
             format="vertical"
-            className="w-[160px] min-h-[600px] !my-0 !max-w-[160px]"
-            showLabel={true}
+            className="w-full !my-0"
+            showLabel={false}
           />
-          <AdsterraBanner
-            format="160x600"
-            showLabel={true}
-            className="w-[160px] min-h-[600px]"
-          />
+          <div className="w-full flex items-center justify-center overflow-hidden">
+            <div className={adsterraFormat === '300x250' ? 'scale-[0.533] min-[1440px]:scale-100 origin-center' : 'w-full'}>
+              <AdsterraBanner
+                format={adsterraFormat}
+                customKey={adsterraFormat === '300x250' ? 'b829e60459e206fdcb08b6bd0e342172' : undefined}
+                showLabel={false}
+                className="!my-0"
+              />
+            </div>
+          </div>
         </div>
       </aside>
 
-      {/* 2. CENTER CONTENT WORKBENCH */}
+      {/* 2. CENTER CONTENT WORKBENCH (Tool Dropzone + Horizontal Ad) */}
       <div className={`w-full ${centerWidthClass} shrink-0 flex-grow transition-all`}>
         {children}
       </div>
 
-      {/* 3. RIGHT SKYSCRAPER RAIL */}
+      {/* 3. RIGHT VERTICAL SPONSOR RAIL */}
       <aside
-        className={`hidden min-[1440px]:flex flex-col items-center shrink-0 sticky top-[80px] z-20 transition-opacity duration-300 ml-4 xl:ml-6 2xl:ml-10 [@media(max-height:780px)]:!hidden ${
+        className={`hidden min-[1200px]:flex flex-col items-center shrink-0 sticky top-[80px] z-20 transition-opacity duration-300 ml-3 xl:ml-5 2xl:ml-8 w-[160px] min-[1440px]:w-[300px] ${
           hasActiveWork ? 'opacity-0 pointer-events-none' : 'opacity-100'
         }`}
-        style={{ width: '160px', minHeight: '600px' }}
         aria-label="Sponsored Advertisement (Right)"
       >
-        <div className="w-[160px] min-h-[600px] bg-transparent border-0 shadow-none flex flex-col items-center justify-start overflow-hidden">
+        <span className="text-[10px] font-bold tracking-widest uppercase text-slate-400 dark:text-slate-500 mb-1 select-none">
+          Sponsored
+        </span>
+        <div className="w-[160px] min-[1440px]:w-[300px] h-[380px] sm:h-[400px] md:h-[420px] rounded-2xl overflow-hidden border border-slate-200/80 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30 flex flex-col items-center justify-center shadow-xs">
           <AdSlot
             placement="TOOL_SIDE_RAIL_RIGHT"
             slot={rightSlot}
             format="vertical"
-            className="w-[160px] min-h-[600px] !my-0 !max-w-[160px]"
-            showLabel={true}
+            className="w-full !my-0"
+            showLabel={false}
           />
-          <AdsterraBanner
-            format="160x600"
-            showLabel={true}
-            className="w-[160px] min-h-[600px]"
-          />
+          <div className="w-full flex items-center justify-center overflow-hidden">
+            <div className={adsterraFormat === '300x250' ? 'scale-[0.533] min-[1440px]:scale-100 origin-center' : 'w-full'}>
+              <AdsterraBanner
+                format={adsterraFormat}
+                customKey={adsterraFormat === '300x250' ? 'b829e60459e206fdcb08b6bd0e342172' : undefined}
+                showLabel={false}
+                className="!my-0"
+              />
+            </div>
+          </div>
         </div>
       </aside>
     </div>

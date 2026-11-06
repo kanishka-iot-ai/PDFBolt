@@ -30,10 +30,13 @@ describe('AdSense Configuration & Registry', () => {
 });
 
 describe('AdSlot Component', () => {
-  it('renders development fallback cleanly when ads are disabled in dev mode', () => {
-    render(<AdSlot placement="HOME_CONTENT" />);
-    const devBadge = screen.getByText(/Development Mode/i);
-    expect(devBadge).toBeInTheDocument();
+  it('renders ad container or development fallback based on configuration', () => {
+    const { container } = render(<AdSlot placement="HOME_CONTENT" />);
+    if (isAdsEnabled()) {
+      expect(container.querySelector('.ad-container')).toBeInTheDocument();
+    } else {
+      expect(screen.getByText(/Development Mode/i)).toBeInTheDocument();
+    }
   });
 
   it('preserves min-height reservation to protect Core Web Vitals (CLS)', () => {

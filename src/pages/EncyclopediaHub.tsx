@@ -3,6 +3,8 @@ import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
 import { ENCYCLOPEDIA } from '../constants';
 import { Layers, BookOpen, Clock, ArrowRight, Sparkles } from 'lucide-react';
+import AdSlot from '../components/AdSlot';
+import AdsterraBanner from '../components/AdsterraBanner';
 
 interface EncyclopediaHubProps {
   darkMode: boolean;
@@ -31,6 +33,12 @@ const EncyclopediaHub: React.FC<EncyclopediaHubProps> = ({ darkMode }) => {
           </p>
         </div>
       </section>
+
+      {/* Sponsored Ad Banner */}
+      <div className="max-w-5xl mx-auto px-6 pt-8 pb-2 flex flex-col items-center justify-center min-h-[114px]">
+        <AdSlot placement="ENCYCLOPEDIA_BOTTOM" className="w-full flex justify-center" />
+        <AdsterraBanner format="responsive" className="my-1" />
+      </div>
 
       {/* Articles Grid */}
       <section className="max-w-5xl mx-auto px-6 py-16">

@@ -186,12 +186,19 @@ ${analysis.keyFindings.map((kf, i) => `${i + 1}. ${kf}`).join('\n')}
                   </p>
                 </div>
               ) : (
-                <FileUploader
-                  onFilesSelected={handleFilesSelected}
-                  accept=".pdf"
-                  multiple={false}
-                  darkMode={darkMode}
-                />
+                <div className="w-full flex flex-col items-center">
+                  <FileUploader
+                    onFilesSelected={handleFilesSelected}
+                    accept=".pdf"
+                    multiple={false}
+                    darkMode={darkMode}
+                  />
+                  {/* Center Horizontal Ad directly under Uploader */}
+                  <div className="w-full max-w-2xl mx-auto mt-4 shrink-0 flex flex-col items-center justify-center min-h-[114px]">
+                    <AdSlot placement="INSPECTOR_MID" className="w-full flex justify-center" />
+                    <AdsterraBanner format="responsive" className="my-1" />
+                  </div>
+                </div>
               )}
             </div>
           </DesktopSideRails>

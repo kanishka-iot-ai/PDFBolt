@@ -3,6 +3,8 @@ import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
 import { GUIDES } from '../constants';
 import { BookOpen, Search, Clock, ArrowRight, Sparkles, Filter } from 'lucide-react';
+import AdSlot from '../components/AdSlot';
+import AdsterraBanner from '../components/AdsterraBanner';
 
 interface GuidesHubProps {
   darkMode: boolean;
@@ -84,6 +86,12 @@ const GuidesHub: React.FC<GuidesHubProps> = ({ darkMode }) => {
           </div>
         </div>
       </section>
+
+      {/* Sponsored Ad Banner */}
+      <div className="max-w-5xl mx-auto px-6 pt-8 pb-2 flex flex-col items-center justify-center min-h-[114px]">
+        <AdSlot placement="GUIDE_IN_CONTENT" className="w-full flex justify-center" />
+        <AdsterraBanner format="responsive" className="my-1" />
+      </div>
 
       {/* Guides Grid */}
       <section className="max-w-6xl mx-auto px-6 py-12">
