@@ -58,45 +58,57 @@
 - **Document Title:** The Ultimate Guide to Private, In-Browser PDF Tools (2026 Edition) - PDFBolt
 - Full 4-page interactive 3D WebP flipbook with contextual links pointing directly to `https://pdfbolt.in` and tool routes.
 
-### 11. AnyFlip Digital Flipbook & Publication — Domain Rating: 85 (100% Free)
+### 11. GitBook Developer Documentation Hub — Domain Rating: 88 (100% Free)
+- ✅ **LIVE & PUBLISHED:** [https://pdfbolt.gitbook.io/pdfbolt-docs](https://pdfbolt.gitbook.io/pdfbolt-docs)
+- **Organization / Space:** PDFBolt
+- **Document Title:** PDFBolt: The Complete Client-Side In-Browser PDF Toolkit
+- **Direct Contextual Outbound Backlinks:**
+  - `https://pdfbolt.in/` (PDFBolt Homepage)
+  - `https://pdfbolt.in/merge-pdf` (Merge PDF Online)
+  - `https://pdfbolt.in/compress-pdf/` (Compress PDF Documents)
+  - `https://pdfbolt.in/student-pdf-tools/` (Student & Academic PDF Tools)
+  - `https://pdfbolt.in/compare/online-pdf-tools/` (Privacy Architecture Comparison)
+- Verified public rendering (HTTP 200 OK) in clean isolated browsing without login.
+
+### 12. AnyFlip Digital Flipbook & Publication — Domain Rating: 85 (100% Free)
 - ✅ **LIVE & PUBLISHED:** [https://online.anyflip.com/jxvbo/iubd/mobile/index.html](https://online.anyflip.com/jxvbo/iubd/mobile/index.html) (CDN: [http://online.anyflip.com/jxvbo/iubd/](http://online.anyflip.com/jxvbo/iubd/))
 - **Author Homepage:** [https://anyflip.com/homepage/jxvbo](https://anyflip.com/homepage/jxvbo)
 - Full 4-page interactive flipbook publication with live outbound links to `https://pdfbolt.in` and tool routes.
 
-### 12. Hashnode Engineering Blog — Domain Rating: 83 (100% Free)
+### 13. Hashnode Engineering Blog — Domain Rating: 83 (100% Free)
 - ✅ **LIVE & ACTIVE:** [https://kanishkagiri.hashnode.dev](https://kanishkagiri.hashnode.dev)
 - Custom domain tech publication with contextual backlinks.
 
-### 13. Indie Hackers Product Hub — Domain Rating: 81 (100% Free)
+### 14. Indie Hackers Product Hub — Domain Rating: 81 (100% Free)
 - ✅ **LIVE & ACTIVE:** [https://www.indiehackers.com/product/pdfbolt-2](https://www.indiehackers.com/product/pdfbolt-2)
 - Community product page with founder profile and live website link.
 
-### 14. SaaSHub — Domain Rating: 79 (100% Free)
+### 15. SaaSHub — Domain Rating: 79 (100% Free)
 - ✅ **LIVE & ACTIVE:** [https://www.saashub.com/pdfbolt-in](https://www.saashub.com/pdfbolt-in)
 - Listed under top free PDF tools & utilities.
 
-### 15. AlternativeTo — Domain Rating: 79 (100% Free)
+### 16. AlternativeTo — Domain Rating: 79 (100% Free)
 - ✅ **SUBMITTED & IN REVIEW:** Submission ID `ecbf3628-aa78-411d-9bf0-6b74551c2f31`
 - Listed as free alternative to iLovePDF and Adobe Acrobat.
 
-### 16. Peerlist — Domain Rating: 77 (100% Free)
+### 17. Peerlist — Domain Rating: 77 (100% Free)
 - ✅ **LIVE & PUBLISHED (Project):** [https://peerlist.io/kanishkabmchak/project/pdfbolt](https://peerlist.io/kanishkabmchak/project/pdfbolt)
 - ✅ **LIVE & PUBLISHED (Profile):** [https://peerlist.io/kanishkabmchak](https://peerlist.io/kanishkabmchak)
 
-### 17. Uneed — Domain Rating: 75 (100% Free)
+### 18. Uneed — Domain Rating: 75 (100% Free)
 - ✅ **CONFIRMED & SCHEDULED IN FREE QUEUE:** [https://www.uneed.best/tool/pdfbolt-private-pdf-tools](https://www.uneed.best/tool/pdfbolt-private-pdf-tools)
 
-### 18. PitchWall — Domain Rating: 70 (100% Free)
+### 19. PitchWall — Domain Rating: 70 (100% Free)
 - ✅ **SUBMITTED & UNDER REVIEW (Free Launch Plan):**
 - **Live Status Page URL:** [https://pitchwall.co/product/pdfbolt-online-pdf-tools/status](https://pitchwall.co/product/pdfbolt-online-pdf-tools/status)
 - **Public Product Preview URL:** [https://pitchwall.co/product/pdfbolt-online-pdf-tools](https://pitchwall.co/product/pdfbolt-online-pdf-tools)
 - **Direct Outbound Do-Follow Backlink:** [https://pitchwall.co/out/pdfbolt.in?ref=PitchWall](https://pitchwall.co/out/pdfbolt.in?ref=PitchWall)
 - **Free Perks:** 1-day homepage feature, Do-follow link, and automated tweet from @pitch_wall.
 
-### 19. DevHunt — Domain Rating: 63 (100% Free)
+### 20. DevHunt — Domain Rating: 63 (100% Free)
 - ✅ **LIVE & PUBLISHED:** [https://devhunt.org/tool/pdfbolt-private-pdf-tools](https://devhunt.org/tool/pdfbolt-private-pdf-tools)
 
-### 20. Launching Next — Domain Rating: 58 (100% Free)
+### 21. Launching Next — Domain Rating: 58 (100% Free)
 - ✅ **SUBMITTED & IN QUEUE:** Submission ID `165753`
 
 ---
@@ -106,8 +118,8 @@
 1. **Fazier (DR 82):**
    - Badges verified live on `https://pdfbolt.in`.
    - Form and logo attached on Tab 64; 3 gallery screenshots in temp folder ready for submission.
-2. **GitBook (DR 88):**
-   - Public technical documentation space for PDFBolt with deep links.
+2. **Substack (DR 92):**
+   - Engineering newsletter publication for PDFBolt client-side architecture.
 3. **AppSumo (DR 83):**
    - Submit free software listing for PDFBolt.
 4. **Vocal Media (DR 82):**
