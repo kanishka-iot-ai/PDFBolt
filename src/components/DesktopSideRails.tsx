@@ -48,12 +48,10 @@ export const DesktopSideRails: React.FC<DesktopSideRailsProps> = ({
   }, []);
 
   return (
-    <div className={`w-full relative flex justify-center items-start px-2 sm:px-4 lg:px-6 ${className}`}>
+    <div className={`w-full relative flex justify-center items-start ${hasActiveWork ? "px-0" : "px-2 sm:px-4 lg:px-6"} ${className}`}>
       {/* 1. LEFT VERTICAL SPONSOR RAIL */}
       <aside
-        className={`hidden min-[1200px]:flex flex-col items-center shrink-0 sticky top-[80px] z-20 transition-opacity duration-300 mr-3 xl:mr-5 2xl:mr-8 w-[160px] min-[1440px]:w-[300px] ${
-          hasActiveWork ? 'opacity-0 pointer-events-none' : 'opacity-100'
-        }`}
+        className={`${hasActiveWork ? "hidden" : "hidden min-[1200px]:flex"} flex-col items-center shrink-0 sticky top-[80px] z-20 transition-opacity duration-300 mr-3 xl:mr-5 2xl:mr-8 w-[160px] min-[1440px]:w-[300px]`}
         aria-label="Sponsored Advertisement (Left)"
       >
         <span className="text-[10px] font-bold tracking-widest uppercase text-slate-400 dark:text-slate-500 mb-1 select-none">
@@ -74,15 +72,13 @@ export const DesktopSideRails: React.FC<DesktopSideRailsProps> = ({
       </aside>
 
       {/* 2. CENTER CONTENT WORKBENCH (Tool Dropzone + Horizontal Ad) */}
-      <div className={`w-full ${centerWidthClass} shrink-0 flex-grow transition-all`}>
+      <div className={`w-full ${hasActiveWork ? "max-w-full" : centerWidthClass} shrink-0 flex-grow transition-all`}>
         {children}
       </div>
 
       {/* 3. RIGHT VERTICAL SPONSOR RAIL */}
       <aside
-        className={`hidden min-[1200px]:flex flex-col items-center shrink-0 sticky top-[80px] z-20 transition-opacity duration-300 ml-3 xl:ml-5 2xl:ml-8 w-[160px] min-[1440px]:w-[300px] ${
-          hasActiveWork ? 'opacity-0 pointer-events-none' : 'opacity-100'
-        }`}
+        className={`${hasActiveWork ? "hidden" : "hidden min-[1200px]:flex"} flex-col items-center shrink-0 sticky top-[80px] z-20 transition-opacity duration-300 ml-3 xl:ml-5 2xl:ml-8 w-[160px] min-[1440px]:w-[300px]`}
         aria-label="Sponsored Advertisement (Right)"
       >
         <span className="text-[10px] font-bold tracking-widest uppercase text-slate-400 dark:text-slate-500 mb-1 select-none">

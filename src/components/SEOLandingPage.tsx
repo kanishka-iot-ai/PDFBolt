@@ -145,24 +145,26 @@ const SEOLandingPage: React.FC<SEOLandingPageProps> = ({ tool: toolProp, toolId,
       </div>
 
       {/* 2. THE WORKING INTERACTIVE TOOL (Full space when active, flanked with zero-CLS side rails when landing) */}
-      {hasActiveWork ? (
-        <div className="w-full h-full flex-grow overflow-hidden">
-          {children}
-        </div>
-      ) : (
-        <DesktopSideRails hasActiveWork={hasActiveWork} centerWidthClass="max-w-4xl" className="my-auto">
-          <div className="flex-grow flex flex-col items-center justify-center p-2 sm:p-4 w-full">
-            <div className="w-full">
+      <div className={`w-full flex-grow flex flex-col ${hasActiveWork ? 'h-full overflow-hidden' : 'my-auto justify-center'}`}>
+        <DesktopSideRails
+          hasActiveWork={hasActiveWork}
+          centerWidthClass={hasActiveWork ? 'max-w-full' : 'max-w-4xl'}
+          className={hasActiveWork ? '!px-0 w-full h-full' : 'my-auto'}
+        >
+          <div className={`w-full flex flex-col items-center justify-center ${hasActiveWork ? 'h-full p-0' : 'p-2 sm:p-4'}`}>
+            <div className="w-full h-full">
               {children}
             </div>
 
             {/* 3. CENTER HORIZONTAL AD (Frames the bottom of the workbench between the two vertical side rails) */}
-            <div className="w-full max-w-4xl mx-auto px-4 mt-4 mb-2 shrink-0 flex flex-col items-center justify-center min-h-[114px] md:min-h-[115px]">
-              <AdsterraBanner format="responsive" className="my-1" showLabel={true} />
-            </div>
+            {!hasActiveWork && (
+              <div className="w-full max-w-4xl mx-auto px-4 mt-4 mb-2 shrink-0 flex flex-col items-center justify-center min-h-[114px] md:min-h-[115px]">
+                <AdsterraBanner format="responsive" className="my-1" showLabel={true} />
+              </div>
+            )}
           </div>
         </DesktopSideRails>
-      )}
+      </div>
 
       {/* 4. RELATED PDF TOOLS (Sleek Suggestive Bottom Bar - Only on landing page) */}
       {!hasActiveWork && relatedToolsList.length > 0 && (
