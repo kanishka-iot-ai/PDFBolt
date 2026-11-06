@@ -258,8 +258,8 @@ const TargetedCompressPage: React.FC<TargetedCompressPageProps> = ({ pageSlug: p
         </div>
       </div>
 
-      {/* Sponsored Ad Banner (Directly Beneath Tool, 100% Above The Fold, Zero-CLS Container) */}
-          <div className="w-full max-w-4xl mx-auto px-2 mt-4 mb-2 flex flex-col items-center justify-center min-h-[110px] md:min-h-[115px]">
+      {/* Sponsored Ad Banner (Displayed when Side Rails are hidden < 1440px to eliminate Ad Sandwich) */}
+          <div className="w-full max-w-4xl mx-auto px-2 mt-6 mb-3 flex flex-col items-center justify-center min-h-[110px] md:min-h-[115px] min-[1440px]:hidden">
             <AdSlot placement="TOOL_CONTENT_BOTTOM" className="w-full flex justify-center" />
             <AdsterraBanner format="responsive" className="my-1" />
           </div>

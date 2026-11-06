@@ -109,7 +109,7 @@ const SEOLandingPage: React.FC<SEOLandingPageProps> = ({ tool: toolProp, toolId,
     .filter(Boolean);
 
   return (
-    <div className={`animate-fadeIn w-full ${hasActiveWork ? 'h-[calc(100vh-64px)] overflow-hidden bg-[#f4f5f8] dark:bg-slate-950 flex flex-col' : 'min-h-[calc(100vh-64px)] lg:h-[calc(100vh-64px)] lg:overflow-hidden flex flex-col justify-between bg-white dark:bg-slate-900'}`}>
+    <div className={`animate-fadeIn w-full ${hasActiveWork ? 'h-[calc(100vh-64px)] overflow-hidden bg-[#f4f5f8] dark:bg-slate-950 flex flex-col' : 'min-h-[calc(100vh-64px)] flex flex-col justify-between bg-white dark:bg-slate-900'}`}>
       <Helmet>
         <title>{tool?.seoTitle || `${tool?.title || 'PDF Tool'} – Free & Private Online Tool | PDFBolt`}</title>
         <meta name="description" content={tool?.description} />
@@ -156,8 +156,8 @@ const SEOLandingPage: React.FC<SEOLandingPageProps> = ({ tool: toolProp, toolId,
               {children}
             </div>
 
-            {/* 3. NON-INTRUSIVE HIGH-VISIBILITY AD PLACEMENT (Only on landing dropzone page) */}
-            <div className="w-full max-w-4xl mx-auto px-4 my-2 shrink-0 flex flex-col items-center justify-center min-h-[114px] md:min-h-[115px]">
+            {/* 3. RESPONSIVE AD PLACEMENT: Only displayed when Side Rails are hidden (< 1440px) to prevent Ad Sandwich */}
+            <div className="w-full max-w-4xl mx-auto px-4 mt-6 mb-3 shrink-0 flex flex-col items-center justify-center min-h-[114px] md:min-h-[115px] min-[1440px]:hidden">
               <AdSlot placement="TOOL_CONTENT_BOTTOM" className="w-full flex justify-center" />
               <AdsterraBanner format="responsive" className="my-2" />
             </div>
