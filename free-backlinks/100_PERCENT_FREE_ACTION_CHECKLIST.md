@@ -55,13 +55,20 @@
 
 ---
 
-### 5. edocr — Domain Rating: 79 (100% Free)
-- **Direct Upload Link:** [https://www.edocr.com/](https://www.edocr.com/)
-- Upload both PDFs from `free-backlinks/documents/`. edocr automatically extracts all URLs and indexes them as live links in Google.
+### 5. About.me — Domain Rating: 90 (100% Free)
+- ✅ **LIVE & PUBLISHED:** [https://about.me/kanishka](https://about.me/kanishka)
+- Direct spotlight button pointing to `https://pdfbolt.in/` with bio attribution.
 
 ---
 
-### 6. GitHub Pages Documentation (`kanishka-iot-ai.github.io/PDFBolt`) — Domain Rating: 97 (100% Free)
+### 6. Peerlist — Domain Rating: 77 (100% Free)
+- ✅ **LIVE & PUBLISHED (Project):** [https://peerlist.io/kanishkabmchak/project/pdfbolt](https://peerlist.io/kanishkabmchak/project/pdfbolt)
+- ✅ **LIVE & PUBLISHED (Profile):** [https://peerlist.io/kanishkabmchak](https://peerlist.io/kanishkabmchak)
+- Verified GitHub connection and direct project link to `https://pdfbolt.in`.
+
+---
+
+### 7. GitHub Pages Documentation (`kanishka-iot-ai.github.io/PDFBolt`) — Domain Rating: 97 (100% Free)
 - ✅ **LIVE & ACTIVE:** [https://kanishka-iot-ai.github.io/PDFBolt/](https://kanishka-iot-ai.github.io/PDFBolt/)
 - Direct Google trust backlink passing high authority to all PDFBolt tool pages.
 
