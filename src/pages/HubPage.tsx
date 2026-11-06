@@ -163,8 +163,7 @@ const HubPage: React.FC<HubPageProps> = ({ darkMode }) => {
           <span className="text-[10px] font-bold tracking-widest uppercase text-slate-400 dark:text-slate-500 mb-1 select-none">
             Sponsored
           </span>
-          <AdSlot placement="HUB_CONTENT_MID" className="w-full flex justify-center" />
-          <AdsterraBanner format="responsive" className="my-1" />
+          <AdsterraBanner format="responsive" className="my-1" showLabel={false} />
         </div>
       </div>
 
@@ -204,7 +203,7 @@ const HubPage: React.FC<HubPageProps> = ({ darkMode }) => {
                       </p>
                     </div>
                     <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800">
-                      <AdSlot placement="TOOL_CONTENT_BOTTOM" className="w-full" showLabel={false} />
+                      <AdsterraBanner format="300x250" showLabel={false} className="!my-0" />
                     </div>
                   </div>
                 )}
@@ -348,8 +347,7 @@ const HubPage: React.FC<HubPageProps> = ({ darkMode }) => {
           <span className="text-[10px] font-bold tracking-widest uppercase text-slate-400 dark:text-slate-500 mb-1 select-none">
             Sponsored
           </span>
-          <AdSlot placement="HUB_CONTENT" className="w-full flex justify-center" />
-          <AdsterraBanner format="responsive" className="my-1" />
+          <AdsterraBanner format="responsive" className="my-1" showLabel={false} />
         </div>
       </div>
 

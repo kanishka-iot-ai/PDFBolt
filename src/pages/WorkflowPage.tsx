@@ -97,8 +97,7 @@ const WorkflowPage: React.FC<WorkflowPageProps> = ({ workflowSlug, darkMode }) =
           <span className="text-[10px] font-bold tracking-widest uppercase text-slate-400 dark:text-slate-500 mb-1 select-none">
             Sponsored
           </span>
-          <AdSlot placement="WORKFLOW_TRANSITION" className="w-full flex justify-center" />
-          <AdsterraBanner format="responsive" className="my-1" />
+          <AdsterraBanner format="responsive" className="my-1" showLabel={false} />
         </div>
       </div>
 
@@ -225,8 +224,7 @@ const WorkflowPage: React.FC<WorkflowPageProps> = ({ workflowSlug, darkMode }) =
           <span className="text-[10px] font-bold tracking-widest uppercase text-slate-400 dark:text-slate-500 mb-1 select-none">
             Sponsored
           </span>
-          <AdSlot placement="HOME_CONTENT" className="w-full flex justify-center" />
-          <AdsterraBanner format="responsive" className="my-1" />
+          <AdsterraBanner format="responsive" className="my-1" showLabel={false} />
         </div>
       </div>
     </div>

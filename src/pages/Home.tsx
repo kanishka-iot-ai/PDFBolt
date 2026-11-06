@@ -264,8 +264,7 @@ const Home: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
           <span className="text-[10px] font-bold tracking-widest uppercase text-slate-400 dark:text-slate-500 mb-1 select-none">
             Sponsored
           </span>
-          <AdSlot placement="HOME_TOOL_TRANSITION" className="w-full flex justify-center" />
-          <AdsterraBanner format="responsive" className="my-1" />
+          <AdsterraBanner format="responsive" className="my-1" showLabel={false} />
         </div>
       </div>
 
@@ -331,8 +330,7 @@ const Home: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
           <span className="text-[10px] font-bold tracking-widest uppercase text-slate-400 dark:text-slate-500 mb-1 select-none">
             Sponsored
           </span>
-          <AdSlot placement="HOME_CONTENT" className="w-full flex justify-center" />
-          <AdsterraBanner format="responsive" className="my-1" />
+          <AdsterraBanner format="responsive" className="my-1" showLabel={false} />
         </div>
       </div>
 
@@ -544,8 +542,7 @@ const Home: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
           <span className="text-[10px] font-bold tracking-widest uppercase text-slate-400 dark:text-slate-500 mb-1 select-none">
             Sponsored
           </span>
-          <AdSlot placement="HOME_KNOWLEDGE_BOTTOM" className="w-full flex justify-center" />
-          <AdsterraBanner format="responsive" className="my-1" />
+          <AdsterraBanner format="responsive" className="my-1" showLabel={false} />
         </div>
       </div>
 
@@ -654,8 +651,7 @@ const Home: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
           <span className="text-[10px] font-bold tracking-widest uppercase text-slate-400 dark:text-slate-500 mb-1 select-none">
             Sponsored
           </span>
-          <AdSlot placement="HOME_PRE_FOOTER" className="w-full flex justify-center" />
-          <AdsterraBanner format="responsive" className="my-1" />
+          <AdsterraBanner format="responsive" className="my-1" showLabel={false} />
         </div>
       </div>
     </div>

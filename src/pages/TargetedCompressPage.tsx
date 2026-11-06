@@ -260,8 +260,7 @@ const TargetedCompressPage: React.FC<TargetedCompressPageProps> = ({ pageSlug: p
 
       {/* Sponsored Horizontal Banner (Balanced with Left and Right Vertical Side Rails) */}
           <div className="w-full max-w-4xl mx-auto px-2 mt-4 mb-2 flex flex-col items-center justify-center min-h-[110px] md:min-h-[115px]">
-            <AdSlot placement="TOOL_CONTENT_BOTTOM" className="w-full flex justify-center" />
-            <AdsterraBanner format="responsive" className="my-1" />
+            <AdsterraBanner format="responsive" className="my-1" showLabel={true} />
           </div>
         </div>
       </DesktopSideRails>

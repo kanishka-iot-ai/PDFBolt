@@ -89,8 +89,7 @@ const GuidesHub: React.FC<GuidesHubProps> = ({ darkMode }) => {
 
       {/* Sponsored Ad Banner */}
       <div className="max-w-5xl mx-auto px-6 pt-8 pb-2 flex flex-col items-center justify-center min-h-[114px]">
-        <AdSlot placement="GUIDE_IN_CONTENT" className="w-full flex justify-center" />
-        <AdsterraBanner format="responsive" className="my-1" />
+        <AdsterraBanner format="responsive" className="my-1" showLabel={true} />
       </div>
 
       {/* Guides Grid */}

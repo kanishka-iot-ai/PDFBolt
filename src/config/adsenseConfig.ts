@@ -86,8 +86,8 @@ export const AD_PLACEMENTS = {
     defaultSlotId: import.meta.env.VITE_ADSENSE_SLOT_TOOL_CONTENT || '',
     format: 'auto',
     responsive: true,
-    minHeightDesktop: '250px',
-    minHeightMobile: '200px',
+    minHeightDesktop: '110px',
+    minHeightMobile: '100px',
     label: 'Advertisement'
   },
   // Result screen placement (Well below download button)
@@ -165,7 +165,7 @@ export const AD_PLACEMENTS = {
     defaultSlotId: import.meta.env.VITE_ADSENSE_SLOT_SIDE_RAIL_LEFT || '',
     format: 'vertical',
     responsive: false,
-    minHeightDesktop: '600px',
+    minHeightDesktop: '250px',
     minHeightMobile: '0px',
     label: 'Advertisement'
   },
@@ -174,7 +174,7 @@ export const AD_PLACEMENTS = {
     defaultSlotId: import.meta.env.VITE_ADSENSE_SLOT_SIDE_RAIL_RIGHT || '',
     format: 'vertical',
     responsive: false,
-    minHeightDesktop: '600px',
+    minHeightDesktop: '250px',
     minHeightMobile: '0px',
     label: 'Advertisement'
   },

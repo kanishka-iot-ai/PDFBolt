@@ -335,6 +335,11 @@ const MainLayout: React.FC<MainLayoutProps> = ({ darkMode, setDarkMode, soundEna
             <Route path="/add-page-numbers" element={<Navigate to="/add-page-numbers-to-pdf/" replace />} />
             <Route path="/qr-pdf-share" element={<Navigate to="/pdf-to-qr-code/" replace />} />
             <Route path="/pdf-analyzer" element={<Navigate to="/analyze-pdf/" replace />} />
+            <Route path="/pdf-inspector" element={<Navigate to="/analyze-pdf/" replace />} />
+            <Route path="/pdf-inspector/*" element={<Navigate to="/analyze-pdf/" replace />} />
+            <Route path="/inspector" element={<Navigate to="/analyze-pdf/" replace />} />
+            <Route path="/workflows" element={<Navigate to="/student-pdf-tools/" replace />} />
+            <Route path="/workflows/*" element={<Navigate to="/student-pdf-tools/" replace />} />
             <Route path="/analyze" element={<Navigate to="/analyze-pdf/" replace />} />
             <Route path="/tools/pdf-analyzer" element={<Navigate to="/analyze-pdf/" replace />} />
             <Route path="/merge" element={<Navigate to="/merge-pdf/" replace />} />

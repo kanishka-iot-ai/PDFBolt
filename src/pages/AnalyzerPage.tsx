@@ -195,8 +195,7 @@ ${analysis.keyFindings.map((kf, i) => `${i + 1}. ${kf}`).join('\n')}
                   />
                   {/* Center Horizontal Ad directly under Uploader */}
                   <div className="w-full max-w-2xl mx-auto mt-4 shrink-0 flex flex-col items-center justify-center min-h-[114px]">
-                    <AdSlot placement="INSPECTOR_MID" className="w-full flex justify-center" />
-                    <AdsterraBanner format="responsive" className="my-1" />
+                    <AdsterraBanner format="responsive" className="my-1" showLabel={true} />
                   </div>
                 </div>
               )}
