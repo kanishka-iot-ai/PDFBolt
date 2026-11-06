@@ -7,7 +7,17 @@
 
 ## 🚀 Fast-Track Free Authority Links (Execute in 15 Minutes)
 
+### 1. Speaker Deck (GitHub / SlideShare Alternative) — Domain Rating: 89 (100% Free)
+- ✅ **LIVE & PUBLISHED:** [https://speakerdeck.com/kanishkaiotai/pdfbolt-ultimate-guide-to-private-pdf-tools-2026](https://speakerdeck.com/kanishkaiotai/pdfbolt-ultimate-guide-to-private-pdf-tools-2026)
+- **Direct PDF CDN URL:** [https://files.speakerdeck.com/presentations/9281520987da436db42499cc69f03645/PDFBolt_Ultimate_Guide_To_Private_PDF_Tools_2026.pdf](https://files.speakerdeck.com/presentations/9281520987da436db42499cc69f03645/PDFBolt_Ultimate_Guide_To_Private_PDF_Tools_2026.pdf)
+- **Title:** `PDFBolt – The Ultimate Guide to Private In-Browser PDF Tools & Compression (2026)`
+- **Category:** Technology / Software
+- **Indexed Content:** Full 4-page HTML5 text layer with direct backlinks to `https://pdfbolt.in`, `https://pdfbolt.in/merge-pdf/`, `https://pdfbolt.in/compress-pdf/`, and tool directories.
+
+---
+
 ### 1. SlideShare (LinkedIn) — Domain Rating: 92 (100% Free)
+*(Note: SlideShare has platform-wide uploads temporarily suspended; Speaker Deck above serves as the high-DR replacement).*
 - **Direct Upload Link:** [https://www.slideshare.net/upload](https://www.slideshare.net/upload)
 - **Document to Upload:**
   `free-backlinks/documents/PDFBolt_Ultimate_Guide_To_Private_PDF_Tools_2026.pdf`
@@ -23,15 +33,12 @@
 ---
 
 ### 2. Scribd — Domain Rating: 91 (100% Free)
-- **Direct Upload Link:** [https://www.scribd.com/upload-document](https://www.scribd.com/upload-document)
-- **Document to Upload:**
-  `free-backlinks/documents/Indian_Exam_And_Job_Portal_PDF_Size_Guide_2026.pdf`
-- **Title:**
-  `Indian Government & Competitive Exam PDF Size Limits Reference (SSC, UPSC, NEET, JEE)`
-- **Description to Paste:**
-  ```text
-  Comprehensive file size and format reference for Indian competitive exam portals (SSC, UPSC, NEET, JEE, IBPS, RRB). Includes step-by-step instructions on reducing PDFs under 100KB/200KB without quality loss at https://pdfbolt.in/student-pdf-tools/
-  ```
+- ✅ **LIVE & PUBLISHED:** [https://www.scribd.com/document/1094207370/Indian-Government-Competitive-Exam-PDF-Size-Limits-Reference-SSC-UPSC-NEET-JEE](https://www.scribd.com/document/1094207370/Indian-Government-Competitive-Exam-PDF-Size-Limits-Reference-SSC-UPSC-NEET-JEE)
+- **Author Profile:** [https://www.scribd.com/user/1041605584/kanishka-bmchak](https://www.scribd.com/user/1041605584/kanishka-bmchak)
+- **Document Uploaded:** `free-backlinks/documents/Indian_Exam_And_Job_Portal_PDF_Size_Guide_2026.pdf`
+- **Title:** `Indian Government & Competitive Exam PDF Size Limits Reference (SSC, UPSC, NEET, JEE)`
+- **Visibility:** 100% Free & Public with full text copy and document downloads enabled.
+- **Active Backlinks:** Direct links to `https://pdfbolt.in/student-pdf-tools/` and target tool presets (100KB, 200KB compression).
 
 ---
 

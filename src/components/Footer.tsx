@@ -57,7 +57,33 @@ const Footer: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
               ★ Trustpilot
             </a>
           </div>
-          <div className="mt-3.5">
+          <div className="mt-3.5 flex flex-col gap-2.5">
+            <a 
+              href="https://fazier.com" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="inline-flex items-center transition-transform hover:scale-105"
+              aria-label="Featured on Fazier"
+            >
+              <img 
+                src="https://fazier.com/api/v1//public/badges/launch_badges.svg?badge_type=featured&theme=light" 
+                alt="Featured on Fazier" 
+                width="200" 
+                height="54" 
+                loading="lazy" 
+                decoding="async" 
+                className={`${darkMode ? 'hidden' : 'block'} h-9 w-auto object-contain`} 
+              />
+              <img 
+                src="https://fazier.com/api/v1//public/badges/launch_badges.svg?badge_type=featured&theme=dark" 
+                alt="Featured on Fazier" 
+                width="200" 
+                height="54" 
+                loading="lazy" 
+                decoding="async" 
+                className={`${darkMode ? 'block' : 'hidden'} h-9 w-auto object-contain`} 
+              />
+            </a>
             <a 
               href="https://launchstag.com/p/pdfbolt" 
               target="_blank" 
