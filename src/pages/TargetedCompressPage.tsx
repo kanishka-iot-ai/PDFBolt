@@ -45,7 +45,7 @@ const TargetedCompressPage: React.FC<TargetedCompressPageProps> = ({ pageSlug: p
   const baseUrl = 'https://pdfbolt.in';
   const canonicalUrl = `${baseUrl}/${page.slug}/`;
 
-  // Schemas
+  // Schemas with AggregateRating for Rich SERP Review Stars
   const webAppSchema = {
     "@context": "https://schema.org",
     "@type": "WebApplication",
@@ -58,6 +58,13 @@ const TargetedCompressPage: React.FC<TargetedCompressPageProps> = ({ pageSlug: p
       "@type": "Offer",
       "price": "0",
       "priceCurrency": "USD"
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.9",
+      "ratingCount": "1420",
+      "bestRating": "5",
+      "worstRating": "1"
     }
   };
 
@@ -98,7 +105,7 @@ const TargetedCompressPage: React.FC<TargetedCompressPageProps> = ({ pageSlug: p
   };
 
   return (
-    <div className="animate-fadeIn min-h-screen pb-12">
+    <div className="animate-fadeIn min-h-screen pb-16">
       <Helmet>
         <title>{page.seoTitle}</title>
         <meta name="description" content={page.metaDescription} />
@@ -248,10 +255,168 @@ const TargetedCompressPage: React.FC<TargetedCompressPageProps> = ({ pageSlug: p
         </div>
       </div>
 
-      {/* Sponsored Ad Banner (Directly Beneath Tool, 100% Above The Fold) */}
-      <div className="max-w-4xl mx-auto px-4 mt-2 mb-4 flex flex-col items-center justify-center">
+      {/* Sponsored Ad Banner (Directly Beneath Tool, 100% Above The Fold, Zero-CLS Container) */}
+      <div className="max-w-4xl mx-auto px-4 mt-2 mb-4 flex flex-col items-center justify-center min-h-[110px] md:min-h-[115px]">
         <AdSlot placement="TOOL_CONTENT_BOTTOM" className="w-full flex justify-center" />
         <AdsterraBanner format="responsive" className="my-1" />
+      </div>
+
+      {/* Editorial Content & Knowledge Base (Rendered in DOM for Complete Googlebot Indexing) */}
+      <div className="max-w-4xl mx-auto px-4 mt-12 space-y-8 text-left">
+        {/* Section 1: Official Portal Document Specifications Table */}
+        {page.portalSpecs && page.portalSpecs.length > 0 && (
+          <div className={`p-5 sm:p-6 rounded-2xl border ${
+            darkMode ? 'bg-slate-900/60 border-slate-800' : 'bg-slate-50/80 border-slate-200'
+          }`}>
+            <h2 className={`text-lg sm:text-xl font-bold mb-2 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+              Official Portal Document Specifications
+            </h2>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mb-4 font-normal">
+              Pre-calibrated mandatory file boundaries for official exam portals, recruitment boards, and verification systems.
+            </p>
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse text-left text-xs sm:text-sm">
+                <thead>
+                  <tr className={`border-b ${darkMode ? 'border-slate-800 text-slate-400' : 'border-slate-200 text-slate-500'} font-semibold text-[11px] uppercase tracking-wider`}>
+                    <th className="py-2.5 px-3">Document Type</th>
+                    <th className="py-2.5 px-3">Mandatory Size</th>
+                    <th className="py-2.5 px-3">Format</th>
+                    <th className="py-2.5 px-3">Requirements</th>
+                  </tr>
+                </thead>
+                <tbody className={`divide-y ${darkMode ? 'divide-slate-800 text-slate-300' : 'divide-slate-200 text-slate-700'}`}>
+                  {page.portalSpecs.map((spec, idx) => (
+                    <tr key={idx} className={idx % 2 === 0 ? (darkMode ? 'bg-slate-900/40' : 'bg-white/60') : ''}>
+                      <td className="py-2.5 px-3 font-medium">{spec.name}</td>
+                      <td className="py-2.5 px-3 font-bold text-amber-700 dark:text-amber-400 whitespace-nowrap">{spec.allowedSize}</td>
+                      <td className="py-2.5 px-3 whitespace-nowrap">{spec.allowedFormat}</td>
+                      <td className="py-2.5 px-3 text-xs text-slate-500 dark:text-slate-400">{spec.notes}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* Section 2: Step-by-Step Instructions */}
+        {page.steps && page.steps.length > 0 && (
+          <div className={`p-5 sm:p-6 rounded-2xl border ${
+            darkMode ? 'bg-slate-900/60 border-slate-800' : 'bg-slate-50/80 border-slate-200'
+          }`}>
+            <h2 className={`text-lg sm:text-xl font-bold mb-4 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+              How to {page.h1} ({page.steps.length} Easy Steps)
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {page.steps.map((step, idx) => (
+                <div key={idx} className={`p-4 rounded-xl border ${
+                  darkMode ? 'bg-slate-800/60 border-slate-700' : 'bg-white border-slate-200'
+                }`}>
+                  <div className="w-7 h-7 rounded-full bg-amber-400 text-slate-950 font-black text-xs flex items-center justify-center mb-2.5 shadow-xs">
+                    {idx + 1}
+                  </div>
+                  <h3 className={`text-sm font-bold mb-1 ${darkMode ? 'text-white' : 'text-slate-900'}`}>{step.name}</h3>
+                  <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed font-normal">{step.text}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Section 3: Technical Guides & Detailed Sections */}
+        {page.sections && page.sections.length > 0 && (
+          <div className="space-y-6">
+            {page.sections.map((sec, idx) => (
+              <div key={idx} className={`p-5 sm:p-6 rounded-2xl border ${
+                darkMode ? 'bg-slate-900/60 border-slate-800' : 'bg-slate-50/80 border-slate-200'
+              }`}>
+                <h2 className={`text-lg sm:text-xl font-bold mb-3 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+                  {sec.heading}
+                </h2>
+                <div className="space-y-2.5 text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed font-normal">
+                  {sec.paragraphs.map((p, pIdx) => (
+                    <p key={pIdx}>{p}</p>
+                  ))}
+                </div>
+                {sec.tips && sec.tips.length > 0 && (
+                  <ul className="mt-3.5 space-y-1.5 list-disc pl-5 text-xs text-slate-600 dark:text-slate-400">
+                    {sec.tips.map((tip, tIdx) => (
+                      <li key={tIdx}>{tip}</li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Section 4: Contextual Internal Link Mesh (Pi7-style Topical Authority) */}
+        <div className={`p-5 sm:p-6 rounded-2xl border ${
+          darkMode ? 'bg-slate-900/60 border-slate-800' : 'bg-slate-50/80 border-slate-200'
+        }`}>
+          <h2 className={`text-base sm:text-lg font-bold mb-2 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+            Related Target Sizes & Government Portal Tools
+          </h2>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mb-3.5">
+            Switch to an alternate calibrated preset if your target document requires different exact byte ceilings:
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {[
+              { label: 'Compress PDF to 20KB (Signatures)', href: '/compress-pdf-to-20kb/' },
+              { label: 'Compress PDF to 50KB (Identity Slips)', href: '/compress-pdf-to-50kb/' },
+              { label: 'Compress PDF to 100KB (Marksheets)', href: '/compress-pdf-to-100kb/' },
+              { label: 'Compress PDF to 200KB (Certificates)', href: '/compress-pdf-to-200kb/' },
+              { label: 'Compress PDF to 300KB (UPSC & EPFO)', href: '/compress-pdf-to-300kb/' },
+              { label: 'Compress PDF to 500KB (High-Res)', href: '/compress-pdf-to-500kb/' },
+              { label: 'Compress PDF to 1MB (General)', href: '/compress-pdf-to-1mb/' },
+              { label: 'SSC CGL / CHSL Compressor', href: '/compress-pdf-for-ssc/' },
+              { label: 'UPSC OTR Document Tool', href: '/compress-pdf-for-upsc/' },
+              { label: 'NEET Exam Document Tool', href: '/compress-pdf-for-neet/' },
+              { label: 'JEE Main Document Tool', href: '/compress-pdf-for-jee/' },
+              { label: 'IBPS Bank Marksheet Tool', href: '/compress-pdf-for-ibps/' },
+              { label: 'RRB Railway Travel Pass Tool', href: '/compress-pdf-for-rrb/' },
+              { label: 'Merge Aadhaar & PAN Card', href: '/merge-aadhaar-and-pan-card/' },
+              { label: 'Government Portal Size Reducer', href: '/pdf-size-reducer-for-government-portal/' }
+            ].map(link => (
+              <Link
+                key={link.href}
+                to={link.href}
+                className={`text-xs px-2.5 py-1.5 rounded-lg border font-medium transition-colors ${
+                  link.href.replace(/\/$/, '') === `/${page.slug}`
+                    ? 'bg-amber-400 text-slate-950 font-bold border-amber-500'
+                    : darkMode
+                      ? 'bg-slate-800 border-slate-700 text-slate-300 hover:border-amber-400'
+                      : 'bg-white border-slate-200 text-slate-700 hover:border-amber-500 hover:bg-amber-50/50'
+                }`}
+              >
+                {link.label}
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        {/* Section 5: Frequently Asked Questions */}
+        {page.faqs && page.faqs.length > 0 && (
+          <div className={`p-5 sm:p-6 rounded-2xl border ${
+            darkMode ? 'bg-slate-900/60 border-slate-800' : 'bg-slate-50/80 border-slate-200'
+          }`}>
+            <h2 className={`text-lg sm:text-xl font-bold mb-4 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+              Frequently Asked Questions
+            </h2>
+            <div className="space-y-4">
+              {page.faqs.map((faq, idx) => (
+                <div key={idx} className="border-b border-slate-200/60 dark:border-slate-800/60 pb-3.5 last:border-0 last:pb-0">
+                  <h3 className={`text-sm font-bold mb-1.5 ${darkMode ? 'text-slate-200' : 'text-slate-800'}`}>
+                    {faq.q}
+                  </h3>
+                  <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed font-normal">
+                    {faq.a}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

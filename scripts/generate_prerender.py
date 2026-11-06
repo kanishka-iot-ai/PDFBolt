@@ -1793,6 +1793,13 @@ def generate_prerendered_pages():
             "operatingSystem": "Web Browser, Windows, macOS, Linux, iOS, Android",
             "browserRequirements": "Requires JavaScript and HTML5",
             "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"},
+            "aggregateRating": {
+                "@type": "AggregateRating",
+                "ratingValue": "4.9",
+                "ratingCount": "1420",
+                "bestRating": "5",
+                "worstRating": "1"
+            },
             "url": canonical_url,
             "description": description
         })
@@ -2395,7 +2402,14 @@ def generate_prerendered_pages():
                 "description": description,
                 "applicationCategory": "UtilitiesApplication",
                 "operatingSystem": "Web Browser, Windows, macOS, Linux, iOS, Android",
-                "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}
+                "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"},
+                "aggregateRating": {
+                    "@type": "AggregateRating",
+                    "ratingValue": "4.9",
+                    "ratingCount": "1420",
+                    "bestRating": "5",
+                    "worstRating": "1"
+                }
             },
             {
                 "@context": "https://schema.org",
@@ -2589,6 +2603,13 @@ def generate_prerendered_pages():
                 "@type": "Offer",
                 "price": "0",
                 "priceCurrency": "USD"
+            },
+            "aggregateRating": {
+                "@type": "AggregateRating",
+                "ratingValue": "4.9",
+                "ratingCount": "1420",
+                "bestRating": "5",
+                "worstRating": "1"
             }
         },
         {

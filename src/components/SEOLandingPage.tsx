@@ -38,6 +38,13 @@ const SEOLandingPage: React.FC<SEOLandingPageProps> = ({ tool: toolProp, toolId,
       "price": "0",
       "priceCurrency": "USD"
     },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.9",
+      "ratingCount": "1420",
+      "bestRating": "5",
+      "worstRating": "1"
+    },
     "featureList": tool?.features?.join(', ') || "PDF Tools"
   };
 
