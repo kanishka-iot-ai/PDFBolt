@@ -44,13 +44,40 @@ export const isAdTestMode = (): boolean => {
  */
 export const AD_PLACEMENTS = {
   // Homepage placements
+  HOME_TOOL_TRANSITION: {
+    name: 'Home Tool Transition (Post-Grid)',
+    defaultSlotId: import.meta.env.VITE_ADSENSE_SLOT_HOME_TOOL_TRANSITION || import.meta.env.VITE_ADSENSE_SLOT_HOME_CONTENT || '',
+    format: 'auto',
+    responsive: true,
+    minHeightDesktop: '115px',
+    minHeightMobile: '110px',
+    label: 'Advertisement'
+  },
   HOME_CONTENT: {
     name: 'Home Content Mid',
     defaultSlotId: import.meta.env.VITE_ADSENSE_SLOT_HOME_CONTENT || '',
     format: 'auto',
     responsive: true,
-    minHeightDesktop: '120px',
-    minHeightMobile: '100px',
+    minHeightDesktop: '115px',
+    minHeightMobile: '110px',
+    label: 'Advertisement'
+  },
+  HOME_KNOWLEDGE_BOTTOM: {
+    name: 'Home Knowledge Bottom',
+    defaultSlotId: import.meta.env.VITE_ADSENSE_SLOT_HOME_KNOWLEDGE || import.meta.env.VITE_ADSENSE_SLOT_HOME_CONTENT || '',
+    format: 'auto',
+    responsive: true,
+    minHeightDesktop: '115px',
+    minHeightMobile: '110px',
+    label: 'Advertisement'
+  },
+  HOME_PRE_FOOTER: {
+    name: 'Home Pre-Footer',
+    defaultSlotId: import.meta.env.VITE_ADSENSE_SLOT_HOME_PRE_FOOTER || import.meta.env.VITE_ADSENSE_SLOT_HOME_CONTENT || '',
+    format: 'auto',
+    responsive: true,
+    minHeightDesktop: '115px',
+    minHeightMobile: '110px',
     label: 'Advertisement'
   },
   // Tool page educational content placements (Below tool workspace, between How-To and FAQ)
@@ -119,8 +146,17 @@ export const AD_PLACEMENTS = {
     defaultSlotId: import.meta.env.VITE_ADSENSE_SLOT_HUB || '',
     format: 'auto',
     responsive: true,
-    minHeightDesktop: '140px',
-    minHeightMobile: '100px',
+    minHeightDesktop: '115px',
+    minHeightMobile: '110px',
+    label: 'Advertisement'
+  },
+  HUB_CONTENT_MID: {
+    name: 'Tools Hub Mid-Section',
+    defaultSlotId: import.meta.env.VITE_ADSENSE_SLOT_HUB_MID || import.meta.env.VITE_ADSENSE_SLOT_HUB || '',
+    format: 'auto',
+    responsive: true,
+    minHeightDesktop: '115px',
+    minHeightMobile: '110px',
     label: 'Advertisement'
   }
 } as const satisfies Record<string, AdPlacementConfig>;

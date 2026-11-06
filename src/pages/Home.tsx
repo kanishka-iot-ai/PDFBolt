@@ -253,6 +253,21 @@ const Home: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
         )}
       </section>
 
+      {/* Non-Intrusive Sponsored Slot Position A: Post-Tool Grid Browsing Pause */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 my-6 sm:my-8">
+        <div 
+          className={`w-full flex flex-col items-center justify-center rounded-2xl border min-h-[114px] md:min-h-[115px] p-2 transition-all ${
+            darkMode ? 'bg-slate-900/40 border-slate-800' : 'bg-slate-50/60 border-slate-200/80'
+          }`}
+          aria-label="Sponsored Advertisement"
+        >
+          <span className="text-[10px] font-bold tracking-widest uppercase text-slate-400 dark:text-slate-500 mb-1 select-none">
+            Sponsored
+          </span>
+          <AdSlot placement="HOME_TOOL_TRANSITION" className="w-full flex justify-center" />
+          <AdsterraBanner format="responsive" className="my-1" />
+        </div>
+      </div>
 
       {/* 3. TRUST & VALUE INDICATORS SECTION (Moved below primary tool discovery) */}
       <section
@@ -305,10 +320,20 @@ const Home: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
         </div>
       </section>
 
-      {/* Non-Intrusive Sponsored Slot */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <AdSlot placement="HOME_CONTENT" className="my-10" />
-        <AdsterraBanner format="responsive" className="my-6" />
+      {/* Non-Intrusive Sponsored Slot Position B: Mid-Content Transition */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 my-6 sm:my-8">
+        <div 
+          className={`w-full flex flex-col items-center justify-center rounded-2xl border min-h-[114px] md:min-h-[115px] p-2 transition-all ${
+            darkMode ? 'bg-slate-900/40 border-slate-800' : 'bg-slate-50/60 border-slate-200/80'
+          }`}
+          aria-label="Sponsored Advertisement"
+        >
+          <span className="text-[10px] font-bold tracking-widest uppercase text-slate-400 dark:text-slate-500 mb-1 select-none">
+            Sponsored
+          </span>
+          <AdSlot placement="HOME_CONTENT" className="w-full flex justify-center" />
+          <AdsterraBanner format="responsive" className="my-1" />
+        </div>
       </div>
 
       {/* 4. EDUCATIONAL GUIDES & KNOWLEDGE HUB */}
@@ -508,6 +533,22 @@ const Home: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
         </div>
       </section>
 
+      {/* Non-Intrusive Sponsored Slot Position C: Post-Guides Editorial Pause */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 my-6 sm:my-8">
+        <div 
+          className={`w-full flex flex-col items-center justify-center rounded-2xl border min-h-[114px] md:min-h-[115px] p-2 transition-all ${
+            darkMode ? 'bg-slate-900/40 border-slate-800' : 'bg-slate-50/60 border-slate-200/80'
+          }`}
+          aria-label="Sponsored Advertisement"
+        >
+          <span className="text-[10px] font-bold tracking-widest uppercase text-slate-400 dark:text-slate-500 mb-1 select-none">
+            Sponsored
+          </span>
+          <AdSlot placement="HOME_KNOWLEDGE_BOTTOM" className="w-full flex justify-center" />
+          <AdsterraBanner format="responsive" className="my-1" />
+        </div>
+      </div>
+
       {/* 5. PRIVACY VERIFICATION WALKTHROUGH */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 py-12">
         <div className={`p-8 sm:p-12 rounded-3xl border ${darkMode ? 'bg-slate-900/60 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
@@ -601,6 +642,22 @@ const Home: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
           </div>
         </div>
       </section>
+
+      {/* Non-Intrusive Sponsored Slot Position D: Pre-Footer Resting Pause */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 mb-12">
+        <div 
+          className={`w-full flex flex-col items-center justify-center rounded-2xl border min-h-[114px] md:min-h-[115px] p-2 transition-all ${
+            darkMode ? 'bg-slate-900/40 border-slate-800' : 'bg-slate-50/60 border-slate-200/80'
+          }`}
+          aria-label="Sponsored Advertisement"
+        >
+          <span className="text-[10px] font-bold tracking-widest uppercase text-slate-400 dark:text-slate-500 mb-1 select-none">
+            Sponsored
+          </span>
+          <AdSlot placement="HOME_PRE_FOOTER" className="w-full flex justify-center" />
+          <AdsterraBanner format="responsive" className="my-1" />
+        </div>
+      </div>
     </div>
   );
 };

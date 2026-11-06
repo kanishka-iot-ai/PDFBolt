@@ -3,6 +3,8 @@ import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
 import { TOOLS, WORKFLOWS } from '../constants';
 import ToolCard from '../components/ToolCard';
+import AdSlot from '../components/AdSlot';
+import AdsterraBanner from '../components/AdsterraBanner';
 import { Search, Sparkles, GraduationCap, Briefcase, Code, BookOpen, Calculator, CheckCircle2, ShieldCheck, ArrowRight } from 'lucide-react';
 
 interface HubPageProps {
@@ -149,6 +151,22 @@ const HubPage: React.FC<HubPageProps> = ({ darkMode }) => {
           })}
         </div>
       </section>
+
+      {/* Non-Intrusive Sponsored Slot: Persona to Tool Grid Transition */}
+      <div className="max-w-7xl mx-auto px-6 my-4">
+        <div 
+          className={`w-full flex flex-col items-center justify-center rounded-2xl border min-h-[114px] md:min-h-[115px] p-2 transition-all ${
+            darkMode ? 'bg-slate-900/40 border-slate-800' : 'bg-slate-50/60 border-slate-200/80'
+          }`}
+          aria-label="Sponsored Advertisement"
+        >
+          <span className="text-[10px] font-bold tracking-widest uppercase text-slate-400 dark:text-slate-500 mb-1 select-none">
+            Sponsored
+          </span>
+          <AdSlot placement="HUB_CONTENT_MID" className="w-full flex justify-center" />
+          <AdsterraBanner format="responsive" className="my-1" />
+        </div>
+      </div>
 
       {/* Tools Grid */}
       <section className="max-w-7xl mx-auto px-6 py-6">
