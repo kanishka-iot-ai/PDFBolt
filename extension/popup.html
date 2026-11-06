@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PDFBolt Launcher</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <div class="popup-container">
+    <!-- Header -->
+    <header class="header">
+      <div class="brand">
+        <img src="icons/icon-32.png" alt="PDFBolt" class="logo" />
+        <div>
+          <h1 class="brand-name">PDF<span>Bolt</span></h1>
+          <p class="tagline">100% Private In-Browser Tools</p>
+        </div>
+      </div>
+      <span class="badge-privacy">🔒 Offline RAM</span>
+    </header>
+
+    <!-- Search Input -->
+    <div class="search-box">
+      <input type="text" id="search-input" placeholder="Search 25+ PDF tools..." autocomplete="off" />
+    </div>
+
+    <!-- Quick Tools Grid -->
+    <div class="section-title">POPULAR TOOLS</div>
+    <div class="tools-grid" id="tools-container">
+      <a href="https://pdfbolt.in/merge-pdf/" target="_blank" class="tool-card" data-title="merge combine join multiple pdfs">
+        <span class="tool-icon">📑</span>
+        <div class="tool-meta">
+          <div class="tool-title">Merge PDF</div>
+          <div class="tool-desc">Combine files in sequence</div>
+        </div>
+      </a>
+
+      <a href="https://pdfbolt.in/compress-pdf/" target="_blank" class="tool-card" data-title="compress reduce size kb mb small optimize">
+        <span class="tool-icon">⚡</span>
+        <div class="tool-meta">
+          <div class="tool-title">Compress PDF</div>
+          <div class="tool-desc">Reduce to 100KB, 200KB or 1MB</div>
+        </div>
+      </a>
+
+      <a href="https://pdfbolt.in/split-pdf/" target="_blank" class="tool-card" data-title="split extract separate pages range">
+        <span class="tool-icon">✂️</span>
+        <div class="tool-meta">
+          <div class="tool-title">Split PDF</div>
+          <div class="tool-desc">Extract specific pages</div>
+        </div>
+      </a>
+
+      <a href="https://pdfbolt.in/pdf-to-word/" target="_blank" class="tool-card" data-title="pdf to word doc docx convert editable">
+        <span class="tool-icon">📝</span>
+        <div class="tool-meta">
+          <div class="tool-title">PDF to Word</div>
+          <div class="tool-desc">Convert to editable DOCX</div>
+        </div>
+      </a>
+
+      <a href="https://pdfbolt.in/edit-pdf/" target="_blank" class="tool-card" data-title="edit pdf draw annotate sign text highlight">
+        <span class="tool-icon">✏️</span>
+        <div class="tool-meta">
+          <div class="tool-title">Edit PDF</div>
+          <div class="tool-desc">Annotate, highlight & text</div>
+        </div>
+      </a>
+
+      <a href="https://pdfbolt.in/redact-pdf/" target="_blank" class="tool-card" data-title="redact hide black out pii aadhaar pan phone">
+        <span class="tool-icon">🛡️</span>
+        <div class="tool-meta">
+          <div class="tool-title">Redact PDF</div>
+          <div class="tool-desc">Permanently remove PII</div>
+        </div>
+      </a>
+
+      <a href="https://pdfbolt.in/compress-pdf-for-ssc/" target="_blank" class="tool-card" data-title="ssc upsc neet jee exam government admit card size">
+        <span class="tool-icon">🎓</span>
+        <div class="tool-meta">
+          <div class="tool-title">Exam Size Reducer</div>
+          <div class="tool-desc">SSC, UPSC, NEET, JEE formats</div>
+        </div>
+      </a>
+
+      <a href="https://pdfbolt.in/protect-pdf/" target="_blank" class="tool-card" data-title="protect lock password encrypt pdf">
+        <span class="tool-icon">🔐</span>
+        <div class="tool-meta">
+          <div class="tool-title">Protect PDF</div>
+          <div class="tool-desc">Add AES encryption password</div>
+        </div>
+      </a>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="footer-guarantee">
+        <span>✅ Files never leave your computer</span>
+      </div>
+      <a href="https://pdfbolt.in/tools/" target="_blank" class="btn-all-tools">
+        Explore All 25+ Tools &rarr;
+      </a>
+    </footer>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>
