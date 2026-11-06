@@ -62,9 +62,17 @@
 ---
 
 ### 6. GitHub Pages Documentation (`kanishka-iot-ai.github.io/PDFBolt`) — Domain Rating: 97 (100% Free)
-- You can activate GitHub Pages directly on your existing `https://github.com/kanishka-iot-ai/PDFBolt` repository:
-  1. Go to your repo **Settings** on GitHub: [https://github.com/kanishka-iot-ai/PDFBolt/settings/pages](https://github.com/kanishka-iot-ai/PDFBolt/settings/pages)
-  2. Under **Build and deployment** -> **Source**, select **Deploy from a branch**.
-  3. Select branch: `gh-pages` and folder: `/ (root)`.
-  4. Click **Save**!
-- Within 60 seconds, your site is live at `https://kanishka-iot-ai.github.io/PDFBolt/`, giving you a permanent **DR 97 backlink** from GitHub!
+- ✅ **LIVE & ACTIVE:** [https://kanishka-iot-ai.github.io/PDFBolt/](https://kanishka-iot-ai.github.io/PDFBolt/)
+- Direct Google trust backlink passing high authority to all PDFBolt tool pages.
+
+---
+
+### 7. DevHunt — Domain Rating: 63 (100% Free)
+- ✅ **LIVE & PUBLISHED:** [https://devhunt.org/tool/pdfbolt-private-pdf-tools](https://devhunt.org/tool/pdfbolt-private-pdf-tools)
+- Listed under developer utilities with direct link to `https://pdfbolt.in`.
+
+---
+
+### 8. Uneed — Domain Rating: 75 (100% Free)
+- ✅ **CONFIRMED & SCHEDULED IN FREE QUEUE:** [https://www.uneed.best/tool/pdfbolt-private-pdf-tools](https://www.uneed.best/tool/pdfbolt-private-pdf-tools)
+- Live teaser and scheduled launch locked in.
