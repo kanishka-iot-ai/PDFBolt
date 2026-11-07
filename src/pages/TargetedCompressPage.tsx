@@ -5,6 +5,7 @@ import { ALL_LANDING_PAGES } from '../data/landingPages';
 import SimpleTool from './SimpleTool';
 import MergeTool from './MergeTool';
 import EditTool from './EditTool';
+import IDCardComposer from '../components/IDCardComposer';
 import { NotifySystem } from '../types';
 import AdsterraBanner from '../components/AdsterraBanner';
 import DesktopSideRails from '../components/DesktopSideRails';
@@ -34,6 +35,7 @@ const PORTAL_PRESETS = [
   { label: 'JEE Main', href: '/compress-pdf-for-jee/' },
   { label: 'IBPS Bank', href: '/compress-pdf-for-ibps/' },
   { label: 'RRB Railway', href: '/compress-pdf-for-rrb/' },
+  { label: 'ID Card 2-in-1', href: '/combine-id-card-to-single-page-pdf/' },
   { label: 'Aadhaar + PAN', href: '/merge-aadhaar-and-pan-card/' },
   { label: 'All Govt Portals', href: '/pdf-size-reducer-for-government-portal/' }
 ];
@@ -229,14 +231,19 @@ const TargetedCompressPage: React.FC<TargetedCompressPageProps> = ({ pageSlug: p
                   />
                 )}
 
-                {page.toolType === 'merge' && (
+                {(page.slug === 'merge-aadhaar-and-pan-card' || page.slug === 'combine-id-card-to-single-page-pdf') ? (
+                  <IDCardComposer
+                    darkMode={darkMode}
+                    notify={notify}
+                  />
+                ) : page.toolType === 'merge' ? (
                   <MergeTool
                     darkMode={darkMode}
                     notify={notify}
                     customHint={page.customHint}
-                    allowImages={page.slug === 'merge-aadhaar-and-pan-card' || page.slug.includes('merge')}
+                    allowImages={page.slug.includes('merge')}
                   />
-                )}
+                ) : null}
 
                 {page.toolType === 'jpg2pdf' && (
                   <SimpleTool

@@ -479,25 +479,80 @@ export async function reorderPages(file: File, orderStr: string): Promise<Uint8A
   return await target.save({ useObjectStreams: true });
 }
 
+export interface WatermarkPdfOptions {
+  text: string;
+  fontSize?: number;
+  isRepeatingGrid?: boolean;
+  colorType?: 'red' | 'navy' | 'gray';
+  opacity?: number;
+}
+
 /**
- * Watermarks PDF.
+ * Watermarks PDF (Supports both classic single centered and anti-theft repeating security grid)
  */
-export async function watermarkPdf(file: File, text: string, fontSize: number = 50): Promise<Uint8Array> {
+export async function watermarkPdf(
+  file: File, 
+  textOrOptions: string | WatermarkPdfOptions, 
+  legacyFontSize: number = 50
+): Promise<Uint8Array> {
+  const options: WatermarkPdfOptions = typeof textOrOptions === 'string'
+    ? { text: textOrOptions, fontSize: legacyFontSize }
+    : textOrOptions;
+
   const bytes = await file.arrayBuffer();
   const pdf = await PDFDocument.load(bytes);
   const font = await pdf.embedFont(StandardFonts.HelveticaBold);
+  const text = (options.text || 'CONFIDENTIAL').toUpperCase();
+  const fontSize = options.fontSize || 40;
+  const isGrid = options.isRepeatingGrid ?? false;
+
+  let color = rgb(0.75, 0.75, 0.75);
+  const opacity = options.opacity ?? (isGrid ? 0.22 : 0.3);
+
+  if (options.colorType === 'red') {
+    color = rgb(0.86, 0.15, 0.15); // Security Red
+  } else if (options.colorType === 'navy') {
+    color = rgb(0.06, 0.22, 0.44); // Bank Navy
+  }
+
   pdf.getPages().forEach(p => {
     const { width, height } = p.getSize();
-    p.drawText(text, {
-      x: width / 4,
-      y: height / 2,
-      size: fontSize,
-      font,
-      color: rgb(0.8, 0.8, 0.8),
-      opacity: 0.3,
-      rotate: degrees(45)
-    });
+    
+    if (isGrid) {
+      // Staggered repeating lattice covering the page diagonally
+      const stepX = 260;
+      const stepY = 120;
+      const diag = Math.sqrt(width * width + height * height) * 1.5;
+      let row = 0;
+      for (let y = -diag / 2; y < height + diag / 2; y += stepY) {
+        const shift = (row % 2) * (stepX / 2);
+        for (let x = -diag / 2 + shift; x < width + diag / 2; x += stepX) {
+          p.drawText(text, {
+            x,
+            y,
+            size: Math.min(fontSize, 20),
+            font,
+            color,
+            opacity,
+            rotate: degrees(35)
+          });
+        }
+        row++;
+      }
+    } else {
+      // Classic single centered diagonal watermark
+      p.drawText(text, {
+        x: width / 4,
+        y: height / 2,
+        size: fontSize,
+        font,
+        color,
+        opacity,
+        rotate: degrees(45)
+      });
+    }
   });
+
   return await pdf.save({ useObjectStreams: true });
 }
 

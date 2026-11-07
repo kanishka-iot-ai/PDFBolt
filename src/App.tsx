@@ -320,6 +320,8 @@ const MainLayout: React.FC<MainLayoutProps> = ({ darkMode, setDarkMode, soundEna
             <Route path="/pdf-size-reducer-for-government-portal" element={<TargetedCompressPage pageSlug="pdf-size-reducer-for-government-portal" darkMode={darkMode} notify={notify} />} />
 
             {/* Identity & Specialized Document Merging */}
+            <Route path="/combine-id-card-to-single-page-pdf" element={<TargetedCompressPage pageSlug="combine-id-card-to-single-page-pdf" darkMode={darkMode} notify={notify} />} />
+            <Route path="/id-card-front-and-back-pdf" element={<TargetedCompressPage pageSlug="combine-id-card-to-single-page-pdf" darkMode={darkMode} notify={notify} />} />
             <Route path="/merge-aadhaar-and-pan-card" element={<TargetedCompressPage pageSlug="merge-aadhaar-and-pan-card" darkMode={darkMode} notify={notify} />} />
             <Route path="/merge-documents-for-visa-application" element={<TargetedCompressPage pageSlug="merge-documents-for-visa-application" darkMode={darkMode} notify={notify} />} />
             <Route path="/jpg-to-pdf-for-exam" element={<TargetedCompressPage pageSlug="jpg-to-pdf-for-exam" darkMode={darkMode} notify={notify} />} />

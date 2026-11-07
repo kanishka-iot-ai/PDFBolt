@@ -158,6 +158,7 @@ const Footer: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
             <li><Link to="/compress-pdf-for-upsc/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">UPSC OTR & CSE</Link></li>
             <li><Link to="/compress-pdf-for-neet/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">NEET UG Portal</Link></li>
             <li><Link to="/compress-pdf-for-ibps/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">IBPS Bank Exam</Link></li>
+            <li><Link to="/combine-id-card-to-single-page-pdf/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">ID Card Front & Back</Link></li>
             <li><Link to="/merge-aadhaar-and-pan-card/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Merge Aadhaar & PAN</Link></li>
             <li><Link to="/merge-documents-for-visa-application/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Visa Documents Merge</Link></li>
             <li><Link to="/jpg-to-pdf-for-exam/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">JPG to PDF for Exam</Link></li>

@@ -10,7 +10,8 @@ import { ocrPdf, ocrPdfToSearchablePdf } from '../services/ocrService';
 import { pptToPdf, pdfToPpt } from '../services/pptService';
 import { redactPdf, repairPdf } from '../services/sanitizeService';
 import { comparePdfDocuments } from '../services/compareService';
-import { FileText, Download, CheckCircle2, Settings2, Eye, EyeOff, X, Image as ImageIcon, Lock, Zap, ArrowRight, Trash2, Plus, Copy, Check, AlertCircle, Target, ShieldCheck, AlertTriangle } from 'lucide-react';
+import { extractSignatureFromPhoto } from '../services/signatureExtractor';
+import { FileText, Download, CheckCircle2, Camera, Settings2, Eye, EyeOff, X, Image as ImageIcon, Lock, Zap, ArrowRight, Trash2, Plus, Copy, Check, AlertCircle, Target, ShieldCheck, AlertTriangle } from 'lucide-react';
 import { NotifySystem } from '../types';
 
 import ProgressBar from '../components/ProgressBar';
@@ -205,6 +206,8 @@ const SimpleTool: React.FC<SimpleToolProps> = ({ title, mode, darkMode, notify, 
 
   // New States
   const [watermarkText, setWatermarkText] = useState('CONFIDENTIAL');
+  const [isAntiTheftGrid, setIsAntiTheftGrid] = useState(false);
+  const [watermarkColorType, setWatermarkColorType] = useState<'red' | 'navy' | 'gray'>('red');
   const [watermarkSize, setWatermarkSize] = useState(50);
   const [signaturePosition, setSignaturePosition] = useState<'bottom-right' | 'bottom-left'>('bottom-right');
   const [penColor, setPenColor] = useState('#000');
@@ -212,6 +215,26 @@ const SimpleTool: React.FC<SimpleToolProps> = ({ title, mode, darkMode, notify, 
   const [signatureBgColor, setSignatureBgColor] = useState('rgba(255,255,255,0)');
   const [savedSignature, setSavedSignature] = useState<string | null>(null);
   const signatureCanvasRef = useRef<SignatureCanvasRef>(null);
+  const signPhotoInputRef = useRef<HTMLInputElement>(null);
+
+  const handleSignaturePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      notify?.upload?.();
+      const extracted = await extractSignatureFromPhoto({
+        sourceImage: file,
+        inkColorMode: 'executive_blue',
+        autoCrop: true,
+        sensitivity: 75
+      });
+      signatureCanvasRef.current?.fromDataURL(extracted.dataUrl);
+      notify?.complete?.();
+    } catch (err) {
+      console.error(err);
+      notify?.error?.();
+    }
+  };
 
   const [repairReport, setRepairReport] = useState<{
     original_pages: number;
@@ -502,7 +525,14 @@ const SimpleTool: React.FC<SimpleToolProps> = ({ title, mode, darkMode, notify, 
           b = await convertPdfToGrayscale(file, { mode: bwMode, dpi: bwDpi });
         }
       }
-      else if (mode === 'watermark' && file) b = await watermarkPdf(file, watermarkText || 'CONFIDENTIAL', watermarkSize);
+      else if (mode === 'watermark' && file) {
+        b = await watermarkPdf(file, {
+          text: watermarkText || 'CONFIDENTIAL',
+          fontSize: watermarkSize,
+          isRepeatingGrid: isAntiTheftGrid,
+          colorType: isAntiTheftGrid ? watermarkColorType : 'gray'
+        });
+      }
       else if (mode === 'split' && file) {
         if (!pageInput) throw new Error("Please enter a page range (e.g. 1-2, 4)");
         b = await splitPdf(file, pageInput);
@@ -1157,6 +1187,28 @@ const SimpleTool: React.FC<SimpleToolProps> = ({ title, mode, darkMode, notify, 
               {/* Signature Canvas */}
               {isSignTool && (
                 <div className="space-y-4">
+                  {/* Photo Signature Extractor Button (CamScanner style) */}
+                  <div className="flex items-center justify-between p-2.5 rounded-xl border border-amber-500/30 bg-amber-500/5">
+                    <div className="text-left">
+                      <span className="text-xs font-bold text-amber-700 dark:text-amber-400 block">Extract from Paper Photo</span>
+                      <span className="text-[10px] text-slate-500 dark:text-slate-400">Snap a real pen signature on paper: strips background & shadows automatically</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => signPhotoInputRef.current?.click()}
+                      className="px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-black flex items-center gap-1.5 shadow-xs cursor-pointer"
+                    >
+                      <Camera size={14} /> Upload / Snap
+                    </button>
+                    <input
+                      ref={signPhotoInputRef}
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleSignaturePhotoUpload}
+                    />
+                  </div>
+
                   <div className="border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden bg-white">
                     <SignatureCanvas
                       ref={signatureCanvasRef}
@@ -1216,29 +1268,122 @@ const SimpleTool: React.FC<SimpleToolProps> = ({ title, mode, darkMode, notify, 
               {/* Watermark Settings */}
               {mode === 'watermark' && (
                 <div className="space-y-4">
+                  {/* Mode Selector */}
+                  <div className="flex items-center gap-2 p-1.5 rounded-xl border bg-slate-100 dark:bg-slate-900 dark:border-slate-800">
+                    <button
+                      type="button"
+                      onClick={() => setIsAntiTheftGrid(false)}
+                      className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                        !isAntiTheftGrid ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-xs' : 'text-slate-500 hover:text-slate-900'
+                      }`}
+                    >
+                      Single Center Watermark
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsAntiTheftGrid(true);
+                        if (watermarkText === 'CONFIDENTIAL') {
+                          setWatermarkText(`ONLY FOR KYC VERIFICATION - ${new Date().toLocaleDateString('en-GB')}`);
+                        }
+                      }}
+                      className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                        isAntiTheftGrid ? 'bg-amber-500 text-slate-950 font-black shadow-xs' : 'text-slate-500 hover:text-slate-900'
+                      }`}
+                    >
+                      <ShieldCheck size={14} /> Anti-Theft Security Lattice
+                    </button>
+                  </div>
+
+                  {isAntiTheftGrid && (
+                    <div className="p-3 rounded-xl border border-amber-500/30 bg-amber-500/5 text-xs text-amber-700 dark:text-amber-300">
+                      <strong>UIDAI & Banking Safe:</strong> Stamps a repeating un-croppable diagonal lattice across the document to prevent identity theft and fraudulent re-use.
+                    </div>
+                  )}
+
                   <div className="space-y-1.5">
-                    <label htmlFor="watermark-text-input" className="block text-xs font-black uppercase tracking-widest text-slate-500">Watermark Text</label>
+                    <div className="flex justify-between items-center">
+                      <label htmlFor="watermark-text-input" className="block text-xs font-black uppercase tracking-widest text-slate-500">
+                        {isAntiTheftGrid ? 'Security Purpose Annotation' : 'Watermark Text'}
+                      </label>
+                      {isAntiTheftGrid && (
+                        <span className="text-[10px] text-slate-400 font-semibold">Repeating diagonal lattice</span>
+                      )}
+                    </div>
                     <input
                       type="text"
                       id="watermark-text-input"
                       name="watermarkText"
                       value={watermarkText}
                       onChange={(e) => setWatermarkText(e.target.value)}
-                      placeholder="CONFIDENTIAL"
-                      className={`w-full p-4 rounded-xl text-base font-bold border focus:ring-2 transition-all outline-none ${darkMode ? 'bg-slate-900 border-slate-700 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'}`}
+                      placeholder={isAntiTheftGrid ? "e.g. ONLY FOR SBI KYC VERIFICATION" : "CONFIDENTIAL"}
+                      className={`w-full p-3.5 rounded-xl text-sm font-bold border focus:ring-2 transition-all outline-none ${darkMode ? 'bg-slate-900 border-slate-700 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'}`}
                     />
                   </div>
+
+                  {/* Anti-Theft Quick Presets */}
+                  {isAntiTheftGrid && (
+                    <div className="space-y-1">
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Quick Purpose Presets:</span>
+                      <div className="flex flex-wrap gap-1.5">
+                        {[
+                          'ONLY FOR BANK KYC VERIFICATION',
+                          'SUBMITTED FOR VISA APPLICATION',
+                          'FOR JOB APPLICATION VERIFICATION ONLY',
+                          'DO NOT DUPLICATE - FOR IDENTITY CHECK ONLY'
+                        ].map(preset => (
+                          <button
+                            key={preset}
+                            type="button"
+                            onClick={() => setWatermarkText(`${preset} - ${new Date().toLocaleDateString('en-GB')}`)}
+                            className="px-2 py-1 rounded-md text-[10px] font-semibold border border-slate-200 dark:border-slate-800 hover:border-amber-500 text-slate-600 dark:text-slate-300"
+                          >
+                            {preset}
+                          </button>
+                        ))}
+                      </div>
+
+                      {/* Color Options */}
+                      <div className="flex items-center gap-2 pt-2">
+                        <span className="text-[10px] font-bold text-slate-400">Color:</span>
+                        <button
+                          type="button"
+                          onClick={() => setWatermarkColorType('red')}
+                          className={`px-2.5 py-0.5 rounded text-[11px] font-bold border ${watermarkColorType === 'red' ? 'border-red-500 bg-red-500/20 text-red-500' : 'border-slate-300 text-slate-400'}`}
+                        >
+                          Security Red
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setWatermarkColorType('navy')}
+                          className={`px-2.5 py-0.5 rounded text-[11px] font-bold border ${watermarkColorType === 'navy' ? 'border-blue-500 bg-blue-500/20 text-blue-500' : 'border-slate-300 text-slate-400'}`}
+                        >
+                          Bank Navy
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setWatermarkColorType('gray')}
+                          className={`px-2.5 py-0.5 rounded text-[11px] font-bold border ${watermarkColorType === 'gray' ? 'border-slate-500 bg-slate-500/20 text-slate-400' : 'border-slate-300 text-slate-400'}`}
+                        >
+                          Neutral Gray
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
                   <div className="space-y-1.5">
                     <div className="flex justify-between items-center">
-                      <label htmlFor="watermark-size-slider" className="block text-xs font-black uppercase tracking-widest text-slate-500">Font Size ({watermarkSize})</label>
+                      <label htmlFor="watermark-size-slider" className="block text-xs font-black uppercase tracking-widest text-slate-500">
+                        {isAntiTheftGrid ? 'Pattern Size' : `Font Size (${watermarkSize}px)`}
+                      </label>
                       <span className="text-xs font-bold text-yellow-600 dark:text-yellow-400">{watermarkSize}px</span>
                     </div>
                     <input
                       type="range"
                       id="watermark-size-slider"
                       name="watermarkSize"
-                      min="10"
-                      max="200"
+                      min={isAntiTheftGrid ? 10 : 20}
+                      max={isAntiTheftGrid ? 50 : 200}
                       value={watermarkSize}
                       onChange={(e) => setWatermarkSize(parseInt(e.target.value, 10) || 48)}
                       className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-yellow-500"

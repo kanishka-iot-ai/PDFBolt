@@ -1040,6 +1040,67 @@ TARGETED_PAGES = [
 
     # Workflow Pages
     {
+        "path": "combine-id-card-to-single-page-pdf",
+        "h1": "Combine ID Card Front & Back on Single Page PDF",
+        "title": "Combine ID Card Front and Back on One Page PDF Free (A4 Print-Ready) | PDFBolt",
+        "description": "Merge both sides of your ID card, Aadhaar, PAN card, or Driver's License onto a single A4 PDF. Choose 1:1 true physical size or KYC zoom with zero server uploads.",
+        "subtitle": "Merge both sides of your ID card, Aadhaar, PAN card, or Driver's License onto a single A4 PDF. Choose 1:1 true physical size or KYC zoom with zero server uploads.",
+        "quick_answer": "To combine both sides of an ID card on one page: 1. Upload Front and Back photos. 2. Select 1:1 Actual Size (85.6mm x 54mm) for printing or KYC Zoom for bank uploads. 3. Optionally enable Anti-Theft Watermark. 4. Click Download Print-Ready A4 PDF.",
+        "target_badge": "1:1 A4 Print-Ready ID Composer (Under 800KB)",
+        "custom_hint": "Upload Front & Back of ID Card (Aadhaar, PAN, License, Voter ID)",
+        "portal_specs": [
+            {"name": "Bank Video KYC (SBI, HDFC, ICICI, Axis)", "size": "Under 1 MB or 2 MB", "format": "Single A4 PDF", "notes": "Both front and back card sides must be visible on single sheet"},
+            {"name": "Demat & Stock Broker KYC (Zerodha, Groww)", "size": "Under 2 MB", "format": "PDF", "notes": "Must include clear photo, signature, and unmasked QR code"},
+            {"name": "UPSC / SSC / State PSC Recruitment Portals", "size": "20 KB – 300 KB", "format": "PDF only", "notes": "Official identity slip verification floor"},
+            {"name": "VFS Global & US Visa Appointment", "size": "Under 2 MB", "format": "A4 PDF", "notes": "1:1 physical dimensions or high-clarity KYC zoom"},
+            {"name": "Rental Agreements & Hotel Check-in", "size": "Any", "format": "Print / PDF", "notes": "Recommended with anti-theft purpose watermark"},
+        ],
+        "features": [
+            "1:1 ISO/IEC 7810 ID-1 True Physical Scale (85.6mm x 54mm) for print, cut, and lamination",
+            "KYC Portal Zoom (1.5x scale) for maximum readability on bank and visa portals",
+            "Optional Anti-Theft Security Purpose Watermark to prevent identity theft and unauthorized reuse",
+            "High-density 300 DPI print-ready rendering ensures UIDAI QR codes and barcodes scan instantly",
+            "100% local WebAssembly processing in your browser memory: zero uploads, complete privacy",
+        ],
+        "how_to": [
+            {"name": "Upload Card Photos", "text": "Select or snap Front and Back photos of your ID card (Aadhaar, PAN, License, Voter ID)."},
+            {"name": "Select A4 Layout", "text": "Choose 1:1 Actual Physical Size for printing/laminating, or KYC Zoom for bank verification."},
+            {"name": "Add Anti-Theft Stamp", "text": "Optionally stamp a diagonal purpose watermark (e.g. 'Only for SBI Bank KYC on 07/11/2026')."},
+            {"name": "Download A4 PDF", "text": "Save your print-ready A4 PDF document or high-resolution JPG image in seconds."},
+        ],
+        "sections": [
+            {
+                "heading": "Why Banks, Exam Boards, and Embassies Require Both ID Sides on One Sheet",
+                "paragraphs": [
+                    "When submitting official identity proofs for Video KYC, government recruitment exams, or passport/visa appointments, submission portals strictly provide only a single document upload slot labeled 'Photo ID Proof (Both Sides)'.",
+                    "Uploading two separate files or submitting a multi-page PDF where the front is on Page 1 and the back is on Page 2 often causes automated document validators to flag the submission as incomplete. PDFBolt arranges both card faces onto a single standard A4 sheet, perfectly centered and ready for human or machine inspection."
+                ]
+            },
+            {
+                "heading": "Understanding 1:1 Physical Scale vs KYC Portal Zoom",
+                "paragraphs": [
+                    "ISO/IEC 7810 ID-1 is the global dimensional standard for identification cards, measuring exactly 85.60 mm × 53.98 mm (3.370 × 2.125 inches). When printing a replacement card to cut and laminate in plastic, choose PDFBolt's '1:1 Actual Physical Size' mode, which includes an optional center cut/fold guide.",
+                    "For digital portal uploads (such as bank accounts or Demat registrations), micro-printed text such as the father's name or issuing authority signature can be difficult for bank officers to inspect at 1:1 scale. Choosing 'KYC Portal Zoom' enlarges both cards by 1.5x while strictly preserving the ISO aspect ratio, ensuring effortless verification."
+                ]
+            },
+            {
+                "heading": "Preventing Identity Theft with Official Purpose Watermarking",
+                "paragraphs": [
+                    "Both UIDAI and the Reserve Bank of India (RBI) advise citizens never to submit un-annotated photocopies of Aadhaar or PAN cards. Rogue intermediaries and fraudsters harvest un-watermarked identity copies to open fraudulent bank accounts or take out unauthorized instant loans.",
+                    "PDFBolt includes an integrated Anti-Theft Security Stamp that layers an un-croppable repeating diagonal lattice across the document (e.g. 'ONLY FOR KYC AT SBI BANK ON DD/MM/YYYY - NOT VALID FOR ANY OTHER PURPOSE'). This renders the document legally useless for identity theft while remaining 100% compliant for your legitimate transaction."
+                ]
+            }
+        ],
+        "faqs": [
+            {"q": "How do I combine both sides of an ID card on one single A4 PDF page?", "a": "Upload the front and back photos of your ID card into PDFBolt. Choose between '1:1 Actual Physical Size' (85.6mm x 54mm) for printing or 'KYC Zoom' for bank uploads. Optionally add an anti-theft security watermark, then click 'Download Print-Ready A4 PDF'."},
+            {"q": "What is the standard size for printing an ID card on A4 paper?", "a": "The international standard for photo ID cards is ISO/IEC 7810 ID-1, measuring 85.60 mm x 53.98 mm (3.370 x 2.125 inches). PDFBolt's 1:1 layout automatically calibrates your front and back images to this exact dimension on standard A4 paper at 300 DPI, ready to print, cut, and laminate."},
+            {"q": "Will the QR code on the back of my Aadhaar or ID card remain scannable?", "a": "Yes. PDFBolt renders the output at high-density 300 DPI (2480 x 3508 pixels on A4), ensuring that UIDAI secure QR codes, 2D barcodes, and micro-text remain 100% sharp and readable by physical barcode scanners and optical KYC verification apps."},
+            {"q": "Can I add an anti-theft purpose watermark to prevent misuse?", "a": "Yes. PDFBolt includes an integrated Anti-Theft Watermark toggle that stamps a repeating diagonal lattice across the cards stating your specific purpose (e.g. 'Only for HDFC Bank KYC on 07/11/2026 - Invalid for other purposes'), preventing fraudsters from reusing your ID proof."},
+            {"q": "Are my sensitive identity cards (Aadhaar, PAN, Passport) uploaded to your server?", "a": "Never. PDFBolt executes 100% inside your web browser using WebAssembly. Your photos and sensitive government identity numbers are processed purely within your device's RAM and never leave your phone or computer."}
+        ],
+        "related": [("merge-aadhaar-and-pan-card", "Merge Aadhaar And Pan Card"), ("pdf-to-jpg-for-aadhaar", "Pdf To Jpg For Aadhaar"), ("compress-pdf-for-ssc", "Compress Pdf For Ssc"), ("unlock-pdf", "Unlock Pdf")]
+    },
+    {
         "path": "merge-aadhaar-and-pan-card",
         "h1": "Merge Aadhaar & PAN Card into One PDF",
         "title": "Merge Aadhaar and PAN Card into One PDF Online Free (100% Private) | PDFBolt",
