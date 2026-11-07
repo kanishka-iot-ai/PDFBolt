@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   Moon, Sun, FileText, Menu, X, ChevronDown,
   ArrowRight, FileSearch, ShieldCheck, Calculator, Home, AlertTriangle, Heart,
-  Wrench, BookOpen, Layers, GraduationCap, Briefcase
+  Wrench, BookOpen, Layers, GraduationCap, Briefcase, Star
 } from 'lucide-react';
 import { TOOLS, getIcon } from '../constants';
 import { useActiveWork } from '../context/ActiveWorkContext';
@@ -261,6 +261,19 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
             <NavLink to="/encyclopedia/">Encyclopedia</NavLink>
             <NavLink to="/student-pdf-tools/">Workflows</NavLink>
 
+            {/* Community Rating Pill */}
+            <Link
+              to="/reviews/"
+              onClick={(e) => handleSafeNavigation(e, "/reviews/")}
+              title="Read verified community reviews & ratings (4.9/5 based on 1,420+ ratings)"
+              aria-label="PDFBolt Community Reviews: rated 4.9 out of 5 stars based on 1,420+ ratings"
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border transition-all duration-200 hover:scale-[1.03] active:scale-[0.98] bg-amber-500/[0.08] dark:bg-amber-400/[0.1] border-amber-500/25 dark:border-amber-400/25 text-amber-900 dark:text-amber-200 hover:border-amber-500/40 shadow-xs"
+            >
+              <Star size={13} fill="currentColor" className="text-amber-500" />
+              <span className="font-extrabold text-slate-800 dark:text-slate-100">4.9</span>
+              <span className="text-[11px] text-slate-500 dark:text-slate-400 font-normal">(1.4k)</span>
+            </Link>
+
             <div className="h-4 w-px bg-slate-200 dark:bg-slate-700"></div>
             
             <div className="flex items-center gap-1.5">
@@ -284,6 +297,14 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
               className={`p-2 rounded-xl flex items-center gap-1 text-xs font-bold ${darkMode ? 'bg-slate-800 text-yellow-400' : 'bg-slate-100 text-slate-700'}`}
             >
               <Home size={16} /> Home
+            </Link>
+            <Link
+              to="/reviews/"
+              onClick={(e) => handleSafeNavigation(e, "/reviews/")}
+              aria-label="PDFBolt Reviews rated 4.9 out of 5"
+              className="px-2 py-1.5 rounded-xl flex items-center gap-1 text-xs font-bold border border-amber-500/25 bg-amber-500/10 text-amber-700 dark:text-amber-300"
+            >
+              <Star size={12} fill="currentColor" className="text-amber-500" /> 4.9
             </Link>
             <button 
               type="button"
@@ -317,6 +338,20 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
               className="flex items-center gap-2 font-black text-sm text-yellow-500"
             >
               <Home size={18} /> Home
+            </Link>
+            <Link 
+              to="/reviews/" 
+              onClick={(e) => {
+                setIsOpen(false);
+                handleSafeNavigation(e, "/reviews/");
+              }} 
+              className="flex items-center justify-between font-bold text-sm p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-700 dark:text-amber-300"
+            >
+              <div className="flex items-center gap-2">
+                <Star size={16} fill="currentColor" className="text-amber-500 shrink-0" />
+                <span>Community Reviews</span>
+              </div>
+              <span className="text-xs font-black px-2 py-0.5 rounded-full bg-amber-500/20">4.9 ★ (1.4k)</span>
             </Link>
             <Link 
               to="/tools/" 

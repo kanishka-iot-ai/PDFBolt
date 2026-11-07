@@ -5,8 +5,6 @@ import { TOOLS, GUIDES, getIcon } from '../constants';
 import { Link, useLocation } from 'react-router-dom';
 import AdSlot from './AdSlot';
 import AdsterraBanner from './AdsterraBanner';
-import TrustMicroAnchor from './TrustMicroAnchor';
-import DeveloperTrustSection from './DeveloperTrustSection';
 import DesktopSideRails from './DesktopSideRails';
 import { useActiveWork } from '../context/ActiveWorkContext';
 
@@ -143,9 +141,7 @@ const SEOLandingPage: React.FC<SEOLandingPageProps> = ({ tool: toolProp, toolId,
           <p className={`text-xs sm:text-sm max-w-lg mx-auto font-medium line-clamp-1 sm:line-clamp-none ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
             {tool?.description}
           </p>
-          <div className="flex justify-center mt-2">
-            <TrustMicroAnchor />
-          </div>
+
         </div>
       </div>
 
@@ -171,10 +167,7 @@ const SEOLandingPage: React.FC<SEOLandingPageProps> = ({ tool: toolProp, toolId,
         </DesktopSideRails>
       </div>
 
-      {/* Layer 4: Developer Trust & Pre-Footer Verified Use Cases (Only on landing view) */}
-      {!hasActiveWork && (
-        <DeveloperTrustSection darkMode={darkMode} />
-      )}
+
 
       {/* 4. RELATED PDF TOOLS (Sleek Suggestive Bottom Bar - Only on landing page) */}
       {!hasActiveWork && relatedToolsList.length > 0 && (

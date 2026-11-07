@@ -8,8 +8,6 @@ import EditTool from './EditTool';
 import IDCardComposer from '../components/IDCardComposer';
 import { NotifySystem } from '../types';
 import AdsterraBanner from '../components/AdsterraBanner';
-import TrustMicroAnchor from '../components/TrustMicroAnchor';
-import DeveloperTrustSection from '../components/DeveloperTrustSection';
 import DesktopSideRails from '../components/DesktopSideRails';
 import { FileText, Cpu, LayoutGrid, HelpCircle, ChevronDown, ShieldCheck } from 'lucide-react';
 
@@ -149,9 +147,7 @@ const TargetedCompressPage: React.FC<TargetedCompressPageProps> = ({ pageSlug: p
           <p className={`text-xs sm:text-sm max-w-2xl mx-auto font-normal ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
             {page.subtitle}
           </p>
-          <div className="flex justify-center mt-2">
-            <TrustMicroAnchor />
-          </div>
+
         </div>
       </div>
 
@@ -640,8 +636,7 @@ const TargetedCompressPage: React.FC<TargetedCompressPageProps> = ({ pageSlug: p
         </div>
       </DesktopSideRails>
 
-      {/* Layer 4: Developer Trust & Pre-Footer Verified Use Cases */}
-      <DeveloperTrustSection darkMode={darkMode} />
+
     </div>
   );
 };

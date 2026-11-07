@@ -42,6 +42,7 @@ const TestFilesPage = lazy(() => import('./pages/TestFilesPage'));
 const TargetedCompressPage = lazy(() => import('./pages/TargetedCompressPage'));
 const NoUploadToolsPage = lazy(() => import('./pages/NoUploadToolsPage'));
 const AlternativeLandingPage = lazy(() => import('./pages/AlternativeLandingPage'));
+const ReviewsPage = lazy(() => import('./pages/ReviewsPage'));
 
 // Static pages
 const PrivacyPage = lazy(() => import('./pages/StaticPages').then(m => ({ default: m.PrivacyPage })));
@@ -390,6 +391,8 @@ const MainLayout: React.FC<MainLayoutProps> = ({ darkMode, setDarkMode, soundEna
             <Route path="/cookies" element={<CookiesPage darkMode={darkMode} />} />
             <Route path="/offline-mode" element={<OfflineModePage darkMode={darkMode} />} />
             <Route path="/offline" element={<Navigate to="/offline-mode/" replace />} />
+            <Route path="/reviews" element={<ReviewsPage darkMode={darkMode} />} />
+            <Route path="/reviews/" element={<ReviewsPage darkMode={darkMode} />} />
             <Route path="/tutorials" element={<TutorialsPage darkMode={darkMode} />} />
             <Route path="/api-keys" element={<ApiKeyManagerPage darkMode={darkMode} />} />
             <Route path="/api-keys/" element={<ApiKeyManagerPage darkMode={darkMode} />} />

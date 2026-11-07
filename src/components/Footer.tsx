@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ShieldCheck, Lock, CheckCircle, Headphones, AlertTriangle } from 'lucide-react';
+import { ShieldCheck, Lock, CheckCircle, Headphones, AlertTriangle, Star } from 'lucide-react';
 
 const Footer: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
   const [showWipeModal, setShowWipeModal] = useState(false);
@@ -56,6 +56,13 @@ const Footer: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
             >
               ★ Trustpilot
             </a>
+            <Link 
+              to="/reviews/" 
+              className={`px-2.5 py-1.5 rounded-xl text-[11px] font-bold flex items-center gap-1 transition-transform hover:scale-105 ${darkMode ? 'bg-slate-800 text-amber-400 border border-slate-700' : 'bg-white shadow-sm text-amber-700 border border-slate-200'}`}
+              aria-label="PDFBolt Community Reviews"
+            >
+              ★ 4.9 Reviews
+            </Link>
           </div>
           <div className="mt-3.5 flex flex-col gap-2.5">
             <a 
@@ -188,6 +195,7 @@ const Footer: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
           <p className={`font-black uppercase text-xs tracking-widest mb-4 ${darkMode ? 'text-slate-200' : 'text-slate-900'}`}>About & Legal</p>
           <ul className="space-y-2 text-xs font-semibold">
             <li><Link to="/about/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">About PDFBolt</Link></li>
+            <li><Link to="/reviews/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors flex items-center gap-1.5"><Star size={13} className="text-amber-500 fill-amber-400" /> Community Reviews (4.9★)</Link></li>
             <li><Link to="/contact/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors flex items-center gap-1.5"><Headphones size={13} /> Contact Support</Link></li>
             <li><Link to="/privacy/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors flex items-center gap-1.5"><ShieldCheck size={13} className="text-emerald-500" /> Privacy Policy</Link></li>
             <li><Link to="/terms/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Terms of Service</Link></li>
