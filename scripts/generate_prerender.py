@@ -14,7 +14,7 @@ CANONICAL_DOMAIN = "https://pdfbolt.in"
 CANONICAL_TOOLS = [
     {
         "path": "merge-pdf",
-        "title": "Merge PDF Files Online Free – Private | PDFBolt",
+        "title": "Merge PDF Files Online Free: Private | PDFBolt",
         "description": "Combine multiple PDF files into one single document in seconds. 100% private in-browser processing with zero server uploads.",
         "h1": "Merge PDF Files Online",
         "subtitle": "Combine, stitch, and reorder multiple PDF documents into one single file with zero server uploads.",
@@ -48,7 +48,7 @@ CANONICAL_TOOLS = [
     },
     {
         "path": "split-pdf",
-        "title": "Split PDF Online – Extract Pages Free | PDFBolt",
+        "title": "Split PDF Online: Extract Pages Free | PDFBolt",
         "description": "Extract specific pages or page ranges from any PDF document into separate files instantly in your browser with zero data exposure.",
         "h1": "Split PDF Document Pages",
         "subtitle": "Extract specific pages, custom ranges, or burst multi-page documents into individual files with client-side privacy.",
@@ -80,7 +80,7 @@ CANONICAL_TOOLS = [
     },
     {
         "path": "compress-pdf",
-        "title": "Compress PDF Online Free – No Upload | PDFBolt",
+        "title": "Compress PDF Online Free: No Upload | PDFBolt",
         "description": "Compress and reduce PDF file size without losing readability. 3 compression profiles for maximum size reduction with local privacy.",
         "h1": "Compress PDF File Size Online",
         "subtitle": "Shrink heavy PDF documents below 10MB or 2MB for email attachments and portal submissions while keeping text sharp.",
@@ -129,7 +129,7 @@ CANONICAL_TOOLS = [
     },
     {
         "path": "pdf-to-word",
-        "title": "PDF to Word Converter – Free, No Upload | PDFBolt",
+        "title": "PDF to Word Converter: Free, No Upload | PDFBolt",
         "description": "Convert PDF documents to editable Microsoft Word (.docx) files. Preserves layouts, tables, fonts, and bold styles.",
         "h1": "Convert PDF to Word Document (.docx)",
         "subtitle": "Transform static PDF documents into fully editable Microsoft Word (.docx) files with layout and table preservation.",
@@ -161,7 +161,7 @@ CANONICAL_TOOLS = [
     },
     {
         "path": "pdf-to-excel",
-        "title": "Convert PDF to Excel Online Free – 100% Private, No Upload | PDFBolt",
+        "title": "Convert PDF to Excel Online Free: 100% Private, No Upload | PDFBolt",
         "description": "Convert PDF tables into editable Microsoft Excel (.xlsx) spreadsheets online for free. 100% private in-browser extraction with zero file uploads or registration.",
         "h1": "PDF to Excel Converter (.xlsx)",
         "subtitle": "Extract financial statements, balance sheets, and invoices into structured, formula-ready Excel spreadsheets.",
@@ -192,7 +192,7 @@ CANONICAL_TOOLS = [
     },
     {
         "path": "pdf-to-ppt",
-        "title": "PDF to PPT Converter – Free Online | PDFBolt",
+        "title": "PDF to PPT Converter: Free Online | PDFBolt",
         "description": "Convert PDF documents into editable Microsoft PowerPoint presentation slides (.pptx) with crisp high-resolution layouts.",
         "h1": "Convert PDF to PowerPoint Presentation (.pptx)",
         "subtitle": "Transform static PDF presentation handouts into editable Microsoft PowerPoint (.pptx) slide decks.",
@@ -254,7 +254,7 @@ CANONICAL_TOOLS = [
     },
     {
         "path": "word-to-pdf",
-        "title": "Word to PDF Converter – Free Online | PDFBolt",
+        "title": "Word to PDF Converter: Free Online | PDFBolt",
         "description": "Convert Microsoft Word (.docx) documents to standard PDF files with vector layout fidelity in your web browser.",
         "h1": "Convert Word Document (.docx) to PDF",
         "subtitle": "Standardize Microsoft Word (.docx) files into secure, non-editable PDF documents with vector fidelity.",
@@ -285,7 +285,7 @@ CANONICAL_TOOLS = [
     },
     {
         "path": "excel-to-pdf",
-        "title": "Excel to PDF Converter – Free & Private | PDFBolt",
+        "title": "Excel to PDF Converter: Free & Private | PDFBolt",
         "description": "Convert Microsoft Excel spreadsheets (.xlsx) into clean, printable PDF documents with custom table styling.",
         "h1": "Convert Excel Spreadsheet (.xlsx) to PDF",
         "subtitle": "Transform Excel sheets (.xlsx) into clean, print-ready PDF tables with auto-scaled column widths.",
@@ -316,7 +316,7 @@ CANONICAL_TOOLS = [
     },
     {
         "path": "ppt-to-pdf",
-        "title": "PowerPoint to PDF Converter – Free Online | PDFBolt",
+        "title": "PowerPoint to PDF Converter: Free Online | PDFBolt",
         "description": "Convert PowerPoint presentations (.pptx) to PDF format with slide-by-slide layout preservation.",
         "h1": "Convert PowerPoint Slides (.pptx) to PDF",
         "subtitle": "Convert PowerPoint presentations (.pptx) into standardized PDF slide decks ready for printing and sharing.",
@@ -347,7 +347,7 @@ CANONICAL_TOOLS = [
     },
     {
         "path": "jpg-to-pdf",
-        "title": "JPG to PDF Converter – Free, In Your Browser | PDFBolt",
+        "title": "JPG to PDF Converter: Free, In Your Browser | PDFBolt",
         "description": "Convert JPG, PNG, and WebP images into a clean, multi-page PDF document. Arrange images and set page orientation.",
         "h1": "Convert JPG & Images to PDF Document",
         "subtitle": "Combine photos, receipts, and image scans into a single multi-page PDF document.",
@@ -378,7 +378,7 @@ CANONICAL_TOOLS = [
     },
     {
         "path": "html-to-pdf",
-        "title": "HTML to PDF Converter – Free Online | PDFBolt",
+        "title": "HTML to PDF Converter: Free Online | PDFBolt",
         "description": "Convert HTML code or web page files directly into printable PDF documents with CSS layout fidelity.",
         "h1": "HTML to PDF Converter",
         "subtitle": "Transform raw HTML code, invoices, and web pages into formatted PDF documents with CSS support.",
@@ -409,7 +409,7 @@ CANONICAL_TOOLS = [
     },
     {
         "path": "edit-pdf",
-        "title": "Edit PDF Online Free – Add Text, Draw & Annotate | PDFBolt",
+        "title": "Edit PDF Online Free: Add Text, Draw & Annotate | PDFBolt",
         "description": "Edit PDF documents directly in your browser. Add text, freehand drawing, annotations, shapes, and whiteout redactions.",
         "h1": "Free Online PDF Editor",
         "subtitle": "Add custom text, annotations, freehand drawings, geometric shapes, and highlights directly on any PDF document.",
@@ -440,7 +440,7 @@ CANONICAL_TOOLS = [
     },
     {
         "path": "protect-pdf",
-        "title": "Protect PDF Online Free – Encrypt & Lock PDF | PDFBolt",
+        "title": "Protect PDF Online Free: Encrypt & Lock PDF | PDFBolt",
         "description": "Encrypt and password-protect your PDF files using AES-128 and AES-256 standard encryption algorithms locally.",
         "h1": "Password Protect & Encrypt PDF Files",
         "subtitle": "Lock confidential PDF files with strong AES-128 or AES-256 encryption and custom permission controls.",
@@ -471,7 +471,7 @@ CANONICAL_TOOLS = [
     },
     {
         "path": "unlock-pdf",
-        "title": "Unlock PDF Online Free – Remove Password Instantly | PDFBolt",
+        "title": "Unlock PDF Online Free: Remove Password Instantly | PDFBolt",
         "description": "Remove password protection and printing/copying restrictions from encrypted PDF files in your browser.",
         "h1": "Unlock Password Protected PDF Files",
         "subtitle": "Remove password prompts and printing restrictions from encrypted PDF documents you own.",
@@ -502,7 +502,7 @@ CANONICAL_TOOLS = [
     },
     {
         "path": "sign-pdf",
-        "title": "Sign PDF Online Free – Add Digital Signatures | PDFBolt",
+        "title": "Sign PDF Online Free: Add Digital Signatures | PDFBolt",
         "description": "Draw, type, or upload your electronic signature and place it onto any PDF document. Legal, fast, and 100% private.",
         "h1": "Sign PDF Documents Online Free",
         "subtitle": "Draw, type, or upload electronic signatures and place them on contracts, leases, and agreements.",
@@ -533,7 +533,7 @@ CANONICAL_TOOLS = [
     },
     {
         "path": "redact-pdf",
-        "title": "Redact PDF Online Free – Black Out Sensitive Text | PDFBolt",
+        "title": "Redact PDF Online Free: Black Out Sensitive Text | PDFBolt",
         "description": "Permanently blackout and rasterize sensitive text, SSNs, and confidential information from PDF documents.",
         "h1": "Permanently Redact Sensitive Data from PDF",
         "subtitle": "Irreversibly black out confidential text, social security numbers, and financial details with true raster redaction.",
@@ -564,7 +564,7 @@ CANONICAL_TOOLS = [
     },
     {
         "path": "ocr-pdf",
-        "title": "OCR PDF Online Free – Convert Scans to Text | PDFBolt",
+        "title": "OCR PDF Online Free: Convert Scans to Text | PDFBolt",
         "description": "Convert scanned PDF documents and images into selectable, searchable, and editable text using neural network OCR in your browser.",
         "h1": "Optical Character Recognition (OCR) for PDF",
         "subtitle": "Turn scanned document photos and non-selectable PDFs into searchable text with neural OCR.",
@@ -595,7 +595,7 @@ CANONICAL_TOOLS = [
     },
     {
         "path": "scan-to-pdf",
-        "title": "Scan to PDF Online Free – Camera Document Scanner | PDFBolt",
+        "title": "Scan to PDF Online Free: Camera Document Scanner | PDFBolt",
         "description": "Use your phone or laptop camera to scan physical paper documents into crisp, high-contrast, multi-page PDF files.",
         "h1": "Online Camera Document Scanner to PDF",
         "subtitle": "Use your webcam or mobile camera to snap and convert paper documents into high-contrast PDF pages.",
@@ -657,7 +657,7 @@ CANONICAL_TOOLS = [
     },
     {
         "path": "rotate-pdf",
-        "title": "Rotate PDF Pages Online Free – Permanent Fix | PDFBolt",
+        "title": "Rotate PDF Pages Online Free: Permanent Fix | PDFBolt",
         "description": "Rotate upside-down or sideways PDF pages by 90, 180, or 270 degrees. Save orientation changes permanently.",
         "h1": "Rotate PDF Pages Permanently Online",
         "subtitle": "Fix sideways and upside-down PDF pages by rotating 90°, 180°, or 270° clockwise or counter-clockwise.",
@@ -688,7 +688,7 @@ CANONICAL_TOOLS = [
     },
     {
         "path": "organize-pdf",
-        "title": "Organize PDF Pages Online Free – Reorder Pages | PDFBolt",
+        "title": "Organize PDF Pages Online Free: Reorder Pages | PDFBolt",
         "description": "Rearrange, reorder, delete, and organize pages inside any multi-page PDF document with visual drag-and-drop.",
         "h1": "Organize & Reorder PDF Pages Online",
         "subtitle": "Rearrange, delete, duplicate, and sort pages in multi-page PDF files with intuitive visual drag-and-drop.",
@@ -750,7 +750,7 @@ CANONICAL_TOOLS = [
     },
     {
         "path": "watermark-pdf",
-        "title": "Watermark PDF Online Free – Add Stamp or Text | PDFBolt",
+        "title": "Watermark PDF Online Free: Add Stamp or Text | PDFBolt",
         "description": "Add custom text watermarks or company logo image stamps to all pages of your PDF document. Control opacity, angle, and position.",
         "h1": "Add Text & Image Watermark to PDF",
         "subtitle": "Stamp 'CONFIDENTIAL', 'DRAFT', or company logo watermarks across PDF pages with custom opacity and rotation.",
@@ -781,7 +781,7 @@ CANONICAL_TOOLS = [
     },
     {
         "path": "delete-pdf-pages",
-        "title": "Delete PDF Pages Online Free – Remove Pages | PDFBolt",
+        "title": "Delete PDF Pages Online Free: Remove Pages | PDFBolt",
         "description": "Remove unwanted, blank, or duplicate pages from any PDF file and download a clean document immediately.",
         "h1": "Delete & Remove Pages from PDF Online",
         "subtitle": "Select and eliminate unwanted blank pages, cover sheets, or confidential sections from PDF documents.",
@@ -812,7 +812,7 @@ CANONICAL_TOOLS = [
     },
     {
         "path": "compare-pdf",
-        "title": "Compare PDF Files Online Free – Side-by-Side Diff | PDFBolt",
+        "title": "Compare PDF Files Online Free: Side-by-Side Diff | PDFBolt",
         "description": "Compare two PDF documents side-by-side to highlight differences, text modifications, and formatting changes in your browser.",
         "h1": "Compare PDF Documents Side-by-Side",
         "subtitle": "Compare two PDF document versions side-by-side with synchronized scrolling and visual difference highlights.",
@@ -843,7 +843,7 @@ CANONICAL_TOOLS = [
     },
     {
         "path": "repair-pdf",
-        "title": "Repair PDF Online Free – Fix Corrupted PDF Files | PDFBolt",
+        "title": "Repair PDF Online Free: Fix Corrupted PDF Files | PDFBolt",
         "description": "Recover and repair corrupt, damaged, or unreadable PDF files by standardizing cross-reference tables and font descriptors.",
         "h1": "Repair Damaged & Corrupted PDF Files",
         "subtitle": "Recover corrupted, broken, or unreadable PDF files by rebuilding damaged XRef tables and object streams.",
@@ -1496,7 +1496,7 @@ CANONICAL_HUBS_AND_PAGES = [
     },
     {
         "path": "privacy",
-        "title": "Privacy Policy – 100% Client-Side PDF Processing | PDFBolt",
+        "title": "Privacy Policy: 100% Client-Side PDF Processing | PDFBolt",
         "description": "Read PDFBolt's privacy policy. All PDF conversions, merges, compression, and edits execute locally inside your browser with zero server data retention.",
         "h1": "PDFBolt Privacy Policy",
         "subtitle": "Zero server retention, local memory execution, and complete GDPR/CCPA compliance.",
@@ -1504,7 +1504,7 @@ CANONICAL_HUBS_AND_PAGES = [
     },
     {
         "path": "terms",
-        "title": "Terms of Service – Free Online PDF Tools | PDFBolt",
+        "title": "Terms of Service: Free Online PDF Tools | PDFBolt",
         "description": "PDFBolt terms of service and acceptable usage guidelines for our browser-based PDF utilities.",
         "h1": "PDFBolt Terms of Service",
         "subtitle": "Clear and transparent terms of service for personal and commercial usage of PDFBolt.",
@@ -1512,7 +1512,7 @@ CANONICAL_HUBS_AND_PAGES = [
     },
     {
         "path": "about",
-        "title": "About PDFBolt – Privacy-First Document Toolkit | PDFBolt",
+        "title": "About PDFBolt: Privacy-First Document Toolkit | PDFBolt",
         "description": "Learn about PDFBolt's mission to provide lightning-fast, 100% private, browser-based PDF utilities with zero cloud uploads.",
         "h1": "About PDFBolt",
         "subtitle": "Our mission to bring private, client-side document processing to millions worldwide.",
@@ -2445,7 +2445,7 @@ def generate_prerendered_pages():
         generated_count += 1
 
     # Category 5: Homepage (Root Index)
-    home_title = "Free Online PDF Tools – Merge, Compress & Edit | PDFBolt"
+    home_title = "Free Online PDF Tools: Merge, Compress & Edit | PDFBolt"
     home_desc = "Use 25+ free online PDF tools to merge, compress, split, convert, edit and protect PDFs. 100% private in-browser WebAssembly processing with zero server uploads."
     home_canonical = f"{CANONICAL_DOMAIN}/"
 
@@ -2757,7 +2757,7 @@ def write_page(base_template, path, title, description, canonical_url, body_cont
 
 def generate_404_page(base_template):
     fallback_404 = os.path.join(DIST_DIR, "404.html")
-    title = "404: Page Not Found – Free Online PDF Tools | PDFBolt"
+    title = "404: Page Not Found: Free Online PDF Tools | PDFBolt"
     description = "The page you are looking for does not exist. Browse PDFBolt's 25+ free online PDF tools to merge, compress, convert, split, and edit PDF files with 100% privacy."
     
     body_content = '''

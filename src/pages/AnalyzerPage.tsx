@@ -165,7 +165,7 @@ ${analysis.keyFindings.map((kf, i) => `${i + 1}. ${kf}`).join('\n')}
             PDF Document Inspector & Deck Builder
           </h1>
           <p className={`text-base md:text-lg max-w-2xl mx-auto ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
-            Understand any PDF instantly. Extract structure, topics, and key insights—then transform it into presentations, reports, or spreadsheets with a single click.
+            Understand any PDF instantly. Extract structure, topics, and key insights, then transform it into presentations, reports, or spreadsheets with a single click.
           </p>
         </div>
       </section>

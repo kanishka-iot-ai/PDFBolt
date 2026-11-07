@@ -106,7 +106,7 @@ const SEOManager: React.FC = () => {
 
   useEffect(() => {
     const baseUrl = 'https://pdfbolt.in';
-    let title = "Free Online PDF Tools – Merge, Compress, Convert & Edit PDFs | PDFBolt";
+    let title = "Free Online PDF Tools: Merge, Compress, Convert & Edit PDFs | PDFBolt";
     let description = "Use free online PDF tools to merge, compress, split, convert, edit and protect PDF files. Fast, private and easy-to-use PDF tools with PDFBolt.";
 
     // Normalise: strip trailing slash for comparison (except homepage)
@@ -121,16 +121,16 @@ const SEOManager: React.FC = () => {
       title = `${tool.seoTitle || `${tool.title} Online`} | PDFBolt`;
       description = tool.description;
     } else if (pathNorm === '/no-upload-pdf-tools') {
-      title = "No-Upload PDF Tools – 100% Client-Side Private Document Toolkit | PDFBolt";
+      title = "No-Upload PDF Tools: 100% Client-Side Private Document Toolkit | PDFBolt";
       description = "Merge, compress, split, redact, and edit PDF files in your browser with zero file uploads. Powered by WebAssembly for 100% data confidentiality and zero data leaks.";
     } else if (cleanSlug === 'compare/ilovepdf-alternative') {
-      title = "Best Free iLovePDF Alternative 2026 – No Daily Task Limits | PDFBolt";
+      title = "Best Free iLovePDF Alternative 2026: No Daily Task Limits | PDFBolt";
       description = "Looking for a free iLovePDF alternative? PDFBolt provides unlimited free PDF merging, compression, and editing with zero daily task limits and local in-browser privacy.";
     } else if (cleanSlug === 'compare/smallpdf-alternative') {
-      title = "Best Free Smallpdf Alternative 2026 – Unlimited Daily PDF Tasks | PDFBolt";
+      title = "Best Free Smallpdf Alternative 2026: Unlimited Daily PDF Tasks | PDFBolt";
       description = "Tired of Smallpdf's 2-task daily limit? PDFBolt provides unlimited free PDF tools with zero daily limits, no subscription paywalls, and in-browser privacy.";
     } else if (cleanSlug === 'compare/adobe-acrobat-alternative') {
-      title = "Free Adobe Acrobat Alternative 2026 – Zero Subscription PDF Toolkit | PDFBolt";
+      title = "Free Adobe Acrobat Alternative 2026: Zero Subscription PDF Toolkit | PDFBolt";
       description = "Cancel your $240/yr Adobe Acrobat subscription. PDFBolt provides free PDF merging, splitting, compression, and editing right in your web browser.";
     } else if (pathNorm === '/tools' || pathNorm === '/pdf-tools') {
       title = "All 25+ Free Online PDF Tools | PDFBolt Directory";

@@ -24,7 +24,7 @@ const TestFilesPage: React.FC<TestFilesPageProps> = ({ darkMode }) => {
         for (let i = 1; i <= 5; i++) {
           const page = pdfDoc.addPage([595.28, 841.89]); // A4
           page.drawText(`PDFBolt Sample Research Report`, { x: 50, y: 780, size: 20, font: boldFont, color: rgb(0.1, 0.1, 0.1) });
-          page.drawText(`Page ${i} of 5 — Generated for Testing & Demonstration`, { x: 50, y: 755, size: 10, font, color: rgb(0.5, 0.5, 0.5) });
+          page.drawText(`Page ${i} of 5: Generated for Testing & Demonstration`, { x: 50, y: 755, size: 10, font, color: rgb(0.5, 0.5, 0.5) });
           page.drawText(`This is a standardized sample PDF document generated to test Merge, Split, Page Numbers, and Compression tools.`, { x: 50, y: 710, size: 12, font, color: rgb(0.2, 0.2, 0.2) });
           page.drawRectangle({ x: 50, y: 400, width: 495, height: 260, color: rgb(0.95, 0.95, 0.95), borderColor: rgb(0.8, 0.8, 0.8), borderWidth: 1 });
           page.drawText(`Sample Chart / Exhibit Block [Page ${i}]`, { x: 70, y: 530, size: 14, font: boldFont, color: rgb(0.4, 0.4, 0.4) });

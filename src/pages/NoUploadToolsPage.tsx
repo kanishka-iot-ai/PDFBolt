@@ -41,10 +41,10 @@ const NoUploadToolsPage: React.FC<NoUploadToolsPageProps> = ({ darkMode }) => {
   return (
     <div className="animate-fadeIn min-h-screen pb-20">
       <Helmet>
-        <title>No-Upload PDF Tools – 100% Client-Side Private Document Toolkit | PDFBolt</title>
+        <title>No-Upload PDF Tools: 100% Client-Side Private Document Toolkit | PDFBolt</title>
         <meta name="description" content="Merge, compress, split, redact, and edit PDF files in your browser with zero file uploads. Powered by WebAssembly for 100% data confidentiality and zero data leaks." />
         <link rel="canonical" href={canonicalUrl} />
-        <meta property="og:title" content="No-Upload PDF Tools – 100% Client-Side Private Document Toolkit | PDFBolt" />
+        <meta property="og:title" content="No-Upload PDF Tools: 100% Client-Side Private Document Toolkit | PDFBolt" />
         <meta property="og:description" content="Process your confidential contracts, medical records, and tax filings directly in your browser. Zero bytes leave your device." />
         <meta property="og:url" content={canonicalUrl} />
         <script type="application/ld+json">{JSON.stringify(webAppSchema)}</script>

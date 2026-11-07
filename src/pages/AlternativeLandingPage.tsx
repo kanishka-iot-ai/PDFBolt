@@ -36,7 +36,7 @@ const COMPETITORS: Record<string, CompetitorData> = {
     title: 'Best Free iLovePDF Alternative (No Daily Limits & Private) | PDFBolt',
     h1: 'Free iLovePDF Alternative Without Daily Limits',
     subtitle: 'Tired of "Daily task limit reached" and slow file upload queues? PDFBolt delivers unlimited free PDF merging, compression, and editing with in-browser privacy.',
-    seoTitle: 'Best Free iLovePDF Alternative 2026 – No Daily Task Limits | PDFBolt',
+    seoTitle: 'Best Free iLovePDF Alternative 2026: No Daily Task Limits | PDFBolt',
     metaDescription: 'Looking for a free iLovePDF alternative? PDFBolt provides unlimited free PDF merging, compression, and editing with zero daily task limits and local in-browser privacy.',
     frustrationPoint: 'iLovePDF restricts free users with daily task limits and upload queues, prompting users to buy recurring monthly subscriptions just to merge simple receipts.',
     comparisonRows: [
@@ -68,7 +68,7 @@ const COMPETITORS: Record<string, CompetitorData> = {
     title: 'Best Smallpdf Alternative (Free Unlimited PDF Tools) | PDFBolt',
     h1: 'Free Smallpdf Alternative (No 2-Task Paywall)',
     subtitle: 'Frustrated by Smallpdf locking you out after just 2 free tasks? PDFBolt gives you unlimited conversions, compressions, and merges with complete privacy.',
-    seoTitle: 'Best Free Smallpdf Alternative 2026 – No 2-Task Paywall | PDFBolt',
+    seoTitle: 'Best Free Smallpdf Alternative 2026: No 2-Task Paywall | PDFBolt',
     metaDescription: 'Tired of Smallpdf daily limits? PDFBolt is a free Smallpdf alternative with unlimited tasks, no 2-file cap, no credit cards, and client-side document processing.',
     frustrationPoint: 'Smallpdf allows only 2 free operations every 24 hours before blocking access behind an aggressive $12/month subscription wall.',
     comparisonRows: [
@@ -98,7 +98,7 @@ const COMPETITORS: Record<string, CompetitorData> = {
     title: 'Free Adobe Acrobat Alternative Online (No Subscription) | PDFBolt',
     h1: 'Free Adobe Acrobat Alternative Online',
     subtitle: 'Don’t want to pay $239/year for basic PDF tools? PDFBolt gives you powerful PDF editing, merging, compression, and signing right in your browser.',
-    seoTitle: 'Free Adobe Acrobat Alternative Online – No $20/Month Fee | PDFBolt',
+    seoTitle: 'Free Adobe Acrobat Alternative Online: No $20/Month Fee | PDFBolt',
     metaDescription: 'Free Adobe Acrobat alternative online. Merge, compress, edit, redact, and sign PDFs in your browser without paying $19.99/month for Acrobat DC Pro.',
     frustrationPoint: 'Adobe Acrobat Pro costs $19.99 to $29.99 per month and requires massive software installations that slow down your computer.',
     comparisonRows: [
@@ -113,7 +113,7 @@ const COMPETITORS: Record<string, CompetitorData> = {
         heading: 'Enterprise Features Without the Enterprise Price Tag',
         paragraphs: [
           'For 95% of students, small business owners, and legal professionals, paying hundreds of dollars annually to Adobe simply to combine contracts, compress scans, and redact sensitive numbers is unnecessary.',
-          'PDFBolt delivers the core tools you actually use—visual redaction, password security, document stitching, and format conversions—accessible from any device with an active internet browser.'
+          'PDFBolt delivers the core tools you actually use (visual redaction, password security, document stitching, and format conversions), accessible from any device with an active internet browser.'
         ]
       }
     ],
@@ -135,7 +135,7 @@ const AlternativeLandingPage: React.FC<{ darkMode: boolean; defaultCompetitor?: 
   const webAppSchema = {
     "@context": "https://schema.org",
     "@type": "WebApplication",
-    "name": `PDFBolt – ${data.h1}`,
+    "name": `PDFBolt: ${data.h1}`,
     "url": canonicalUrl,
     "description": data.metaDescription,
     "applicationCategory": "UtilitiesApplication",
@@ -178,7 +178,7 @@ const AlternativeLandingPage: React.FC<{ darkMode: boolean; defaultCompetitor?: 
           </nav>
 
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-yellow-500/15 text-yellow-900 dark:text-yellow-300 font-black text-xs uppercase tracking-widest mb-4 border border-yellow-500/30">
-            <Sparkles size={14} /> {data.badge}
+            <ShieldCheck size={14} /> {data.badge}
           </div>
 
           <h1 className={`text-3xl sm:text-5xl md:text-6xl font-black mb-4 tracking-tight leading-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>

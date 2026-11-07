@@ -657,7 +657,7 @@ export const AboutPage: React.FC<{ darkMode: boolean }> = ({ darkMode }) => (
           The Portable Document Format (PDF) has been the cornerstone of digital communication since 1993. Yet, traditional online PDF utilities remain riddled with frustrating barriers: aggressive monthly subscriptions for basic operations like merging two receipts, artificial limits that lock users out after two file conversions, and worst of all, silently transmitting confidential contracts, tax returns, and medical records to unverified remote servers.
         </p>
         <p className="text-sm sm:text-base">
-          <strong>PDFBolt was founded to solve this problem completely.</strong> By taking full advantage of modern web capabilities—including WebAssembly (Wasm), client-side Canvas rendering, parallel worker threads, and memory-safe ephemeral backend pipelines—we have engineered a comprehensive PDF toolkit that delivers enterprise-grade fidelity with zero compromise on user confidentiality.
+          <strong>PDFBolt was founded to solve this problem completely.</strong> By taking full advantage of modern web capabilities (including WebAssembly (Wasm), client-side Canvas rendering, parallel worker threads, and memory-safe ephemeral backend pipelines), we have engineered a comprehensive PDF toolkit that delivers enterprise-grade fidelity with zero compromise on user confidentiality.
         </p>
       </section>
 
@@ -740,7 +740,7 @@ export const AboutPage: React.FC<{ darkMode: boolean }> = ({ darkMode }) => (
           Commitment to Editorial & Educational Standards
         </h2>
         <p className="text-sm sm:text-base">
-          In addition to our software suite, PDFBolt publishes comprehensive educational resources—including our <Link to="/encyclopedia/" className="font-bold text-yellow-700 dark:text-yellow-400 underline">PDF Format Encyclopedia</Link> and step-by-step <Link to="/guides/" className="font-bold text-yellow-700 dark:text-yellow-400 underline">How-To Knowledge Base</Link>—to help professionals, educators, and students understand PDF/A archiving standards, OCR layers, vector vs. raster rendering, and document security.
+          In addition to our software suite, PDFBolt publishes comprehensive educational resources, including our <Link to="/encyclopedia/" className="font-bold text-yellow-700 dark:text-yellow-400 underline">PDF Format Encyclopedia</Link> and step-by-step <Link to="/guides/" className="font-bold text-yellow-700 dark:text-yellow-400 underline">How-To Knowledge Base</Link>, to help professionals, educators, and students understand PDF/A archiving standards, OCR layers, vector vs. raster rendering, and document security.
         </p>
       </section>
 

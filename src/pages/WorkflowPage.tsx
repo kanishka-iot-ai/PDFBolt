@@ -108,7 +108,7 @@ const WorkflowPage: React.FC<WorkflowPageProps> = ({ workflowSlug, darkMode }) =
           The Step-by-Step {workflow.title}
         </h2>
         <p className={`text-base mb-12 ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
-          Execute each phase of your workflow sequentially using client-side tools — your files never leave your browser.
+          Execute each phase of your workflow sequentially using client-side tools: your files never leave your browser.
         </p>
 
         <div className="space-y-6">

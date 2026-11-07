@@ -1050,7 +1050,7 @@ export const GUIDES: Guide[] = [
       {
         heading: 'How Data Extraction Reconstructs Grids',
         paragraphs: [
-          'PDF files do not naturally contain "tables"—they store floating text glyphs at absolute X/Y coordinates. Our spatial grouping algorithm determines horizontal line baselines and vertical column boundaries.'
+          'PDF files do not naturally contain "tables": they store floating text glyphs at absolute X/Y coordinates. Our spatial grouping algorithm determines horizontal line baselines and vertical column boundaries.'
         ]
       }
     ],
