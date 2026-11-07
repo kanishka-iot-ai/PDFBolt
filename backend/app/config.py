@@ -33,7 +33,9 @@ class Settings(BaseSettings):
         "https://pdfbolt.in",
         "https://www.pdfbolt.in",
         "https://pdfbolt.com",
-        "https://www.pdfbolt.com"
+        "https://www.pdfbolt.com",
+        "https://pdfbolt-eo3.pages.dev",
+        "https://pdfbolt.pages.dev"
     ]
 
     @field_validator("CORS_ORIGINS", mode="after")

@@ -186,7 +186,7 @@ app.include_router(api_v1_router)
 app.include_router(direct_convert_router)
 
 
-@app.api_route("/", methods=["GET", "HEAD"])
+@app.api_route("/api/v1", methods=["GET"])
 def root():
     resp = {
         "status": "healthy",
