@@ -13,6 +13,9 @@ from backend.app.core.validation import validate_pdf_file, validate_output_file
 
 logger = get_logger(__name__)
 
+# Global concurrency lock for LibreOffice conversions
+LIBREOFFICE_SEMAPHORE = threading.Semaphore(1)
+
 
 class BaseProcessor(ABC):
     """
@@ -37,11 +40,8 @@ class BaseProcessor(ABC):
         self.job_id = str(job_id or uuid.uuid4())
         self._is_temp_work_dir = False
         if work_dir is None:
-            # Use RAM-disk on Linux (/dev/shm) for zero-disk-I/O intermediate files.
-            # Falls back to default temp dir on Windows and macOS.
-            import os as _os
-            _ram_dir = "/dev/shm" if _os.path.isdir("/dev/shm") else None
-            self.work_dir = Path(tempfile.mkdtemp(prefix="pdfbolt_proc_", dir=_ram_dir))
+            # Preserve container RAM by using disk-backed temp dir instead of RAM-disk (/dev/shm).
+            self.work_dir = Path(tempfile.mkdtemp(prefix="pdfbolt_proc_"))
             self._is_temp_work_dir = True
         else:
             self.work_dir = Path(work_dir)

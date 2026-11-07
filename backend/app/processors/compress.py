@@ -155,6 +155,14 @@ class PDFCompressionEngine:
                             page.replace_image(xref, stream=compressed_img_bytes)
                         except Exception:
                             doc.update_stream(xref, stream=compressed_img_bytes)
+                        finally:
+                            try:
+                                image.close()
+                            except Exception:
+                                pass
+                            del image
+                            del img_byte_arr
+                            del compressed_img_bytes
                     except Exception as img_err:
                         logger.debug(f"Image xref {xref} optimization notice: {img_err}")
                         continue

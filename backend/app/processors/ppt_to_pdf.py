@@ -11,7 +11,7 @@ import pymupdf
 
 from backend.app.core.errors import PDFBoltError, OutputValidationError
 from backend.app.core.validation import validate_pdf_output
-from backend.app.processors.base import BaseProcessor
+from backend.app.processors.base import BaseProcessor, LIBREOFFICE_SEMAPHORE
 from backend.app.core.logging import logger
 
 
@@ -154,7 +154,8 @@ class PptToPdfProcessor(BaseProcessor):
         converted = False
 
         if conv_info:
-            conv_type, conv_bin = conv_info
+            with LIBREOFFICE_SEMAPHORE:
+                conv_type, conv_bin = conv_info
             if conv_type == "unoconv":
                 try:
                     cmd = [conv_bin, "-f", "pdf", "-o", str(output_pdf), str(input_path)]

@@ -7,7 +7,7 @@ from typing import Any, Dict, Optional, List
 
 from backend.app.core.errors import PDFBoltError, OutputValidationError
 from backend.app.core.validation import validate_pdf_output
-from backend.app.processors.base import BaseProcessor
+from backend.app.processors.base import BaseProcessor, LIBREOFFICE_SEMAPHORE
 from backend.app.core.logging import logger
 
 
@@ -221,52 +221,55 @@ class ExcelToPdfProcessor(BaseProcessor):
         converted = False
 
         if libreoffice_bin:
-            # Isolated profile directory per job to prevent concurrency lock collision
-            profile_dir = tempfile.mkdtemp(prefix=f"lo_prof_{self.job_id}_")
-            profile_url = Path(profile_dir).as_uri()
+            with LIBREOFFICE_SEMAPHORE:
+                # Isolated profile directory per job to prevent concurrency lock collision
+                profile_dir = tempfile.mkdtemp(prefix=f"lo_prof_{self.job_id}_")
+                profile_url = Path(profile_dir).as_uri()
 
-            # Exact headless command with --outdir preceding input_file:
-            # libreoffice -env:UserInstallation=file://... --headless --convert-to pdf --outdir <dir> <input_file>
-            cmd = [
-                libreoffice_bin,
-                f"-env:UserInstallation={profile_url}",
-                "--headless",
-                "--convert-to",
-                "pdf",
-                "--outdir",
-                str(output_dir),
-                str(input_path)
-            ]
+                # Exact headless command with --outdir preceding input_file:
+                # libreoffice -env:UserInstallation=file://... --headless --convert-to pdf --outdir <dir> <input_file>
+                cmd = [
+                    libreoffice_bin,
+                    f"-env:UserInstallation={profile_url}",
+                    "--headless",
+                    "--convert-to",
+                    "pdf",
+                    "--outdir",
+                    str(output_dir),
+                    str(input_path)
+                ]
 
-            try:
-                cmd_str = " ".join(cmd)
-                logger.info(f"Starting conversion of '{input_path}' to '{output_pdf}' using LibreOffice: {cmd_str}")
-                res = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
+                try:
+                    cmd_str = " ".join(cmd)
+                    logger.info(f"Starting conversion of '{input_path}' to '{output_pdf}' using LibreOffice: {cmd_str}")
+                    res = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
 
-                generated_pdf = output_dir / f"{input_path.stem}.pdf"
-                if not (generated_pdf.exists() and generated_pdf.stat().st_size > 0):
-                    # Check for any .pdf generated in output_dir that is not output_pdf yet
-                    pdf_candidates = [
-                        p for p in output_dir.glob("*.pdf")
-                        if p.resolve() != output_pdf.resolve() and p.stat().st_size > 0
-                    ]
-                    if pdf_candidates:
-                        generated_pdf = pdf_candidates[0]
+                    generated_pdf = output_dir / f"{input_path.stem}.pdf"
+                    if not (generated_pdf.exists() and generated_pdf.stat().st_size > 0):
+                        # Check for any .pdf generated in output_dir that is not output_pdf yet
+                        pdf_candidates = [
+                            p for p in output_dir.glob("*.pdf")
+                            if p.resolve() != output_pdf.resolve() and p.stat().st_size > 0
+                        ]
+                        if pdf_candidates:
+                            generated_pdf = pdf_candidates[0]
 
-                if generated_pdf.exists() and generated_pdf.stat().st_size > 0:
-                    if generated_pdf.resolve() != output_pdf.resolve():
-                        try:
-                            os.replace(str(generated_pdf), str(output_pdf))
-                        except Exception:
-                            shutil.copy(str(generated_pdf), str(output_pdf))
-                    converted = True
-                    logger.info(f"Conversion successful! PDF saved as '{output_pdf}'")
-                else:
-                    logger.warning(f"LibreOffice command executed, but output PDF not found. Returncode: {res.returncode}, Stderr: {res.stderr}")
-            except Exception as e:
-                logger.warning(f"LibreOffice Excel conversion failed, trying fallback: {e}")
-            finally:
-                shutil.rmtree(profile_dir, ignore_errors=True)
+                    if generated_pdf.exists() and generated_pdf.stat().st_size > 0:
+                        if generated_pdf.resolve() != output_pdf.resolve():
+                            try:
+                                os.replace(str(generated_pdf), str(output_pdf))
+                            except Exception:
+                                shutil.copy(str(generated_pdf), str(output_pdf))
+                        converted = True
+                        logger.info(f"Conversion successful! PDF saved as '{output_pdf}'")
+                    else:
+                        logger.warning(f"LibreOffice command executed, but output PDF not found. Returncode: {res.returncode}, Stderr: {res.stderr}")
+                except Exception as e:
+                    logger.warning(f"LibreOffice Excel conversion failed, trying fallback: {e}")
+                finally:
+                    shutil.rmtree(profile_dir, ignore_errors=True)
+                    import gc
+                    gc.collect()
 
         # Fallback to native python generator if LibreOffice not available or failed
         if not converted:

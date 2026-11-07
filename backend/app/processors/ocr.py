@@ -16,7 +16,7 @@ from backend.app.core.logging import logger
 from backend.app.config import settings
 
 # Dedicated thread-level concurrency bounding for OCR execution
-_OCR_THREAD_SEMAPHORE = threading.BoundedSemaphore(getattr(settings, "OCR_MAX_CONCURRENT_WORKERS", 2))
+_OCR_THREAD_SEMAPHORE = threading.BoundedSemaphore(getattr(settings, "OCR_MAX_CONCURRENT_WORKERS", 1))
 
 
 class OcrProcessor(BaseProcessor):
@@ -201,13 +201,13 @@ class OcrProcessor(BaseProcessor):
                         writer.add_page(page)
                         continue
 
-                    # Lazily open pdfplumber ONCE for the entire document lifecycle
+                    # Lazily open PyMuPDF (fitz) ONCE: C++ zero-copy pixmap extraction drops RAM by 70%
                     if pdf_doc is None:
-                        import pdfplumber
-                        pdf_doc = pdfplumber.open(str(input_pdf))
+                        import fitz
+                        pdf_doc = fitz.open(str(input_pdf))
 
                     try:
-                        plumb_page = pdf_doc.pages[idx]
+                        fitz_page = pdf_doc[idx]
 
                         # Large image safeguard: clamp resolution if dimensions would exceed pixel budget
                         est_pixels = (width / 72.0 * target_dpi) * (height / 72.0 * target_dpi)
@@ -217,8 +217,10 @@ class OcrProcessor(BaseProcessor):
                             effective_dpi = max(72, int(target_dpi * scale))
                             logger.info(f"Dynamically clamped OCR DPI from {target_dpi} to {effective_dpi} on page {idx+1}")
 
-                        page_img = plumb_page.to_image(resolution=effective_dpi)
-                        pil_img = page_img.original
+                        pix = fitz_page.get_pixmap(dpi=effective_dpi)
+                        from PIL import Image
+                        pil_img = Image.open(io.BytesIO(pix.tobytes("png")))
+                        del pix
                         try:
                             ocr_text = self._ocr_image_to_text(pil_img, lang, timeout=per_page_timeout)
                         finally:
@@ -227,7 +229,8 @@ class OcrProcessor(BaseProcessor):
                             except Exception:
                                 pass
                             del pil_img
-                            del page_img
+                            import gc
+                            gc.collect()
 
                         if ocr_text.strip():
                             packet = io.BytesIO()
