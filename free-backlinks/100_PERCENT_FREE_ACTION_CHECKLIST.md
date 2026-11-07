@@ -130,32 +130,45 @@
 - ✅ **LIVE & ACTIVE:** [https://www.indiehackers.com/product/pdfbolt-2](https://www.indiehackers.com/product/pdfbolt-2)
 - Community product page with founder profile and live website link.
 
-### 19. SaaSHub — Domain Rating: 79 (100% Free)
+### 19. Canny Product Roadmap & Feedback Hub — Domain Rating: 80 (100% Free)
+- ✅ **LIVE & PUBLISHED (Portal):** [https://pdfbolt.canny.io](https://pdfbolt.canny.io)
+- ✅ **LIVE & ACTIVE (Feedback Board):** [https://pdfbolt.canny.io/feature-requests](https://pdfbolt.canny.io/feature-requests)
+- ✅ **LIVE & PUBLISHED (Roadmap Post):** [https://pdfbolt.canny.io/feature-requests/p/webassembly-client-side-ocr-local-document-processing-enhancements](https://pdfbolt.canny.io/feature-requests/p/webassembly-client-side-ocr-local-document-processing-enhancements)
+- **Organization:** PDFBolt
+- **Direct Live Outbound Backlinks:**
+  - Homepage: `https://pdfbolt.in`
+  - Merge PDF: `https://pdfbolt.in/merge-pdf/`
+  - Compress PDF: `https://pdfbolt.in/compress-pdf/`
+  - Student & Exam Tools: `https://pdfbolt.in/student-pdf-tools/`
+  - Privacy Architecture Analysis: `https://pdfbolt.in/compare/online-pdf-tools/`
+- Verified public rendering (HTTP 200 OK) without login requirements on 100% permanent free tier.
+
+### 20. SaaSHub — Domain Rating: 79 (100% Free)
 - ✅ **LIVE & ACTIVE:** [https://www.saashub.com/pdfbolt-in](https://www.saashub.com/pdfbolt-in)
 - Listed under top free PDF tools & utilities.
 
-### 20. AlternativeTo — Domain Rating: 79 (100% Free)
+### 21. AlternativeTo — Domain Rating: 79 (100% Free)
 - ✅ **SUBMITTED & IN REVIEW:** Submission ID `ecbf3628-aa78-411d-9bf0-6b74551c2f31`
 - Listed as free alternative to iLovePDF and Adobe Acrobat.
 
-### 21. Peerlist — Domain Rating: 77 (100% Free)
+### 22. Peerlist — Domain Rating: 77 (100% Free)
 - ✅ **LIVE & PUBLISHED (Project):** [https://peerlist.io/kanishkabmchak/project/pdfbolt](https://peerlist.io/kanishkabmchak/project/pdfbolt)
 - ✅ **LIVE & PUBLISHED (Profile):** [https://peerlist.io/kanishkabmchak](https://peerlist.io/kanishkabmchak)
 
-### 22. Uneed — Domain Rating: 75 (100% Free)
+### 23. Uneed — Domain Rating: 75 (100% Free)
 - ✅ **CONFIRMED & SCHEDULED IN FREE QUEUE:** [https://www.uneed.best/tool/pdfbolt-private-pdf-tools](https://www.uneed.best/tool/pdfbolt-private-pdf-tools)
 
-### 23. PitchWall — Domain Rating: 70 (100% Free)
+### 24. PitchWall — Domain Rating: 70 (100% Free)
 - ✅ **SUBMITTED & UNDER REVIEW (Free Launch Plan):**
 - **Live Status Page URL:** [https://pitchwall.co/product/pdfbolt-online-pdf-tools/status](https://pitchwall.co/product/pdfbolt-online-pdf-tools/status)
 - **Public Product Preview URL:** [https://pitchwall.co/product/pdfbolt-online-pdf-tools](https://pitchwall.co/product/pdfbolt-online-pdf-tools)
 - **Direct Outbound Do-Follow Backlink:** [https://pitchwall.co/out/pdfbolt.in?ref=PitchWall](https://pitchwall.co/out/pdfbolt.in?ref=PitchWall)
 - **Free Perks:** 1-day homepage feature, Do-follow link, and automated tweet from @pitch_wall.
 
-### 24. DevHunt — Domain Rating: 63 (100% Free)
+### 25. DevHunt — Domain Rating: 63 (100% Free)
 - ✅ **LIVE & PUBLISHED:** [https://devhunt.org/tool/pdfbolt-private-pdf-tools](https://devhunt.org/tool/pdfbolt-private-pdf-tools)
 
-### 25. Launching Next — Domain Rating: 58 (100% Free)
+### 26. Launching Next — Domain Rating: 58 (100% Free)
 - ✅ **SUBMITTED & IN QUEUE:** Submission ID `165753`
 
 ---
