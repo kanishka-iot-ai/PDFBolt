@@ -210,6 +210,22 @@ class JobService:
             job.input_size = total_in_bytes
             job.page_count_in = first_page_count
 
+            # Heavy operation limit check (Word/Excel/PPT conversions & OCR capped at 25 MB like iLovePDF Free Tier)
+            heavy_ops = {
+                'word-to-pdf', 'word_to_pdf', 'docx-to-pdf', 'docx_to_pdf',
+                'excel-to-pdf', 'excel_to_pdf', 'xlsx-to-pdf', 'xlsx_to_pdf',
+                'ppt-to-pdf', 'ppt_to_pdf', 'pptx-to-pdf', 'pptx_to_pdf',
+                'pdf-to-word', 'pdf_to_word', 'pdf-to-excel', 'pdf_to_excel',
+                'pdf-to-ppt', 'pdf_to_ppt', 'ocr', 'ocr_pdf', 'ocr-pdf'
+            }
+            heavy_limit = getattr(settings, 'HEAVY_CONVERSION_MAX_BYTES', 25 * 1024 * 1024)
+            if op_key in heavy_ops and total_in_bytes > heavy_limit:
+                limit_mb = heavy_limit // (1024 * 1024)
+                actual_mb = round(total_in_bytes / (1024 * 1024), 1)
+                raise PDFBoltError(
+                    'FILE_TOO_LARGE',
+                    f'File size ({actual_mb} MB) exceeds the free conversion limit of {limit_mb} MB (aligned with industry standard). Please compress your file or upload a smaller document.'
+                )
 
             # Step 11: Execute processor in bounded non-blocking worker thread
             processor = processor_cls(job_id=job_id, work_dir=work_dir, settings=options)

@@ -79,21 +79,22 @@ class Settings(BaseSettings):
             return v
         return {}
 
-    # File & Security Limits
-    MAX_UPLOAD_SIZE_BYTES: int = 100 * 1024 * 1024  # 100 MB
+    # File & Security Limits (Calibrated to iLovePDF & Smallpdf Free Tier Benchmarks)
+    MAX_UPLOAD_SIZE_BYTES: int = 50 * 1024 * 1024       # 50 MB (Global limit; matches iLovePDF Compress/Merge)
+    HEAVY_CONVERSION_MAX_BYTES: int = 25 * 1024 * 1024   # 25 MB (Word/Excel/PPT/OCR; matches iLovePDF Free Tier)
     MAX_PAGE_LIMIT: int = 1000
     MAX_EXECUTION_TIMEOUT_SECONDS: int = 120
     RATE_LIMIT_PER_MINUTE: int = 60
     JOB_FAST_PATH_TARGET_SECONDS: float = 3.0
     JOB_FAST_PATH_MAX_INPUT_BYTES: int = 5 * 1024 * 1024
-    JOB_MAX_CONCURRENT_WORKERS: int = max(2, (os.cpu_count() or 2))
+    JOB_MAX_CONCURRENT_WORKERS: int = max(1, min(2, (os.cpu_count() or 2)))
 
     # OCR Engine Resource & Concurrency Controls
-    OCR_MAX_CONCURRENT_WORKERS: int = max(1, min(2, (os.cpu_count() or 2) // 2))
-    OCR_MAX_PAGE_LIMIT: int = 100
+    OCR_MAX_CONCURRENT_WORKERS: int = 1
+    OCR_MAX_PAGE_LIMIT: int = 50                         # 50 pages (aligned with industry free tiers)
     OCR_PER_PAGE_TIMEOUT_SECONDS: int = 30
     OCR_EXECUTION_TIMEOUT_SECONDS: int = 120
-    OCR_MAX_INPUT_SIZE_BYTES: int = 50 * 1024 * 1024  # 50 MB
+    OCR_MAX_INPUT_SIZE_BYTES: int = 25 * 1024 * 1024     # 25 MB (matches iLovePDF Free Tier)
     OCR_MAX_IMAGE_PIXELS: int = 25_000_000             # 25 MP safe raster ceiling
     OCR_DEFAULT_DPI: int = 150
 

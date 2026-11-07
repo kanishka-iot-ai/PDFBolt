@@ -74,6 +74,11 @@ async def convert_word_to_pdf(file: UploadFile = File(...), caller: PartnerIdent
         )
 
     file_bytes = await file.read()
+    if len(file_bytes) > settings.HEAVY_CONVERSION_MAX_BYTES:
+        raise HTTPException(
+            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+            detail=f"File size ({round(len(file_bytes)/(1024*1024), 1)} MB) exceeds the free conversion limit of 25 MB (aligned with industry standard). Please compress images inside your document or upload a smaller file."
+        )
     output_filename = f"{Path(filename).stem}.pdf"
 
     # 1. Attempt conversion via Gotenberg LibreOffice HTTP container
@@ -159,8 +164,15 @@ async def convert_pdf_to_word(background_tasks: BackgroundTasks, file: UploadFil
     input_pdf_path = os.path.join(temp_dir, "input.pdf")
     output_docx_path = os.path.join(temp_dir, f"{Path(filename).stem}.docx")
 
+    pdf_bytes = await file.read()
+    if len(pdf_bytes) > settings.HEAVY_CONVERSION_MAX_BYTES:
+        raise HTTPException(
+            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+            detail=f"File size ({round(len(pdf_bytes)/(1024*1024), 1)} MB) exceeds the free conversion limit of 25 MB (aligned with industry standard). Please use our Compress PDF tool first."
+        )
+
     with open(input_pdf_path, "wb") as f:
-        f.write(await file.read())
+        f.write(pdf_bytes)
 
     try:
         # Step A: Check if PDF has digital text
@@ -249,6 +261,11 @@ async def convert_excel_to_pdf(file: UploadFile = File(...)):
         )
 
     file_bytes = await file.read()
+    if len(file_bytes) > settings.HEAVY_CONVERSION_MAX_BYTES:
+        raise HTTPException(
+            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+            detail=f"File size ({round(len(file_bytes)/(1024*1024), 1)} MB) exceeds the free conversion limit of 25 MB (aligned with industry standard). Please compress images inside your document or upload a smaller file."
+        )
     output_filename = f"{Path(filename).stem}.pdf"
 
     # Local Headless LibreOffice Conversion with High-Fidelity Python Fallback
