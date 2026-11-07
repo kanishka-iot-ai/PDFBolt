@@ -5,19 +5,7 @@ from backend.app.models.schemas import JobResponse, JobStatus, OperationType, Fi
 from backend.app.config import settings
 from backend.app.services.storage import storage
 from backend.app.services.cleanup_service import cleanup_service
-from backend.app.processors.compress import CompressProcessor
-from backend.app.processors.merge import MergeProcessor
-from backend.app.processors.split import SplitProcessor
-from backend.app.processors.rotate import RotateProcessor
-from backend.app.processors.delete_pages import DeletePagesProcessor
-from backend.app.processors.watermark import WatermarkProcessor
-from backend.app.processors.page_number import PageNumberProcessor
-from backend.app.processors.protect import ProtectProcessor, UnlockProcessor
-from backend.app.processors.pdf_to_image import PDFToImageProcessor, ImageToPDFProcessor
-from backend.app.processors.pdf_to_word import PDFToWordProcessor
-from backend.app.processors.pdf_to_excel import PDFToExcelProcessor
-from backend.app.processors.pdf_to_ppt import PDFToPPTProcessor
-from backend.app.processors.grayscale import GrayscaleProcessor
+# Lazy loading: processors are dynamically resolved via PROCESSOR_REGISTRY
 from backend.app.core.errors import PDFProcessingException, ErrorCode
 
 
@@ -110,24 +98,8 @@ class JobManager:
             job["status"] = JobStatus.PROCESSING
             job["progress"] = 30
 
-            processor_map = {
-                OperationType.COMPRESS.value: CompressProcessor,
-                OperationType.SPLIT.value: SplitProcessor,
-                OperationType.ROTATE.value: RotateProcessor,
-                OperationType.DELETE_PAGES.value: DeletePagesProcessor,
-                OperationType.WATERMARK.value: WatermarkProcessor,
-                OperationType.PAGE_NUMBER.value: PageNumberProcessor,
-                OperationType.PROTECT.value: ProtectProcessor,
-                OperationType.UNLOCK.value: UnlockProcessor,
-                OperationType.PDF_TO_IMAGE.value: PDFToImageProcessor,
-                OperationType.IMAGE_TO_PDF.value: ImageToPDFProcessor,
-                OperationType.PDF_TO_WORD.value: PDFToWordProcessor,
-                OperationType.PDF_TO_EXCEL.value: PDFToExcelProcessor,
-                OperationType.PDF_TO_PPT.value: PDFToPPTProcessor,
-                OperationType.GRAYSCALE.value: GrayscaleProcessor,
-            }
-
-            proc_class = processor_map.get(op)
+            from backend.app.services.job_service import PROCESSOR_REGISTRY
+            proc_class = PROCESSOR_REGISTRY.get(op)
             if not proc_class:
                 raise PDFProcessingException(
                     error_code=ErrorCode.PROCESSING_FAILED,

@@ -15,126 +15,123 @@ from backend.app.services.file_service import file_service
 from backend.app.services.storage_provider import storage_provider
 from backend.app.services.cleanup_service import cleanup_service
 
-# Import all processors
+# Lazy Processor Registry: Prevents heavy C-libraries (WeasyPrint, pdf2docx, openpyxl, tesseract)
+# from being eagerly loaded on boot, saving ~150MB of baseline container RAM on Render Free Tier.
+import importlib
 from backend.app.processors.base import BaseProcessor
-from backend.app.processors.merge import MergeProcessor
-from backend.app.processors.split import SplitProcessor
-from backend.app.processors.compress import CompressProcessor
-from backend.app.processors.rotate import RotateProcessor
-from backend.app.processors.delete_pages import DeletePagesProcessor
-from backend.app.processors.extract_pages import ExtractPagesProcessor
-from backend.app.processors.organize import OrganizeProcessor
-from backend.app.processors.watermark import WatermarkProcessor
-from backend.app.processors.page_numbers import PageNumbersProcessor
-from backend.app.processors.protect import ProtectProcessor
-from backend.app.processors.unlock import UnlockProcessor
-from backend.app.processors.sign import SignProcessor
-from backend.app.processors.redact import RedactProcessor
-from backend.app.processors.repair import RepairProcessor
-from backend.app.processors.pdf_to_word import PdfToWordProcessor
-from backend.app.processors.pdf_to_excel import PdfToExcelProcessor
-from backend.app.processors.pdf_to_ppt import PdfToPptProcessor
-from backend.app.processors.ppt_to_pdf import PptToPdfProcessor
-from backend.app.processors.pdf_to_images import PdfToImagesProcessor
-from backend.app.processors.images_to_pdf import ImagesToPdfProcessor
-from backend.app.processors.ocr import OcrProcessor
-from backend.app.processors.analyzer import AnalyzerProcessor
-from backend.app.processors.handwriting import HandwritingProcessor
-from backend.app.processors.compare import CompareProcessor
-from backend.app.processors.word_to_pdf import WordToPdfProcessor
-from backend.app.processors.excel_to_pdf import ExcelToPdfProcessor
-from backend.app.processors.html_to_pdf import HtmlToPdfProcessor
-from backend.app.processors.grayscale import GrayscaleProcessor
 
-PROCESSOR_REGISTRY: Dict[str, Type[BaseProcessor]] = {
-    "merge_pdf": MergeProcessor,
-    "merge": MergeProcessor,
-    "split_pdf": SplitProcessor,
-    "split": SplitProcessor,
-    "compress_pdf": CompressProcessor,
-    "compress": CompressProcessor,
-    "rotate_pdf": RotateProcessor,
-    "rotate": RotateProcessor,
-    "delete_pdf_pages": DeletePagesProcessor,
-    "delete-pages": DeletePagesProcessor,
-    "delete_pages": DeletePagesProcessor,
-    "extract-pages": ExtractPagesProcessor,
-    "extract_pages": ExtractPagesProcessor,
-    "organize_pdf": OrganizeProcessor,
-    "organize": OrganizeProcessor,
-    "watermark_pdf": WatermarkProcessor,
-    "watermark": WatermarkProcessor,
-    "add_page_numbers": PageNumbersProcessor,
-    "page-numbers": PageNumbersProcessor,
-    "page_numbers": PageNumbersProcessor,
-    "protect_pdf": ProtectProcessor,
-    "protect": ProtectProcessor,
-    "unlock_pdf": UnlockProcessor,
-    "unlock": UnlockProcessor,
-    "sign_pdf": SignProcessor,
-    "sign": SignProcessor,
-    "redact_pdf": RedactProcessor,
-    "redact": RedactProcessor,
-    "repair_pdf": RepairProcessor,
-    "repair": RepairProcessor,
-    "compare_pdf": CompareProcessor,
-    "compare": CompareProcessor,
-    "compare-pdf": CompareProcessor,
-    "compare_pdf": CompareProcessor,
-    "pdf-to-word": PdfToWordProcessor,
-    "pdf_to_word": PdfToWordProcessor,
-    "pdf-to-excel": PdfToExcelProcessor,
-    "pdf_to_excel": PdfToExcelProcessor,
-    "pdf-to-ppt": PdfToPptProcessor,
-    "pdf_to_ppt": PdfToPptProcessor,
-    "ppt-to-pdf": PptToPdfProcessor,
-    "ppt_to_pdf": PptToPdfProcessor,
-    "pptx-to-pdf": PptToPdfProcessor,
-    "pptx_to_pdf": PptToPdfProcessor,
-    "pdf-to-jpg": PdfToImagesProcessor,
-    "pdf_to_jpg": PdfToImagesProcessor,
-    "pdf-to-images": PdfToImagesProcessor,
-    "pdf_to_images": PdfToImagesProcessor,
-    "pdf-to-image": PdfToImagesProcessor,
-    "jpg_to_pdf": ImagesToPdfProcessor,
-    "images-to-pdf": ImagesToPdfProcessor,
-    "images_to_pdf": ImagesToPdfProcessor,
-    "jpg-to-pdf": ImagesToPdfProcessor,
-    "ocr_pdf": OcrProcessor,
-    "ocr": OcrProcessor,
-    "ocr-pdf": OcrProcessor,
-    "analyze_pdf": AnalyzerProcessor,
-    "analyze": AnalyzerProcessor,
-    "analyze-pdf": AnalyzerProcessor,
-    "handwriting_to_pdf": HandwritingProcessor,
-    "handwriting-to-pdf": HandwritingProcessor,
-    "handwriting": HandwritingProcessor,
-    "scan-handwriting": HandwritingProcessor,
-    "scan_handwriting": HandwritingProcessor,
-    "word-to-pdf": WordToPdfProcessor,
-    "word_to_pdf": WordToPdfProcessor,
-    "docx-to-pdf": WordToPdfProcessor,
-    "docx_to_pdf": WordToPdfProcessor,
-    "excel-to-pdf": ExcelToPdfProcessor,
-    "excel_to_pdf": ExcelToPdfProcessor,
-    "xlsx-to-pdf": ExcelToPdfProcessor,
-    "xlsx_to_pdf": ExcelToPdfProcessor,
-    "xls-to-pdf": ExcelToPdfProcessor,
-    "xls_to_pdf": ExcelToPdfProcessor,
-    "excel2pdf": ExcelToPdfProcessor,
-    "html-to-pdf": HtmlToPdfProcessor,
-    "html_to_pdf": HtmlToPdfProcessor,
-    "html2pdf": HtmlToPdfProcessor,
-    "grayscale": GrayscaleProcessor,
-    "grayscale_pdf": GrayscaleProcessor,
-    "grayscale-pdf": GrayscaleProcessor,
-    "color_to_bw": GrayscaleProcessor,
-    "color-to-bw": GrayscaleProcessor,
-    "black_and_white": GrayscaleProcessor,
-    "black-and-white": GrayscaleProcessor,
-    "pdf_to_grayscale": GrayscaleProcessor,
-    "pdf-to-grayscale": GrayscaleProcessor,
+_PROCESSOR_MODULE_MAP = {
+    "merge": ("backend.app.processors.merge", "MergeProcessor"),
+    "merge_pdf": ("backend.app.processors.merge", "MergeProcessor"),
+    "split": ("backend.app.processors.split", "SplitProcessor"),
+    "split_pdf": ("backend.app.processors.split", "SplitProcessor"),
+    "compress": ("backend.app.processors.compress", "CompressProcessor"),
+    "compress_pdf": ("backend.app.processors.compress", "CompressProcessor"),
+    "rotate": ("backend.app.processors.rotate", "RotateProcessor"),
+    "rotate_pdf": ("backend.app.processors.rotate", "RotateProcessor"),
+    "delete_pages": ("backend.app.processors.delete_pages", "DeletePagesProcessor"),
+    "delete-pages": ("backend.app.processors.delete_pages", "DeletePagesProcessor"),
+    "delete_pdf_pages": ("backend.app.processors.delete_pages", "DeletePagesProcessor"),
+    "extract_pages": ("backend.app.processors.extract_pages", "ExtractPagesProcessor"),
+    "extract-pages": ("backend.app.processors.extract_pages", "ExtractPagesProcessor"),
+    "organize": ("backend.app.processors.organize", "OrganizeProcessor"),
+    "organize_pdf": ("backend.app.processors.organize", "OrganizeProcessor"),
+    "watermark": ("backend.app.processors.watermark", "WatermarkProcessor"),
+    "watermark_pdf": ("backend.app.processors.watermark", "WatermarkProcessor"),
+    "page_numbers": ("backend.app.processors.page_numbers", "PageNumbersProcessor"),
+    "page-numbers": ("backend.app.processors.page_numbers", "PageNumbersProcessor"),
+    "add_page_numbers": ("backend.app.processors.page_numbers", "PageNumbersProcessor"),
+    "protect": ("backend.app.processors.protect", "ProtectProcessor"),
+    "protect_pdf": ("backend.app.processors.protect", "ProtectProcessor"),
+    "unlock": ("backend.app.processors.unlock", "UnlockProcessor"),
+    "unlock_pdf": ("backend.app.processors.unlock", "UnlockProcessor"),
+    "sign": ("backend.app.processors.sign", "SignProcessor"),
+    "sign_pdf": ("backend.app.processors.sign", "SignProcessor"),
+    "redact": ("backend.app.processors.redact", "RedactProcessor"),
+    "redact_pdf": ("backend.app.processors.redact", "RedactProcessor"),
+    "repair": ("backend.app.processors.repair", "RepairProcessor"),
+    "repair_pdf": ("backend.app.processors.repair", "RepairProcessor"),
+    "compare": ("backend.app.processors.compare", "CompareProcessor"),
+    "compare-pdf": ("backend.app.processors.compare", "CompareProcessor"),
+    "compare_pdf": ("backend.app.processors.compare", "CompareProcessor"),
+    "pdf-to-word": ("backend.app.processors.pdf_to_word", "PdfToWordProcessor"),
+    "pdf_to_word": ("backend.app.processors.pdf_to_word", "PdfToWordProcessor"),
+    "pdf-to-excel": ("backend.app.processors.pdf_to_excel", "PdfToExcelProcessor"),
+    "pdf_to_excel": ("backend.app.processors.pdf_to_excel", "PdfToExcelProcessor"),
+    "pdf-to-ppt": ("backend.app.processors.pdf_to_ppt", "PdfToPptProcessor"),
+    "pdf_to_ppt": ("backend.app.processors.pdf_to_ppt", "PdfToPptProcessor"),
+    "ppt-to-pdf": ("backend.app.processors.ppt_to_pdf", "PptToPdfProcessor"),
+    "ppt_to_pdf": ("backend.app.processors.ppt_to_pdf", "PptToPdfProcessor"),
+    "pptx-to-pdf": ("backend.app.processors.ppt_to_pdf", "PptToPdfProcessor"),
+    "pptx_to_pdf": ("backend.app.processors.ppt_to_pdf", "PptToPdfProcessor"),
+    "pdf-to-jpg": ("backend.app.processors.pdf_to_images", "PdfToImagesProcessor"),
+    "pdf_to_jpg": ("backend.app.processors.pdf_to_images", "PdfToImagesProcessor"),
+    "pdf-to-images": ("backend.app.processors.pdf_to_images", "PdfToImagesProcessor"),
+    "pdf_to_images": ("backend.app.processors.pdf_to_images", "PdfToImagesProcessor"),
+    "pdf-to-image": ("backend.app.processors.pdf_to_images", "PdfToImagesProcessor"),
+    "jpg_to_pdf": ("backend.app.processors.images_to_pdf", "ImagesToPdfProcessor"),
+    "images-to-pdf": ("backend.app.processors.images_to_pdf", "ImagesToPdfProcessor"),
+    "images_to_pdf": ("backend.app.processors.images_to_pdf", "ImagesToPdfProcessor"),
+    "jpg-to-pdf": ("backend.app.processors.images_to_pdf", "ImagesToPdfProcessor"),
+    "ocr": ("backend.app.processors.ocr", "OcrProcessor"),
+    "ocr_pdf": ("backend.app.processors.ocr", "OcrProcessor"),
+    "ocr-pdf": ("backend.app.processors.ocr", "OcrProcessor"),
+    "analyze": ("backend.app.processors.analyzer", "AnalyzerProcessor"),
+    "analyze_pdf": ("backend.app.processors.analyzer", "AnalyzerProcessor"),
+    "analyze-pdf": ("backend.app.processors.analyzer", "AnalyzerProcessor"),
+    "handwriting": ("backend.app.processors.handwriting", "HandwritingProcessor"),
+    "handwriting-to-pdf": ("backend.app.processors.handwriting", "HandwritingProcessor"),
+    "handwriting_to_pdf": ("backend.app.processors.handwriting", "HandwritingProcessor"),
+    "scan-handwriting": ("backend.app.processors.handwriting", "HandwritingProcessor"),
+    "scan_handwriting": ("backend.app.processors.handwriting", "HandwritingProcessor"),
+    "word-to-pdf": ("backend.app.processors.word_to_pdf", "WordToPdfProcessor"),
+    "word_to_pdf": ("backend.app.processors.word_to_pdf", "WordToPdfProcessor"),
+    "docx-to-pdf": ("backend.app.processors.word_to_pdf", "WordToPdfProcessor"),
+    "docx_to_pdf": ("backend.app.processors.word_to_pdf", "WordToPdfProcessor"),
+    "excel-to-pdf": ("backend.app.processors.excel_to_pdf", "ExcelToPdfProcessor"),
+    "excel_to_pdf": ("backend.app.processors.excel_to_pdf", "ExcelToPdfProcessor"),
+    "xlsx-to-pdf": ("backend.app.processors.excel_to_pdf", "ExcelToPdfProcessor"),
+    "xlsx_to_pdf": ("backend.app.processors.excel_to_pdf", "ExcelToPdfProcessor"),
+    "xls-to-pdf": ("backend.app.processors.excel_to_pdf", "ExcelToPdfProcessor"),
+    "xls_to_pdf": ("backend.app.processors.excel_to_pdf", "ExcelToPdfProcessor"),
+    "excel2pdf": ("backend.app.processors.excel_to_pdf", "ExcelToPdfProcessor"),
+    "html-to-pdf": ("backend.app.processors.html_to_pdf", "HtmlToPdfProcessor"),
+    "html_to_pdf": ("backend.app.processors.html_to_pdf", "HtmlToPdfProcessor"),
+    "html2pdf": ("backend.app.processors.html_to_pdf", "HtmlToPdfProcessor"),
+    "grayscale": ("backend.app.processors.grayscale", "GrayscaleProcessor"),
+    "grayscale_pdf": ("backend.app.processors.grayscale", "GrayscaleProcessor"),
+    "grayscale-pdf": ("backend.app.processors.grayscale", "GrayscaleProcessor"),
+    "color_to_bw": ("backend.app.processors.grayscale", "GrayscaleProcessor"),
+    "color-to-bw": ("backend.app.processors.grayscale", "GrayscaleProcessor"),
+    "black_and_white": ("backend.app.processors.grayscale", "GrayscaleProcessor"),
+    "black-and-white": ("backend.app.processors.grayscale", "GrayscaleProcessor"),
+    "pdf_to_grayscale": ("backend.app.processors.grayscale", "GrayscaleProcessor"),
+    "pdf-to-grayscale": ("backend.app.processors.grayscale", "GrayscaleProcessor"),
 }
+
+def get_processor_cls(op_key: str):
+    mapping = _PROCESSOR_MODULE_MAP.get(op_key)
+    if not mapping:
+        return None
+    mod_name, cls_name = mapping
+    mod = importlib.import_module(mod_name)
+    return getattr(mod, cls_name)
+
+class _LazyProcessorRegistry(dict):
+    def __getitem__(self, key: str):
+        cls = get_processor_cls(key)
+        if cls is None:
+            raise KeyError(key)
+        return cls
+
+    def get(self, key: str, default=None):
+        cls = get_processor_cls(key)
+        return cls if cls is not None else default
+
+    def __contains__(self, key: str) -> bool:
+        return key in _PROCESSOR_MODULE_MAP
+
+PROCESSOR_REGISTRY = _LazyProcessorRegistry()
 
 
 

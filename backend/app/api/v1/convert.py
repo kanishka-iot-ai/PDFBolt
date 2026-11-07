@@ -10,20 +10,7 @@ from fastapi import APIRouter, UploadFile, File, HTTPException, BackgroundTasks,
 from fastapi.responses import FileResponse, Response
 from pypdf import PdfReader
 
-try:
-    from pdf2docx import Converter
-    HAS_PDF2DOCX = True
-except ImportError:
-    HAS_PDF2DOCX = False
-
-try:
-    from pdf2image import convert_from_path
-    import pytesseract
-    from docx import Document
-    from docx.shared import Inches, Pt
-    HAS_OCR = True
-except ImportError:
-    HAS_OCR = False
+# pdf2docx and pytesseract are imported lazily inside convert_pdf_to_word to save 40MB+ startup RAM
 
 from backend.app.core.logging import logger
 from backend.app.core.errors import PDFBoltError
@@ -178,53 +165,65 @@ async def convert_pdf_to_word(background_tasks: BackgroundTasks, file: UploadFil
         # Step A: Check if PDF has digital text
         is_digital = has_digital_text(input_pdf_path)
 
-        if is_digital and HAS_PDF2DOCX:
-            # Step B (Digital Path): pdf2docx converts layout, tables, fonts & images safely (single worker to prevent OOM)
-            def _convert_digital():
-                cv = Converter(input_pdf_path)
-                cv.convert(output_docx_path, multi_processing=False, cpu_count=1)
-                cv.close()
-            await asyncio.to_thread(_convert_digital)
-        elif HAS_OCR:
-            # Step C (Scanned / Camera Path): OCR with bounded DPI and immediate memory cleanup
-            def _convert_scanned():
-                import gc
-                images = convert_from_path(input_pdf_path, dpi=150)
-                doc = Document()
+        converted_successfully = False
+        if is_digital:
+            try:
+                from pdf2docx import Converter
+                def _convert_digital():
+                    cv = Converter(input_pdf_path)
+                    cv.convert(output_docx_path, multi_processing=False, cpu_count=1)
+                    cv.close()
+                await asyncio.to_thread(_convert_digital)
+                converted_successfully = True
+            except ImportError:
+                pass
 
-                for section in doc.sections:
-                    section.top_margin = Inches(1.0)
-                    section.bottom_margin = Inches(1.0)
-                    section.left_margin = Inches(1.0)
-                    section.right_margin = Inches(1.0)
+        if not converted_successfully:
+            try:
+                from pdf2image import convert_from_path
+                import pytesseract
+                from docx import Document
+                from docx.shared import Inches, Pt
 
-                for i, image in enumerate(images):
-                    if i > 0:
-                        doc.add_page_break()
+                def _convert_scanned():
+                    import gc
+                    images = convert_from_path(input_pdf_path, dpi=150)
+                    doc = Document()
 
-                    ocr_text = pytesseract.image_to_string(image, lang="eng")
-                    try:
-                        image.close()
-                    except Exception:
-                        pass
-                    
-                    for line in ocr_text.splitlines():
-                        clean_line = line.strip()
-                        if clean_line:
-                            p = doc.add_paragraph(clean_line)
-                            p.paragraph_format.line_spacing = 1.15
-                            p.paragraph_format.space_after = Pt(4)
+                    for section in doc.sections:
+                        section.top_margin = Inches(1.0)
+                        section.bottom_margin = Inches(1.0)
+                        section.left_margin = Inches(1.0)
+                        section.right_margin = Inches(1.0)
 
-                doc.save(output_docx_path)
-                del images
-                gc.collect()
+                    for i, image in enumerate(images):
+                        if i > 0:
+                            doc.add_page_break()
 
-            await asyncio.to_thread(_convert_scanned)
-        else:
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="PDF conversion engine is missing required dependencies."
-            )
+                        ocr_text = pytesseract.image_to_string(image, lang="eng")
+                        try:
+                            image.close()
+                        except Exception:
+                            pass
+                        
+                        for line in ocr_text.splitlines():
+                            clean_line = line.strip()
+                            if clean_line:
+                                p = doc.add_paragraph(clean_line)
+                                p.paragraph_format.line_spacing = 1.15
+                                p.paragraph_format.space_after = Pt(4)
+
+                    doc.save(output_docx_path)
+                    del images
+                    gc.collect()
+
+                await asyncio.to_thread(_convert_scanned)
+                converted_successfully = True
+            except ImportError:
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail="PDF conversion engine is missing required dependencies."
+                )
 
         if not os.path.exists(output_docx_path) or os.path.getsize(output_docx_path) == 0:
             raise HTTPException(

@@ -44,6 +44,10 @@ services:
         value: "2"
       - key: PYTHONMALLOC
         value: "malloc"
+      - key: MALLOC_TRIM_THRESHOLD_
+        value: "100000"
+      - key: MALLOC_MMAP_THRESHOLD_
+        value: "100000"
       - key: REQUIRE_API_KEY_FOR_EXTERNAL
         value: "true"
       - key: ADMIN_PORTAL_PASSWORD

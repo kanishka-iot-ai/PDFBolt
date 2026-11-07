@@ -50,9 +50,12 @@ async def _render_keepalive_worker():
             await asyncio.sleep(780)  # 13 minutes (Render free tier sleeps after 15m idle)
             def _ping():
                 import urllib.request
-                req = urllib.request.Request(url, headers={"User-Agent": "PDFBolt-Render-KeepAlive/1.0"})
+                import gc
+                req = urllib.request.Request(url, headers={"User-Agent": "PDFBolt-Render-KeepAlive/1.0", "Connection": "close"})
                 with urllib.request.urlopen(req, timeout=10) as resp:
-                    return resp.status
+                    status = resp.status
+                gc.collect()
+                return status
             status = await asyncio.to_thread(_ping)
             logger.debug(f"Render keep-alive ping status: {status}")
         except asyncio.CancelledError:
