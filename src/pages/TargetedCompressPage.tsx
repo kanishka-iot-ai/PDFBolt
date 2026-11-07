@@ -9,7 +9,7 @@ import IDCardComposer from '../components/IDCardComposer';
 import { NotifySystem } from '../types';
 import AdsterraBanner from '../components/AdsterraBanner';
 import DesktopSideRails from '../components/DesktopSideRails';
-import { FileText, Cpu, LayoutGrid, HelpCircle, ChevronDown } from 'lucide-react';
+import { FileText, Cpu, LayoutGrid, HelpCircle, ChevronDown, ShieldCheck } from 'lucide-react';
 
 interface TargetedCompressPageProps {
   pageSlug?: string;
@@ -373,7 +373,7 @@ const TargetedCompressPage: React.FC<TargetedCompressPageProps> = ({ pageSlug: p
               </div>
 
               {/* Active Tab Panel Body */}
-              <div className="p-4 sm:p-5 max-h-[360px] overflow-y-auto">
+              <div className="p-4 sm:p-5 max-h-[420px] overflow-y-auto">
                 {/* TAB 1: Portal Specs */}
                 {activeTab === 'specs' && page.portalSpecs && (
                   <div className="animate-fadeIn space-y-3">
@@ -405,13 +405,55 @@ const TargetedCompressPage: React.FC<TargetedCompressPageProps> = ({ pageSlug: p
                         </tbody>
                       </table>
                     </div>
+
+                    <div className={`p-3 rounded-xl border flex items-start gap-2.5 text-xs ${
+                      darkMode ? 'bg-amber-500/10 border-amber-500/20 text-amber-300' : 'bg-amber-50 border-amber-200 text-amber-900'
+                    }`}>
+                      <ShieldCheck size={16} className="shrink-0 mt-0.5 text-amber-500" />
+                      <div className="leading-relaxed">
+                        <span className="font-bold">Strict Binary Ceiling Guarantee:</span> Government exam servers validate file sizes in strict binary octets (1 KB = 1,024 bytes). PDFBolt automatically applies a pre-calculated safety margin (e.g., targeting 18.5 KB for 20 KB limit, 280 KB for 300 KB limit) ensuring your document is never rejected by upload filters.
+                      </div>
+                    </div>
                   </div>
                 )}
 
-                {/* TAB 2: Technical Guide */}
-                {activeTab === 'guide' && page.sections && (
-                  <div className="animate-fadeIn space-y-3">
-                    {page.sections.map((sec, idx) => (
+                {/* TAB 2: Technical Guide & Verified Steps */}
+                {activeTab === 'guide' && (
+                  <div className="animate-fadeIn space-y-4">
+                    {page.steps && page.steps.length > 0 && (
+                      <div className="space-y-2.5">
+                        <div className="flex items-center justify-between">
+                          <h4 className={`text-xs font-bold uppercase tracking-wider ${darkMode ? 'text-amber-400' : 'text-amber-600'}`}>
+                            How to {page.h1} ({page.steps.length} Easy Steps)
+                          </h4>
+                          <span className="text-[11px] text-slate-400 font-medium">Verified Workflow</span>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5">
+                          {page.steps.map((step, sIdx) => (
+                            <div
+                              key={sIdx}
+                              className={`p-3.5 rounded-xl border flex flex-col gap-1.5 ${
+                                darkMode ? 'bg-slate-900/60 border-slate-800' : 'bg-slate-50/80 border-slate-200'
+                              }`}
+                            >
+                              <div className="flex items-center gap-2">
+                                <span className="w-5 h-5 rounded-full bg-amber-500 text-slate-950 text-[11px] font-black flex items-center justify-center shrink-0">
+                                  {sIdx + 1}
+                                </span>
+                                <h5 className={`text-xs font-bold ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+                                  {step.name}
+                                </h5>
+                              </div>
+                              <p className="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed pl-7">
+                                {step.text}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {page.sections && page.sections.map((sec, idx) => (
                       <div key={idx} className={`p-4 rounded-xl border ${darkMode ? 'bg-slate-950/40 border-slate-800' : 'bg-slate-50/60 border-slate-200/80'}`}>
                         <h4 className={`text-sm font-bold mb-2 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
                           {sec.heading}

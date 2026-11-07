@@ -250,8 +250,8 @@ TARGETED_PAGES = [
     {
         "path": "compress-pdf-to-20kb",
         "h1": "Compress PDF to 20KB Online",
-        "title": "Compress PDF to 20KB Free (SSC Signature Ceiling) | PDFBolt",
-        "description": "Compress PDF to 20KB online free without losing readability. Exact size calibration for SSC, UPSC, IBPS, and state recruitment exam portals. 100% private in-browser.",
+        "title": "Compress PDF to 20KB Online Free (Strict < 20KB for SSC & Signatures) | PDFBolt",
+        "description": "Compress PDF to under 20KB online for free. Pre-calibrated 18.5KB ceiling for SSC CGL, IBPS, and State PSC signatures and thumb impressions. 100% private in-browser WebAssembly.",
         "subtitle": "Reduce PDF file size to under 20KB for signatures, thumb impressions, and portal requirements with local browser privacy.",
         "quick_answer": "To compress a PDF to 20KB: 1. Drag and drop your PDF into PDFBolt. 2. Extreme compression is pre-selected with exact 19.9KB ceiling calibration. 3. Click 'Compress PDF' to download your lightweight file under 20KB instantly.",
         "target_badge": "Under 20 KB (Govt Exams & Strict Ceilings)",
@@ -488,8 +488,8 @@ TARGETED_PAGES = [
     {
         "path": "compress-pdf-to-300kb",
         "h1": "Compress PDF to 300KB Online",
-        "title": "Compress PDF to 300KB Online Free (Exact Size & High Quality) | PDFBolt",
-        "description": "Resize and compress PDF to 300KB online for free with exact target size. Fast, private in-browser tool for UPSC OTR, SSC, High Court & government job portals.",
+        "title": "Compress PDF to 300KB Online Free (Exact Size & UPSC OTR Preset) | PDFBolt",
+        "description": "Compress PDF to under 300KB online for free. Exact 270KB-295KB ceiling for UPSC OTR, EPFO passbook, and State PSC portals. 100% private in-browser WebAssembly, zero cloud upload.",
         "subtitle": "Optimize PDF files to under 300KB for UPSC, State Public Service Commissions, and immigration portals.",
         "quick_answer": "To compress PDF to 300KB: 1. Drag & drop your PDF file. 2. The exact 300 KB target size is pre-selected. 3. Optionally enable Grayscale for scanned certificates. 4. Click 'Compress PDF' and download your UPSC-compliant file under 300KB.",
         "target_badge": "Under 300 KB (UPSC, EPFO & Portal Ready)",
@@ -1103,8 +1103,8 @@ TARGETED_PAGES = [
     {
         "path": "merge-aadhaar-and-pan-card",
         "h1": "Merge Aadhaar & PAN Card into One PDF",
-        "title": "Merge Aadhaar and PAN Card into One PDF Online Free (100% Private) | PDFBolt",
-        "description": "Merge Aadhaar and PAN card into one PDF online for free. Combine mobile phone photos (JPG/PNG) or PDFs for bank KYC, Demat, and income tax with zero server uploads.",
+        "title": "Merge Aadhaar and PAN Card into Single Page PDF Online Free | PDFBolt",
+        "description": "Combine Aadhaar (front & back) and PAN card onto a single A4 page PDF for bank KYC. Real 1:1 ISO print scaling, Anti-Theft Watermark, 100% private in-browser WebAssembly.",
         "subtitle": "Combine Aadhaar card (front and back) and PAN card into a single PDF document for banking KYC, government portals, and visa applications.",
         "quick_answer": "To merge Aadhaar and PAN card into one PDF: 1. Upload your Aadhaar (front & back) and PAN card (as photos or PDFs). 2. Drag cards to arrange the page sequence. 3. Click 'Merge PDF' to instantly generate and download your combined, KYC-ready document with zero server upload.",
         "target_badge": "Combined Identity Mode (Under 1MB KYC Ready)",
