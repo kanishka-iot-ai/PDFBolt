@@ -82,7 +82,17 @@
   - Privacy Architecture Analysis: `https://pdfbolt.in/compare/online-pdf-tools/`
 - Verified public rendering (HTTP 200 OK) in clean anonymous browsing without login.
 
-### 9. Behance (Adobe) Design & Technology Showcase — Domain Authority: 92 / DR 93 (100% Free)
+### 9. Docker Hub Global Registry & Authority Profile — Domain Rating: 92 (100% Free)
+- ✅ **LIVE & ACTIVE:** [https://hub.docker.com/u/kanishkanow](https://hub.docker.com/u/kanishkanow)
+- **Username:** `kanishkanow`
+- **Full Name:** `Kanishka Giri`
+- **Company:** `PDFBolt`
+- **Location:** `India`
+- **Avatar:** Founder's Professional Portrait in suit & tie (`kanishka_creator_photo.jpg`)
+- **Direct Live Outbound Backlink:** [https://pdfbolt.in](https://pdfbolt.in)
+- Verified public rendering (HTTP 200 OK) without login in clean visitor browser context.
+
+### 10. Behance (Adobe) Design & Technology Showcase — Domain Authority: 92 / DR 93 (100% Free)
 - ✅ **LIVE & PUBLISHED (Project):** [https://www.behance.net/gallery/258152359/PDFBolt-Private-In-Browser-PDF-Toolkit](https://www.behance.net/gallery/258152359/PDFBolt-Private-In-Browser-PDF-Toolkit)
 - ✅ **LIVE & ACTIVE (Creator Profile):** [https://www.behance.net/kanishkagiri](https://www.behance.net/kanishkagiri)
 - **Project Title:** PDFBolt – Private In-Browser PDF Toolkit
@@ -94,22 +104,22 @@
   - Primary Creator Website: `https://pdfbolt.in/`
 - Verified public rendering with full gallery screenshots and UI/UX case study.
 
-### 10. Dev.to Developer Community — Domain Rating: 91 (100% Free)
+### 11. Dev.to Developer Community — Domain Rating: 91 (100% Free)
 - ✅ **LIVE & ACTIVE:** [https://dev.to/kanishkaiotai](https://dev.to/kanishkaiotai)
 - Developer profile and articles referencing client-side WebAssembly document processing.
 
-### 11. Product Hunt — Domain Rating: 91 (100% Free)
+### 12. Product Hunt — Domain Rating: 91 (100% Free)
 - ✅ **LIVE & ACTIVE:** [https://producthunt.com/products/pdfbolt-2](https://producthunt.com/products/pdfbolt-2)
 - Official product page with direct do-follow links and screenshots.
 
-### 12. Hacker News — Domain Rating: 91 (100% Free)
+### 13. Hacker News — Domain Rating: 91 (100% Free)
 - ✅ **LIVE & PUBLISHED (Discussion):** [https://news.ycombinator.com/item?id=50401697](https://news.ycombinator.com/item?id=50401697)
 - ✅ **LIVE & ACTIVE (Founder Profile):** [https://news.ycombinator.com/user?id=kanishkabmchak](https://news.ycombinator.com/user?id=kanishkabmchak)
 - **Submission Title:** `Show HN: PDFBolt – In-browser PDF tools with WebAssembly (zero server uploads)`
 - **Direct Target URL:** `https://pdfbolt.in`
 - **Contextual Bio Backlinks:** Bio updated with direct links to `https://pdfbolt.in`, `/merge-pdf/`, `/compress-pdf/`, `/student-pdf-tools/`, and GitHub repository.
 
-### 13. CodePen Developer Profile & Interactive Pen Showcase — Domain Rating: 91 (100% Free)
+### 14. CodePen Developer Profile & Interactive Pen Showcase — Domain Rating: 91 (100% Free)
 - ✅ **LIVE & ACTIVE (Profile):** [https://codepen.io/KANISHKA-GIRI](https://codepen.io/KANISHKA-GIRI)
 - ✅ **LIVE & PUBLISHED (Showcase Pen):** [https://codepen.io/KANISHKA-GIRI/pen/rayoZRd](https://codepen.io/KANISHKA-GIRI/pen/rayoZRd)
 - **Profile Name:** KANISHKA GIRI (`@KANISHKA-GIRI`)
@@ -121,12 +131,12 @@
   - Student & Exam Tools: `https://pdfbolt.in/student-pdf-tools/`
 - Verified public rendering (HTTP 200 OK) in clean anonymous browsing without login.
 
-### 14. Scribd Knowledge & Document Publishing — Domain Rating: 91 (100% Free)
+### 15. Scribd Knowledge & Document Publishing — Domain Rating: 91 (100% Free)
 - ✅ **LIVE & PUBLISHED:** [https://www.scribd.com/document/1094207370/Indian-Government-Competitive-Exam-PDF-Size-Limits-Reference-SSC-UPSC-NEET-JEE](https://www.scribd.com/document/1094207370/Indian-Government-Competitive-Exam-PDF-Size-Limits-Reference-SSC-UPSC-NEET-JEE)
 - **Author Profile:** [https://www.scribd.com/user/1041605584/kanishka-bmchak](https://www.scribd.com/user/1041605584/kanishka-bmchak)
 - Full text reference indexed in Google search with direct links to `https://pdfbolt.in/student-pdf-tools/`.
 
-### 15. Open Collective Open Source & Tech Initiative — Domain Rating: 90 (100% Free)
+### 16. Open Collective Open Source & Tech Initiative — Domain Rating: 90 (100% Free)
 - ✅ **LIVE & ACTIVE (Collective Hub):** [https://opencollective.com/pdfboltin](https://opencollective.com/pdfboltin)
 - ✅ **LIVE & ACTIVE (Creator Profile):** [https://opencollective.com/kanishkagiri](https://opencollective.com/kanishkagiri)
 - **Collective Name:** PDFBolt (`@pdfboltin`)
@@ -142,11 +152,11 @@
     - Architecture Comparison: `https://pdfbolt.in/compare/online-pdf-tools/`
 - Verified public rendering (HTTP 200 OK) in clean anonymous browsing without login.
 
-### 16. About.me — Domain Rating: 90 (100% Free)
+### 17. About.me — Domain Rating: 90 (100% Free)
 - ✅ **LIVE & PUBLISHED:** [https://about.me/kanishka](https://about.me/kanishka)
 - Direct spotlight button pointing to `https://pdfbolt.in/` with bio attribution.
 
-### 17. Buy Me a Coffee Creator & Project Hub — Domain Rating: 90 (100% Free)
+### 18. Buy Me a Coffee Creator & Project Hub — Domain Rating: 90 (100% Free)
 - ✅ **LIVE & PUBLISHED:** [https://buymeacoffee.com/pdfbolt](https://buymeacoffee.com/pdfbolt)
 - **Profile:** PDFBolt - Private PDF Tools (`@pdfbolt`)
 - **Category:** Software & Technology / Developer
@@ -158,12 +168,12 @@
   - Privacy Architecture Analysis: `https://pdfbolt.in/compare/online-pdf-tools/`
 - Verified public rendering (HTTP 200 OK) without login or payout credentials required.
 
-### 18. Speaker Deck (GitHub / SlideShare Alternative) — Domain Rating: 89 (100% Free)
+### 19. Speaker Deck (GitHub / SlideShare Alternative) — Domain Rating: 89 (100% Free)
 - ✅ **LIVE & PUBLISHED:** [https://speakerdeck.com/kanishkaiotai/pdfbolt-ultimate-guide-to-private-pdf-tools-2026](https://speakerdeck.com/kanishkaiotai/pdfbolt-ultimate-guide-to-private-pdf-tools-2026)
 - **Direct PDF CDN URL:** [https://files.speakerdeck.com/presentations/9281520987da436db42499cc69f03645/PDFBolt_Ultimate_Guide_To_Private_PDF_Tools_2026.pdf](https://files.speakerdeck.com/presentations/9281520987da436db42499cc69f03645/PDFBolt_Ultimate_Guide_To_Private_PDF_Tools_2026.pdf)
 - Full 4-page HTML5 text layer with direct backlinks to `https://pdfbolt.in`, `https://pdfbolt.in/merge-pdf/`, `https://pdfbolt.in/compress-pdf/`.
 
-### 19. Ko-fi Creator & Project Hub — Domain Rating: 89 (100% Free)
+### 20. Ko-fi Creator & Project Hub — Domain Rating: 89 (100% Free)
 - ✅ **LIVE & PUBLISHED:** [https://ko-fi.com/pdfbolt](https://ko-fi.com/pdfbolt)
 - **Profile:** PDFBolt - Private PDF Tools (`@pdfbolt`)
 - **Category:** Software & Technology / Developer
@@ -175,7 +185,7 @@
   - Privacy Architecture Analysis: `https://pdfbolt.in/compare/online-pdf-tools/`
 - Verified public rendering (HTTP 200 OK) without login or payment methods connected.
 
-### 20. Replit Developer & Project Hub — Domain Rating: 89 (100% Free)
+### 21. Replit Developer & Project Hub — Domain Rating: 89 (100% Free)
 - ✅ **LIVE & ACTIVE (Profile):** [https://replit.com/@kanishkabmchak](https://replit.com/@kanishkabmchak)
 - **Profile Name:** Kanishka Giri (`@kanishkabmchak`)
 - **Avatar:** Founder Portrait in suit & tie (`kanishka_creator_photo.jpg`)
@@ -186,13 +196,13 @@
   - GitHub: `https://github.com/kanishka-iot-ai`
 - Verified public profile rendering with indexable developer authority.
 
-### 21. FlipHTML5 Interactive Digital Publication — Domain Rating: 88 (100% Free)
+### 22. FlipHTML5 Interactive Digital Publication — Domain Rating: 88 (100% Free)
 - ✅ **LIVE & PUBLISHED:** [https://online.fliphtml5.com/pdfbolt/rypa/](https://online.fliphtml5.com/pdfbolt/rypa/) (Viewer: [https://online.fliphtml5.com/pdfbolt/rypa/#p=1](https://online.fliphtml5.com/pdfbolt/rypa/#p=1))
 - **Public Brand Profile:** [https://fliphtml5.com/pdfbolt](https://fliphtml5.com/pdfbolt)
 - **Document Title:** The Ultimate Guide to Private, In-Browser PDF Tools (2026 Edition) - PDFBolt
 - Full 4-page interactive 3D WebP flipbook with contextual links pointing directly to `https://pdfbolt.in` and tool routes.
 
-### 22. GitBook Developer Documentation Hub — Domain Rating: 88 (100% Free)
+### 23. GitBook Developer Documentation Hub — Domain Rating: 88 (100% Free)
 - ✅ **LIVE & PUBLISHED:** [https://pdfbolt.gitbook.io/pdfbolt-docs](https://pdfbolt.gitbook.io/pdfbolt-docs)
 - **Organization / Space:** PDFBolt
 - **Document Title:** PDFBolt: The Complete Client-Side In-Browser PDF Toolkit
@@ -204,7 +214,7 @@
   - `https://pdfbolt.in/compare/online-pdf-tools/` (Privacy Architecture Comparison)
 - Verified public rendering (HTTP 200 OK) in clean isolated browsing without login.
 
-### 23. Beacons.ai Verified Authority Hub — Domain Rating: 86 (100% Free)
+### 24. Beacons.ai Verified Authority Hub — Domain Rating: 86 (100% Free)
 - ✅ **LIVE & ACTIVE:** [https://beacons.ai/pdfbolt](https://beacons.ai/pdfbolt)
 - **Username / Handle:** `pdfbolt`
 - **Display Name:** PDFBolt - Private PDF Tools
@@ -219,12 +229,12 @@
   - Architecture Comparison: `https://pdfbolt.in/compare/online-pdf-tools/` (*Online PDF Tools Comparison: Client vs Cloud*)
 - Verified public rendering (HTTP 200 OK) in isolated visitor browser context without login.
 
-### 24. AnyFlip Digital Flipbook & Publication — Domain Rating: 85 (100% Free)
+### 25. AnyFlip Digital Flipbook & Publication — Domain Rating: 85 (100% Free)
 - ✅ **LIVE & PUBLISHED:** [https://online.anyflip.com/jxvbo/iubd/mobile/index.html](https://online.anyflip.com/jxvbo/iubd/mobile/index.html) (CDN: [http://online.anyflip.com/jxvbo/iubd/](http://online.anyflip.com/jxvbo/iubd/))
 - **Author Homepage:** [https://anyflip.com/homepage/jxvbo](https://anyflip.com/homepage/jxvbo)
 - Full 4-page interactive flipbook publication with live outbound links to `https://pdfbolt.in` and tool routes.
 
-### 25. Devpost High-Authority Developer Showcase — Domain Rating: 85 (100% Free)
+### 26. Devpost High-Authority Developer Showcase — Domain Rating: 85 (100% Free)
 - ✅ **LIVE & PUBLISHED:** [https://devpost.com/software/pdfbolt-abqwz9](https://devpost.com/software/pdfbolt-abqwz9)
 - **Author / Builder:** [kanishka-iot-ai](https://devpost.com/kanishka-iot-ai) (KANISHKA GIRI)
 - **Project Title:** PDFBolt - Private In-Browser PDF Tools
@@ -238,18 +248,32 @@
   - Privacy Architecture Analysis: `https://pdfbolt.in/compare/online-pdf-tools/`
 - Verified public rendering (HTTP 200 OK) with live gallery screenshots and tech stack attribution.
 
-### 26. Hashnode Engineering Blog — Domain Rating: 83 (100% Free)
+### 27. Hashnode Engineering Blog — Domain Rating: 83 (100% Free)
 - ✅ **LIVE & ACTIVE:** [https://kanishkagiri.hashnode.dev](https://kanishkagiri.hashnode.dev)
 - Custom domain tech publication with contextual backlinks.
 
-### 27. AppSumo Marketplace & Software Directory — Domain Rating: 83 (100% Free)
+### 28. AppSumo Marketplace & Software Directory — Domain Rating: 83 (100% Free)
 - ✅ **ESTABLISHED & PREVIEW ACTIVE:** [https://appsumo.com/products/preview-pdfbolt/?p=1](https://appsumo.com/products/preview-pdfbolt/?p=1)
 - **Partner Listing ID:** `234558`
 - **Product Title:** PDFBolt - Private In-Browser PDF Tools
 - **Direct Live Outbound Backlinks:** `https://pdfbolt.in`
 - Established product listing on global digital marketplace with verified domain authority.
 
-### 28. F6S Startup Network & Founder Hub — Domain Rating: 82 (100% Free)
+### 29. Taplink Verified Authority Link Hub — Domain Rating: 83 (100% Free)
+- ✅ **LIVE & ACTIVE:** [https://taplink.cc/pdfbolt](https://taplink.cc/pdfbolt)
+- **Account Handle:** `@pdfbolt`
+- **Profile Title:** PDFBolt - Private PDF Tools
+- **Avatar:** Official 3D Glossy Shield & Bolt Logo (`pdfbolt_brand_logo.png`)
+- **Bio:** 100% private in-browser PDF utilities built with WebAssembly. Zero file uploads.
+- **Direct Live Outbound Backlinks:**
+  - PDFBolt Homepage: `https://pdfbolt.in`
+  - Merge PDF Online: `https://pdfbolt.in/merge-pdf/`
+  - Compress PDF Online: `https://pdfbolt.in/compress-pdf/`
+  - Govt Exam & Student PDF Tools: `https://pdfbolt.in/student-pdf-tools/`
+  - Security Architecture Comparison: `https://pdfbolt.in/compare/online-pdf-tools/`
+- Verified public rendering (HTTP 200 OK) in clean anonymous browsing without login.
+
+### 30. F6S Startup Network & Founder Hub — Domain Rating: 82 (100% Free)
 - ✅ **LIVE & ACTIVE:** [https://www.f6s.com/kanishka-giri](https://www.f6s.com/kanishka-giri)
 - **Profile:** KANISHKA GIRI (Founder & Creator of PDFBolt)
 - **Direct Live Outbound Backlinks:**
@@ -257,11 +281,11 @@
   - Bio Contextual Link: `https://pdfbolt.in/merge-pdf/`
 - Verified public founder profile highlighting PDFBolt's WebAssembly architecture.
 
-### 29. Indie Hackers Product Hub — Domain Rating: 81 (100% Free)
+### 31. Indie Hackers Product Hub — Domain Rating: 81 (100% Free)
 - ✅ **LIVE & ACTIVE:** [https://www.indiehackers.com/product/pdfbolt-2](https://www.indiehackers.com/product/pdfbolt-2)
 - Community product page with founder profile and live website link.
 
-### 30. Campsite.bio Verified Authority Hub — Domain Rating: 81 (100% Free)
+### 32. Campsite.bio Verified Authority Hub — Domain Rating: 81 (100% Free)
 - ✅ **LIVE & ACTIVE:** [https://campsite.bio/pdfbolt](https://campsite.bio/pdfbolt)
 - **Handle:** `@pdfbolt`
 - **Profile Title:** PDFBolt - Private PDF Tools
@@ -275,7 +299,7 @@
   - Security Architecture Comparison: `https://pdfbolt.in/compare/online-pdf-tools/`
 - Verified public rendering (HTTP 200 OK) in clean anonymous browsing without login.
 
-### 31. Solo.to Verified Authority Link Hub — Domain Rating: 81 (100% Free)
+### 33. Solo.to Verified Authority Link Hub — Domain Rating: 81 (100% Free)
 - ✅ **LIVE & PUBLISHED:** [https://solo.to/pdfbolt](https://solo.to/pdfbolt)
 - **Profile:** PDFBolt - Private PDF Tools (`@pdfbolt`)
 - **Avatar:** Official 3D Glossy Brand Shield Logo
@@ -287,7 +311,7 @@
   - Privacy Comparison: [Privacy Architecture Comparison](https://pdfbolt.in/compare/online-pdf-tools/)
 - Verified public rendering (HTTP 200 OK) without login in clean visitor browser context.
 
-### 32. Canny Product Roadmap & Feedback Hub — Domain Rating: 80 (100% Free)
+### 34. Canny Product Roadmap & Feedback Hub — Domain Rating: 80 (100% Free)
 - ✅ **LIVE & PUBLISHED (Portal):** [https://pdfbolt.canny.io](https://pdfbolt.canny.io)
 - ✅ **LIVE & ACTIVE (Feedback Board):** [https://pdfbolt.canny.io/feature-requests](https://pdfbolt.canny.io/feature-requests)
 - ✅ **LIVE & PUBLISHED (Roadmap Post):** [https://pdfbolt.canny.io/feature-requests/p/webassembly-client-side-ocr-local-document-processing-enhancements](https://pdfbolt.canny.io/feature-requests/p/webassembly-client-side-ocr-local-document-processing-enhancements)
@@ -300,32 +324,32 @@
   - Privacy Architecture Analysis: `https://pdfbolt.in/compare/online-pdf-tools/`
 - Verified public rendering (HTTP 200 OK) without login requirements on 100% permanent free tier.
 
-### 33. SaaSHub — Domain Rating: 79 (100% Free)
+### 35. SaaSHub — Domain Rating: 79 (100% Free)
 - ✅ **LIVE & ACTIVE:** [https://www.saashub.com/pdfbolt-in](https://www.saashub.com/pdfbolt-in)
 - Listed under top free PDF tools & utilities.
 
-### 34. AlternativeTo — Domain Rating: 79 (100% Free)
+### 36. AlternativeTo — Domain Rating: 79 (100% Free)
 - ✅ **SUBMITTED & IN REVIEW:** Submission ID `ecbf3628-aa78-411d-9bf0-6b74551c2f31`
 - Listed as free alternative to iLovePDF and Adobe Acrobat.
 
-### 35. Peerlist — Domain Rating: 77 (100% Free)
+### 37. Peerlist — Domain Rating: 77 (100% Free)
 - ✅ **LIVE & PUBLISHED (Project):** [https://peerlist.io/kanishkabmchak/project/pdfbolt](https://peerlist.io/kanishkabmchak/project/pdfbolt)
 - ✅ **LIVE & PUBLISHED (Profile):** [https://peerlist.io/kanishkabmchak](https://peerlist.io/kanishkabmchak)
 
-### 36. Uneed — Domain Rating: 75 (100% Free)
+### 38. Uneed — Domain Rating: 75 (100% Free)
 - ✅ **CONFIRMED & SCHEDULED IN FREE QUEUE:** [https://www.uneed.best/tool/pdfbolt-private-pdf-tools](https://www.uneed.best/tool/pdfbolt-private-pdf-tools)
 
-### 37. PitchWall — Domain Rating: 70 (100% Free)
+### 39. PitchWall — Domain Rating: 70 (100% Free)
 - ✅ **SUBMITTED & UNDER REVIEW (Free Launch Plan):**
 - **Live Status Page URL:** [https://pitchwall.co/product/pdfbolt-online-pdf-tools/status](https://pitchwall.co/product/pdfbolt-online-pdf-tools/status)
 - **Public Product Preview URL:** [https://pitchwall.co/product/pdfbolt-online-pdf-tools](https://pitchwall.co/product/pdfbolt-online-pdf-tools)
 - **Direct Outbound Do-Follow Backlink:** [https://pitchwall.co/out/pdfbolt.in?ref=PitchWall](https://pitchwall.co/out/pdfbolt.in?ref=PitchWall)
 - **Free Perks:** 1-day homepage feature, Do-follow link, and automated tweet from @pitch_wall.
 
-### 38. DevHunt — Domain Rating: 63 (100% Free)
+### 40. DevHunt — Domain Rating: 63 (100% Free)
 - ✅ **LIVE & PUBLISHED:** [https://devhunt.org/tool/pdfbolt-private-pdf-tools](https://devhunt.org/tool/pdfbolt-private-pdf-tools)
 
-### 39. Launching Next — Domain Rating: 58 (100% Free)
+### 41. Launching Next — Domain Rating: 58 (100% Free)
 - ✅ **SUBMITTED & IN QUEUE:** Submission ID `165753`
 
 ---
