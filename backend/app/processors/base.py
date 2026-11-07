@@ -17,6 +17,17 @@ logger = get_logger(__name__)
 LIBREOFFICE_SEMAPHORE = threading.Semaphore(1)
 
 
+def force_reclaim_system_memory():
+    """Forces Python GC and glibc malloc_trim to return free pages to the Linux kernel/cgroup."""
+    import gc
+    gc.collect()
+    try:
+        import ctypes
+        ctypes.CDLL("libc.so.6").malloc_trim(0)
+    except Exception:
+        pass
+
+
 class BaseProcessor(ABC):
     """
     Master abstract processor base class.
@@ -96,6 +107,8 @@ class BaseProcessor(ABC):
         except Exception as e:
             logger.error(f"processor.failed job_id={self.job_id} op={self.operation} error={e}")
             raise PDFBoltError("PROCESSING_FAILED", str(e))
+        finally:
+            force_reclaim_system_memory()
 
     @abstractmethod
     def process(self, input_files: Any, options: Any = None) -> Any:
@@ -124,11 +137,13 @@ class BaseProcessor(ABC):
         self.is_cancelled.set()
 
     def cleanup(self) -> None:
-        """Delete work directory. Called by cleanup service."""
+        """Delete work directory and return freed pages to OS."""
         try:
             shutil.rmtree(self.work_dir, ignore_errors=True)
         except Exception:
             pass
+        finally:
+            force_reclaim_system_memory()
 
     def _process_bytes_generic(self, content: bytes, filename: str) -> Tuple[bytes, str, Dict[str, Any]]:
         """Generic adapter for legacy byte-in/byte-out interface."""

@@ -154,9 +154,19 @@ class CleanupService:
 
 
     async def execute_cleanup_cycle(self, job_manager_instance: Any = None) -> int:
-        """Executes periodic cleanup pass."""
+        """Executes periodic cleanup pass and reclaims heap memory from OS."""
         ttl_purged = self.run_15min_ttl_cleanup(job_manager_instance)
         hard_purged = self.run_20min_hard_safety_cleanup()
+
+        # Enforce periodic memory reclamation to keep container resident memory at baseline (~85MB)
+        import gc
+        gc.collect()
+        try:
+            import ctypes
+            ctypes.CDLL("libc.so.6").malloc_trim(0)
+        except Exception:
+            pass
+
         return ttl_purged + hard_purged
 
     async def start_periodic_worker(self, job_manager_instance: Any = None):
