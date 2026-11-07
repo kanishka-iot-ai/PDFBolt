@@ -152,12 +152,14 @@ const TargetedCompressPage: React.FC<TargetedCompressPageProps> = ({ pageSlug: p
       <DesktopSideRails centerWidthClass="max-w-4xl" className="py-2">
         <div className="w-full">
           <div className="w-full px-1 sm:px-2 py-1">
-            <div className={`rounded-2xl sm:rounded-3xl border shadow-md overflow-hidden transition-all ${
-              darkMode ? 'bg-slate-900/90 border-slate-800' : 'bg-white/95 border-slate-200'
+            <div className={`rounded-2xl sm:rounded-3xl border craft-card backdrop-blur-xl overflow-hidden transition-all ${
+              darkMode 
+                ? 'bg-[#0e1422]/85 border-white/[0.08] shadow-[0_8px_32px_rgba(0,0,0,0.36)]' 
+                : 'bg-white/90 border-slate-200/90 shadow-[0_4px_24px_rgba(0,0,0,0.04)]'
             }`}>
               {/* Integrated Size & Portal Preset Rail */}
               <div className={`px-3 sm:px-5 py-2 sm:py-2.5 border-b flex flex-col gap-1.5 ${
-                darkMode ? 'bg-slate-900/95 border-slate-800' : 'bg-slate-50/90 border-slate-100'
+                darkMode ? 'bg-[#0b101c]/90 border-white/[0.06]' : 'bg-slate-50/80 border-slate-200/70'
               }`}>
                 {/* Row 1: Target Size Presets */}
                 <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5">
@@ -273,12 +275,14 @@ const TargetedCompressPage: React.FC<TargetedCompressPageProps> = ({ pageSlug: p
 
           {/* Precision Information & Guidelines Console (Single-Screen Multi-Tab Architecture) */}
           <div className="w-full max-w-4xl mx-auto px-1 sm:px-2 mt-4 text-left">
-            <div className={`rounded-2xl border shadow-sm transition-all overflow-hidden ${
-              darkMode ? 'bg-slate-900/80 border-slate-800' : 'bg-white/90 border-slate-200'
+            <div className={`rounded-2xl border craft-card backdrop-blur-xl transition-all overflow-hidden ${
+              darkMode 
+                ? 'bg-[#0e1422]/85 border-white/[0.08] shadow-[0_8px_32px_rgba(0,0,0,0.36)]' 
+                : 'bg-white/90 border-slate-200/90 shadow-[0_4px_24px_rgba(0,0,0,0.04)]'
             }`}>
               {/* Segmented Tab Navigation Bar */}
               <div className={`p-1.5 border-b flex items-center gap-1.5 overflow-x-auto no-scrollbar ${
-                darkMode ? 'bg-slate-950/60 border-slate-800' : 'bg-slate-100/80 border-slate-200/80'
+                darkMode ? 'bg-[#0b101c]/80 border-white/[0.06]' : 'bg-slate-50/80 border-slate-200/70'
               }`}>
                 {page.portalSpecs && page.portalSpecs.length > 0 && (
                   <button

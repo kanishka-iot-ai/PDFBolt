@@ -103,7 +103,7 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
 
   return (
     <>
-      <nav className={`sticky top-0 z-50 transition-all duration-300 glass border-b ${darkMode ? 'border-slate-800 bg-slate-900/80' : 'border-slate-200 bg-white/80'} shadow-sm`}>
+      <nav className={`sticky top-0 z-50 transition-all duration-300 glass border-b ${darkMode ? 'border-white/[0.08] bg-[#090D15]/80 backdrop-blur-xl' : 'border-slate-200/80 bg-[#FBFBF9]/85 backdrop-blur-xl'} shadow-sm`}>
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between h-16">
           {/* Brand Logo (Links to /) */}
           <Link
@@ -145,7 +145,7 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
               
               {/* Mega Menu */}
               {isToolsOpen && (
-                <div className={`absolute top-full -left-32 md:-left-48 mt-4 w-[840px] max-w-[95vw] rounded-3xl shadow-2xl border animate-slideDown overflow-hidden ${darkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-200'}`}>
+                <div className={`absolute top-full -left-32 md:-left-48 mt-4 w-[840px] max-w-[95vw] rounded-3xl shadow-2xl border animate-slideDown overflow-hidden ${darkMode ? 'bg-[#0e1422]/95 border-white/[0.08] shadow-[0_20px_50px_rgba(0,0,0,0.5)] backdrop-blur-2xl' : 'bg-white/95 border-slate-200/90 shadow-2xl backdrop-blur-2xl'}`}>
                   <div className="grid grid-cols-3 gap-0">
                     <div className="col-span-2 p-6 grid grid-cols-2 gap-6">
                       {toolCategories.slice(0, 4).map(cat => (

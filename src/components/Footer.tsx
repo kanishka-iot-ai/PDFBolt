@@ -20,7 +20,7 @@ const Footer: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
   };
 
   return (
-    <footer className={`py-16 border-t mt-auto transition-colors duration-300 ${darkMode ? 'bg-slate-900 border-slate-800 text-slate-400' : 'bg-slate-50 border-slate-200 text-slate-600'}`}>
+    <footer className={`py-16 border-t mt-auto transition-colors duration-300 ${darkMode ? 'bg-[#070b12] border-white/[0.06] text-slate-400' : 'bg-[#F5F5F0] border-slate-200/80 text-slate-600'}`}>
       <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8">
         
         {/* Col 1: Brand & Privacy Column */}

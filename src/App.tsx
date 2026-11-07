@@ -223,7 +223,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ darkMode, setDarkMode, soundEna
   }, [location.pathname]);
 
   return (
-    <div className={`min-h-screen flex flex-col transition-colors duration-300 font-sans relative ${darkMode ? 'dark bg-[#090D15] text-slate-100' : 'bg-[#F9FAFB] text-slate-900'}`}>
+    <div className={`min-h-screen flex flex-col transition-colors duration-300 font-sans relative ${darkMode ? 'dark bg-[#090D15] text-slate-100' : 'bg-[#FBFBF9] text-slate-900'}`}>
       {/* Background Layer 1: Ambient Photonic Amber Key-Light */}
       <div className="absolute inset-0 bg-amber-beacon pointer-events-none" aria-hidden="true" />
 

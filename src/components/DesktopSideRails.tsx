@@ -57,7 +57,7 @@ export const DesktopSideRails: React.FC<DesktopSideRailsProps> = ({
         <span className="text-[10px] font-bold tracking-widest uppercase text-slate-400 dark:text-slate-500 mb-1 select-none">
           Sponsored
         </span>
-        <div className="w-[130px] xl:w-[160px] 2xl:w-[300px] min-h-[120px] xl:min-h-[140px] 2xl:min-h-[254px] rounded-2xl overflow-hidden border border-slate-200/80 dark:border-slate-800 bg-white/60 dark:bg-slate-900/40 flex flex-col items-center justify-center shadow-xs">
+        <div className="w-[130px] xl:w-[160px] 2xl:w-[300px] min-h-[120px] xl:min-h-[140px] 2xl:min-h-[254px] rounded-2xl overflow-hidden border border-slate-200/80 dark:border-white/[0.08] bg-white/70 dark:bg-[#0e1422]/70 backdrop-blur-md flex flex-col items-center justify-center shadow-xs">
           <div className="w-full flex items-center justify-center overflow-hidden">
             <div className={adsterraFormat === '300x250' ? 'scale-[0.43] xl:scale-[0.533] 2xl:scale-100 origin-center' : 'w-full'}>
               <AdsterraBanner
@@ -84,7 +84,7 @@ export const DesktopSideRails: React.FC<DesktopSideRailsProps> = ({
         <span className="text-[10px] font-bold tracking-widest uppercase text-slate-400 dark:text-slate-500 mb-1 select-none">
           Sponsored
         </span>
-        <div className="w-[130px] xl:w-[160px] 2xl:w-[300px] min-h-[120px] xl:min-h-[140px] 2xl:min-h-[254px] rounded-2xl overflow-hidden border border-slate-200/80 dark:border-slate-800 bg-white/60 dark:bg-slate-900/40 flex flex-col items-center justify-center shadow-xs">
+        <div className="w-[130px] xl:w-[160px] 2xl:w-[300px] min-h-[120px] xl:min-h-[140px] 2xl:min-h-[254px] rounded-2xl overflow-hidden border border-slate-200/80 dark:border-white/[0.08] bg-white/70 dark:bg-[#0e1422]/70 backdrop-blur-md flex flex-col items-center justify-center shadow-xs">
           <div className="w-full flex items-center justify-center overflow-hidden">
             <div className={adsterraFormat === '300x250' ? 'scale-[0.43] xl:scale-[0.533] 2xl:scale-100 origin-center' : 'w-full'}>
               <AdsterraBanner

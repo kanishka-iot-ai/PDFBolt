@@ -124,7 +124,7 @@ const SEOLandingPage: React.FC<SEOLandingPageProps> = ({ tool: toolProp, toolId,
       </Helmet>
 
       {/* 1. HERO HEADER (Always retained in DOM for SEO & A11y, visually hidden during active interaction) */}
-      <div className={hasActiveWork ? "sr-only" : `pt-3 sm:pt-4 pb-2 sm:pb-3 border-b shrink-0 ${darkMode ? 'border-slate-800 bg-slate-900/50' : 'border-slate-100 bg-slate-50'}`}>
+      <div className={hasActiveWork ? "sr-only" : `pt-3 sm:pt-4 pb-2 sm:pb-3 border-b shrink-0 ${darkMode ? 'border-slate-800/80 bg-slate-900/30' : 'border-slate-200/80 bg-white/40'}`}>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
           {/* Breadcrumb Navigation */}
           <nav className="flex justify-center items-center gap-2 text-xs font-semibold mb-1 text-slate-500">
@@ -168,7 +168,7 @@ const SEOLandingPage: React.FC<SEOLandingPageProps> = ({ tool: toolProp, toolId,
 
       {/* 4. RELATED PDF TOOLS (Sleek Suggestive Bottom Bar - Only on landing page) */}
       {!hasActiveWork && relatedToolsList.length > 0 && (
-        <div className={`border-t px-4 sm:px-6 py-1.5 shrink-0 ${darkMode ? 'border-slate-800 bg-slate-900/40' : 'border-slate-100 bg-white'}`}>
+        <div className={`border-t px-4 sm:px-6 py-1.5 shrink-0 ${darkMode ? 'border-slate-800/80 bg-slate-900/40 backdrop-blur-md' : 'border-slate-200/80 bg-white/70 backdrop-blur-md'}`}>
           <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
             <span className="text-[11px] font-black uppercase tracking-wider text-slate-400 shrink-0 hidden sm:inline">
               Suggested Tools:
