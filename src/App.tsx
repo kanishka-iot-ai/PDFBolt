@@ -223,7 +223,8 @@ const MainLayout: React.FC<MainLayoutProps> = ({ darkMode, setDarkMode, soundEna
   }, [location.pathname]);
 
   return (
-    <div className={`min-h-screen flex flex-col transition-colors duration-300 font-sans ${darkMode ? 'dark bg-slate-900 text-white' : 'bg-white text-slate-900'}`}>
+    <div className={`min-h-screen flex flex-col transition-colors duration-300 font-sans ambient-spotlight ${darkMode ? 'dark bg-[#0a0e17] text-slate-100' : 'bg-[#f8fafc] text-slate-900'}`}>
+      <div className="site-noise-texture" aria-hidden="true" />
       <Navbar
         darkMode={darkMode}
         toggleDarkMode={() => setDarkMode(!darkMode)}

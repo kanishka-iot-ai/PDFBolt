@@ -123,7 +123,7 @@ export const SIZE_COMPRESSION_PAGES: LandingPageContent[] = [
       {
         heading: 'Why 50KB is the Universal Standard for Exam Portals',
         paragraphs: [
-          'Major recruitment agencies—including the Staff Selection Commission (SSC), Union Public Service Commission (UPSC), and Institute of Banking Personnel Selection (IBPS)—require uploaded identification documents, caste certificates, and marksheets to stay strictly between 20KB and 50KB.',
+          'Major recruitment agencies, including the Staff Selection Commission (SSC), Union Public Service Commission (UPSC), and Institute of Banking Personnel Selection (IBPS), require uploaded identification documents, caste certificates, and marksheets to stay strictly between 20KB and 50KB.',
           'Uploading files larger than 50KB results in immediate form rejection with error messages like "File size exceeded". PDFBolt ensures your file meets the exact limit without stripping legible details.'
         ]
       },
@@ -235,7 +235,7 @@ export const SIZE_COMPRESSION_PAGES: LandingPageContent[] = [
       {
         heading: 'Why 200KB is the Gold Standard for Multi-Page Documents',
         paragraphs: [
-          'A 200KB limit provides the ideal balance between compact file size and high visual fidelity. It allows multi-page documents—such as college marksheets, caste certificates, and employment contracts—to retain their stamps, watermarks, and signatures without blurring.',
+          'A 200KB limit provides the ideal balance between compact file size and high visual fidelity. It allows multi-page documents (such as college marksheets, caste certificates, and employment contracts) to retain their stamps, watermarks, and signatures without blurring.',
           'National testing bodies like the National Testing Agency (NTA) for NEET and JEE Main, as well as the UPSC, enforce strict 200KB or 300KB ceilings. PDFBolt\'s 200KB compressor ensures your PDF stays within bounds while keeping all signatures and verification seals dark and legible.'
         ]
       }
@@ -280,7 +280,7 @@ export const SIZE_COMPRESSION_PAGES: LandingPageContent[] = [
       {
         heading: 'Meeting UPSC OTR, State PSC & High Court 300KB Requirements',
         paragraphs: [
-          'The Union Public Service Commission (UPSC) strictly mandates that all documents uploaded to the One Time Registration (OTR) portal—including Aadhaar cards, matriculation certificates, degree marksheets, and caste certificates—must strictly adhere to a file size between 20 KB and 300 KB. State PSC portals (UPPSC, BPSC, MPPSC, MPSC, TNPSC) and Indian High Court e-filing systems enforce identical 300KB thresholds.',
+          'The Union Public Service Commission (UPSC) strictly mandates that all documents uploaded to the One Time Registration (OTR) portal (including Aadhaar cards, matriculation certificates, degree marksheets, and caste certificates) must strictly adhere to a file size between 20 KB and 300 KB. State PSC portals (UPPSC, BPSC, MPPSC, MPSC, TNPSC) and Indian High Court e-filing systems enforce identical 300KB thresholds.',
           'If your file is 305KB or 19KB, the portal will immediately reject the upload with an error such as "File size must be between 20KB and 300KB". PDFBolt uses in-browser WebAssembly downsampling to automatically place your document safely inside the 150KB–280KB optimal window.'
         ]
       },
@@ -1064,7 +1064,7 @@ export const WORKFLOW_PAGES: LandingPageContent[] = [
       {
         heading: 'Why Some Portals Require Aadhaar in JPG Format Rather Than PDF',
         paragraphs: [
-          'While national recruitment portals prefer PDF documents, numerous commercial and mobile verification systems—including telecom SIM KYC, airline check-in, gig-economy onboarding, and state welfare schemes—only accept image formats (.jpg, .jpeg). Attempting to upload a PDF file causes an \'Unsupported File Type\' error.',
+          'While national recruitment portals prefer PDF documents, numerous commercial and mobile verification systems (including telecom SIM KYC, airline check-in, gig-economy onboarding, and state welfare schemes) only accept image formats (.jpg, .jpeg). Attempting to upload a PDF file causes an \'Unsupported File Type\' error.',
           'Converting an official e-Aadhaar PDF to JPG allows you to crop and submit the exact front or back card view required by the mobile app validator.',
         ]
       },

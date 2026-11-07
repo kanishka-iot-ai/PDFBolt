@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Link, useParams } from 'react-router-dom';
 import { ALL_LANDING_PAGES } from '../data/landingPages';
@@ -6,9 +6,9 @@ import SimpleTool from './SimpleTool';
 import MergeTool from './MergeTool';
 import EditTool from './EditTool';
 import { NotifySystem } from '../types';
-import AdSlot from '../components/AdSlot';
 import AdsterraBanner from '../components/AdsterraBanner';
 import DesktopSideRails from '../components/DesktopSideRails';
+import { FileText, Cpu, LayoutGrid, HelpCircle, ChevronDown } from 'lucide-react';
 
 interface TargetedCompressPageProps {
   pageSlug?: string;
@@ -45,6 +45,14 @@ const TargetedCompressPage: React.FC<TargetedCompressPageProps> = ({ pageSlug: p
   const page = ALL_LANDING_PAGES.find(p => p.slug === currentSlug) || ALL_LANDING_PAGES[0];
   const baseUrl = 'https://pdfbolt.in';
   const canonicalUrl = `${baseUrl}/${page.slug}/`;
+
+  // Information Console Active Tab & FAQ state
+  const [activeTab, setActiveTab] = useState<'specs' | 'guide' | 'tools' | 'faqs'>(() => {
+    if (page.portalSpecs && page.portalSpecs.length > 0) return 'specs';
+    if (page.sections && page.sections.length > 0) return 'guide';
+    return 'faqs';
+  });
+  const [expandedFaq, setExpandedFaq] = useState<number | null>(0);
 
   // Schemas with AggregateRating for Rich SERP Review Stars
   const webAppSchema = {
@@ -106,7 +114,7 @@ const TargetedCompressPage: React.FC<TargetedCompressPageProps> = ({ pageSlug: p
   };
 
   return (
-    <div className="animate-fadeIn min-h-screen pb-16">
+    <div className="animate-fadeIn min-h-screen pb-12">
       <Helmet>
         <title>{page.seoTitle}</title>
         <meta name="description" content={page.metaDescription} />
@@ -120,10 +128,10 @@ const TargetedCompressPage: React.FC<TargetedCompressPageProps> = ({ pageSlug: p
         <script type="application/ld+json">{JSON.stringify(breadcrumbSchema)}</script>
       </Helmet>
 
-      {/* Top Breadcrumbs & Hero Header (Ultra-Compact for Instant Viewport Visibility) */}
-      <div className={`pt-4 pb-3 sm:pt-5 sm:pb-3.5 border-b ${darkMode ? 'border-slate-800 bg-slate-900/50' : 'border-slate-100 bg-slate-50'}`}>
+      {/* Top Breadcrumbs & Compact Header */}
+      <div className={`pt-3 pb-2.5 sm:pt-4 sm:pb-3 border-b ${darkMode ? 'border-slate-800/80 bg-slate-900/40' : 'border-slate-200/80 bg-white/60'}`}>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
-          <nav aria-label="Breadcrumb" className="flex justify-center items-center gap-2 text-xs font-semibold mb-1.5 text-slate-500">
+          <nav aria-label="Breadcrumb" className="flex justify-center items-center gap-1.5 text-[11px] font-semibold mb-1 text-slate-500">
             <Link to="/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Home</Link>
             <span>/</span>
             <Link to="/tools/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">PDF Tools</Link>
@@ -131,7 +139,7 @@ const TargetedCompressPage: React.FC<TargetedCompressPageProps> = ({ pageSlug: p
             <span className="text-yellow-700 dark:text-yellow-400 font-bold">{page.h1}</span>
           </nav>
 
-          <h1 className={`text-2xl sm:text-3xl md:text-4xl font-extrabold mb-1.5 tracking-tight leading-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+          <h1 className={`text-xl sm:text-2xl md:text-3xl font-extrabold mb-1 tracking-tight leading-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>
             {page.h1}
           </h1>
           <p className={`text-xs sm:text-sm max-w-2xl mx-auto font-normal ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
@@ -143,285 +151,386 @@ const TargetedCompressPage: React.FC<TargetedCompressPageProps> = ({ pageSlug: p
       {/* Interactive Tool Container with Integrated Preset Switcher & Zero-CLS Side Rails */}
       <DesktopSideRails centerWidthClass="max-w-4xl" className="py-2">
         <div className="w-full">
-          <div className="w-full px-1 sm:px-2 py-2">
-        <div className={`rounded-2xl sm:rounded-3xl border shadow-lg overflow-hidden transition-all ${
-          darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
-        }`}>
-          {/* Integrated Size & Portal Preset Rail */}
-          <div className={`px-3 sm:px-5 py-2.5 sm:py-3 border-b flex flex-col gap-2 ${
-            darkMode ? 'bg-slate-900/90 border-slate-800' : 'bg-slate-50/90 border-slate-100'
-          }`}>
-            {/* Row 1: Target Size Presets */}
-            <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5">
-              <span className="text-[10px] sm:text-[11px] font-bold tracking-wider uppercase text-slate-400 dark:text-slate-500 shrink-0">
-                Target Size:
-              </span>
-              <div className="flex items-center gap-1.5 flex-nowrap shrink-0">
-                {SIZE_PRESETS.map(link => {
-                  const isActive = link.href.replace(/\/$/, '') === `/${page.slug}`;
-                  return (
-                    <Link
-                      key={link.href}
-                      to={link.href}
-                      className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all ${
-                        isActive
-                          ? 'bg-amber-400 text-slate-950 font-black shadow-xs ring-1 ring-amber-500/50'
-                          : darkMode
-                            ? 'bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white'
-                            : 'bg-white text-slate-700 border border-slate-200 hover:border-slate-300 hover:bg-slate-100 shadow-2xs'
-                      }`}
-                    >
-                      {link.label}
-                    </Link>
-                  );
-                })}
-              </div>
-            </div>
+          <div className="w-full px-1 sm:px-2 py-1">
+            <div className={`rounded-2xl sm:rounded-3xl border shadow-md overflow-hidden transition-all ${
+              darkMode ? 'bg-slate-900/90 border-slate-800' : 'bg-white/95 border-slate-200'
+            }`}>
+              {/* Integrated Size & Portal Preset Rail */}
+              <div className={`px-3 sm:px-5 py-2 sm:py-2.5 border-b flex flex-col gap-1.5 ${
+                darkMode ? 'bg-slate-900/95 border-slate-800' : 'bg-slate-50/90 border-slate-100'
+              }`}>
+                {/* Row 1: Target Size Presets */}
+                <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5">
+                  <span className="text-[10px] sm:text-[11px] font-bold tracking-wider uppercase text-slate-400 dark:text-slate-500 shrink-0">
+                    Target Size:
+                  </span>
+                  <div className="flex items-center gap-1.5 flex-nowrap shrink-0">
+                    {SIZE_PRESETS.map(link => {
+                      const isActive = link.href.replace(/\/$/, '') === `/${page.slug}`;
+                      return (
+                        <Link
+                          key={link.href}
+                          to={link.href}
+                          className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all ${
+                            isActive
+                              ? 'bg-amber-400 text-slate-950 font-black shadow-xs ring-1 ring-amber-500/50'
+                              : darkMode
+                                ? 'bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white'
+                                : 'bg-white text-slate-700 border border-slate-200 hover:border-slate-300 hover:bg-slate-100 shadow-2xs'
+                          }`}
+                        >
+                          {link.label}
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </div>
 
-            {/* Row 2: Exam & Portal Shortcuts */}
-            <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5 border-t border-slate-200/50 dark:border-slate-800/50 pt-1.5">
-              <span className="text-[10px] sm:text-[11px] font-bold tracking-wider uppercase text-slate-400 dark:text-slate-500 shrink-0">
-                Portals:
-              </span>
-              <div className="flex items-center gap-1.5 flex-nowrap shrink-0">
-                {PORTAL_PRESETS.map(link => {
-                  const isActive = link.href.replace(/\/$/, '') === `/${page.slug}`;
-                  return (
-                    <Link
-                      key={link.href}
-                      to={link.href}
-                      className={`px-2 py-0.5 rounded-md text-[11px] font-medium transition-all ${
-                        isActive
-                          ? 'bg-amber-400 text-slate-950 font-bold shadow-xs'
-                          : darkMode
-                            ? 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
-                            : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100 border border-transparent hover:border-slate-200'
-                      }`}
-                    >
-                      {link.label}
-                    </Link>
-                  );
-                })}
+                {/* Row 2: Exam & Portal Shortcuts */}
+                <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5 border-t border-slate-200/50 dark:border-slate-800/50 pt-1.5">
+                  <span className="text-[10px] sm:text-[11px] font-bold tracking-wider uppercase text-slate-400 dark:text-slate-500 shrink-0">
+                    Portals:
+                  </span>
+                  <div className="flex items-center gap-1.5 flex-nowrap shrink-0">
+                    {PORTAL_PRESETS.map(link => {
+                      const isActive = link.href.replace(/\/$/, '') === `/${page.slug}`;
+                      return (
+                        <Link
+                          key={link.href}
+                          to={link.href}
+                          className={`px-2 py-0.5 rounded-md text-[11px] font-medium transition-all ${
+                            isActive
+                              ? 'bg-amber-400 text-slate-950 font-bold shadow-xs'
+                              : darkMode
+                                ? 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
+                                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100 border border-transparent hover:border-slate-200'
+                          }`}
+                        >
+                          {link.label}
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+
+              {/* Tool Workspace Area */}
+              <div className="p-3 sm:p-5">
+                {page.toolType === 'compress' && (
+                  <SimpleTool
+                    title={page.h1}
+                    mode="compress"
+                    darkMode={darkMode}
+                    notify={notify}
+                    initialCompressionLevel={page.presetLevel}
+                    targetSizeHint={page.targetSizeHint}
+                  />
+                )}
+
+                {page.toolType === 'merge' && (
+                  <MergeTool
+                    darkMode={darkMode}
+                    notify={notify}
+                    customHint={page.customHint}
+                    allowImages={page.slug === 'merge-aadhaar-and-pan-card' || page.slug.includes('merge')}
+                  />
+                )}
+
+                {page.toolType === 'jpg2pdf' && (
+                  <SimpleTool
+                    title={page.h1}
+                    mode="jpg2pdf"
+                    darkMode={darkMode}
+                    notify={notify}
+                    targetSizeHint={page.targetSizeHint}
+                  />
+                )}
+
+                {page.toolType === 'pdf2jpg' && (
+                  <SimpleTool
+                    title={page.h1}
+                    mode="pdf2jpg"
+                    darkMode={darkMode}
+                    notify={notify}
+                    targetSizeHint={page.targetSizeHint}
+                  />
+                )}
+
+                {page.toolType === 'edit' && (
+                  <EditTool
+                    darkMode={darkMode}
+                    notify={notify}
+                  />
+                )}
               </div>
             </div>
           </div>
 
-          {/* Tool Workspace Area */}
-          <div className="p-3 sm:p-5">
-            {page.toolType === 'compress' && (
-              <SimpleTool
-                title={page.h1}
-                mode="compress"
-                darkMode={darkMode}
-                notify={notify}
-                initialCompressionLevel={page.presetLevel}
-                targetSizeHint={page.targetSizeHint}
-              />
-            )}
-
-            {page.toolType === 'merge' && (
-              <MergeTool
-                darkMode={darkMode}
-                notify={notify}
-                customHint={page.customHint}
-                allowImages={page.slug === 'merge-aadhaar-and-pan-card' || page.slug.includes('merge')}
-              />
-            )}
-
-            {page.toolType === 'jpg2pdf' && (
-              <SimpleTool
-                title={page.h1}
-                mode="jpg2pdf"
-                darkMode={darkMode}
-                notify={notify}
-                targetSizeHint={page.targetSizeHint}
-              />
-            )}
-
-            {page.toolType === 'pdf2jpg' && (
-              <SimpleTool
-                title={page.h1}
-                mode="pdf2jpg"
-                darkMode={darkMode}
-                notify={notify}
-                targetSizeHint={page.targetSizeHint}
-              />
-            )}
-
-            {page.toolType === 'edit' && (
-              <EditTool
-                darkMode={darkMode}
-                notify={notify}
-              />
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Sponsored Horizontal Banner (Balanced with Left and Right Vertical Side Rails) */}
-          <div className="w-full max-w-4xl mx-auto px-2 mt-4 mb-2 flex flex-col items-center justify-center min-h-[110px] md:min-h-[115px]">
+          {/* Sponsored Horizontal Banner */}
+          <div className="w-full max-w-4xl mx-auto px-2 my-2 flex flex-col items-center justify-center min-h-[105px]">
             <AdsterraBanner format="responsive" className="my-1" showLabel={true} />
+          </div>
+
+          {/* Precision Information & Guidelines Console (Single-Screen Multi-Tab Architecture) */}
+          <div className="w-full max-w-4xl mx-auto px-1 sm:px-2 mt-4 text-left">
+            <div className={`rounded-2xl border shadow-sm transition-all overflow-hidden ${
+              darkMode ? 'bg-slate-900/80 border-slate-800' : 'bg-white/90 border-slate-200'
+            }`}>
+              {/* Segmented Tab Navigation Bar */}
+              <div className={`p-1.5 border-b flex items-center gap-1.5 overflow-x-auto no-scrollbar ${
+                darkMode ? 'bg-slate-950/60 border-slate-800' : 'bg-slate-100/80 border-slate-200/80'
+              }`}>
+                {page.portalSpecs && page.portalSpecs.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab('specs')}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 cursor-pointer ${
+                      activeTab === 'specs'
+                        ? darkMode
+                          ? 'bg-slate-800 text-amber-400 shadow-xs ring-1 ring-slate-700'
+                          : 'bg-white text-slate-900 shadow-xs ring-1 ring-slate-200'
+                        : 'text-slate-500 hover:text-slate-900 dark:hover:text-slate-200'
+                    }`}
+                  >
+                    <FileText size={14} className={activeTab === 'specs' ? 'text-amber-500' : 'text-slate-400'} />
+                    <span>Portal Specs</span>
+                    <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-semibold ${
+                      activeTab === 'specs'
+                        ? 'bg-amber-500/20 text-amber-600 dark:text-amber-400'
+                        : 'bg-slate-200 dark:bg-slate-800 text-slate-500'
+                    }`}>
+                      {page.portalSpecs.length}
+                    </span>
+                  </button>
+                )}
+
+                {page.sections && page.sections.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab('guide')}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 cursor-pointer ${
+                      activeTab === 'guide'
+                        ? darkMode
+                          ? 'bg-slate-800 text-amber-400 shadow-xs ring-1 ring-slate-700'
+                          : 'bg-white text-slate-900 shadow-xs ring-1 ring-slate-200'
+                        : 'text-slate-500 hover:text-slate-900 dark:hover:text-slate-200'
+                    }`}
+                  >
+                    <Cpu size={14} className={activeTab === 'guide' ? 'text-amber-500' : 'text-slate-400'} />
+                    <span>Technical Guide</span>
+                  </button>
+                )}
+
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('tools')}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 cursor-pointer ${
+                    activeTab === 'tools'
+                      ? darkMode
+                        ? 'bg-slate-800 text-amber-400 shadow-xs ring-1 ring-slate-700'
+                        : 'bg-white text-slate-900 shadow-xs ring-1 ring-slate-200'
+                      : 'text-slate-500 hover:text-slate-900 dark:hover:text-slate-200'
+                  }`}
+                >
+                  <LayoutGrid size={14} className={activeTab === 'tools' ? 'text-amber-500' : 'text-slate-400'} />
+                  <span>Related Portals</span>
+                </button>
+
+                {page.faqs && page.faqs.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab('faqs')}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 cursor-pointer ${
+                      activeTab === 'faqs'
+                        ? darkMode
+                          ? 'bg-slate-800 text-amber-400 shadow-xs ring-1 ring-slate-700'
+                          : 'bg-white text-slate-900 shadow-xs ring-1 ring-slate-200'
+                        : 'text-slate-500 hover:text-slate-900 dark:hover:text-slate-200'
+                    }`}
+                  >
+                    <HelpCircle size={14} className={activeTab === 'faqs' ? 'text-amber-500' : 'text-slate-400'} />
+                    <span>FAQs</span>
+                    <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-semibold ${
+                      activeTab === 'faqs'
+                        ? 'bg-amber-500/20 text-amber-600 dark:text-amber-400'
+                        : 'bg-slate-200 dark:bg-slate-800 text-slate-500'
+                    }`}>
+                      {page.faqs.length}
+                    </span>
+                  </button>
+                )}
+              </div>
+
+              {/* Active Tab Panel Body */}
+              <div className="p-4 sm:p-5 max-h-[360px] overflow-y-auto">
+                {/* TAB 1: Portal Specs */}
+                {activeTab === 'specs' && page.portalSpecs && (
+                  <div className="animate-fadeIn space-y-3">
+                    <div className="flex items-center justify-between">
+                      <h3 className={`text-sm font-bold ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+                        Official Portal Document Specifications
+                      </h3>
+                      <span className="text-[11px] text-slate-400">Pre-calibrated mandatory file boundaries</span>
+                    </div>
+                    <div className="overflow-x-auto rounded-xl border border-slate-200/80 dark:border-slate-800">
+                      <table className="w-full border-collapse text-left text-xs">
+                        <thead>
+                          <tr className={`border-b ${darkMode ? 'border-slate-800 bg-slate-950/40 text-slate-400' : 'border-slate-200 bg-slate-50 text-slate-500'} font-bold text-[11px] uppercase tracking-wider`}>
+                            <th className="py-2 px-3">Document Type</th>
+                            <th className="py-2 px-3">Mandatory Size</th>
+                            <th className="py-2 px-3">Format</th>
+                            <th className="py-2 px-3">Requirements</th>
+                          </tr>
+                        </thead>
+                        <tbody className={`divide-y ${darkMode ? 'divide-slate-800 text-slate-300' : 'divide-slate-200 text-slate-700'}`}>
+                          {page.portalSpecs.map((spec, idx) => (
+                            <tr key={idx} className={idx % 2 === 0 ? (darkMode ? 'bg-slate-900/40' : 'bg-white') : (darkMode ? 'bg-slate-950/20' : 'bg-slate-50/50')}>
+                              <td className="py-2 px-3 font-semibold">{spec.name}</td>
+                              <td className="py-2 px-3 font-bold text-amber-600 dark:text-amber-400 whitespace-nowrap">{spec.allowedSize}</td>
+                              <td className="py-2 px-3 whitespace-nowrap">{spec.allowedFormat}</td>
+                              <td className="py-2 px-3 text-slate-500 dark:text-slate-400">{spec.notes}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
+
+                {/* TAB 2: Technical Guide */}
+                {activeTab === 'guide' && page.sections && (
+                  <div className="animate-fadeIn space-y-3">
+                    {page.sections.map((sec, idx) => (
+                      <div key={idx} className={`p-4 rounded-xl border ${darkMode ? 'bg-slate-950/40 border-slate-800' : 'bg-slate-50/60 border-slate-200/80'}`}>
+                        <h4 className={`text-sm font-bold mb-2 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+                          {sec.heading}
+                        </h4>
+                        <div className="space-y-2 text-xs text-slate-600 dark:text-slate-300 leading-relaxed font-normal">
+                          {sec.paragraphs.map((p, pIdx) => (
+                            <p key={pIdx}>{p}</p>
+                          ))}
+                        </div>
+                        {sec.tips && sec.tips.length > 0 && (
+                          <ul className="mt-2.5 space-y-1 list-disc pl-4 text-xs text-slate-500 dark:text-slate-400">
+                            {sec.tips.map((tip, tIdx) => (
+                              <li key={tIdx}>{tip}</li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* TAB 3: Related Portals */}
+                {activeTab === 'tools' && (
+                  <div className="animate-fadeIn space-y-4">
+                    <div>
+                      <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
+                        Calibrated Target Sizes
+                      </h4>
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                        {SIZE_PRESETS.map(preset => {
+                          const isActive = preset.href.replace(/\/$/, '') === `/${page.slug}`;
+                          return (
+                            <Link
+                              key={preset.href}
+                              to={preset.href}
+                              className={`p-2 rounded-xl border text-center transition-all text-xs font-bold ${
+                                isActive
+                                  ? 'bg-amber-400 text-slate-950 border-amber-500 shadow-xs'
+                                  : darkMode
+                                    ? 'bg-slate-950/40 border-slate-800 text-slate-300 hover:border-amber-400 hover:text-white'
+                                    : 'bg-slate-50 border-slate-200 text-slate-700 hover:border-amber-500 hover:bg-amber-50/30'
+                              }`}
+                            >
+                              {preset.label}
+                            </Link>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    <div>
+                      <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
+                        Official Exam & Recruitment Portals
+                      </h4>
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                        {PORTAL_PRESETS.map(portal => {
+                          const isActive = portal.href.replace(/\/$/, '') === `/${page.slug}`;
+                          return (
+                            <Link
+                              key={portal.href}
+                              to={portal.href}
+                              className={`p-2 rounded-xl border text-center transition-all text-xs font-medium truncate ${
+                                isActive
+                                  ? 'bg-amber-400 text-slate-950 font-bold border-amber-500 shadow-xs'
+                                  : darkMode
+                                    ? 'bg-slate-950/40 border-slate-800 text-slate-300 hover:border-amber-400 hover:text-white'
+                                    : 'bg-slate-50 border-slate-200 text-slate-700 hover:border-amber-500 hover:bg-amber-50/30'
+                              }`}
+                            >
+                              {portal.label}
+                            </Link>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* TAB 4: Frequently Asked Questions */}
+                {activeTab === 'faqs' && page.faqs && (
+                  <div className="animate-fadeIn space-y-2">
+                    {page.faqs.map((faq, idx) => {
+                      const isOpen = expandedFaq === idx;
+                      return (
+                        <div
+                          key={idx}
+                          className={`rounded-xl border transition-all ${
+                            isOpen
+                              ? darkMode
+                                ? 'bg-slate-950/60 border-amber-500/30 ring-1 ring-amber-500/20'
+                                : 'bg-amber-50/30 border-amber-200/80 ring-1 ring-amber-200/40'
+                              : darkMode
+                                ? 'bg-slate-950/30 border-slate-800/80'
+                                : 'bg-slate-50/60 border-slate-200/60'
+                          }`}
+                        >
+                          <button
+                            type="button"
+                            onClick={() => setExpandedFaq(isOpen ? null : idx)}
+                            className="w-full p-3.5 text-left flex items-center justify-between gap-3 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded-xl"
+                          >
+                            <h4 className={`text-xs sm:text-sm font-bold ${
+                              isOpen
+                                ? 'text-amber-700 dark:text-amber-400'
+                                : darkMode ? 'text-slate-200' : 'text-slate-800'
+                            }`}>
+                              {faq.q}
+                            </h4>
+                            <ChevronDown
+                              size={16}
+                              className={`shrink-0 transition-transform duration-200 ${
+                                isOpen ? 'rotate-180 text-amber-500' : 'text-slate-400'
+                              }`}
+                            />
+                          </button>
+                          {isOpen && (
+                            <div className="px-3.5 pb-3.5 pt-0 text-xs text-slate-600 dark:text-slate-300 leading-relaxed font-normal border-t border-slate-200/50 dark:border-slate-800/50 mt-1">
+                              {faq.a}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         </div>
       </DesktopSideRails>
-
-      {/* Editorial Content & Knowledge Base (Rendered in DOM for Complete Googlebot Indexing) */}
-      <div className="max-w-4xl mx-auto px-4 mt-12 space-y-8 text-left">
-        {/* Section 1: Official Portal Document Specifications Table */}
-        {page.portalSpecs && page.portalSpecs.length > 0 && (
-          <div className={`p-5 sm:p-6 rounded-2xl border ${
-            darkMode ? 'bg-slate-900/60 border-slate-800' : 'bg-slate-50/80 border-slate-200'
-          }`}>
-            <h2 className={`text-lg sm:text-xl font-bold mb-2 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
-              Official Portal Document Specifications
-            </h2>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mb-4 font-normal">
-              Pre-calibrated mandatory file boundaries for official exam portals, recruitment boards, and verification systems.
-            </p>
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse text-left text-xs sm:text-sm">
-                <thead>
-                  <tr className={`border-b ${darkMode ? 'border-slate-800 text-slate-400' : 'border-slate-200 text-slate-500'} font-semibold text-[11px] uppercase tracking-wider`}>
-                    <th className="py-2.5 px-3">Document Type</th>
-                    <th className="py-2.5 px-3">Mandatory Size</th>
-                    <th className="py-2.5 px-3">Format</th>
-                    <th className="py-2.5 px-3">Requirements</th>
-                  </tr>
-                </thead>
-                <tbody className={`divide-y ${darkMode ? 'divide-slate-800 text-slate-300' : 'divide-slate-200 text-slate-700'}`}>
-                  {page.portalSpecs.map((spec, idx) => (
-                    <tr key={idx} className={idx % 2 === 0 ? (darkMode ? 'bg-slate-900/40' : 'bg-white/60') : ''}>
-                      <td className="py-2.5 px-3 font-medium">{spec.name}</td>
-                      <td className="py-2.5 px-3 font-bold text-amber-700 dark:text-amber-400 whitespace-nowrap">{spec.allowedSize}</td>
-                      <td className="py-2.5 px-3 whitespace-nowrap">{spec.allowedFormat}</td>
-                      <td className="py-2.5 px-3 text-xs text-slate-500 dark:text-slate-400">{spec.notes}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
-
-        {/* Section 2: Step-by-Step Instructions */}
-        {page.steps && page.steps.length > 0 && (
-          <div className={`p-5 sm:p-6 rounded-2xl border ${
-            darkMode ? 'bg-slate-900/60 border-slate-800' : 'bg-slate-50/80 border-slate-200'
-          }`}>
-            <h2 className={`text-lg sm:text-xl font-bold mb-4 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
-              How to {page.h1} ({page.steps.length} Easy Steps)
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {page.steps.map((step, idx) => (
-                <div key={idx} className={`p-4 rounded-xl border ${
-                  darkMode ? 'bg-slate-800/60 border-slate-700' : 'bg-white border-slate-200'
-                }`}>
-                  <div className="w-7 h-7 rounded-full bg-amber-400 text-slate-950 font-black text-xs flex items-center justify-center mb-2.5 shadow-xs">
-                    {idx + 1}
-                  </div>
-                  <h3 className={`text-sm font-bold mb-1 ${darkMode ? 'text-white' : 'text-slate-900'}`}>{step.name}</h3>
-                  <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed font-normal">{step.text}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Section 3: Technical Guides & Detailed Sections */}
-        {page.sections && page.sections.length > 0 && (
-          <div className="space-y-6">
-            {page.sections.map((sec, idx) => (
-              <div key={idx} className={`p-5 sm:p-6 rounded-2xl border ${
-                darkMode ? 'bg-slate-900/60 border-slate-800' : 'bg-slate-50/80 border-slate-200'
-              }`}>
-                <h2 className={`text-lg sm:text-xl font-bold mb-3 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
-                  {sec.heading}
-                </h2>
-                <div className="space-y-2.5 text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed font-normal">
-                  {sec.paragraphs.map((p, pIdx) => (
-                    <p key={pIdx}>{p}</p>
-                  ))}
-                </div>
-                {sec.tips && sec.tips.length > 0 && (
-                  <ul className="mt-3.5 space-y-1.5 list-disc pl-5 text-xs text-slate-600 dark:text-slate-400">
-                    {sec.tips.map((tip, tIdx) => (
-                      <li key={tIdx}>{tip}</li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* Section 4: Contextual Internal Link Mesh (Pi7-style Topical Authority) */}
-        <div className={`p-5 sm:p-6 rounded-2xl border ${
-          darkMode ? 'bg-slate-900/60 border-slate-800' : 'bg-slate-50/80 border-slate-200'
-        }`}>
-          <h2 className={`text-base sm:text-lg font-bold mb-2 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
-            Related Target Sizes & Government Portal Tools
-          </h2>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mb-3.5">
-            Switch to an alternate calibrated preset if your target document requires different exact byte ceilings:
-          </p>
-          <div className="flex flex-wrap gap-2">
-            {[
-              { label: 'Compress PDF to 20KB (Signatures)', href: '/compress-pdf-to-20kb/' },
-              { label: 'Compress PDF to 50KB (Identity Slips)', href: '/compress-pdf-to-50kb/' },
-              { label: 'Compress PDF to 100KB (Marksheets)', href: '/compress-pdf-to-100kb/' },
-              { label: 'Compress PDF to 200KB (Certificates)', href: '/compress-pdf-to-200kb/' },
-              { label: 'Compress PDF to 300KB (UPSC & EPFO)', href: '/compress-pdf-to-300kb/' },
-              { label: 'Compress PDF to 500KB (High-Res)', href: '/compress-pdf-to-500kb/' },
-              { label: 'Compress PDF to 1MB (General)', href: '/compress-pdf-to-1mb/' },
-              { label: 'SSC CGL / CHSL Compressor', href: '/compress-pdf-for-ssc/' },
-              { label: 'UPSC OTR Document Tool', href: '/compress-pdf-for-upsc/' },
-              { label: 'NEET Exam Document Tool', href: '/compress-pdf-for-neet/' },
-              { label: 'JEE Main Document Tool', href: '/compress-pdf-for-jee/' },
-              { label: 'IBPS Bank Marksheet Tool', href: '/compress-pdf-for-ibps/' },
-              { label: 'RRB Railway Travel Pass Tool', href: '/compress-pdf-for-rrb/' },
-              { label: 'Merge Aadhaar & PAN Card', href: '/merge-aadhaar-and-pan-card/' },
-              { label: 'Government Portal Size Reducer', href: '/pdf-size-reducer-for-government-portal/' }
-            ].map(link => (
-              <Link
-                key={link.href}
-                to={link.href}
-                className={`text-xs px-2.5 py-1.5 rounded-lg border font-medium transition-colors ${
-                  link.href.replace(/\/$/, '') === `/${page.slug}`
-                    ? 'bg-amber-400 text-slate-950 font-bold border-amber-500'
-                    : darkMode
-                      ? 'bg-slate-800 border-slate-700 text-slate-300 hover:border-amber-400'
-                      : 'bg-white border-slate-200 text-slate-700 hover:border-amber-500 hover:bg-amber-50/50'
-                }`}
-              >
-                {link.label}
-              </Link>
-            ))}
-          </div>
-        </div>
-
-        {/* Section 5: Frequently Asked Questions */}
-        {page.faqs && page.faqs.length > 0 && (
-          <div className={`p-5 sm:p-6 rounded-2xl border ${
-            darkMode ? 'bg-slate-900/60 border-slate-800' : 'bg-slate-50/80 border-slate-200'
-          }`}>
-            <h2 className={`text-lg sm:text-xl font-bold mb-4 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
-              Frequently Asked Questions
-            </h2>
-            <div className="space-y-4">
-              {page.faqs.map((faq, idx) => (
-                <div key={idx} className="border-b border-slate-200/60 dark:border-slate-800/60 pb-3.5 last:border-0 last:pb-0">
-                  <h3 className={`text-sm font-bold mb-1.5 ${darkMode ? 'text-slate-200' : 'text-slate-800'}`}>
-                    {faq.q}
-                  </h3>
-                  <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed font-normal">
-                    {faq.a}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
     </div>
   );
 };
