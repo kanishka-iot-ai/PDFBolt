@@ -3,6 +3,19 @@ Use these exact pre-written profiles to rapidly submit PDFBolt to top-tier direc
 
 ---
 
+## 🎨 Official Media & Profile Picture Assets
+Always use these pre-authorized assets located in `C:\Users\KANISHKA GIRI\AppData\Local\Temp\`:
+
+1. **Brand / Product / Tool / Hub Avatar (3D Glossy Shield & Bolt Logo):**
+   - File Path: `C:\Users\KANISHKA GIRI\AppData\Local\Temp\pdfbolt_brand_logo.png` (or `pdfbolt_logo_250.png`)
+   - Use Cases: App listings, Company profile pictures, Linktree avatar, Canny logo, Ko-fi logo, BuyMeACoffee logo, directory logos.
+
+2. **Creator / Founder / Author Profile Picture (Professional Suit & Tie Portrait):**
+   - File Path: `C:\Users\KANISHKA GIRI\AppData\Local\Temp\kanishka_creator_photo.jpg`
+   - Use Cases: Personal founder profiles, author avatars, contributor profiles (F6S founder avatar, Devpost builder profile, Behance user profile, Medium/Dev.to author avatar).
+
+---
+
 ## 1. AlternativeTo (`https://alternativeto.net/add`)
 **Domain Rating (DR):** 79  
 **Submission URL:** [https://alternativeto.net/software/add/](https://alternativeto.net/software/add/)  
