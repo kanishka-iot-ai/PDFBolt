@@ -23,6 +23,7 @@ import { useActiveWork } from '../context/ActiveWorkContext';
 import PDFThumbnail from '../components/PDFThumbnail';
 import OutputPreviewModal from '../components/OutputPreviewModal';
 import FileSizeComparisonBadge from '../components/FileSizeComparisonBadge';
+import PostDownloadFeedback from '../components/PostDownloadFeedback';
 
 const formatBytes = (bytes?: number) => {
   if (!bytes || bytes === 0) return '0 B';
@@ -2098,6 +2099,9 @@ const SimpleTool: React.FC<SimpleToolProps> = ({ title, mode, darkMode, notify, 
               >
                 <FileText size={16} /> Process Another File
               </button>
+
+              {/* Layer 3: Post-Download Non-Intrusive Feedback Prompt */}
+              <PostDownloadFeedback toolName={title} />
 
 
             </div>
