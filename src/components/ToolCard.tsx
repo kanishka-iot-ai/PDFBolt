@@ -61,10 +61,10 @@ const ToolCard: React.FC<ToolCardProps> = ({ tool, darkMode, compact = false }) 
       className="tool-card-link block h-full group outline-none focus-visible:ring-2 focus-visible:ring-yellow-500 focus-visible:ring-offset-2 rounded-2xl transition-transform duration-150 hover:-translate-y-0.5 active:translate-y-0"
     >
       <div
-        className={`h-full p-4 sm:p-5 md:p-6 flex flex-col justify-between rounded-2xl border ${categoryStyle} ${
+        className={`h-full p-4 sm:p-5 md:p-6 flex flex-col justify-between rounded-2xl border craft-card backdrop-blur-md ${categoryStyle} ${
           darkMode
-            ? 'bg-slate-900/70 border-slate-800 text-white'
-            : 'bg-white border-slate-200 text-slate-900 shadow-sm'
+            ? 'bg-[#0e1422]/75 border-white/[0.08] hover:border-amber-500/40 text-white shadow-[0_8px_32px_rgba(0,0,0,0.36)]'
+            : 'bg-white/85 border-slate-200/90 hover:border-amber-400/50 text-slate-900 shadow-[0_4px_24px_rgba(0,0,0,0.04)]'
         }`}
       >
         <div>

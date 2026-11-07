@@ -223,15 +223,23 @@ const MainLayout: React.FC<MainLayoutProps> = ({ darkMode, setDarkMode, soundEna
   }, [location.pathname]);
 
   return (
-    <div className={`min-h-screen flex flex-col transition-colors duration-300 font-sans ambient-spotlight ${darkMode ? 'dark bg-[#0a0e17] text-slate-100' : 'bg-[#f8fafc] text-slate-900'}`}>
+    <div className={`min-h-screen flex flex-col transition-colors duration-300 font-sans relative ${darkMode ? 'dark bg-[#090D15] text-slate-100' : 'bg-[#F9FAFB] text-slate-900'}`}>
+      {/* Background Layer 1: Ambient Photonic Amber Key-Light */}
+      <div className="absolute inset-0 bg-amber-beacon pointer-events-none" aria-hidden="true" />
+
+      {/* Background Layer 2: Radially Masked Precision Architectural Grid */}
+      <div className="absolute inset-x-0 top-0 h-[850px] bg-grid-blueprint pointer-events-none" aria-hidden="true" />
+
+      {/* Background Layer 3: Tactile Micro-Vellum Grain Overlay */}
       <div className="site-noise-texture" aria-hidden="true" />
+
       <Navbar
         darkMode={darkMode}
         toggleDarkMode={() => setDarkMode(!darkMode)}
         soundEnabled={soundEnabled}
         toggleSound={() => setSoundEnabled(!soundEnabled)}
       />
-      <main className="flex-grow">
+      <main className="flex-grow relative z-10">
         <Suspense fallback={<PageLoader />}>
           <Routes>
             {/* Home & Hubs */}

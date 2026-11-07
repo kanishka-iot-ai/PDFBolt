@@ -93,7 +93,7 @@ const Home: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
       {/* 1. HIGH-CONVERTING COMPACT HERO WITH INSTANT TRUST PILLARS (Above the fold) */}
       <section
         className={`relative overflow-hidden pt-5 pb-5 sm:pt-7 sm:pb-7 text-center border-b ${
-          darkMode ? 'border-slate-800 bg-slate-950' : 'border-slate-100 bg-slate-50/80'
+          darkMode ? 'border-slate-800/80 bg-slate-900/30' : 'border-slate-200/80 bg-white/40'
         }`}
       >
         <div className="absolute inset-0 bg-gradient-to-b from-slate-100/50 via-transparent to-transparent dark:from-slate-800/25 dark:via-transparent pointer-events-none" />
