@@ -5,8 +5,6 @@ import { TOOLS, GUIDES, getIcon } from '../constants';
 import { Link, useLocation } from 'react-router-dom';
 import AdSlot from './AdSlot';
 import AdsterraBanner from './AdsterraBanner';
-import RatingTrustBadge from './RatingTrustBadge';
-import UserReviewsSection from './UserReviewsSection';
 import DesktopSideRails from './DesktopSideRails';
 import { useActiveWork } from '../context/ActiveWorkContext';
 
@@ -48,22 +46,6 @@ const SEOLandingPage: React.FC<SEOLandingPageProps> = ({ tool: toolProp, toolId,
       "bestRating": "5",
       "worstRating": "1"
     },
-    "review": [
-      {
-        "@type": "Review",
-        "author": { "@type": "Person", "name": "Priya Sharma" },
-        "datePublished": "2026-11-06",
-        "reviewRating": { "@type": "Rating", "ratingValue": "5", "bestRating": "5" },
-        "reviewBody": "The 300KB compressor saved my UPSC OTR registration. Output was exactly 284KB with sharp roll numbers and signatures."
-      },
-      {
-        "@type": "Review",
-        "author": { "@type": "Person", "name": "Advocate Rajesh Verma" },
-        "datePublished": "2026-11-05",
-        "reviewRating": { "@type": "Rating", "ratingValue": "5", "bestRating": "5" },
-        "reviewBody": "Flattened my High Court e-filing petition in 2 seconds without uploading confidential client files to remote servers."
-      }
-    ],
     "featureList": tool?.features?.join(', ') || "PDF Tools"
   };
 
@@ -159,9 +141,6 @@ const SEOLandingPage: React.FC<SEOLandingPageProps> = ({ tool: toolProp, toolId,
           <p className={`text-xs sm:text-sm max-w-lg mx-auto font-medium line-clamp-1 sm:line-clamp-none ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
             {tool?.description}
           </p>
-          <div className="flex justify-center mt-2">
-            <RatingTrustBadge />
-          </div>
         </div>
       </div>
 
@@ -186,13 +165,6 @@ const SEOLandingPage: React.FC<SEOLandingPageProps> = ({ tool: toolProp, toolId,
           </div>
         </DesktopSideRails>
       </div>
-
-      {/* Verified Reviews Section (Only on landing page) */}
-      {!hasActiveWork && (
-        <div className="w-full pb-6">
-          <UserReviewsSection darkMode={darkMode} />
-        </div>
-      )}
 
       {/* 4. RELATED PDF TOOLS (Sleek Suggestive Bottom Bar - Only on landing page) */}
       {!hasActiveWork && relatedToolsList.length > 0 && (
