@@ -1600,5 +1600,129 @@ TARGETED_PAGES = [
             {"q": "Will my edited PDF have any PDFBolt branding on it?", "a": "None at all. Your exported PDF is identical to your original file plus the edits you made."}
         ],
         "related": [("edit-pdf", "Edit PDF"), ("sign-pdf", "Sign PDF")]
+    },
+    {
+        "path": "mask-aadhaar-card-pdf",
+        "h1": "Mask Aadhaar Card PDF Online Free (UIDAI Compliant)",
+        "title": "Mask Aadhaar Card PDF Online (Free, 100% In-Browser UIDAI Compliance) | PDFBolt",
+        "description": "Mask Aadhaar card PDF online free. Hide first 8 digits (XXXX XXXX) and show only last 4 digits for hotel, SIM, KYC & job applications. 100% client-side privacy.",
+        "subtitle": "Conceal the first 8 digits of your Aadhaar number (XXXX XXXX) and leave only the last 4 digits visible. 100% private in-browser redaction for KYC, hotel check-ins, and job applications.",
+        "quick_answer": "Masking your Aadhaar card conceals the first 8 digits of your 12-digit UIDAI number, leaving only the last 4 digits visible (XXXX-XXXX-1234). UIDAI and RBI regulations explicitly recommend sharing only Masked Aadhaar copies for hotel check-ins, job verifications, and private services to prevent identity fraud and unauthorized biometric linking.",
+        "target_badge": "UIDAI Compliance Guarantee",
+        "features": [
+            "100% private in-browser redaction: your Aadhaar never touches an external server",
+            "Conceals first 8 digits (XXXX XXXX) to comply with UIDAI and RBI guidelines",
+            "Permanently flattens blackout layer into document pixels to prevent layer removal",
+            "Preserves QR code and photograph for official validity"
+        ],
+        "how_to": [
+            {"name": "Upload Aadhaar Card PDF or Image", "text": "Select your e-Aadhaar PDF or scanned card image."},
+            {"name": "Black Out First 8 Digits", "text": "Draw a redaction box over the first 8 digits of the 12-digit UIDAI number."},
+            {"name": "Download Masked Aadhaar PDF", "text": "Save your compliant, safe document ready for sharing."}
+        ],
+        "faqs": [
+            {"q": "Is Masked Aadhaar legally valid for hotel check-in and KYC?", "a": "Yes. UIDAI regulations state that Masked Aadhaar has the same legal validity as regular Aadhaar for identification purposes."},
+            {"q": "Can someone remove the black box to see my original Aadhaar number?", "a": "No. PDFBolt burns the redaction directly into the document canvas raster layer, permanently deleting the underlying pixel data before export."}
+        ],
+        "related": [("watermark-aadhaar-pan-for-kyc", "Watermark Aadhaar & PAN"), ("combine-id-card-to-single-page-pdf", "Combine ID Card"), ("merge-aadhaar-and-pan-card", "Merge Aadhaar & PAN")]
+    },
+    {
+        "path": "compress-signature-to-20kb",
+        "h1": "Compress Signature to 20KB Online Free",
+        "title": "Compress Signature to 20KB Online Free (Remove Shadows & BG) | PDFBolt",
+        "description": "Compress signature photo to under 20KB online free. Remove paper shadows, extract crisp transparent ink, and resize to exact portal dimensions for SSC, UPSC & IBPS.",
+        "subtitle": "Remove mobile camera paper shadows, knock out yellow background, and extract clean signature ink under 20 KB. Calibrated for SSC, UPSC, IBPS, and government exam portals.",
+        "quick_answer": "Recruitment portals like SSC, UPSC, and IBPS enforce strict 10 KB to 20 KB signature file size caps and reject uploads with dark paper shadows or yellow lighting. PDFBolt automatically knocks out yellow paper background, removes mobile camera shadows, enhances pen ink contrast, and compresses the final signature under 20 KB in your browser.",
+        "target_badge": "Sub-20KB Safe-Band",
+        "features": [
+            "Guaranteed binary ceiling: targets 14 KB to 18 KB safe-band under the 20 KB cutoff",
+            "Shadow knockout: eliminates desk shadows and uneven room lighting from phone photos",
+            "Ink contrast booster: turns faint blue or ballpoint pen strokes into bold, sharp vectors",
+            "Zero server upload: instant client-side image processing protects personal signatures"
+        ],
+        "how_to": [
+            {"name": "Upload Phone Photo of Signature", "text": "Snap a photo of your pen signature on white paper and select the image."},
+            {"name": "Auto-Clean Paper Shadows", "text": "Our algorithm knocks out the yellow paper cast and isolates the ink strokes."},
+            {"name": "Download Sub-20KB Signature", "text": "Save your optimized signature image ready for immediate portal upload."}
+        ],
+        "faqs": [
+            {"q": "Will this signature meet SSC CGL and UPSC portal requirements?", "a": "Yes. The output is pre-scaled and compressed strictly between 12 KB and 18 KB with high-contrast ink on pure white background."},
+            {"q": "Is it safe to upload my signature here?", "a": "Your signature is never uploaded to any server. All contrast stretching, thresholding, and compression happen entirely on your device."}
+        ],
+        "related": [("compress-pdf-to-20kb", "Compress to 20KB"), ("compress-pdf-for-ssc", "Compress for SSC"), ("compress-pdf-for-upsc", "Compress for UPSC")]
+    },
+    {
+        "path": "split-book-scan-to-single-pages-pdf",
+        "h1": "Split Two-Page Book Scan PDF into Single Pages Online Free",
+        "title": "Split Two-Page Book Scan PDF to Single Pages Free | PDFBolt",
+        "description": "Split double-page book scans and textbook spreads into sequential single-page PDFs online free. Perfect for scanned books, registers, and study notes.",
+        "subtitle": "Convert double-page book scans and horizontal textbook spreads into sequential single-page portrait PDFs. Perfect for study notes, library registers, and tablet reading.",
+        "quick_answer": "Scanning an open book or notebook captures two pages side-by-side in a single landscape image. PDFBolt lets you split two-page book spreads into individual, sequential portrait A4 pages so you can read comfortably on tablets, e-readers, and phones without awkward horizontal zooming.",
+        "target_badge": "2-in-1 Book Splitter",
+        "features": [
+            "Bifurcates horizontal 2-page spreads into left (Page 1) and right (Page 2) order",
+            "Keeps original OCR text and resolution intact with zero re-encoding loss",
+            "100% private: large book scans process in device RAM without slow server uploads",
+            "Unlimited pages: split entire textbooks without 50-page paywalls"
+        ],
+        "how_to": [
+            {"name": "Upload Scanned Book PDF", "text": "Select your two-page spread scanned document."},
+            {"name": "Select Page Range or Split Mode", "text": "Choose the pages you want to split or extract."},
+            {"name": "Download Sequential Single-Page PDF", "text": "Get your newly organized, mobile-friendly PDF instantly."}
+        ],
+        "faqs": [
+            {"q": "Can I split a large 200-page scanned textbook?", "a": "Yes. PDFBolt uses local WebAssembly memory to process large documents smoothly without file size limits."}
+        ],
+        "related": [("split-pdf", "Split PDF"), ("scan-handwriting-to-pdf", "Scan Handwriting"), ("organize-pdf", "Organize PDF")]
+    },
+    {
+        "path": "compress-pdf-for-ssc-cgl",
+        "h1": "Compress PDF for SSC CGL Online Free (50KB to 100KB)",
+        "title": "Compress PDF for SSC CGL Online Free (50KB-100KB Guaranteed) | PDFBolt",
+        "description": "Compress certificate and mark sheet PDFs for SSC CGL, CHSL & MTS portals online free. Guaranteed 50KB to 100KB safe-band compliance with zero blur.",
+        "subtitle": "Compress matriculation certificates, mark sheets, and caste certificates for Staff Selection Commission (SSC CGL, CHSL, MTS) portals. Guaranteed safe-band between 50 KB and 100 KB.",
+        "quick_answer": "The Staff Selection Commission (SSC) portal strictly limits educational qualification certificates, caste certificates, and PwD documents between 50 KB and 100 KB. Files larger than 100 KB or smaller than 50 KB are instantly rejected. PDFBolt automatically calibrates your document into the 65 KB to 85 KB safe zone with crisp text rendering.",
+        "target_badge": "50KB-100KB Safe-Band",
+        "features": [
+            "Calibrated safe-band: automatically targets 65 KB to 85 KB to prevent rejection",
+            "Text legibility shield: smart downsampling prevents blurry numbers and signatures",
+            "Multi-page certificate support: compress consolidated mark sheets seamlessly",
+            "Zero server upload: 100% private client-side processing"
+        ],
+        "how_to": [
+            {"name": "Upload SSC Document PDF", "text": "Select your scanned certificate or marksheet."},
+            {"name": "Automatic 50KB-100KB Safe-Band Tuning", "text": "Our engine applies optimal compression preserving roll number clarity."},
+            {"name": "Download Verified File", "text": "Upload directly to ssc.gov.in without size error prompts."}
+        ],
+        "faqs": [
+            {"q": "What is the exact allowed PDF size for SSC CGL certificate uploads?", "a": "The SSC portal requires all certificate PDFs (10th, 12th, graduation, caste certificate) to be between 50 KB and 100 KB."}
+        ],
+        "related": [("compress-pdf-to-100kb", "Compress to 100KB"), ("compress-pdf-for-ssc", "Compress for SSC"), ("compress-signature-to-20kb", "Compress Signature")]
+    },
+    {
+        "path": "flatten-pdf-for-court-upload",
+        "h1": "Flatten PDF Form Fields for Court & Legal Filing Online Free",
+        "title": "Flatten PDF Form Fields for Court & Legal Filing Online Free | PDFBolt",
+        "description": "Flatten PDF form fields, interactive checkboxes, and signatures into static vectors online free. Meets Indian eCourts, High Court & PACER legal e-filing rules.",
+        "subtitle": "Flatten interactive form fields, checkboxes, and digital signatures into non-editable static vectors. Fully compliant with Indian eCourts, High Court, Supreme Court, and PACER e-filing rules.",
+        "quick_answer": "Legal e-filing systems (including Indian High Courts, District eCourts, and US PACER) mandate flattened PDFs so that interactive form fields, dropdowns, and digital annotations cannot be altered after filing. PDFBolt permanently bakes all form fields and text layers into static, non-editable vectors while preserving high-resolution print quality.",
+        "target_badge": "Court e-Filing Compliance",
+        "features": [
+            "Bakes form fields and signatures permanently into document background",
+            "Eliminates security risks: prevents tampering with filed legal pleadings",
+            "Preserves 300 DPI vector clarity for court reading and printing",
+            "Zero server upload: confidential client contracts and affidavits remain 100% private"
+        ],
+        "how_to": [
+            {"name": "Upload Interactive Legal PDF", "text": "Select your petition, contract, or form with fillable fields."},
+            {"name": "Flatten All Layers & Form Widgets", "text": "Convert all dynamic fields into permanent static page elements."},
+            {"name": "Download Court-Ready PDF", "text": "Submit to the legal e-filing portal with zero validation errors."}
+        ],
+        "faqs": [
+            {"q": "Does flattening reduce the visual quality or text clarity of my legal petition?", "a": "No. PDFBolt converts the interactive elements into high-resolution vector paths, retaining crisp 300 DPI clarity for court inspection."},
+            {"q": "Is my confidential legal document uploaded to your servers?", "a": "Never. All flattening occurs directly inside your browser WebAssembly memory. Not a single byte is sent over the internet."}
+        ],
+        "related": [("edit-pdf", "Edit PDF"), ("protect-pdf", "Protect PDF"), ("no-upload-pdf-tools", "No-Upload Tools")]
     }
+
 ]

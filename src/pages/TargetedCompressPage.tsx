@@ -281,6 +281,46 @@ const TargetedCompressPage: React.FC<TargetedCompressPageProps> = ({ pageSlug: p
                     targetSizeHint={page.targetSizeHint}
                   />
                 )}
+
+                {page.toolType === 'sign' && (
+                  <SimpleTool
+                    title={page.h1}
+                    mode="sign"
+                    darkMode={darkMode}
+                    notify={notify}
+                    targetSizeHint={page.targetSizeHint}
+                  />
+                )}
+
+                {page.toolType === 'redact' && (
+                  <SimpleTool
+                    title={page.h1}
+                    mode="redact"
+                    darkMode={darkMode}
+                    notify={notify}
+                    targetSizeHint={page.targetSizeHint}
+                  />
+                )}
+
+                {page.toolType === 'split' && (
+                  <SimpleTool
+                    title={page.h1}
+                    mode="split"
+                    darkMode={darkMode}
+                    notify={notify}
+                    targetSizeHint={page.targetSizeHint}
+                  />
+                )}
+
+                {page.toolType === 'repair' && (
+                  <SimpleTool
+                    title={page.h1}
+                    mode="repair"
+                    darkMode={darkMode}
+                    notify={notify}
+                    targetSizeHint={page.targetSizeHint}
+                  />
+                )}
               </div>
             </div>
           </div>

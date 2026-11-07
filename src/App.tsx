@@ -325,6 +325,11 @@ const MainLayout: React.FC<MainLayoutProps> = ({ darkMode, setDarkMode, soundEna
             <Route path="/merge-and-compress-pdf-to-300kb" element={<TargetedCompressPage pageSlug="merge-and-compress-pdf-to-300kb" darkMode={darkMode} notify={notify} />} />
             <Route path="/watermark-aadhaar-pan-for-kyc" element={<TargetedCompressPage pageSlug="watermark-aadhaar-pan-for-kyc" darkMode={darkMode} notify={notify} />} />
             <Route path="/unlimited-pdf-merger-no-limits" element={<TargetedCompressPage pageSlug="unlimited-pdf-merger-no-limits" darkMode={darkMode} notify={notify} />} />
+            <Route path="/mask-aadhaar-card-pdf" element={<TargetedCompressPage pageSlug="mask-aadhaar-card-pdf" darkMode={darkMode} notify={notify} />} />
+            <Route path="/compress-signature-to-20kb" element={<TargetedCompressPage pageSlug="compress-signature-to-20kb" darkMode={darkMode} notify={notify} />} />
+            <Route path="/split-book-scan-to-single-pages-pdf" element={<TargetedCompressPage pageSlug="split-book-scan-to-single-pages-pdf" darkMode={darkMode} notify={notify} />} />
+            <Route path="/compress-pdf-for-ssc-cgl" element={<TargetedCompressPage pageSlug="compress-pdf-for-ssc-cgl" darkMode={darkMode} notify={notify} />} />
+            <Route path="/flatten-pdf-for-court-upload" element={<TargetedCompressPage pageSlug="flatten-pdf-for-court-upload" darkMode={darkMode} notify={notify} />} />
             <Route path="/id-card-front-and-back-pdf" element={<TargetedCompressPage pageSlug="combine-id-card-to-single-page-pdf" darkMode={darkMode} notify={notify} />} />
             <Route path="/merge-aadhaar-and-pan-card" element={<TargetedCompressPage pageSlug="merge-aadhaar-and-pan-card" darkMode={darkMode} notify={notify} />} />
             <Route path="/merge-documents-for-visa-application" element={<TargetedCompressPage pageSlug="merge-documents-for-visa-application" darkMode={darkMode} notify={notify} />} />
