@@ -1,6 +1,8 @@
 import os
+import uuid
 import shutil
 import tempfile
+import asyncio
 from pathlib import Path
 from typing import Optional
 import httpx
@@ -26,6 +28,7 @@ except ImportError:
 from backend.app.core.logging import logger
 from backend.app.core.errors import PDFBoltError
 from backend.app.core.security import verify_partner_api_key, PartnerIdentity
+from backend.app.processors.base import LIBREOFFICE_SEMAPHORE
 
 router = APIRouter(prefix="/convert", tags=["Document Conversion"])
 
@@ -98,17 +101,21 @@ async def convert_word_to_pdf(file: UploadFile = File(...), caller: PartnerIdent
         f.write(file_bytes)
 
     try:
-        import subprocess
-        cmd = [
-            "soffice",
-            "--headless",
-            "--convert-to",
-            "pdf:writer_pdf_Export",
-            "--outdir",
-            temp_dir,
-            input_path
-        ]
-        subprocess.run(cmd, check=True, timeout=120, capture_output=True)
+        def _run_soffice():
+            with LIBREOFFICE_SEMAPHORE:
+                import subprocess
+                cmd = [
+                    "soffice",
+                    "--headless",
+                    "--convert-to",
+                    "pdf:writer_pdf_Export",
+                    "--outdir",
+                    temp_dir,
+                    input_path
+                ]
+                subprocess.run(cmd, check=True, timeout=120, capture_output=True)
+
+        await asyncio.to_thread(_run_soffice)
 
         if not os.path.exists(output_path) or os.path.getsize(output_path) == 0:
             raise HTTPException(
@@ -160,35 +167,47 @@ async def convert_pdf_to_word(background_tasks: BackgroundTasks, file: UploadFil
         is_digital = has_digital_text(input_pdf_path)
 
         if is_digital and HAS_PDF2DOCX:
-            # Step B (Digital Path): pdf2docx converts layout, tables, fonts & images
-            cv = Converter(input_pdf_path)
-            cv.convert(output_docx_path, multi_processing=True, cpu_count=2)
-            cv.close()
+            # Step B (Digital Path): pdf2docx converts layout, tables, fonts & images safely (single worker to prevent OOM)
+            def _convert_digital():
+                cv = Converter(input_pdf_path)
+                cv.convert(output_docx_path, multi_processing=False, cpu_count=1)
+                cv.close()
+            await asyncio.to_thread(_convert_digital)
         elif HAS_OCR:
-            # Step C (Scanned / Camera Path): OCR with pdf2image + Tesseract
-            images = convert_from_path(input_pdf_path, dpi=300)
-            doc = Document()
+            # Step C (Scanned / Camera Path): OCR with bounded DPI and immediate memory cleanup
+            def _convert_scanned():
+                import gc
+                images = convert_from_path(input_pdf_path, dpi=150)
+                doc = Document()
 
-            for section in doc.sections:
-                section.top_margin = Inches(1.0)
-                section.bottom_margin = Inches(1.0)
-                section.left_margin = Inches(1.0)
-                section.right_margin = Inches(1.0)
+                for section in doc.sections:
+                    section.top_margin = Inches(1.0)
+                    section.bottom_margin = Inches(1.0)
+                    section.left_margin = Inches(1.0)
+                    section.right_margin = Inches(1.0)
 
-            for i, image in enumerate(images):
-                if i > 0:
-                    doc.add_page_break()
+                for i, image in enumerate(images):
+                    if i > 0:
+                        doc.add_page_break()
 
-                ocr_text = pytesseract.image_to_string(image, lang="eng")
-                
-                for line in ocr_text.splitlines():
-                    clean_line = line.strip()
-                    if clean_line:
-                        p = doc.add_paragraph(clean_line)
-                        p.paragraph_format.line_spacing = 1.15
-                        p.paragraph_format.space_after = Pt(4)
+                    ocr_text = pytesseract.image_to_string(image, lang="eng")
+                    try:
+                        image.close()
+                    except Exception:
+                        pass
+                    
+                    for line in ocr_text.splitlines():
+                        clean_line = line.strip()
+                        if clean_line:
+                            p = doc.add_paragraph(clean_line)
+                            p.paragraph_format.line_spacing = 1.15
+                            p.paragraph_format.space_after = Pt(4)
 
-            doc.save(output_docx_path)
+                doc.save(output_docx_path)
+                del images
+                gc.collect()
+
+            await asyncio.to_thread(_convert_scanned)
         else:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -259,18 +278,22 @@ async def convert_excel_to_pdf(file: UploadFile = File(...)):
         converted = False
         if soffice_bin:
             try:
-                profile_url = Path(profile_dir).as_uri()
-                cmd = [
-                    soffice_bin,
-                    f"-env:UserInstallation={profile_url}",
-                    "--headless",
-                    "--convert-to",
-                    "pdf",
-                    "--outdir",
-                    temp_dir,
-                    input_path
-                ]
-                subprocess.run(cmd, check=True, timeout=120, capture_output=True)
+                def _run_excel_soffice():
+                    with LIBREOFFICE_SEMAPHORE:
+                        profile_url = Path(profile_dir).as_uri()
+                        cmd = [
+                            soffice_bin,
+                            f"-env:UserInstallation={profile_url}",
+                            "--headless",
+                            "--convert-to",
+                            "pdf",
+                            "--outdir",
+                            temp_dir,
+                            input_path
+                        ]
+                        subprocess.run(cmd, check=True, timeout=120, capture_output=True)
+
+                await asyncio.to_thread(_run_excel_soffice)
 
                 if os.path.exists(output_path) and os.path.getsize(output_path) > 0:
                     converted = True

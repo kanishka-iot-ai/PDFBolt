@@ -219,7 +219,8 @@ class OcrProcessor(BaseProcessor):
 
                         pix = fitz_page.get_pixmap(dpi=effective_dpi)
                         from PIL import Image
-                        pil_img = Image.open(io.BytesIO(pix.tobytes("png")))
+                        mode = "RGBA" if pix.alpha else "RGB"
+                        pil_img = Image.frombytes(mode, [pix.width, pix.height], pix.samples)
                         del pix
                         try:
                             ocr_text = self._ocr_image_to_text(pil_img, lang, timeout=per_page_timeout)
