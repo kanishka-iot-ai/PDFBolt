@@ -321,6 +321,10 @@ const MainLayout: React.FC<MainLayoutProps> = ({ darkMode, setDarkMode, soundEna
 
             {/* Identity & Specialized Document Merging */}
             <Route path="/combine-id-card-to-single-page-pdf" element={<TargetedCompressPage pageSlug="combine-id-card-to-single-page-pdf" darkMode={darkMode} notify={notify} />} />
+            <Route path="/id-card-front-and-back-actual-size-pdf" element={<TargetedCompressPage pageSlug="id-card-front-and-back-actual-size-pdf" darkMode={darkMode} notify={notify} />} />
+            <Route path="/merge-and-compress-pdf-to-300kb" element={<TargetedCompressPage pageSlug="merge-and-compress-pdf-to-300kb" darkMode={darkMode} notify={notify} />} />
+            <Route path="/watermark-aadhaar-pan-for-kyc" element={<TargetedCompressPage pageSlug="watermark-aadhaar-pan-for-kyc" darkMode={darkMode} notify={notify} />} />
+            <Route path="/unlimited-pdf-merger-no-limits" element={<TargetedCompressPage pageSlug="unlimited-pdf-merger-no-limits" darkMode={darkMode} notify={notify} />} />
             <Route path="/id-card-front-and-back-pdf" element={<TargetedCompressPage pageSlug="combine-id-card-to-single-page-pdf" darkMode={darkMode} notify={notify} />} />
             <Route path="/merge-aadhaar-and-pan-card" element={<TargetedCompressPage pageSlug="merge-aadhaar-and-pan-card" darkMode={darkMode} notify={notify} />} />
             <Route path="/merge-documents-for-visa-application" element={<TargetedCompressPage pageSlug="merge-documents-for-visa-application" darkMode={darkMode} notify={notify} />} />

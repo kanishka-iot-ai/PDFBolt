@@ -271,6 +271,16 @@ const TargetedCompressPage: React.FC<TargetedCompressPageProps> = ({ pageSlug: p
                     notify={notify}
                   />
                 )}
+
+                {page.toolType === 'watermark' && (
+                  <SimpleTool
+                    title={page.h1}
+                    mode="watermark"
+                    darkMode={darkMode}
+                    notify={notify}
+                    targetSizeHint={page.targetSizeHint}
+                  />
+                )}
               </div>
             </div>
           </div>

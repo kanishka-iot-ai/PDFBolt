@@ -246,6 +246,177 @@ EXTRA_GUIDES = [
 ]
 
 TARGETED_PAGES = [
+    {
+        "path": "merge-and-compress-pdf-to-300kb",
+        "h1": "Merge & Compress PDF to Under 300KB",
+        "title": "Merge and Compress PDF to 300KB Online Free (All-in-One) | PDFBolt",
+        "description": "Merge multiple PDF files and compress to under 300KB in one click. Pre-calibrated for UPSC OTR, EPFO, and State PSC portals. 100% private in-browser WebAssembly.",
+        "subtitle": "Combine multiple PDF documents, certificates, or marksheets and compress them strictly under 300KB in a single private step.",
+        "quick_answer": "To merge and compress PDF to under 300KB: 1. Drag & drop your PDF documents or certificates. 2. Arrange pages in chronological order. 3. Click 'Merge & Compress' to automatically downsample to 8-bit grayscale and deflate streams to an exact 270KB-295KB ceiling.",
+        "target_badge": "Atomic Merge + Under 300KB Output",
+        "portal_specs": [
+            {"name": "UPSC OTR & Civil Services (CSE)", "size": "20 KB – 300 KB", "format": "PDF only", "notes": "Combine 10th marksheet + caste certificate into single sub-300KB file"},
+            {"name": "EPFO Unified Member Portal", "size": "Max 300 KB", "format": "PDF", "notes": "Bank passbook + joint declaration + cancelled cheque"},
+            {"name": "State PSC Application Portals", "size": "20 KB – 300 KB", "format": "PDF", "notes": "Combined educational degrees and domicile proof"},
+            {"name": "High Court & District Court e-Filing", "size": "Max 300 KB", "format": "PDF", "notes": "Legal petition + affidavit annexures"}
+        ],
+        "features": [
+            "Solves the multi-tool friction: merge multiple files and hit the 300KB limit in one screen",
+            "Guaranteed binary ceiling: targets 270KB–295KB so government servers never reject your file",
+            "Preserves original text sharpness, stamps, and signatures at 150 DPI",
+            "100% private local execution in browser RAM with zero cloud uploads"
+        ],
+        "how_to": [
+            {"name": "Add Documents", "text": "Select two or more PDF marksheets, certificates, or forms."},
+            {"name": "Auto-Calibrate 300KB", "text": "Our engine sequences pages and applies smart 8-bit stream deflation."},
+            {"name": "Download Portal-Ready File", "text": "Get your combined, compliant sub-300KB PDF ready for submission."}
+        ],
+        "sections": [
+            {
+                "heading": "Why You Need an All-in-One Merge & 300KB Compressor",
+                "paragraphs": [
+                    "Most government examination portals (such as UPSC OTR, UPPSC, BPSC, and State Public Service Commissions) require candidates to upload a single PDF file containing multiple documents, while strictly capping the file size between 20KB and 300KB.",
+                    "Traditional online tools force you through a frustrating two-step process: you merge your files on one website, then look for a compressor, compress it, fail the 300KB ceiling, and start over. PDFBolt solves this in a single click in device RAM."
+                ]
+            }
+        ],
+        "faqs": [
+            {"q": "Can I merge 3 or 4 certificates and still fit into 300KB?", "a": "Yes. PDFBolt uses edge-preserving 8-bit grayscale downsampling to reduce scanner background noise while keeping vector text crisp, allowing 3 to 6 pages to fit under 300KB."},
+            {"q": "Why do other tools output 305KB after merging?", "a": "Other tools use approximate percentage compression sliders that fail on strict binary validation (300KB = exactly 307,200 bytes). PDFBolt calculates exact octet byte boundaries with a safety buffer to ensure 100% portal acceptance."}
+        ],
+        "related": [
+            ("compress-pdf-to-300kb", "Compress to 300KB"),
+            ("combine-id-card-to-single-page-pdf", "ID Card 2-in-1"),
+            ("merge-aadhaar-and-pan-card", "Aadhaar + PAN Merge")
+        ]
+    },
+    {
+        "path": "watermark-aadhaar-pan-for-kyc",
+        "h1": "Anti-Theft KYC Watermark for Aadhaar & PAN Card",
+        "title": "Anti-Theft KYC Watermark for Aadhaar & PAN Online Free | PDFBolt",
+        "description": "Add anti-theft diagonal KYC purpose watermarks to Aadhaar and PAN cards online. UIDAI & RBI compliant, un-croppable lattice grid, 100% private in-browser WebAssembly.",
+        "subtitle": "Protect your identity: add un-croppable diagonal purpose watermarks across Aadhaar and PAN cards before submitting for bank KYC or SIM cards.",
+        "quick_answer": "To add an Anti-Theft KYC watermark: 1. Upload your Aadhaar or PAN card PDF or photo. 2. Select purpose preset (e.g. 'Only for HDFC Bank KYC - DD/MM/YYYY'). 3. Click 'Apply Security Watermark' to burn a diagonal lattice across the document that identity thieves cannot crop.",
+        "target_badge": "UIDAI & RBI Anti-Theft KYC Mode",
+        "portal_specs": [
+            {"name": "UIDAI Security Circular Compliance", "size": "Any", "format": "PDF / JPG", "notes": "Mandates purpose note across Aadhaar copies to prevent misuse"},
+            {"name": "RBI Bank KYC (SBI, HDFC, ICICI, Axis)", "size": "Under 2 MB", "format": "PDF", "notes": "Valid only for designated bank and specific account opening"},
+            {"name": "Telecom & SIM Card Activation", "size": "Under 1 MB", "format": "PDF / JPG", "notes": "Designated purpose prevents duplicate unauthorized SIM issuance"}
+        ],
+        "features": [
+            "UIDAI & RBI advisory compliant: prevents identity theft and loan fraud",
+            "Un-croppable 35° diagonal lattice pattern covering all sensitive zones",
+            "Hard rasterized burn-in: cannot be selected or deleted using PDF editing software",
+            "100% private local processing with zero server uploads"
+        ],
+        "how_to": [
+            {"name": "Upload ID Document", "text": "Select your Aadhaar card, PAN card, or Voter ID file."},
+            {"name": "Choose KYC Purpose", "text": "Select an official bank, SIM, or visa purpose preset with today's date."},
+            {"name": "Download Protected PDF", "text": "Save your watermarked identity proof safe for submission."}
+        ],
+        "sections": [
+            {
+                "heading": "Why You Must Watermark Aadhaar and PAN Before Submission",
+                "paragraphs": [
+                    "The Unique Identification Authority of India (UIDAI) and the Reserve Bank of India (RBI) have repeatedly issued cybersecurity circulars urging citizens to never share unmasked or unmarked copies of their Aadhaar or PAN cards. Unscrupulous agents often reuse photocopies to open fake accounts or procure illegal SIM cards.",
+                    "By overlaying an un-croppable diagonal security watermark that clearly states the recipient and purpose, the photocopy becomes legally unusable for any other organization."
+                ]
+            }
+        ],
+        "faqs": [
+            {"q": "Will banks accept a watermarked Aadhaar copy?", "a": "Yes! RBI and UIDAI guidelines explicitly endorse purpose-limited watermarked copies as official best practice for KYC compliance."},
+            {"q": "Can someone erase the watermark using a PDF editor?", "a": "No. PDFBolt burns the watermark directly into the document stream as an integrated graphical lattice rather than a floating text layer, preventing simple deletion."}
+        ],
+        "related": [
+            ("merge-aadhaar-and-pan-card", "Aadhaar + PAN Merge"),
+            ("combine-id-card-to-single-page-pdf", "ID Card 2-in-1"),
+            ("compress-pdf-to-100kb", "Compress to 100KB")
+        ]
+    },
+    {
+        "path": "id-card-front-and-back-actual-size-pdf",
+        "h1": "ID Card Front & Back on Single Page (Exact 1:1 Size)",
+        "title": "Print ID Card Front and Back on One Page (Actual 1:1 Size PDF) | PDFBolt",
+        "description": "Place ID card front and back on a single A4 page at exact 1:1 physical size (85.6mm x 54mm). Perfect for printing, notary, and visa submissions. Zero upload.",
+        "subtitle": "Merge both sides of your ID card, Aadhaar, Driving License, or Voter ID onto a single A4 page at true physical scale with scissor cut guides.",
+        "quick_answer": "To print ID card front and back at 1:1 scale: 1. Upload front and back photos. 2. Select '1:1 Actual Size' layout. 3. Download the print-ready 300 DPI A4 PDF with center fold guidelines.",
+        "target_badge": "True 1:1 ISO/IEC 7810 ID-1 Physical Scale",
+        "portal_specs": [
+            {"name": "Official Plastic Card Replication", "size": "85.60 mm × 53.98 mm", "format": "PDF", "notes": "Matches physical credit card / Aadhaar smart card dimensions"},
+            {"name": "Passport & Visa Physical Submission", "size": "A4 Printable", "format": "300 DPI PDF", "notes": "Both sides aligned vertically with scissor cutting guidelines"}
+        ],
+        "features": [
+            "Calibrated to ISO/IEC 7810 ID-1 international standard (85.60mm × 53.98mm)",
+            "Centered vertical alignment with light scissor cutting guidelines",
+            "Ultra high-resolution 300 DPI vector output for crisp printing",
+            "100% private in-browser WebAssembly processing"
+        ],
+        "how_to": [
+            {"name": "Snap or Upload Both Sides", "text": "Upload photos of the front and back of your ID card."},
+            {"name": "Calibrate to 1:1 Scale", "text": "Our engine centers both sides at exact physical wallet dimensions."},
+            {"name": "Print or Save PDF", "text": "Print directly onto A4 paper or save for visa and notary filings."}
+        ],
+        "sections": [
+            {
+                "heading": "Why 1:1 True Physical Scale Matters for ID Printing",
+                "paragraphs": [
+                    "When you insert phone camera photos into typical document editors, the software automatically stretches the images to fill the width of the page, turning a wallet-sized 8.5cm ID into an oversized 20cm printout. Notary offices and embassies reject these distorted prints.",
+                    "PDFBolt calculates exact point coordinates on a standard 300 DPI A4 page to render both sides at precisely 85.60mm × 53.98mm, accompanied by dashed center cutting marks for clean folding."
+                ]
+            }
+        ],
+        "faqs": [
+            {"q": "How do I ensure the printout matches my real card size?", "a": "When printing from Adobe Acrobat or your browser, select 'Actual Size' or 'Scale: 100%' instead of 'Fit to Page' to preserve true physical dimensions."},
+            {"q": "Does this tool work with Driving Licenses and Voter IDs?", "a": "Yes! All modern government identity cards follow the universal ISO/IEC 7810 ID-1 form factor."}
+        ],
+        "related": [
+            ("combine-id-card-to-single-page-pdf", "Combine ID Card"),
+            ("merge-aadhaar-and-pan-card", "Aadhaar + PAN Merge"),
+            ("watermark-aadhaar-pan-for-kyc", "Anti-Theft Watermark")
+        ]
+    },
+    {
+        "path": "unlimited-pdf-merger-no-limits",
+        "h1": "100% Free Unlimited PDF Merger (No Daily Limits)",
+        "title": "Unlimited Free PDF Merger: No Daily Task Limits & No Sign-Up | PDFBolt",
+        "description": "Merge unlimited PDF files online for free. No 2-file daily limit, no subscriptions, no email signup. 100% private in-browser WebAssembly execution.",
+        "subtitle": "Merge unlimited PDF documents with zero task caps, zero queues, and zero signups. Process heavy multi-page files privately in your browser.",
+        "quick_answer": "To merge unlimited PDFs: 1. Drag & drop any number of files (5, 20, or 50+). 2. Reorder pages freely. 3. Click 'Merge PDF' to compile your combined file instantly without daily limits.",
+        "target_badge": "Zero Daily Task Limits / Unlimited Files",
+        "portal_specs": [
+            {"name": "Batch Document Compilation", "size": "Unlimited", "format": "PDF", "notes": "No 2-file or 3-task limits like iLovePDF or Smallpdf"},
+            {"name": "Corporate Legal Archiving", "size": "Up to RAM capacity", "format": "PDF", "notes": "Zero server transmission keeps files strictly confidential"}
+        ],
+        "features": [
+            "Zero daily task restrictions: no 2-document limits like iLovePDF or Smallpdf",
+            "Batch process large document collections in browser RAM without server queues",
+            "100% free with no credit card, account creation, or email signup",
+            "Zero cloud transmission: private WebAssembly processing"
+        ],
+        "how_to": [
+            {"name": "Add Any Number of PDFs", "text": "Select multiple documents without artificial limits."},
+            {"name": "Arrange Page Order", "text": "Drag cards to organize the unified sequence."},
+            {"name": "Download Merged File", "text": "Save your combined PDF instantly."}
+        ],
+        "sections": [
+            {
+                "heading": "Why Cloud PDF Tools Enforce Daily Limits & Why PDFBolt Does Not",
+                "paragraphs": [
+                    "Commercial SaaS platforms like iLovePDF, Smallpdf, and Sejda operate expensive centralized cloud server fleets. Every megabyte costs them bandwidth and compute, forcing them to lock free users behind restrictive paywalls.",
+                    "PDFBolt compiles engines to WebAssembly, running directly on your computer or phone CPU. Because we do not pay cloud compute costs for your files, PDFBolt is truly free and unlimited forever."
+                ]
+            }
+        ],
+        "faqs": [
+            {"q": "Is there any limit to the number of PDFs I can merge?", "a": "No. The only boundary is your device memory (RAM), allowing modern computers and smartphones to easily merge dozens of files at once."}
+        ],
+        "related": [
+            ("merge-pdf", "Merge PDF"),
+            ("ilovepdf-limit-reached-free-alternative", "iLovePDF Limit Alternative"),
+            ("smallpdf-daily-limit-alternative", "Smallpdf Alternative")
+        ]
+    },
+
     # Size Compression Pages
     {
         "path": "compress-pdf-to-20kb",
