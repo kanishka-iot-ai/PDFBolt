@@ -83,7 +83,7 @@ const COMPETITORS: Record<string, CompetitorData> = {
         heading: 'Escape Smallpdf’s Aggressive Subscription Trap',
         paragraphs: [
           'Nothing is more irritating than converting two files for an urgent job application and being abruptly locked out with a screen demanding your credit card number for a "free trial".',
-          'PDFBolt was engineered as an open, accessible counterweight to rent-seeking PDF monopolies. We leverage efficient client-side WebAssembly to keep server overhead minimal, passing those savings on to you with genuinely unlimited, free tools.'
+          'PDFBolt was engineered as an open, accessible counterweight to rent-seeking PDF monopolies. We use efficient client-side WebAssembly to keep server overhead minimal, passing those savings on to you with genuinely unlimited, free tools.'
         ]
       }
     ],

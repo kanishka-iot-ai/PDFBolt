@@ -66,9 +66,9 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
         return () => setHasActiveWork(false);
     }, [pages.length, setHasActiveWork]);
 
-    // -------------------------------------------------------------
+    
     // Launch Native Document Scanner (Google ML Kit / Apple VisionKit)
-    // -------------------------------------------------------------
+    
     const handleLaunchScanner = () => {
         triggerNativeDocumentScanner(
             nativeCameraInputRef.current,
@@ -104,9 +104,9 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
         );
     };
 
-    // -------------------------------------------------------------
+    
     // Image Files Ingestion Handler
-    // -------------------------------------------------------------
+    
     const handleFilesSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = e.target.files;
         if (!files || files.length === 0) return;
@@ -152,9 +152,9 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
         if (notify && notify.success) notify.success("Pages added to document!");
     };
 
-    // -------------------------------------------------------------
+    
     // OCR Text Recognition (For 'To Text' mode)
-    // -------------------------------------------------------------
+    
     const performOcrOnImage = async (dataUrl: string) => {
         setIsOcrProcessing(true);
         setOcrTextResult(null);
@@ -173,9 +173,9 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
         }
     };
 
-    // -------------------------------------------------------------
+    
     // Interactive 4-Corner Manual Crop Editor
-    // -------------------------------------------------------------
+    
     const openCornerEditor = (page: ScannedPage) => {
         setEditingPageId(page.id);
         setManualCorners({ ...page.corners });
@@ -416,9 +416,9 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
         });
     };
 
-    // -------------------------------------------------------------
+    
     // High-Resolution PDF Export
-    // -------------------------------------------------------------
+    
     const saveAsPdf = async () => {
         if (pages.length === 0) return;
         setIsPdfGenerating(true);
@@ -500,9 +500,9 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
                 onChange={handleFilesSelected}
             />
 
-            {/* ------------------------------------------------------------- */}
+            
             {/* MAIN SCANNER HUB */}
-            {/* ------------------------------------------------------------- */}
+            
             {pages.length === 0 && (
                 <div className="flex flex-col items-center justify-center p-4 sm:p-6 text-center max-w-lg animate-fadeIn mt-4 sm:mt-8 w-full">
                     {/* Hero Icon */}
@@ -568,9 +568,9 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
                 </div>
             )}
 
-            {/* ------------------------------------------------------------- */}
+            
             {/* POST-CAPTURE REVIEW & MULTI-PAGE MANAGEMENT */}
-            {/* ------------------------------------------------------------- */}
+            
             {pages.length > 0 && (
                 <div className="w-full max-w-6xl animate-fadeIn p-4 sm:p-6 lg:p-8 space-y-6">
 
@@ -746,9 +746,9 @@ const ScanTool: React.FC<ScanToolProps> = ({ darkMode, notify }) => {
                 </div>
             )}
 
-            {/* ------------------------------------------------------------- */}
+            
             {/* INTERACTIVE 4-CORNER FINE-TUNING MODAL WITH LOUPE */}
-            {/* ------------------------------------------------------------- */}
+            
             {cropModalOpen && (
                 <div className="fixed inset-0 z-[120] bg-black/90 backdrop-blur-md flex items-center justify-center p-3 sm:p-4">
                     <div className="bg-slate-900 border border-slate-800 rounded-3xl p-4 sm:p-6 max-w-2xl w-full text-white shadow-2xl flex flex-col space-y-3 sm:space-y-4 animate-scaleUp max-h-[95dvh] overflow-y-auto">

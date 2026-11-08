@@ -172,7 +172,7 @@ function parseFontStyles(fontName: string): { bold: boolean; italic: boolean } {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// STAGE 1 — EXTRACTION & COORDINATE NORMALIZATION
+// Stage 1: Extraction & COORDINATE NORMALIZATION
 // ═══════════════════════════════════════════════════════════════════
 
 async function extractMetadata(pdf: any): Promise<Record<string, string>> {
@@ -385,7 +385,7 @@ async function extractAllPages(pdf: any): Promise<ProcessedPage[]> {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// STAGE 2 — OCR FOR SCANNED PAGES
+// Stage 2: OCR FOR SCANNED PAGES
 // ═══════════════════════════════════════════════════════════════════
 
 async function runOcrOnPage(page: any, pageHeight: number): Promise<TItem[]> {
@@ -433,7 +433,7 @@ async function runOcrOnPage(page: any, pageHeight: number): Promise<TItem[]> {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// STAGE 3 — ADVANCED LAYOUT RECONSTRUCTION
+// Stage 3: Advanced LAYOUT RECONSTRUCTION
 // ═══════════════════════════════════════════════════════════════════
 
 /** Calculate median body font size across document */
@@ -473,7 +473,7 @@ function groupItemsIntoLines(sortedItems: TItem[]): Line[] {
       currentTop = (currentTop * (currentGroup.length - 1) + item.top) / currentGroup.length;
       currentH = Math.max(currentH, item.height);
     } else {
-      // Finalize current line — O(N) reduce avoids O(N) spread array copies
+      // Finalize current line: O(N) reduce avoids O(N) spread array copies
       currentGroup.sort((a, b) => a.left - b.left);
       const lineLeft = currentGroup[0].left;
       let lineRight = -Infinity;
@@ -502,7 +502,7 @@ function groupItemsIntoLines(sortedItems: TItem[]): Line[] {
     }
   }
 
-  // Final line — same O(N) reduce pattern
+  // Final line: same O(N) reduce pattern
   currentGroup.sort((a, b) => a.left - b.left);
   const lineLeft = currentGroup[0].left;
   let lineRight = -Infinity;
@@ -531,7 +531,7 @@ function groupItemsIntoLines(sortedItems: TItem[]): Line[] {
 /** Join line items with smart space handling based on bounding box gaps */
 function joinLineItems(items: TItem[]): string {
   if (!items.length) return '';
-  // O(N) accumulator — avoids O(N²) string reallocations from repeated +=
+  // O(N) accumulator: avoids O(N²) string reallocations from repeated +=
   const parts: string[] = [items[0].text];
 
   for (let i = 1; i < items.length; i++) {
@@ -937,7 +937,7 @@ function buildPageDocElements(page: ProcessedPage, bodyFontSize: number): DocEle
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// STAGE 4 — DOCX GENERATION WITH NATIVE WORD STYLING
+// Stage 4: DOCX GENERATION WITH NATIVE WORD STYLING
 // ═══════════════════════════════════════════════════════════════════
 
 function base64ToUint8Array(dataUrl: string): Uint8Array {
@@ -1193,7 +1193,7 @@ async function generateDocxDocument(
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// STAGE 5 — QUALITY SCORING & MAIN EXPORT
+// Stage 5: Quality SCORING & MAIN EXPORT
 // ═══════════════════════════════════════════════════════════════════
 
 function computeConversionQuality(pages: ProcessedPage[], allPageElements: DocElement[][]): QualityReport {

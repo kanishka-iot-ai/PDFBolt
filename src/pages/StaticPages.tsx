@@ -57,9 +57,7 @@ const PageLayout: React.FC<{
   </div>
 );
 
-/* ========================================================================
-   1. CONTACT PAGE
-   ======================================================================== */
+// Contact Page
 export const ContactPage: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -360,9 +358,7 @@ ${message}`)}`;
   );
 };
 
-/* ========================================================================
-   2. PRIVACY POLICY (AdSense, GDPR, CCPA, CPRA & Zero-Retention Compliant)
-   ======================================================================== */
+// Privacy Policy(AdSense, GDPR, CCPA, CPRA & Zero-Retention Compliant)
 export const PrivacyPage: React.FC<{ darkMode: boolean }> = ({ darkMode }) => (
   <PageLayout 
     title="Privacy Policy"
@@ -554,7 +550,7 @@ export const PrivacyPage: React.FC<{ darkMode: boolean }> = ({ darkMode }) => (
           <li><strong>Right to Object & Restrict Processing:</strong> You may object to the processing of non-essential cookies via our consent manager or Google Ads Settings.</li>
         </ul>
         <p className="text-sm">
-          To exercise any GDPR rights, contact our Data Protection Officer at <a href="mailto:support@pdfbolt.in" className="font-bold text-yellow-700 dark:text-yellow-400 underline">support@pdfbolt.in</a>. We respond to all verified requests within 24–48 hours.
+          To exercise any GDPR rights, contact our Data Protection Officer at <a href="mailto:support@pdfbolt.in" className="font-bold text-yellow-700 dark:text-yellow-400 underline">support@pdfbolt.in</a>. We respond to all verified requests within 24 to 48 hours.
         </p>
       </section>
 
@@ -603,15 +599,13 @@ export const PrivacyPage: React.FC<{ darkMode: boolean }> = ({ darkMode }) => (
   </PageLayout>
 );
 
-/* ========================================================================
-   3. ABOUT PAGE (Rich, Professional, Publisher E-E-A-T Verified)
-   ======================================================================== */
+// About Page(Rich, Professional, Publisher E-E-A-T Verified)
 export const AboutPage: React.FC<{ darkMode: boolean }> = ({ darkMode }) => (
   <PageLayout 
     title="About PDFBolt"
     subtitle="PDFBolt is an independent, privacy-first document intelligence platform engineered to make modern PDF conversion, editing, and optimization lightning-fast, 100% free, and completely secure."
     lastUpdated="September 1, 2026"
-    badge="Engineered for Speed & Privacy"
+    badge="Private In-Browser Tools"
     badgeIcon={<Sparkles size={14} />}
     darkMode={darkMode}
   >
@@ -627,8 +621,8 @@ export const AboutPage: React.FC<{ darkMode: boolean }> = ({ darkMode }) => (
           },
           { 
             icon: <Zap className="w-6 h-6 text-yellow-500" />, 
-            title: "Sub-Second Execution", 
-            desc: "Optimized C/Rust engines compiled to native browser bytecode deliver instant conversion with zero queue wait times." 
+            title: "Direct Browser Execution", 
+            desc: "WebAssembly modules process documents locally on your device without server queues." 
           },
           { 
             icon: <Award className="w-6 h-6 text-emerald-500" />, 
@@ -651,10 +645,10 @@ export const AboutPage: React.FC<{ darkMode: boolean }> = ({ darkMode }) => (
       {/* Mission & Background */}
       <section className="space-y-4">
         <h2 className={`text-2xl sm:text-3xl font-black tracking-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>
-          Our Mission: Rebuilding PDF Tools for the Modern Web
+          Why PDFBolt Was Built
         </h2>
         <p className="text-sm sm:text-base">
-          The Portable Document Format (PDF) has been the cornerstone of digital communication since 1993. Yet, traditional online PDF utilities remain riddled with frustrating barriers: aggressive monthly subscriptions for basic operations like merging two receipts, artificial limits that lock users out after two file conversions, and worst of all, silently transmitting confidential contracts, tax returns, and medical records to unverified remote servers.
+          The Portable Document Format (PDF) has been the foundation of digital document exchange since 1993. Yet, traditional online PDF utilities remain riddled with frustrating barriers: aggressive monthly subscriptions for basic operations like merging two receipts, artificial limits that lock users out after two file conversions, and worst of all, silently transmitting confidential contracts, tax returns, and medical records to unverified remote servers.
         </p>
         <p className="text-sm sm:text-base">
           <strong>PDFBolt was founded to solve this problem completely.</strong> By taking full advantage of modern web capabilities (including WebAssembly (Wasm), client-side Canvas rendering, parallel worker threads, and memory-safe ephemeral backend pipelines), we have engineered a comprehensive PDF toolkit that delivers enterprise-grade fidelity with zero compromise on user confidentiality.
@@ -702,7 +696,7 @@ export const AboutPage: React.FC<{ darkMode: boolean }> = ({ darkMode }) => (
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {[
             { name: "WebAssembly Core", desc: "Native C/Rust libraries running inside the browser sandbox for zero-upload privacy." },
-            { name: "PyMuPDF & MuPDF", desc: "Ultra-high-resolution 200–300 DPI rasterization and lossless stream deflating." },
+            { name: "PyMuPDF & MuPDF", desc: "Ultra-high-resolution 200 to 300 DPI rasterization and lossless stream deflating." },
             { name: "Headless Document Engines", desc: "LibreOffice & WeasyPrint integration for pristine DOCX, XLSX, and PPTX conversions." },
             { name: "Neural OCR & Handwriting", desc: "Optical character recognition transforms scanned documents and handwritten notes into searchable text." }
           ].map((tech, i) => (
@@ -800,9 +794,7 @@ export const AboutPage: React.FC<{ darkMode: boolean }> = ({ darkMode }) => (
   </PageLayout>
 );
 
-/* ========================================================================
-   4. TERMS OF SERVICE
-   ======================================================================== */
+// Terms of Service
 export const TermsPage: React.FC<{ darkMode: boolean }> = ({ darkMode }) => (
   <PageLayout 
     title="Terms of Service"
@@ -897,9 +889,7 @@ export const TermsPage: React.FC<{ darkMode: boolean }> = ({ darkMode }) => (
 );
 
 
-/* ========================================================================
-   5. COOKIES & CONSENT PREFERENCES PAGE
-   ======================================================================== */
+// Cookies & Consent Preferences Page
 export const CookiesPage: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
   const [cookiePref, setCookiePref] = useState(() => {
     return localStorage.getItem('pdfbolt_cookie_consent') || 'accepted';
@@ -1083,9 +1073,7 @@ export const CookiesPage: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
 };
 
 
-/* ========================================================================
-   6. OFFLINE PWA & LOCAL EXECUTION PAGE
-   ======================================================================== */
+// Offline PWA & Local Execution Page
 export const OfflineModePage: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
   const [isOffline, setIsOffline] = useState<boolean>(!navigator.onLine);
 

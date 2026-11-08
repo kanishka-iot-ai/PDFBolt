@@ -108,7 +108,7 @@ export async function analyzePdfDocument(file: File): Promise<DocumentAnalysis> 
 
             const words = pageText.split(/\s+/).filter(Boolean);
             totalWords += words.length;
-            // Collect in array — joined O(N) at the end instead of O(N²) incrementally
+            // Collect in array: joined O(N) at the end instead of O(N²) incrementally
             pageTexts.push(pageText);
 
             // Table detection heuristic: look for vertical alignment patterns
@@ -130,7 +130,7 @@ export async function analyzePdfDocument(file: File): Promise<DocumentAnalysis> 
         pdf.destroy();
     }
 
-    // O(N) single join — was O(N²) from repeated string concatenation
+    // O(N) single join: was O(N²) from repeated string concatenation
     const fullText = pageTexts.join('\n\n');
 
 

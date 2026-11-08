@@ -42,7 +42,7 @@ const HubPage: React.FC<HubPageProps> = ({ darkMode }) => {
   return (
     <div className="animate-fadeIn pb-24">
       <Helmet>
-        <title>PDF Tools Hub – All 25+ Free Online PDF Converters & Editors | PDFBolt</title>
+        <title>PDF Tools Hub: All 25+ Free Online PDF Converters & Editors | PDFBolt</title>
         <meta name="description" content="Discover the complete PDFBolt toolkit: Merge, Split, Compress, OCR, Convert to Word, Excel, PowerPoint, Protect, Sign, and Redact PDFs with 100% client-side privacy." />
         <link rel="canonical" href="https://pdfbolt.in/tools/" />
       </Helmet>
@@ -194,7 +194,7 @@ const HubPage: React.FC<HubPageProps> = ({ darkMode }) => {
                         <span className="text-[10px] font-bold uppercase tracking-widest px-2.5 py-0.5 rounded-full bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 border border-yellow-500/20">
                           Sponsored
                         </span>
-                        <Sparkles size={14} className="text-yellow-500" />
+                        
                       </div>
                       <h3 className={`text-base font-bold mb-1.5 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
                         Cloud Document Suite

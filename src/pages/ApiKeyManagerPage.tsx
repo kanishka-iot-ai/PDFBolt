@@ -280,9 +280,9 @@ export const ApiKeyManagerPage: React.FC<{ darkMode: boolean }> = ({ darkMode })
     }
   };
 
-  // --------------------------------------------------------------------------
+  
   // Password Locked Screen
-  // --------------------------------------------------------------------------
+  
   if (!isAuthenticated) {
     return (
       <div className={`min-h-[80vh] flex items-center justify-center px-4 py-16 ${darkMode ? 'bg-slate-950 text-white' : 'bg-slate-50 text-slate-900'}`}>
@@ -409,9 +409,9 @@ print("Result:", res.json())`;
   -F "file=@/path/to/invoice.docx" \\
   --output converted.pdf`;
 
-  // --------------------------------------------------------------------------
+  
   // Authenticated Key Manager View
-  // --------------------------------------------------------------------------
+  
   return (
     <div className={`min-h-screen py-10 px-4 sm:px-6 lg:px-8 ${darkMode ? 'bg-slate-950 text-white' : 'bg-slate-50 text-slate-900'}`}>
       <div className="max-w-6xl mx-auto space-y-10">

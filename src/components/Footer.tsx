@@ -54,14 +54,14 @@ const Footer: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
               className={`px-2.5 py-1.5 rounded-xl text-[11px] font-bold flex items-center gap-1 transition-transform hover:scale-105 ${darkMode ? 'bg-slate-800 text-emerald-400 border border-slate-700' : 'bg-white shadow-sm text-emerald-700 border border-slate-200'}`}
               aria-label="Trustpilot Reviews"
             >
-              ★ Trustpilot
+              Trustpilot
             </a>
             <Link 
               to="/reviews/" 
               className={`px-2.5 py-1.5 rounded-xl text-[11px] font-bold flex items-center gap-1 transition-transform hover:scale-105 ${darkMode ? 'bg-slate-800 text-amber-400 border border-slate-700' : 'bg-white shadow-sm text-amber-700 border border-slate-200'}`}
               aria-label="PDFBolt Community Reviews"
             >
-              ★ 4.9 Reviews
+              4.9/5 Reviews
             </Link>
           </div>
           <div className="mt-3.5 flex flex-col gap-2.5">

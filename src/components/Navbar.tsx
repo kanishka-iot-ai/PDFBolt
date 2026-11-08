@@ -222,7 +222,7 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
                       <div className="space-y-3">
                         <div className="flex items-center justify-between">
                           <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider bg-amber-500/10 text-amber-800 dark:text-amber-300 border border-amber-500/20">
-                            <Sparkles size={11} className="text-amber-500" /> Pro Utilities
+                            Pro Utilities
                           </span>
                           <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400">100% Client RAM</span>
                         </div>

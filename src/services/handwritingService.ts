@@ -654,9 +654,7 @@ export function generateClientTXT(pages: HandwritingPage[], title: string): stri
   return lines.join('\n');
 }
 
-// ----------------------------------------------------
 // Internal Helpers
-// ----------------------------------------------------
 
 function createThumbnail(canvas: HTMLCanvasElement, maxDim: number): string {
   const thumb = document.createElement('canvas');

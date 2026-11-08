@@ -59,7 +59,7 @@ const NoUploadToolsPage: React.FC<NoUploadToolsPageProps> = ({ darkMode }) => {
           </div>
           <h1 className={`text-4xl sm:text-5xl md:text-6xl font-black mb-6 tracking-tight leading-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>
             No-Upload PDF Tools <br className="hidden sm:inline" />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-teal-500">Zero Cloud Transfers</span>
+            <span className="text-emerald-600 dark:text-emerald-400">Zero Cloud Transfers</span>
           </h1>
           <p className={`text-base sm:text-lg md:text-xl max-w-3xl mx-auto font-medium leading-relaxed ${darkMode ? 'text-slate-300' : 'text-slate-600'}`}>
             Process sensitive contracts, financial audits, medical records, and government identity proofs entirely within your browser memory. Your documents never touch remote servers.

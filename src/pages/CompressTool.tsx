@@ -188,7 +188,7 @@ const CompressTool: React.FC<CompressToolProps> = ({ darkMode, notify }) => {
       title: 'Maximum Quality',
       stars: '★★★★★',
       quality: 'Maximum (300 DPI)',
-      comp: 'Low (15–30%)',
+      comp: 'Low (15 to 30%)',
       bestFor: 'Printing & Archival documents'
     },
     {
@@ -196,7 +196,7 @@ const CompressTool: React.FC<CompressToolProps> = ({ darkMode, notify }) => {
       title: 'High Quality',
       stars: '★★★★☆',
       quality: 'High (200 DPI)',
-      comp: 'Moderate (35–50%)',
+      comp: 'Moderate (35 to 50%)',
       bestFor: 'Professional & Business presentations'
     },
     {
@@ -204,7 +204,7 @@ const CompressTool: React.FC<CompressToolProps> = ({ darkMode, notify }) => {
       title: 'Balanced',
       stars: '★★★★☆',
       quality: 'Balanced (150 DPI)',
-      comp: 'High (50–70%)',
+      comp: 'High (50 to 70%)',
       bestFor: 'General office & sharing',
       isRecommended: true
     },
@@ -213,7 +213,7 @@ const CompressTool: React.FC<CompressToolProps> = ({ darkMode, notify }) => {
       title: 'High Compression',
       stars: '★★★☆☆',
       quality: 'Standard (96 DPI)',
-      comp: 'Very High (65–80%)',
+      comp: 'Very High (65 to 80%)',
       bestFor: 'Email attachments & web upload'
     },
     {
@@ -221,13 +221,13 @@ const CompressTool: React.FC<CompressToolProps> = ({ darkMode, notify }) => {
       title: 'Extreme Compression',
       stars: '★★☆☆☆',
       quality: 'Screen (72 DPI)',
-      comp: 'Maximum (75–90%)',
+      comp: 'Maximum (75 to 90%)',
       bestFor: 'Strict portal limits (<2MB)'
     },
     {
       id: 'custom',
       title: 'Custom Profile',
-      stars: '⚙️',
+      stars: 'Custom',
       quality: 'User-Defined',
       comp: 'Custom',
       bestFor: 'Granular DPI & JPEG adjustments'

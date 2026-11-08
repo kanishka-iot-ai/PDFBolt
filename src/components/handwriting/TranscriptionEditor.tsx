@@ -69,7 +69,7 @@ const TranscriptionEditor: React.FC<TranscriptionEditorProps> = ({
     } else {
       return (
         <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400 font-bold text-xs">
-          <AlertCircle size={13} /> Low Confidence ({Math.round(currentPage.confidence * 100)}%) – Please Review
+          <AlertCircle size={13} /> Low Confidence ({Math.round(currentPage.confidence * 100)}%) - Please Review
         </span>
       );
     }

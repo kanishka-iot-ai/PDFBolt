@@ -187,7 +187,7 @@ export const ReviewsPage: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
     }
   });
 
-  // Modal State for Writing a Review
+  
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formRating, setFormRating] = useState(5);
   const [formName, setFormName] = useState('');
@@ -276,7 +276,7 @@ export const ReviewsPage: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
     }, 1800);
   };
 
-  // Filtered reviews
+  
   const filteredReviews = useMemo(() => {
     return reviews.filter(rev => {
       if (selectedCategory !== 'All' && rev.category !== selectedCategory) {
@@ -360,7 +360,7 @@ export const ReviewsPage: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
             PDFBolt Community Reviews
           </h1>
           <p className="mt-3 text-sm sm:text-base text-slate-600 dark:text-slate-400 leading-relaxed font-normal">
-            Real outcomes from students, exam applicants, advocates, and cyber centers who depend on 100% private, client-side WebAssembly tools.
+            Feedback from students, applicants, and professionals using PDFBolt for local PDF tasks.
           </p>
         </div>
 

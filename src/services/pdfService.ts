@@ -207,23 +207,23 @@ export async function inspectPdfForCompression(file: File): Promise<PdfCompressi
   // Determine document structure
   let detectedType: 'text-heavy' | 'image-heavy' | 'scanned' | 'presentation' | 'mixed' = 'mixed';
   let recommendedProfile: 'max' | 'high' | 'balanced' | 'high-compression' | 'extreme' = 'balanced';
-  let expectedReductionPercent = '45%–65%';
+  let expectedReductionPercent = '45% to 65%';
   let recommendationReason = 'Balanced compression achieves excellent visual clarity with a high file size reduction.';
 
   if (totalImages === 0 && totalTextLength > 500) {
     detectedType = 'text-heavy';
     recommendedProfile = 'high';
-    expectedReductionPercent = '30%–50%';
+    expectedReductionPercent = '30% to 50%';
     recommendationReason = 'This document is primarily vector text and fonts. High Quality preserves crystal-clear typography.';
   } else if (totalImages >= 5 || (file.size / Math.max(1, pdf.numPages)) > 1.5 * 1024 * 1024) {
     detectedType = 'image-heavy';
     recommendedProfile = 'balanced';
-    expectedReductionPercent = '55%–75%';
+    expectedReductionPercent = '55% to 75%';
     recommendationReason = 'This PDF contains high-resolution embedded images. Balanced downsampling will save significant space.';
   } else if (totalTextLength < 50 && totalImages > 0) {
     detectedType = 'scanned';
     recommendedProfile = 'high-compression';
-    expectedReductionPercent = '60%–80%';
+    expectedReductionPercent = '60% to 80%';
     recommendationReason = 'This appears to be a scanned paper archive. High Compression optimizes image density for email and portals.';
   }
 

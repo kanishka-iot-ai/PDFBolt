@@ -11,14 +11,12 @@ import {
   Workflow, ComparisonFeature, TestFileItem
 } from './types';
 
-// ==========================================
-// 1. ALL TOOLS METADATA (25+ Tools)
-// ==========================================
+// 1. All Tools Metadata
 export const TOOLS: ToolMetadata[] = [
   {
     id: ToolType.MERGE,
     title: 'Merge PDF',
-    seoTitle: 'Merge PDF Files Online Free – Private | PDFBolt',
+    seoTitle: 'Merge PDF Files Online Free: Private | PDFBolt',
     canonicalPath: '/merge-pdf/',
     path: '/merge-pdf/',
     seoPath: '/merge-pdf-online',
@@ -48,7 +46,7 @@ export const TOOLS: ToolMetadata[] = [
   {
     id: ToolType.SPLIT,
     title: 'Split PDF',
-    seoTitle: 'Split PDF Online – Extract Pages Free | PDFBolt',
+    seoTitle: 'Split PDF Online: Extract Pages Free | PDFBolt',
     canonicalPath: '/split-pdf/',
     path: '/split-pdf/',
     seoPath: '/split-pdf-pages',
@@ -77,7 +75,7 @@ export const TOOLS: ToolMetadata[] = [
   {
     id: ToolType.COMPRESS,
     title: 'Compress PDF',
-    seoTitle: 'Compress PDF Online Free – No Upload | PDFBolt',
+    seoTitle: 'Compress PDF Online Free: No Upload | PDFBolt',
     canonicalPath: '/compress-pdf/',
     path: '/compress-pdf/',
     seoPath: '/compress-pdf-online',
@@ -106,7 +104,7 @@ export const TOOLS: ToolMetadata[] = [
   {
     id: ToolType.PDF_TO_WORD,
     title: 'PDF to Word',
-    seoTitle: 'PDF to Word Converter – Free, No Upload | PDFBolt',
+    seoTitle: 'PDF to Word Converter: Free, No Upload | PDFBolt',
     canonicalPath: '/pdf-to-word/',
     path: '/pdf-to-word/',
     description: 'Convert PDF documents into fully editable Microsoft Word (.docx) files with layout preservation.',
@@ -135,7 +133,7 @@ export const TOOLS: ToolMetadata[] = [
   {
     id: ToolType.PDF_TO_PPT,
     title: 'PDF to PowerPoint',
-    seoTitle: 'PDF to PPT Converter – Free Online | PDFBolt',
+    seoTitle: 'PDF to PPT Converter: Free Online | PDFBolt',
     canonicalPath: '/pdf-to-ppt/',
     path: '/pdf-to-ppt/',
     description: 'Transform PDF presentation decks into editable PowerPoint (.pptx) slides with high fidelity.',
@@ -164,7 +162,7 @@ export const TOOLS: ToolMetadata[] = [
   {
     id: ToolType.PDF_TO_EXCEL,
     title: 'PDF to Excel',
-    seoTitle: 'PDF to Excel Converter – Convert PDF to Excel Online Free | PDFBolt',
+    seoTitle: 'PDF to Excel Converter: Convert PDF to Excel Online Free | PDFBolt',
     canonicalPath: '/pdf-to-excel/',
     path: '/pdf-to-excel/',
     description: 'Extract tables, spreadsheets, and tabular financial data from PDF into clean Microsoft Excel (.xlsx) sheets.',
@@ -193,7 +191,7 @@ export const TOOLS: ToolMetadata[] = [
   {
     id: ToolType.PDF_TO_JPG,
     title: 'PDF to JPG',
-    seoTitle: 'PDF to JPG Converter – Extract High-Resolution Images',
+    seoTitle: 'PDF to JPG Converter: Extract High-Resolution Images',
     canonicalPath: '/pdf-to-jpg/',
     path: '/pdf-to-jpg/',
     description: 'Convert PDF pages into high-resolution JPG images or extract embedded photos in seconds.',
@@ -222,7 +220,7 @@ export const TOOLS: ToolMetadata[] = [
   {
     id: ToolType.WORD_TO_PDF,
     title: 'Word to PDF',
-    seoTitle: 'Word to PDF Converter – Free Online | PDFBolt',
+    seoTitle: 'Word to PDF Converter: Free Online | PDFBolt',
     canonicalPath: '/word-to-pdf/',
     path: '/word-to-pdf/',
     description: 'Convert DOCX Word documents into professional, print-ready PDF files with exact formatting.',
@@ -251,7 +249,7 @@ export const TOOLS: ToolMetadata[] = [
   {
     id: ToolType.EXCEL_TO_PDF,
     title: 'Excel to PDF',
-    seoTitle: 'Excel to PDF Converter – Free & Private | PDFBolt',
+    seoTitle: 'Excel to PDF Converter: Free & Private | PDFBolt',
     canonicalPath: '/excel-to-pdf/',
     path: '/excel-to-pdf/',
     description: 'Transform Excel spreadsheets (.xlsx) into clean, paginated PDF documents with column auto-fitting.',
@@ -280,7 +278,7 @@ export const TOOLS: ToolMetadata[] = [
   {
     id: ToolType.PPT_TO_PDF,
     title: 'PPT to PDF',
-    seoTitle: 'PowerPoint to PDF Converter – Free Online | PDFBolt',
+    seoTitle: 'PowerPoint to PDF Converter: Free Online | PDFBolt',
     canonicalPath: '/ppt-to-pdf/',
     path: '/ppt-to-pdf/',
     description: 'Convert PowerPoint presentations (.pptx) into universal PDF slide handouts.',
@@ -309,7 +307,7 @@ export const TOOLS: ToolMetadata[] = [
   {
     id: ToolType.JPG_TO_PDF,
     title: 'JPG to PDF',
-    seoTitle: 'JPG to PDF Converter – Free, In Your Browser | PDFBolt',
+    seoTitle: 'JPG to PDF Converter: Free, In Your Browser | PDFBolt',
     canonicalPath: '/jpg-to-pdf/',
     path: '/jpg-to-pdf/',
     description: 'Combine JPG, PNG, and WebP images into a single polished PDF document with margin controls.',
@@ -338,7 +336,7 @@ export const TOOLS: ToolMetadata[] = [
   {
     id: ToolType.HTML_TO_PDF,
     title: 'HTML to PDF',
-    seoTitle: 'HTML to PDF Converter – Free Online | PDFBolt',
+    seoTitle: 'HTML to PDF Converter: Free Online | PDFBolt',
     canonicalPath: '/html-to-pdf/',
     path: '/html-to-pdf/',
     description: 'Render web pages, invoices, and raw HTML/CSS code into formatted PDF documents.',
@@ -367,7 +365,7 @@ export const TOOLS: ToolMetadata[] = [
   {
     id: ToolType.EDIT,
     title: 'Edit PDF',
-    seoTitle: 'Free Online PDF Editor – Add Text, Draw & Annotate PDFs',
+    seoTitle: 'Free Online PDF Editor: Add Text, Draw & Annotate PDFs',
     canonicalPath: '/edit-pdf/',
     path: '/edit-pdf/',
     description: 'Add text, custom annotations, signatures, and freehand drawings directly onto PDF pages.',
@@ -396,7 +394,7 @@ export const TOOLS: ToolMetadata[] = [
   {
     id: ToolType.PROTECT,
     title: 'Protect PDF',
-    seoTitle: 'Protect PDF Online – Encrypt PDF Files with Password',
+    seoTitle: 'Protect PDF Online: Encrypt PDF Files with Password',
     canonicalPath: '/protect-pdf/',
     path: '/protect-pdf/',
     description: 'Encrypt your confidential PDF files with 128/256-bit AES password protection and permission locks.',
@@ -425,7 +423,7 @@ export const TOOLS: ToolMetadata[] = [
   {
     id: ToolType.UNLOCK,
     title: 'Unlock PDF',
-    seoTitle: 'Unlock PDF Online – Remove PDF Password Protection',
+    seoTitle: 'Unlock PDF Online: Remove PDF Password Protection',
     canonicalPath: '/unlock-pdf/',
     path: '/unlock-pdf/',
     description: 'Remove password restrictions and security locks from PDF files you have permissions to access.',
@@ -454,7 +452,7 @@ export const TOOLS: ToolMetadata[] = [
   {
     id: ToolType.SIGN,
     title: 'Sign PDF',
-    seoTitle: 'Sign PDF Online – Add Digital & Handwritten Signatures Free',
+    seoTitle: 'Sign PDF Online: Add Digital & Handwritten Signatures Free',
     canonicalPath: '/sign-pdf/',
     path: '/sign-pdf/',
     description: 'Sign contracts, lease agreements, and documents online with drawn, typed, or uploaded signatures.',
@@ -483,7 +481,7 @@ export const TOOLS: ToolMetadata[] = [
   {
     id: ToolType.REDACT,
     title: 'Redact PDF',
-    seoTitle: 'Redact PDF Online – Permanently Black Out Sensitive Data',
+    seoTitle: 'Redact PDF Online: Permanently Black Out Sensitive Data',
     canonicalPath: '/redact-pdf/',
     path: '/redact-pdf/',
     description: 'Permanently destroy and black out sensitive personal data, SSNs, credit cards, and confidential text from PDFs.',
@@ -512,7 +510,7 @@ export const TOOLS: ToolMetadata[] = [
   {
     id: ToolType.OCR,
     title: 'OCR PDF',
-    seoTitle: 'OCR PDF Online – Make Scanned PDFs Searchable & Selectable',
+    seoTitle: 'OCR PDF Online: Make Scanned PDFs Searchable & Selectable',
     canonicalPath: '/ocr-pdf/',
     path: '/ocr-pdf/',
     description: 'Extract text from scanned PDFs and photos using high-accuracy Optical Character Recognition.',
@@ -541,7 +539,7 @@ export const TOOLS: ToolMetadata[] = [
   {
     id: ToolType.SCAN_TO_PDF,
     title: 'Scan to PDF',
-    seoTitle: 'Scan to PDF – Mobile & Web Document Camera Scanner',
+    seoTitle: 'Scan to PDF: Mobile & Web Document Camera Scanner',
     canonicalPath: '/scan-to-pdf/',
     path: '/scan-to-pdf/',
     description: 'Scan physical paper documents using your smartphone or laptop webcam with edge detection.',
@@ -570,7 +568,7 @@ export const TOOLS: ToolMetadata[] = [
   {
     id: ToolType.SCAN_HANDWRITING,
     title: 'Handwriting to PDF',
-    seoTitle: 'Handwriting to PDF – Convert Handwritten Notes to Text PDF',
+    seoTitle: 'Handwriting to PDF: Convert Handwritten Notes to Text PDF',
     canonicalPath: '/scan-handwriting-to-pdf/',
     path: '/scan-handwriting-to-pdf/',
     description: 'Capture handwritten notebook pages and transcribe them into computerized typed PDF text.',
@@ -599,7 +597,7 @@ export const TOOLS: ToolMetadata[] = [
   {
     id: ToolType.ROTATE,
     title: 'Rotate PDF',
-    seoTitle: 'Rotate PDF Online – Rotate PDF Pages Permanently',
+    seoTitle: 'Rotate PDF Online: Rotate PDF Pages Permanently',
     canonicalPath: '/rotate-pdf/',
     path: '/rotate-pdf/',
     description: 'Rotate upside-down or sideways PDF pages 90, 180, or 270 degrees permanently.',
@@ -628,7 +626,7 @@ export const TOOLS: ToolMetadata[] = [
   {
     id: ToolType.ORGANIZE,
     title: 'Organize PDF',
-    seoTitle: 'Organize PDF Online – Reorder, Rotate & Delete Pages',
+    seoTitle: 'Organize PDF Online: Reorder, Rotate & Delete Pages',
     canonicalPath: '/organize-pdf/',
     path: '/organize-pdf/',
     description: 'Visual drag-and-drop workspace to reorder, duplicate, rotate, or delete PDF pages easily.',
@@ -657,7 +655,7 @@ export const TOOLS: ToolMetadata[] = [
   {
     id: ToolType.PAGE_NUMBERS,
     title: 'Add Page Numbers',
-    seoTitle: 'Add Page Numbers to PDF – Number PDF Pages Online',
+    seoTitle: 'Add Page Numbers to PDF: Number PDF Pages Online',
     canonicalPath: '/add-page-numbers-to-pdf/',
     path: '/add-page-numbers-to-pdf/',
     description: 'Insert customizable header or footer page numbers with standard format templates.',
@@ -686,7 +684,7 @@ export const TOOLS: ToolMetadata[] = [
   {
     id: ToolType.WATERMARK,
     title: 'Watermark PDF',
-    seoTitle: 'Watermark PDF Online – Add Text & Stamp Watermarks to PDF',
+    seoTitle: 'Watermark PDF Online: Add Text & Stamp Watermarks to PDF',
     canonicalPath: '/watermark-pdf/',
     path: '/watermark-pdf/',
     description: 'Stamp customized text watermarks (CONFIDENTIAL, DRAFT, COPY) across your PDF pages.',
@@ -707,7 +705,7 @@ export const TOOLS: ToolMetadata[] = [
     faqs: [
       { q: 'Can I adjust the watermark transparency so text remains readable?', a: 'Yes, you can adjust opacity from 10% to 100% so text underneath stays clearly legible.' },
       { q: 'Can I change the watermark angle and size?', a: 'Yes, customize font size, rotation angle (diagonal 45° or horizontal 0°), and colors.' },
-      { q: 'Can watermarks be easily stripped by basic readers?', a: 'Watermarks are embedded directly into the PDF content stream for robust visibility.' }
+      { q: 'Can watermarks be easily stripped by basic readers?', a: 'Watermarks are embedded directly into the PDF content stream for prevent removal.' }
     ],
     relatedTools: [ToolType.PROTECT, ToolType.EDIT, ToolType.PAGE_NUMBERS],
     relatedGuides: ['how-to-edit-a-pdf']
@@ -715,7 +713,7 @@ export const TOOLS: ToolMetadata[] = [
   {
     id: ToolType.DELETE_PAGES,
     title: 'Delete PDF Pages',
-    seoTitle: 'Delete Pages from PDF Online – Remove Unwanted PDF Pages',
+    seoTitle: 'Delete Pages from PDF Online: Remove Unwanted PDF Pages',
     canonicalPath: '/delete-pdf-pages/',
     path: '/delete-pdf-pages/',
     description: 'Remove unwanted blank or duplicate pages from any PDF document in two clicks.',
@@ -744,7 +742,7 @@ export const TOOLS: ToolMetadata[] = [
   {
     id: ToolType.COMPARE,
     title: 'Compare PDF',
-    seoTitle: 'Compare PDF Files Online – Find Differences Between Two PDFs',
+    seoTitle: 'Compare PDF Files Online: Find Differences Between Two PDFs',
     canonicalPath: '/compare-pdf/',
     path: '/compare-pdf/',
     description: 'Highlight text and visual differences between two PDF document revisions side-by-side.',
@@ -773,7 +771,7 @@ export const TOOLS: ToolMetadata[] = [
   {
     id: ToolType.REPAIR,
     title: 'Repair PDF',
-    seoTitle: 'Repair PDF Online – Fix Damaged & Corrupted PDF Files',
+    seoTitle: 'Repair PDF Online: Fix Damaged & Corrupted PDF Files',
     canonicalPath: '/repair-pdf/',
     path: '/repair-pdf/',
     description: 'Recover data and fix broken cross-reference tables in damaged or corrupted PDF files.',
@@ -802,7 +800,7 @@ export const TOOLS: ToolMetadata[] = [
   {
     id: ToolType.PDF_TO_QR,
     title: 'PDF to QR Code',
-    seoTitle: 'PDF to QR Code Converter – Generate Scannable PDF QR Codes',
+    seoTitle: 'PDF to QR Code Converter: Generate Scannable PDF QR Codes',
     canonicalPath: '/pdf-to-qr-code/',
     path: '/pdf-to-qr-code/',
     description: 'Generate high-resolution QR codes for PDF menus, brochures, and flyers with optional PIN security.',
@@ -889,9 +887,7 @@ export const TOOLS: ToolMetadata[] = [
   }
 ];
 
-// ==========================================
 // 2. COMPREHENSIVE HOW-TO GUIDES (12+ Guides)
-// ==========================================
 export const GUIDES: Guide[] = [
   {
     slug: 'how-to-convert-pdf-to-word',
@@ -1551,16 +1547,14 @@ export const GUIDES: Guide[] = [
       }
     ],
     faqs: [
-      { q: 'Kya mai multiple photos ko ek PDF me jod sakta hoon?', a: 'Haan! Aap ek sath 10–20 photos upload karke ek single multi-page PDF bana sakte hain.' }
+      { q: 'Kya mai multiple photos ko ek PDF me jod sakta hoon?', a: 'Haan! Aap ek sath 10 to 20 photos upload karke ek single multi-page PDF bana sakte hain.' }
     ],
     relatedGuides: ['pdf-compress-kaise-kare', 'how-to-merge-pdf-files'],
     relatedTools: [ToolType.JPG_TO_PDF, ToolType.COMPRESS]
   }
 ];
 
-// ==========================================
 // 3. PDF FORMAT ENCYCLOPEDIA (6 Topics)
-// ==========================================
 export const ENCYCLOPEDIA: EncyclopediaArticle[] = [
   {
     slug: 'what-is-pdf',
@@ -1702,18 +1696,16 @@ export const ENCYCLOPEDIA: EncyclopediaArticle[] = [
   }
 ];
 
-// ==========================================
 // 4. PERSONA WORKFLOWS (3 Hubs)
-// ==========================================
 export const WORKFLOWS: Workflow[] = [
   {
     slug: 'student-pdf-tools',
     title: 'Student & Academic PDF Workflow',
-    metaTitle: 'Student PDF Toolkit – Merge, OCR & Convert Notes',
+    metaTitle: 'Student PDF Toolkit: Merge, OCR & Convert Notes',
     metaDescription: 'All-in-one PDF study ecosystem for students: OCR handwritten notes, extract lecture slides, compress assignments, and merge study guides.',
     audience: 'Students & Educators',
     heroBadge: 'Academic Study Hub',
-    heroHeadline: 'Master Your Coursework with Zero-Upload PDF Tools',
+    heroHeadline: 'Manage Coursework with In-Browser PDF Tools',
     heroSubheadline: 'Digitize handwritten lecture notes, extract slide decks into editable Word documents, and merge study guides with 100% privacy on any campus device.',
     diagram: {
       steps: ['Lecture PDF / Scan', 'OCR Handwritten Notes', 'Convert to Word/PPT', 'Compress for Submission']
@@ -1762,7 +1754,7 @@ export const WORKFLOWS: Workflow[] = [
   {
     slug: 'business-pdf-tools',
     title: 'Business & Enterprise PDF Workflow',
-    metaTitle: 'Business PDF Tools – Redact, Sign & Extract Data',
+    metaTitle: 'Business PDF Tools: Redact, Sign & Extract Data',
     metaDescription: 'Enterprise-grade PDF workflow: Redact sensitive financial data, sign contracts, extract tabular invoices to Excel, and encrypt files securely.',
     audience: 'Business & Finance',
     heroBadge: 'Business & Legal Hub',
@@ -1814,7 +1806,7 @@ export const WORKFLOWS: Workflow[] = [
   {
     slug: 'developer-pdf-tools',
     title: 'Developer PDF Tools & Client-Side Architecture',
-    metaTitle: 'Developer PDF Tools – WASM, PDF-Lib & Client OCR',
+    metaTitle: 'Developer PDF Tools: WASM, PDF-Lib & Client OCR',
     metaDescription: 'Explore PDFBolt client-side architecture: WebAssembly, PDF-Lib, Tesseract OCR, and how to build zero-upload browser document processing.',
     audience: 'Software Developers',
     heroBadge: 'Developer & Architecture Hub',
@@ -1851,16 +1843,14 @@ export const WORKFLOWS: Workflow[] = [
       { title: 'Instant Latency & Offline Support', description: 'Eliminates roundtrip upload latency and enables full offline client-side capabilities.' }
     ],
     faqs: [
-      { q: 'What libraries power PDFBolt under the hood?', a: 'We leverage pdf-lib, pdfjs-dist, Tesseract.js, ExcelJS, mammoth, and html2canvas with Web Worker concurrency.' }
+      { q: 'What libraries power PDFBolt under the hood?', a: 'We use pdf-lib, pdfjs-dist, Tesseract.js, ExcelJS, mammoth, and html2canvas with Web Worker concurrency.' }
     ],
     relatedTools: [ToolType.COMPARE, ToolType.OCR, ToolType.REPAIR],
     relatedGuides: []
   }
 ];
 
-// ==========================================
 // 5. COMPARISONS DATA
-// ==========================================
 export const COMPARISON_FEATURES: ComparisonFeature[] = [
   { name: 'Processing Location', pdfBolt: '100% Client Browser (Private)', serverCompetitor: 'Uploaded to Remote Servers', desktopAcrobat: 'Local Device', notes: 'PDFBolt processes everything locally in browser memory.' },
   { name: 'Privacy & Security', pdfBolt: 'Absolute (Zero Cloud Uploads)', serverCompetitor: 'Third-party Server Risk', desktopAcrobat: 'Local Disk Only', notes: 'Files never leave your machine.' },
@@ -1871,9 +1861,7 @@ export const COMPARISON_FEATURES: ComparisonFeature[] = [
   { name: 'True Permanent Redaction', pdfBolt: 'Yes (Raster Flattening)', serverCompetitor: 'Varies / Basic Overlay', desktopAcrobat: 'Yes (Sanitization)', notes: 'Permanently burns pixels to destroy underlying text layers.' }
 ];
 
-// ==========================================
 // 6. SAMPLE TEST FILES
-// ==========================================
 export const SAMPLE_TEST_FILES: TestFileItem[] = [
   { id: 'sample-multipage', name: 'Multi-Page Research Report.pdf', description: '5-page document with headings, vector diagrams, and formatted body paragraphs.', category: 'General', size: '240 KB', pageCount: 5, idealFor: ['Merge PDF', 'Split PDF', 'Organize PDF', 'Page Numbers'], generatorType: 'text' },
   { id: 'sample-scanned', name: 'Scanned Archive Document.pdf', description: 'Realistic scanned paper image containing unselectable historical text.', category: 'OCR & Vision', size: '850 KB', pageCount: 2, idealFor: ['OCR PDF', 'PDF to Word', 'Scan to PDF'], generatorType: 'scanned' },
@@ -1881,9 +1869,7 @@ export const SAMPLE_TEST_FILES: TestFileItem[] = [
   { id: 'sample-slides', name: 'Pitch Deck Presentation.pdf', description: 'Landscape 16:9 presentation deck with title slides, bullet cards, and callouts.', category: 'Presentation', size: '520 KB', pageCount: 6, idealFor: ['PDF to PPT', 'PDF to JPG', 'Compress PDF'], generatorType: 'slides' }
 ];
 
-// ==========================================
 // 7. ICON HELPER
-// ==========================================
 export const getIcon = (name: string) => {
   const icons: Record<string, React.ReactNode> = {
     Merge: <Merge className="w-8 h-8" />, Scissors: <Scissors className="w-8 h-8" />,

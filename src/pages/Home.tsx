@@ -57,12 +57,12 @@ const Home: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
     { id: 'utilities', title: 'Utilities', icon: <Settings size={16} /> }
   ];
 
-  // Lookup popular tools in exact order
+  
   const popularTools = useMemo(() => {
     return POPULAR_TOOL_IDS.map(id => TOOLS.find(t => t.id === id)).filter(Boolean) as ToolMetadata[];
   }, []);
 
-  // Filtered tools when searching or viewing specific categories
+  
   const filteredTools = useMemo(() => {
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase().trim();
@@ -90,7 +90,7 @@ const Home: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
 
   return (
     <div>
-      {/* 1. HIGH-CONVERTING COMPACT HERO WITH INSTANT TRUST PILLARS (Above the fold) */}
+      
       <section
         className={`relative overflow-hidden pt-5 pb-5 sm:pt-7 sm:pb-7 text-center border-b ${
           darkMode ? 'border-slate-800/80 bg-slate-900/30' : 'border-slate-200/80 bg-white/40'
@@ -100,7 +100,7 @@ const Home: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
 
         <div className="max-w-4xl mx-auto px-4 sm:px-6 relative z-10">
 
-          {/* Primary H1 */}
+          
           <h1
             className={`text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black tracking-tight mb-2 leading-tight ${
               darkMode ? 'text-white' : 'text-slate-900'
@@ -109,7 +109,7 @@ const Home: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
             Free Online PDF Tools for Every Task
           </h1>
 
-          {/* Supporting Text */}
+          
           <p
             className={`text-xs sm:text-sm md:text-base max-w-xl mx-auto mb-3.5 font-normal leading-relaxed ${
               darkMode ? 'text-slate-300' : 'text-slate-600'
@@ -122,11 +122,11 @@ const Home: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
         </div>
       </section>
 
-      {/* 2. POPULAR PDF TOOLS & TOOL GRID (Immediately Above the fold) */}
+      
       <section className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
-        {/* Category Selector Tabs & Docked Compact Filter */}
+        
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 mb-6">
-          {/* Category Filter Pills */}
+          
           <div
             role="tablist"
             aria-label="PDF tool categories"
@@ -158,7 +158,7 @@ const Home: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
             ))}
           </div>
 
-          {/* Compact Docked Tool Search Filter */}
+          
           <div className="relative w-full lg:w-64 shrink-0">
             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
             <input
@@ -189,7 +189,7 @@ const Home: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
           </div>
         </div>
 
-        {/* Filter Indicator when searching */}
+        
         {searchQuery && (
           <div className="mb-4">
             <p className={`text-xs font-semibold ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
@@ -198,7 +198,7 @@ const Home: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
           </div>
         )}
 
-        {/* Primary Tools Grid */}
+        
         <div className="flex items-center justify-between mb-4">
           <h2 className={`text-xl sm:text-2xl font-black ${darkMode ? 'text-white' : 'text-slate-900'}`}>
             {activeCategory === 'all' ? 'All Online PDF Tools' : `${activeCategory.charAt(0).toUpperCase() + activeCategory.slice(1)} Tools`}
@@ -268,7 +268,7 @@ const Home: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
         </div>
       </div>
 
-      {/* 3. TRUST & VALUE INDICATORS SECTION (Moved below primary tool discovery) */}
+      
       <section
         className={`py-8 sm:py-10 border-y ${
           darkMode ? 'border-slate-800 bg-slate-900/40' : 'border-slate-200/80 bg-white'
@@ -334,7 +334,7 @@ const Home: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
         </div>
       </div>
 
-      {/* 4. EDUCATIONAL GUIDES & KNOWLEDGE HUB */}
+      
       <section
         className={`py-12 sm:py-16 border-t ${
           darkMode ? 'border-slate-800 bg-slate-900/30' : 'border-slate-200 bg-slate-50/50'
@@ -347,7 +347,7 @@ const Home: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
                 <FileText size={14} /> Knowledge Base & Tutorials
               </div>
               <h2 className={`text-2xl sm:text-3xl md:text-4xl font-black ${darkMode ? 'text-white' : 'text-slate-900'}`}>
-                Learn How to Master Your PDFs
+                Guides & Tutorials for PDF Tasks
               </h2>
             </div>
             <Link
@@ -546,7 +546,7 @@ const Home: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
         </div>
       </div>
 
-      {/* 5. PRIVACY VERIFICATION WALKTHROUGH */}
+      
       <section className="max-w-7xl mx-auto px-4 sm:px-6 py-12">
         <div className={`p-8 sm:p-12 rounded-3xl border ${darkMode ? 'bg-slate-900/60 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
           <div className="max-w-3xl mx-auto text-center mb-10">
@@ -597,7 +597,7 @@ const Home: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
         </div>
       </section>
 
-      {/* 6. CUSTOMER CARE & SUPPORT SECTION */}
+      
       <section className="max-w-7xl mx-auto px-4 sm:px-6 py-16 sm:py-20">
         <div
           className={`p-8 sm:p-12 md:p-16 rounded-[2.5rem] border relative overflow-hidden text-center transition-all ${

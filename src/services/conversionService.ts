@@ -424,7 +424,7 @@ async function runOCR(page: any): Promise<string> {
 
 
 /**
- * PDF → Word (.docx) — Universal Engine v5 (Document Reconstruction Pipeline)
+ * PDF → Word (.docx): Universal Engine v5 (Document Reconstruction Pipeline)
  *
  * Delegates to pdfToWordEngine.ts which implements:
  *  Stage 1  │ PDF classification (text / scanned / mixed / image-only)

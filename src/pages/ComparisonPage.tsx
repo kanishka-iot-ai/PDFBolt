@@ -15,7 +15,7 @@ const ComparisonPage: React.FC<ComparisonPageProps> = ({ darkMode }) => {
   return (
     <div className="animate-fadeIn pb-24">
       <Helmet>
-        <title>Online PDF Tools Comparison (2026) – Client-Side Privacy vs Cloud Converters | PDFBolt</title>
+        <title>Online PDF Tools Comparison (2026): Client-Side Privacy vs Cloud Converters | PDFBolt</title>
         <meta name="description" content="Transparent architectural comparison: Compare PDFBolt client-side WebAssembly processing vs cloud server upload tools (Smallpdf, iLovePDF) and desktop Adobe Acrobat." />
         <link rel="canonical" href={canonicalUrl} />
       </Helmet>
@@ -23,12 +23,12 @@ const ComparisonPage: React.FC<ComparisonPageProps> = ({ darkMode }) => {
       {/* Hero Header */}
       <section className={`py-16 border-b ${darkMode ? 'border-slate-800 bg-slate-900/40' : 'border-slate-100 bg-slate-50/70'}`}>
         <div className="max-w-5xl mx-auto px-6 text-center">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 font-black text-xs uppercase tracking-widest mb-4">
-            <Sparkles size={14} /> Comprehensive 2026 Comparison
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 font-bold text-xs uppercase tracking-wider mb-4">
+            2026 Architectural Comparison
           </div>
           <h1 className={`text-4xl md:text-6xl font-black mb-6 tracking-tight leading-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>
             Client-Side Browser Processing vs <br className="hidden md:inline" />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 to-amber-500">Cloud Upload Services</span>
+            <span className="text-yellow-600 dark:text-yellow-400">Cloud Upload Services</span>
           </h1>
           <p className={`text-lg md:text-xl max-w-3xl mx-auto mb-6 ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
             An honest, transparent evaluation of document privacy, speed, file size limits, and security architecture across modern PDF platforms.

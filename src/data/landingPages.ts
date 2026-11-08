@@ -29,9 +29,7 @@ export interface LandingPageContent {
   relatedSlugs: string[];
 }
 
-// ---------------------------------------------------------------------------
 // 1. SIZE-SPECIFIC COMPRESSION PAGES (Wave 1 & Wave 2)
-// ---------------------------------------------------------------------------
 export const SIZE_COMPRESSION_PAGES: LandingPageContent[] = [
   {
     slug: 'compress-pdf-to-20kb',
@@ -39,11 +37,11 @@ export const SIZE_COMPRESSION_PAGES: LandingPageContent[] = [
     presetLevel: 'extreme',
     targetSizeHint: 'Under 20 KB (Govt Exams & Strict Ceilings)',
     portalSpecs: [
-      { name: 'SSC CGL / CHSL / MTS Portal', allowedSize: '10 KB – 20 KB', allowedFormat: 'PDF / JPG', notes: 'Candidate signature & left thumb impression (strict ceiling)' },
-      { name: 'UPSC Civil Services & NDA Portal', allowedSize: '20 KB – 300 KB', allowedFormat: 'PDF only', notes: 'Photo ID proof & identity slip verification floor' },
-      { name: 'IBPS PO / Clerk / RRB Recruitment', allowedSize: '10 KB – 20 KB', allowedFormat: 'PDF / JPG', notes: 'Candidate handwritten declaration & signature scan' },
+      { name: 'SSC CGL / CHSL / MTS Portal', allowedSize: '10 KB to 20 KB', allowedFormat: 'PDF / JPG', notes: 'Candidate signature & left thumb impression (strict ceiling)' },
+      { name: 'UPSC Civil Services & NDA Portal', allowedSize: '20 KB to 300 KB', allowedFormat: 'PDF only', notes: 'Photo ID proof & identity slip verification floor' },
+      { name: 'IBPS PO / Clerk / RRB Recruitment', allowedSize: '10 KB to 20 KB', allowedFormat: 'PDF / JPG', notes: 'Candidate handwritten declaration & signature scan' },
       { name: 'State PSCs (BPSC, UPPSC, MPSC, TNPSC)', allowedSize: 'Max 20 KB', allowedFormat: 'PDF', notes: 'Candidate identity slips & verification uploads' },
-      { name: 'GATE / JAM / NTA Candidate Upload', allowedSize: '10 KB – 20 KB', allowedFormat: 'PDF / JPG', notes: 'Official signature slip verification threshold' },
+      { name: 'GATE / JAM / NTA Candidate Upload', allowedSize: '10 KB to 20 KB', allowedFormat: 'PDF / JPG', notes: 'Official signature slip verification threshold' },
     ],
     title: 'Compress PDF to 20KB Online Free (Exact Size & Govt Portal Preset) | PDFBolt',
     h1: 'Compress PDF to 20KB Online',
@@ -52,7 +50,7 @@ export const SIZE_COMPRESSION_PAGES: LandingPageContent[] = [
     metaDescription: 'Compress PDF to under 20KB online for free. Pre-calibrated 18.5KB ceiling for SSC CGL, IBPS, and State PSC signatures and thumb impressions. 100% private in-browser WebAssembly.',
     quickAnswer: 'To compress a PDF to 20KB: 1. Drag and drop your PDF into PDFBolt. 2. Extreme compression is pre-selected with exact 19.9KB ceiling calibration. 3. Click "Compress PDF" to download your lightweight file under 20KB instantly.',
     keyHighlights: [
-      'Pre-configured Extreme Compression algorithm with 18KB–19.9KB safety ceiling',
+      'Pre-configured Extreme Compression algorithm with 18 KB to 19.9 KB safety ceiling',
       'Purges non-essential metadata streams, redundant fonts, and color profiles',
       'High contrast retention for ink curves, stamps, and biometric thumb impressions',
       '100% private in-browser WebAssembly execution with zero server uploads'
@@ -66,8 +64,8 @@ export const SIZE_COMPRESSION_PAGES: LandingPageContent[] = [
       {
         heading: 'What Actually Fits in a 20KB PDF & Technical Optimization',
         paragraphs: [
-          'Shrinking a PDF document below 20KB is one of the most restrictive document constraints enforced by Indian recruitment portals (SSC CGL/CHSL, IBPS, and State PSCs). A standard multi-page document or one containing embedded TrueType font families often has a minimum floor of 150KB–200KB solely in font metrics and structural dictionaries. To hit 20KB, the document should be a single page, cropped signature, or certificate scan.',
-          'PDFBolt achieves the 20KB target by deflating object streams, stripping unnecessary XML metadata, and downsampling raster layers into optimized 8-bit grayscale channels. Our engine targets an exact 18 KB – 19.9 KB safety ceiling, ensuring portal validators enforcing strict "< 20KB" rules never reject your upload due to byte rounding.'
+          'Shrinking a PDF document below 20KB is one of the most restrictive document constraints enforced by Indian recruitment portals (SSC CGL/CHSL, IBPS, and State PSCs). A standard multi-page document or one containing embedded TrueType font families often has a minimum floor of 150 KB to 200 KB solely in font metrics and structural dictionaries. To hit 20KB, the document should be a single page, cropped signature, or certificate scan.',
+          'PDFBolt achieves the 20KB target by deflating object streams, stripping unnecessary XML metadata, and downsampling raster layers into optimized 8-bit grayscale channels. Our engine targets an exact 18 KB to 19.9 KB safety ceiling, ensuring portal validators enforcing strict "< 20KB" rules never reject your upload due to byte rounding.'
         ],
         tips: [
           'Ensure the original file has only 1 or 2 pages for optimal sub-20KB compression.',
@@ -96,11 +94,11 @@ export const SIZE_COMPRESSION_PAGES: LandingPageContent[] = [
     presetLevel: 'extreme',
     targetSizeHint: 'Under 50 KB (High Deflate & Portal Ready)',
     portalSpecs: [
-      { name: 'Passport Seva Photograph & Slip', allowedSize: '20 KB – 50 KB', allowedFormat: 'PDF / JPG', notes: 'Candidate photo, age proof, and address verification' },
-      { name: 'SBI & IBPS Candidate Signature & LTI', allowedSize: '20 KB – 50 KB', allowedFormat: 'PDF / JPG', notes: 'Left thumb impression and running-hand declaration' },
-      { name: 'State Scholarship & Welfare Portals', allowedSize: '50 KB – 100 KB', allowedFormat: 'PDF only', notes: 'Annual family income & student domicile certificates' },
-      { name: 'DigiLocker & NSP Document Upload', allowedSize: 'Under 50 KB – 100 KB', allowedFormat: 'PDF', notes: 'Category, bonafide student proof, and fee receipts' },
-      { name: 'RRB Railway Travel Pass (SC/ST)', allowedSize: '50 KB – 100 KB', allowedFormat: 'PDF only', notes: 'Mandatory for free sleeper class rail travel authority' },
+      { name: 'Passport Seva Photograph & Slip', allowedSize: '20 KB to 50 KB', allowedFormat: 'PDF / JPG', notes: 'Candidate photo, age proof, and address verification' },
+      { name: 'SBI & IBPS Candidate Signature & LTI', allowedSize: '20 KB to 50 KB', allowedFormat: 'PDF / JPG', notes: 'Left thumb impression and running-hand declaration' },
+      { name: 'State Scholarship & Welfare Portals', allowedSize: '50 KB to 100 KB', allowedFormat: 'PDF only', notes: 'Annual family income & student domicile certificates' },
+      { name: 'DigiLocker & NSP Document Upload', allowedSize: 'Under 50 KB to 100 KB', allowedFormat: 'PDF', notes: 'Category, bonafide student proof, and fee receipts' },
+      { name: 'RRB Railway Travel Pass (SC/ST)', allowedSize: '50 KB to 100 KB', allowedFormat: 'PDF only', notes: 'Mandatory for free sleeper class rail travel authority' },
     ],
     title: 'Compress PDF to 50KB Online Free (Exact Size & Govt Portal Preset) | PDFBolt',
     h1: 'Compress PDF to 50KB Online',
@@ -109,7 +107,7 @@ export const SIZE_COMPRESSION_PAGES: LandingPageContent[] = [
     metaDescription: 'Compress PDF to 50KB online free without losing readability. Exact size calibration for passport photos, SSC, UPSC, and banking portal uploads. 100% private in-browser.',
     quickAnswer: 'To compress a PDF to 50KB: 1. Upload your PDF file. 2. The 50KB ceiling preset is automatically loaded. 3. Optionally enable Grayscale for scanned certificates. 4. Click "Compress PDF" and download your verified sub-50KB document in seconds.',
     keyHighlights: [
-      'Tailored for strict 20KB–50KB exam upload limitations',
+      'Tailored for strict 20 KB to 50 KB exam upload limitations',
       'Removes unreferenced XRef objects and compacts content streams',
       'Preserves high contrast for signatures, stamps, and official seals',
       'Zero server upload wait times with client-side WebAssembly'
@@ -148,9 +146,9 @@ export const SIZE_COMPRESSION_PAGES: LandingPageContent[] = [
     targetSizeHint: 'Under 100 KB (Recommended for Portals)',
     portalSpecs: [
       { name: 'CBSE & ICSE Board Marksheets', allowedSize: 'Max 100 KB', allowedFormat: 'PDF only', notes: 'Official matriculation / 12th passing certificate' },
-      { name: 'SSC CGL / CHSL Category & PwD', allowedSize: '100 KB – 200 KB', allowedFormat: 'PDF', notes: 'Central government SC/ST/OBC/EWS reservation validity' },
-      { name: 'RRB Railway Technical Qualification', allowedSize: '100 KB – 200 KB', allowedFormat: 'PDF only', notes: 'ITI / NAC / Engineering diploma certificates' },
-      { name: 'Domicile & Income Verification', allowedSize: '50 KB – 100 KB', allowedFormat: 'PDF', notes: 'Tahsil / Revenue authority issued state domicile proof' },
+      { name: 'SSC CGL / CHSL Category & PwD', allowedSize: '100 KB to 200 KB', allowedFormat: 'PDF', notes: 'Central government SC/ST/OBC/EWS reservation validity' },
+      { name: 'RRB Railway Technical Qualification', allowedSize: '100 KB to 200 KB', allowedFormat: 'PDF only', notes: 'ITI / NAC / Engineering diploma certificates' },
+      { name: 'Domicile & Income Verification', allowedSize: '50 KB to 100 KB', allowedFormat: 'PDF', notes: 'Tahsil / Revenue authority issued state domicile proof' },
       { name: 'Central University Admission Portals', allowedSize: 'Max 100 KB', allowedFormat: 'PDF', notes: 'CUET UG/PG student enrollment & merit rank slips' },
     ],
     title: 'Compress PDF to 100KB Online Free (Exact Size & High Quality) | PDFBolt',
@@ -161,7 +159,7 @@ export const SIZE_COMPRESSION_PAGES: LandingPageContent[] = [
     quickAnswer: 'To compress a PDF to 100KB: 1. Drag & drop your PDF file. 2. The exact 100 KB ceiling is pre-selected. 3. Optionally toggle "Convert to Black & White" for maximum reduction on scanned certificates. 4. Click "Compress PDF" and download your clean, portal-compliant file under 100KB.',
     keyHighlights: [
       'The #1 requested target size for government job and educational portals',
-      'Flawlessly handles 3–5 page certificates, transcripts, and affidavits',
+      'Handles 3 to 5 page certificates, transcripts, and affidavits',
       'Retains sharp vector text glyphs while compressing background scans',
       'No files are transmitted across third-party cloud servers'
     ],
@@ -195,8 +193,8 @@ export const SIZE_COMPRESSION_PAGES: LandingPageContent[] = [
     ],
     faqs: [
       { q: 'Will text in a 100KB PDF remain clear when printed?', a: 'Yes. Vector typography is preserved untouched. Only background image DPI is downsampled to web portal standards (150 DPI).' },
-      { q: 'What if my file is still slightly above 100KB?', a: 'Simply enable our "Convert to Black & White (Grayscale)" toggle or type a lower target (like 90 KB) into the Exact Target Size box. Grayscale eliminates background color noise, effortlessly reducing file size by up to 80%.' },
-      { q: 'Can multi-page marksheets (2–4 pages) reach 100KB?', a: 'Yes! For text-based documents and standard marksheets, PDFBolt easily fits 3 to 5 pages into under 100KB by downsampling background scanner noise while preserving vector typography.' },
+      { q: 'What if my file is still slightly above 100KB?', a: 'Simply enable our "Convert to Black & White (Grayscale)" toggle or type a lower target (like 90 KB) into the Exact Target Size box. Grayscale eliminates background color noise, reducing file size by up to 80%.' },
+      { q: 'Can multi-page marksheets (2 to 4 pages) reach 100KB?', a: 'Yes! For text-based documents and standard marksheets, PDFBolt easily fits 3 to 5 pages into under 100KB by downsampling background scanner noise while preserving vector typography.' },
       { q: 'Is a 100KB PDF acceptable for GATE, State CET, and university portals?', a: 'Yes. 100KB is the standard ceiling across major admission portals (such as GATE, State CETs, and Central Universities). PDFBolt ensures compliance with official 150 DPI verification guidelines.' },
       { q: 'Are my academic certificates stored on any server?', a: 'Never. PDFBolt runs 100% locally in your browser memory using WebAssembly. Your marks, personal information, and grades remain completely private on your device.' }
     ],
@@ -208,11 +206,11 @@ export const SIZE_COMPRESSION_PAGES: LandingPageContent[] = [
     presetLevel: 'recommended',
     targetSizeHint: 'Under 200 KB (Balanced Clarity & Portal Ready)',
     portalSpecs: [
-      { name: 'NTA NEET & JEE Main Applications', allowedSize: '50 KB – 300 KB', allowedFormat: 'PDF only', notes: 'Class 10 passing, category, and PwBD disability certificates' },
-      { name: 'UPSC CSE Marksheet & Matriculation', allowedSize: '100 KB – 200 KB', allowedFormat: 'PDF only', notes: 'Mandatory proof of date of birth, degree, and category' },
-      { name: 'SSC CGL / CHSL Educational Qualification', allowedSize: '100 KB – 200 KB', allowedFormat: 'PDF', notes: 'Graduation degree and provisional certificate uploads' },
-      { name: 'Central Government Caste Validity', allowedSize: '100 KB – 200 KB', allowedFormat: 'PDF only', notes: 'Mandatory Central list format for active recruitment year' },
-      { name: 'High Court & District Court e-Filing', allowedSize: 'Under 200 KB – 2 MB', allowedFormat: 'PDF/A', notes: 'Petitions, affidavits, and vakalatnama attachments' },
+      { name: 'NTA NEET & JEE Main Applications', allowedSize: '50 KB to 300 KB', allowedFormat: 'PDF only', notes: 'Class 10 passing, category, and PwBD disability certificates' },
+      { name: 'UPSC CSE Marksheet & Matriculation', allowedSize: '100 KB to 200 KB', allowedFormat: 'PDF only', notes: 'Mandatory proof of date of birth, degree, and category' },
+      { name: 'SSC CGL / CHSL Educational Qualification', allowedSize: '100 KB to 200 KB', allowedFormat: 'PDF', notes: 'Graduation degree and provisional certificate uploads' },
+      { name: 'Central Government Caste Validity', allowedSize: '100 KB to 200 KB', allowedFormat: 'PDF only', notes: 'Mandatory Central list format for active recruitment year' },
+      { name: 'High Court & District Court e-Filing', allowedSize: 'Under 200 KB to 2 MB', allowedFormat: 'PDF/A', notes: 'Petitions, affidavits, and vakalatnama attachments' },
     ],
     title: 'Compress PDF to 200KB Online Free (Exact Size & Govt Portal Preset) | PDFBolt',
     h1: 'Compress PDF to 200KB Online',
@@ -222,7 +220,7 @@ export const SIZE_COMPRESSION_PAGES: LandingPageContent[] = [
     quickAnswer: 'To compress a PDF to 200KB: 1. Upload your file. 2. The 200KB target ceiling is pre-selected. 3. Click "Compress PDF" to download your high-clarity sub-200KB document.',
     keyHighlights: [
       'Standard limit for NTA NEET, JEE Main, and UPSC One-Time Registration',
-      'Comfortably compresses 5–10 page documents without degrading charts',
+      'Comfortably compresses 5 to 10 pages documents without degrading charts',
       'Maintains full searchability and text selectable capability',
       'Executed 100% locally in device memory with zero uploads'
     ],
@@ -253,11 +251,11 @@ export const SIZE_COMPRESSION_PAGES: LandingPageContent[] = [
     presetLevel: 'recommended',
     targetSizeHint: 'Under 300 KB (UPSC, EPFO & Portal Ready)',
     portalSpecs: [
-      { name: 'UPSC OTR & CSE Portal', allowedSize: '20 KB – 300 KB', allowedFormat: 'PDF', notes: 'Mandatory for Aadhaar, matriculation, and caste certificates' },
+      { name: 'UPSC OTR & CSE Portal', allowedSize: '20 KB to 300 KB', allowedFormat: 'PDF', notes: 'Mandatory for Aadhaar, matriculation, and caste certificates' },
       { name: 'EPFO Unified Member Portal', allowedSize: 'Max 300 KB', allowedFormat: 'PDF', notes: 'Bank passbook, cancelled cheque, and claim verification' },
       { name: 'AICTE Pragati & Saksham', allowedSize: 'Max 300 KB', allowedFormat: 'PDF', notes: 'Student bonafide, marksheet, and income certificate' },
       { name: 'Udyam & FSSAI (FoSCoS)', allowedSize: 'Max 300 KB', allowedFormat: 'PDF', notes: 'Business registration, rental agreement, and ID proof' },
-      { name: 'State PSC (UPPSC / BPSC / MPSC)', allowedSize: '20 KB – 300 KB', allowedFormat: 'PDF', notes: 'Government recruitment applications & certificates' },
+      { name: 'State PSC (UPPSC / BPSC / MPSC)', allowedSize: '20 KB to 300 KB', allowedFormat: 'PDF', notes: 'Government recruitment applications & certificates' },
     ],
     title: 'Compress PDF to 300KB Online Free (Exact Size & High Quality) | PDFBolt',
     h1: 'Compress PDF to 300KB Online',
@@ -281,16 +279,16 @@ export const SIZE_COMPRESSION_PAGES: LandingPageContent[] = [
         heading: 'Meeting UPSC OTR, State PSC & High Court 300KB Requirements',
         paragraphs: [
           'The Union Public Service Commission (UPSC) strictly mandates that all documents uploaded to the One Time Registration (OTR) portal (including Aadhaar cards, matriculation certificates, degree marksheets, and caste certificates) must strictly adhere to a file size between 20 KB and 300 KB. State PSC portals (UPPSC, BPSC, MPPSC, MPSC, TNPSC) and Indian High Court e-filing systems enforce identical 300KB thresholds.',
-          'If your file is 305KB or 19KB, the portal will immediately reject the upload with an error such as "File size must be between 20KB and 300KB". PDFBolt uses in-browser WebAssembly downsampling to automatically place your document safely inside the 150KB–280KB optimal window.'
+          'If your file is 305KB or 19KB, the portal will immediately reject the upload with an error such as "File size must be between 20KB and 300KB". PDFBolt uses in-browser WebAssembly downsampling to automatically place your document safely inside the 150KB to 280KB optimal window.'
         ]
       },
       {
         heading: 'Document Compression Benchmarks for 300KB Target',
         paragraphs: [
           'Scanned multi-page documents and smartphone photos frequently produce bloated 3MB to 10MB PDF files due to uncompressed 300 DPI or 600 DPI background scanner noise. Here is how PDFBolt reduces common official documents to under 300KB:',
-          '• Color Scanned College Marksheet / Transcript (3–5 Pages): Original 4.8 MB → Compressed 245 KB (95% reduction, crisp text).',
+          '• Color Scanned College Marksheet / Transcript (3 to 5 pages): Original 4.8 MB → Compressed 245 KB (95% reduction, crisp text).',
           '• Government Caste / Income / Domicile Certificate (Single Page): Original 3.2 MB → Compressed 185 KB (94% reduction, stamps preserved).',
-          '• High Court Legal Brief / Affidavit (10–15 Pages): Original 7.8 MB → Compressed 275 KB (96% reduction, official seals intact).',
+          '• High Court Legal Brief / Affidavit (10 to 15 pages): Original 7.8 MB → Compressed 275 KB (96% reduction, official seals intact).',
           '• Aadhaar / Voter ID / Passport Scan (Both Sides): Original 2.4 MB → Compressed 160 KB (93% reduction, photo and QR sharp).'
         ]
       },
@@ -305,7 +303,7 @@ export const SIZE_COMPRESSION_PAGES: LandingPageContent[] = [
         heading: 'Why Some Scanned PDFs Exceed 300KB & How Grayscale Mode Solves It',
         paragraphs: [
           'Scanned documents often carry heavy color noise from aged paper, yellowing certificates, or low-grade scanner sensors. This color data consumes up to 75% of the total file size without adding any informational value.',
-          'If your file is having difficulty reaching 300KB, simply toggle PDFBolt\'s "Convert to Black & White (Grayscale)" option. Our engine strips out background color chroma while maintaining 300 DPI black-and-white contrast, effortlessly dropping file size by an additional 60% to 80%.'
+          'If your file is having difficulty reaching 300KB, simply toggle PDFBolt\'s "Convert to Black & White (Grayscale)" option. Our engine strips out background color chroma while maintaining 300 DPI black-and-white contrast, dropping file size by an additional 60% to 80%.'
         ]
       }
     ],
@@ -331,7 +329,7 @@ export const SIZE_COMPRESSION_PAGES: LandingPageContent[] = [
     quickAnswer: 'To compress PDF to 500KB: 1. Upload your file. 2. Click "Compress PDF". 3. Download your lightweight under-500KB file.',
     keyHighlights: [
       'Universal upload limit for legal e-filing and academic portals',
-      'Accommodates 15–25 page reports with diagrams and charts',
+      'Accommodates 15 to 25 pages reports with diagrams and charts',
       '100% private in-browser WebAssembly execution',
       'Maintains sharp rendering on retina and 4K displays'
     ],
@@ -361,7 +359,7 @@ export const SIZE_COMPRESSION_PAGES: LandingPageContent[] = [
     title: 'Compress PDF to 1MB Online Free | PDFBolt',
     h1: 'Compress PDF to 1MB Online',
     subtitle: 'Shrink massive PDF files to under 1MB for fast email delivery, messaging apps, and web uploads.',
-    seoTitle: 'Compress PDF to 1MB Online Free – Fast & Private | PDFBolt',
+    seoTitle: 'Compress PDF to 1MB Online Free: Fast & Private | PDFBolt',
     metaDescription: 'Compress PDF to 1MB online free. Reduce 20MB, 50MB, or 100MB documents to under 1MB for email attachments without losing pages or quality.',
     quickAnswer: 'To compress PDF to 1MB: 1. Upload your heavy PDF. 2. Select Recommended Compression. 3. Click "Compress PDF" and download your under 1MB file.',
     keyHighlights: [
@@ -396,7 +394,7 @@ export const SIZE_COMPRESSION_PAGES: LandingPageContent[] = [
     title: 'Compress PDF to 2MB Online Free | PDFBolt',
     h1: 'Compress PDF to 2MB Online',
     subtitle: 'Reduce heavy PDF portfolios, scan bundles, and architectural drawings to under 2MB with maximum visual quality.',
-    seoTitle: 'Compress PDF to 2MB Online Free – High Fidelity | PDFBolt',
+    seoTitle: 'Compress PDF to 2MB Online Free: High Fidelity | PDFBolt',
     metaDescription: 'Compress PDF to 2MB online for free. Ideal for job application portals (Workday, Taleo, Greenhouse) that enforce 2MB limits. Zero server uploads.',
     quickAnswer: 'To compress PDF to 2MB: 1. Upload your resume or document. 2. Click "Compress PDF". 3. Save your verified sub-2MB file.',
     keyHighlights: [
@@ -419,21 +417,19 @@ export const SIZE_COMPRESSION_PAGES: LandingPageContent[] = [
       }
     ],
     faqs: [
-      { q: 'Will ATS scanners still be able to read my resume?', a: 'Yes! PDFBolt preserves true text streams and Unicode mapping, so applicant tracking systems parse your skills flawlessly.' }
+      { q: 'Will ATS scanners still be able to read my resume?', a: 'Yes! PDFBolt preserves true text streams and Unicode mapping, so applicant tracking systems parse your skills accurately.' }
     ],
     relatedSlugs: ['compress-pdf-to-1mb', 'compress-pdf-to-500kb', 'guides/how-to-compress-a-pdf']
   }
 ];
 
-// ---------------------------------------------------------------------------
 // 2. INDIA EXAM & GOVERNMENT PORTALS (Wave 1)
-// ---------------------------------------------------------------------------
 export const EXAM_COMPRESSION_PAGES: LandingPageContent[] = [
   {
     slug: 'compress-pdf-for-ssc',
     toolType: 'compress',
     presetLevel: 'extreme',
-    targetSizeHint: 'SSC Portal Mode (100KB–200KB / Sub-50KB)',
+    targetSizeHint: 'SSC Portal Mode (100 KB to 200 KB / Sub-50KB)',
     title: 'Compress PDF for SSC Online Application (CGL, CHSL, MTS) | PDFBolt',
     h1: 'Compress PDF for SSC Application',
     subtitle: 'Resize certificates, marksheets, and identity documents to exact SSC CGL, CHSL, MTS & GD upload requirements.',
@@ -441,16 +437,16 @@ export const EXAM_COMPRESSION_PAGES: LandingPageContent[] = [
     metaDescription: 'Compress PDF for SSC online application free. Resize documents, marksheets, and certificates under 100KB or 200KB to meet official ssc.gov.in portal upload specs.',
     quickAnswer: 'To compress a PDF for SSC: 1. Drag & drop your certificate or marksheet. 2. Select \'Exact Target Size\' and enter 150 KB (or 100 KB for older forms). 3. Optionally toggle \'Convert to Black & White\' to eliminate color scanner grain. 4. Click \'Compress PDF\' and download your verified file ready for ssc.gov.in.',
     portalSpecs: [
-      { name: '10th / Matriculation Marksheet', allowedSize: '100 KB – 200 KB', allowedFormat: 'PDF', notes: 'Mandatory proof of date of birth and roll number' },
-      { name: 'Category / Caste Certificate (SC/ST/OBC/EWS)', allowedSize: '100 KB – 200 KB', allowedFormat: 'PDF', notes: 'Must follow official Central Government format' },
-      { name: 'PwBD Disability Certificate', allowedSize: '100 KB – 200 KB', allowedFormat: 'PDF', notes: 'Issued by designated government medical board' },
-      { name: 'Ex-Servicemen Discharge Book', allowedSize: '100 KB – 200 KB', allowedFormat: 'PDF', notes: 'All pages legible with discharge date visible' },
-      { name: 'Candidate Photograph (Scan/Upload)', allowedSize: '20 KB – 50 KB', allowedFormat: 'JPEG / JPG', notes: '3.5 cm x 4.5 cm with light white background' },
-      { name: 'Candidate Signature (Scan/Upload)', allowedSize: '10 KB – 20 KB', allowedFormat: 'JPEG / JPG', notes: 'Black ink on white paper, 4.0 cm x 2.0 cm' },
+      { name: '10th / Matriculation Marksheet', allowedSize: '100 KB to 200 KB', allowedFormat: 'PDF', notes: 'Mandatory proof of date of birth and roll number' },
+      { name: 'Category / Caste Certificate (SC/ST/OBC/EWS)', allowedSize: '100 KB to 200 KB', allowedFormat: 'PDF', notes: 'Must follow official Central Government format' },
+      { name: 'PwBD Disability Certificate', allowedSize: '100 KB to 200 KB', allowedFormat: 'PDF', notes: 'Issued by designated government medical board' },
+      { name: 'Ex-Servicemen Discharge Book', allowedSize: '100 KB to 200 KB', allowedFormat: 'PDF', notes: 'All pages legible with discharge date visible' },
+      { name: 'Candidate Photograph (Scan/Upload)', allowedSize: '20 KB to 50 KB', allowedFormat: 'JPEG / JPG', notes: '3.5 cm x 4.5 cm with light white background' },
+      { name: 'Candidate Signature (Scan/Upload)', allowedSize: '10 KB to 20 KB', allowedFormat: 'JPEG / JPG', notes: 'Black ink on white paper, 4.0 cm x 2.0 cm' },
     ],
     keyHighlights: [
-      'Calibrated for ssc.gov.in portal validation logic (Last Verified: October 2026 for 2026–2027 Recruitment Cycles)',
-      'Exact Target Size Mode guarantees files stay strictly inside the 100KB–200KB window',
+      'Calibrated for ssc.gov.in portal validation logic (Last Verified: October 2026 for 2026 to 2027 Recruitment Cycles)',
+      'Exact Target Size Mode guarantees files stay strictly inside the 100 KB to 200 KB window',
       'Optional Grayscale (B&W) conversion strips background scanner tint for an instant 70% size reduction',
       '100% in-browser WebAssembly processing: zero document upload, complete Aadhaar and marksheet privacy',
     ],
@@ -463,7 +459,7 @@ export const EXAM_COMPRESSION_PAGES: LandingPageContent[] = [
       {
         heading: 'Official Staff Selection Commission (SSC) Document Specifications',
         paragraphs: [
-          'The Staff Selection Commission conducts major national recruitment examinations including SSC CGL, CHSL, MTS, CPO, and GD Constable via its official portal at ssc.gov.in (Last Verified: October 2026 for 2026–2027 Recruitment Cycles). During peak application periods, thousands of candidates face rejection because their scanned documents exceed strict server thresholds.',
+          'The Staff Selection Commission conducts major national recruitment examinations including SSC CGL, CHSL, MTS, CPO, and GD Constable via its official portal at ssc.gov.in (Last Verified: October 2026 for 2026 to 2027 Recruitment Cycles). During peak application periods, thousands of candidates face rejection because their scanned documents exceed strict server thresholds.',
           'The official SSC application system automatically checks file byte boundaries upon selection. Certificates exceeding 200KB or below 100KB trigger an immediate \'File size out of range\' rejection dialog. PDFBolt allows you to set an exact target such as 150 KB, placing your file squarely in the approved range without pixelating text or stamps.',
         ]
       },
@@ -471,7 +467,7 @@ export const EXAM_COMPRESSION_PAGES: LandingPageContent[] = [
         heading: 'Why Marksheet Scans Exceed 200KB & How Grayscale Mode Fixes It',
         paragraphs: [
           'School marksheets, university degree certificates, and caste validity forms scanned at standard cyber cafes are often saved at 300 or 600 DPI in 24-bit RGB color. Even a single-page document can weigh 2MB to 5MB due to paper texture noise and yellowing backgrounds.',
-          'Enabling PDFBolt\'s \'Convert to Black & White (Grayscale)\' option eliminates unnecessary color chroma channels while preserving sharp 300 DPI text edges and official signatures. This single toggle drops file size by 60% to 80%, effortlessly meeting SSC\'s 100KB–200KB limit.',
+          'Enabling PDFBolt\'s \'Convert to Black & White (Grayscale)\' option eliminates unnecessary color chroma channels while preserving sharp 300 DPI text edges and official signatures. This single toggle drops file size by 60% to 80%, meeting SSC\'s 100KB to 200KB limit.',
         ]
       },
       {
@@ -484,7 +480,7 @@ export const EXAM_COMPRESSION_PAGES: LandingPageContent[] = [
     ],
     faqs: [
       { q: 'Why does the SSC website say \'File size out of range\'?', a: 'This error triggers when your uploaded file is larger than 200KB or smaller than 100KB. Use PDFBolt\'s \'Exact Target Size\' mode and set 150 KB to ensure your file lands safely in the middle of the acceptable window.' },
-      { q: 'What are the exact document file size requirements for SSC CGL, CHSL, and MTS 2026–2027?', a: 'Per official ssc.gov.in guidelines: Educational and Category certificates must be in PDF format between 100KB and 200KB. Candidate photographs must be 20KB to 50KB (JPEG), and signatures must be 10KB to 20KB (JPEG).' },
+      { q: 'What are the exact document file size requirements for SSC CGL, CHSL, and MTS 2026 to 2027?', a: 'Per official ssc.gov.in guidelines: Educational and Category certificates must be in PDF format between 100KB and 200KB. Candidate photographs must be 20KB to 50KB (JPEG), and signatures must be 10KB to 20KB (JPEG).' },
       { q: 'How can I compress a 3MB scanned certificate into under 200KB without blurring?', a: 'Select \'Exact Target Size\' and enter 180 KB. If the file is a color scan of an old certificate, turn on the \'Convert to Black & White (Grayscale)\' switch to strip background paper noise and guarantee crisp text.' },
       { q: 'Can I compress SSC documents on my mobile phone?', a: 'Yes! PDFBolt runs locally inside Google Chrome or Apple Safari on any Android or iOS device with zero app downloads or software installation required.' },
       { q: 'Are my sensitive marksheets, caste certificates, or Aadhaar numbers uploaded to any server?', a: 'Never. PDFBolt operates entirely inside your local device memory using client-side WebAssembly. Zero bytes leave your browser, ensuring absolute security and compliance with Indian digital privacy standards.' },
@@ -495,22 +491,22 @@ export const EXAM_COMPRESSION_PAGES: LandingPageContent[] = [
     slug: 'compress-pdf-for-upsc',
     toolType: 'compress',
     presetLevel: 'recommended',
-    targetSizeHint: 'UPSC Portal Mode (20KB–300KB Range)',
+    targetSizeHint: 'UPSC Portal Mode (20KB to 300KB Range)',
     title: 'Compress PDF for UPSC Online Application (CSE, NDA, CDS, OTR) | PDFBolt',
     h1: 'Compress PDF for UPSC Application',
-    subtitle: 'Optimize identity cards, degree certificates, and category proofs to exact UPSC 20KB–300KB portal standards.',
+    subtitle: 'Optimize identity cards, degree certificates, and category proofs to exact UPSC 20KB to 300KB portal standards.',
     seoTitle: 'Compress PDF for UPSC OTR & CSE Application (20KB to 300KB) | PDFBolt',
     metaDescription: 'Compress PDF for UPSC online application free. Meet official UPSC OTR, Civil Services, NDA, and CDS document size limits (20KB to 300KB) with zero quality loss.',
-    quickAnswer: 'To compress a PDF for UPSC: 1. Drag & drop your PDF certificate or Photo ID. 2. Select \'Exact Target Size\' and enter 250 KB (safely within the 20KB–300KB range). 3. Toggle \'Convert to Black & White\' if your file contains scanned color grain. 4. Click \'Compress PDF\' and download your document ready for upsconline.nic.in.',
+    quickAnswer: 'To compress a PDF for UPSC: 1. Drag & drop your PDF certificate or Photo ID. 2. Select \'Exact Target Size\' and enter 250 KB (safely within the 20KB to 300KB range). 3. Toggle \'Convert to Black & White\' if your file contains scanned color grain. 4. Click \'Compress PDF\' and download your document ready for upsconline.nic.in.',
     portalSpecs: [
-      { name: 'Photo ID Card (Aadhaar / Passport / Voter ID / PAN)', allowedSize: '20 KB – 300 KB', allowedFormat: 'PDF only', notes: 'Must be readable, unlocked (no password), and match OTR details' },
-      { name: 'Age & Matriculation Certificate', allowedSize: '20 KB – 300 KB', allowedFormat: 'PDF only', notes: '10th standard certificate showing full name and date of birth' },
-      { name: 'Graduation Degree / Transcript', allowedSize: '20 KB – 300 KB', allowedFormat: 'PDF only', notes: 'Must clearly display university seal and registrar signature' },
-      { name: 'Community / EWS / OBC-NCL Certificate', allowedSize: '20 KB – 300 KB', allowedFormat: 'PDF only', notes: 'Issued by designated revenue authority for the active financial year' },
-      { name: 'PwBD Disability Certificate', allowedSize: '20 KB – 300 KB', allowedFormat: 'PDF only', notes: 'Permanent disability certificate issued by medical board' },
+      { name: 'Photo ID Card (Aadhaar / Passport / Voter ID / PAN)', allowedSize: '20 KB to 300 KB', allowedFormat: 'PDF only', notes: 'Must be readable, unlocked (no password), and match OTR details' },
+      { name: 'Age & Matriculation Certificate', allowedSize: '20 KB to 300 KB', allowedFormat: 'PDF only', notes: '10th standard certificate showing full name and date of birth' },
+      { name: 'Graduation Degree / Transcript', allowedSize: '20 KB to 300 KB', allowedFormat: 'PDF only', notes: 'Must clearly display university seal and registrar signature' },
+      { name: 'Community / EWS / OBC-NCL Certificate', allowedSize: '20 KB to 300 KB', allowedFormat: 'PDF only', notes: 'Issued by designated revenue authority for the active financial year' },
+      { name: 'PwBD Disability Certificate', allowedSize: '20 KB to 300 KB', allowedFormat: 'PDF only', notes: 'Permanent disability certificate issued by medical board' },
     ],
     keyHighlights: [
-      'Tailored for UPSC One-Time Registration (OTR) and CSE portals (Last Verified: October 2026 for 2026–2027 Cycles)',
+      'Tailored for UPSC One-Time Registration (OTR) and CSE portals (Last Verified: October 2026 for 2026 to 2027 Cycles)',
       'Guarantees output stays strictly inside the mandatory 20KB to 300KB range required by upsconline.nic.in',
       'Target Size input lets you calibrate directly to 250 KB for maximum quality headroom',
       '100% private WebAssembly processing: zero cloud storage of confidential identity numbers',
@@ -524,8 +520,8 @@ export const EXAM_COMPRESSION_PAGES: LandingPageContent[] = [
       {
         heading: 'Official UPSC One-Time Registration (OTR) & CSE Document Guidelines',
         paragraphs: [
-          'The Union Public Service Commission (UPSC) conducts India\'s premier civil services and defense examinations (CSE, NDA, CDS, CMS, IES) through its centralized portal at upsconline.nic.in (Last Verified: October 2026 for 2026–2027 Cycles). Candidates must complete One-Time Registration (OTR) and upload government-issued photo identity cards and educational certificates.',
-          'UPSC rules strictly state: \'The document must be in PDF format only and the size should be between 20 KB and 300 KB.\' Uploading a file of 301KB or 19KB produces a validation failure that halts the application. PDFBolt\'s target size engine optimizes your document to sit reliably in the 150KB–260KB sweet spot.',
+          'The Union Public Service Commission (UPSC) conducts India\'s premier civil services and defense examinations (CSE, NDA, CDS, CMS, IES) through its centralized portal at upsconline.nic.in (Last Verified: October 2026 for 2026 to 2027 Cycles). Candidates must complete One-Time Registration (OTR) and upload government-issued photo identity cards and educational certificates.',
+          'UPSC rules strictly state: \'The document must be in PDF format only and the size should be between 20 KB and 300 KB.\' Uploading a file of 301KB or 19KB produces a validation failure that halts the application. PDFBolt\'s target size engine optimizes your document to sit reliably in the 150KB to 260KB sweet spot.',
         ]
       },
       {
@@ -539,7 +535,7 @@ export const EXAM_COMPRESSION_PAGES: LandingPageContent[] = [
         heading: 'Compressing Multi-Page Degree Transcripts and Caste Validity Documents',
         paragraphs: [
           'Graduation transcripts or combined caste validity certificates can span 3 to 6 pages, frequently exceeding the 300KB limit when scanned together. If individual page resolution is dropped indiscriminately, marks and subject codes become unreadable.',
-          'PDFBolt optimizes multi-page documents by applying web-standard 150 DPI resolution downsampling and removing redundant embedded font subsets. If your multi-page document still nears 300KB, toggle \'Convert to Black & White\' to strip scanner background tints and effortlessly reduce file size by another 60%.',
+          'PDFBolt optimizes multi-page documents by applying web-standard 150 DPI resolution downsampling and removing redundant embedded font subsets. If your multi-page document still nears 300KB, toggle \'Convert to Black & White\' to strip scanner background tints and reduce file size by another 60%.',
         ]
       },
     ],
@@ -556,37 +552,37 @@ export const EXAM_COMPRESSION_PAGES: LandingPageContent[] = [
     slug: 'compress-pdf-for-neet',
     toolType: 'compress',
     presetLevel: 'recommended',
-    targetSizeHint: 'NEET NTA Mode (50KB–300KB Range)',
+    targetSizeHint: 'NEET NTA Mode (50 KB to 300 KB Range)',
     title: 'Compress PDF for NEET UG Application (NTA Portal) | PDFBolt',
     h1: 'Compress PDF for NEET UG Application',
-    subtitle: 'Resize 10th certificates, category proofs, and citizenship documents to exact NTA NEET 50KB–300KB upload requirements.',
+    subtitle: 'Resize 10th certificates, category proofs, and citizenship documents to exact NTA NEET 50 KB to 300 KB upload requirements.',
     seoTitle: 'Compress PDF for NEET UG Application (50KB to 300KB) | PDFBolt',
     metaDescription: 'Compress PDF for NEET UG online application free. Meet official NTA NEET document size limits (50KB to 300KB) for certificates and identity proofs.',
-    quickAnswer: 'To compress documents for NEET UG: 1. Drag & drop your PDF marksheet or certificate. 2. Select \'Exact Target Size\' and enter 200 KB (safely within NTA\'s 50KB–300KB range). 3. Toggle \'Convert to Black & White\' if your scan has colored noise. 4. Click \'Compress PDF\' and download your verified file for neet.nta.nic.in.',
+    quickAnswer: 'To compress documents for NEET UG: 1. Drag & drop your PDF marksheet or certificate. 2. Select \'Exact Target Size\' and enter 200 KB (safely within NTA\'s 50 KB to 300 KB range). 3. Toggle \'Convert to Black & White\' if your scan has colored noise. 4. Click \'Compress PDF\' and download your verified file for neet.nta.nic.in.',
     portalSpecs: [
-      { name: 'Class 10 / Passing Certificate', allowedSize: '50 KB – 300 KB', allowedFormat: 'PDF only', notes: 'Mandatory proof of candidate full name, parent names, and date of birth' },
-      { name: 'Category Certificate (Gen-EWS / OBC-NCL / SC / ST)', allowedSize: '50 KB – 300 KB', allowedFormat: 'PDF only', notes: 'Central list format issued per active financial year guidelines' },
-      { name: 'PwBD Disability Certificate', allowedSize: '50 KB – 300 KB', allowedFormat: 'PDF only', notes: 'Issued by designated NEET disability screening centers' },
-      { name: 'Citizenship / Domicile Certificate', allowedSize: '50 KB – 300 KB', allowedFormat: 'PDF only', notes: 'For NRI, OCI, or state quota eligibility proof' },
-      { name: 'Passport Photo (Postcard & Standard)', allowedSize: '10 KB – 200 KB', allowedFormat: 'JPEG / JPG', notes: 'White background with 80% face coverage' },
-      { name: 'Left & Right Fingers / Thumb Impressions', allowedSize: '10 KB – 200 KB', allowedFormat: 'JPEG / JPG', notes: 'Blue ink on white paper, clearly unblurred' },
+      { name: 'Class 10 / Passing Certificate', allowedSize: '50 KB to 300 KB', allowedFormat: 'PDF only', notes: 'Mandatory proof of candidate full name, parent names, and date of birth' },
+      { name: 'Category Certificate (Gen-EWS / OBC-NCL / SC / ST)', allowedSize: '50 KB to 300 KB', allowedFormat: 'PDF only', notes: 'Central list format issued per active financial year guidelines' },
+      { name: 'PwBD Disability Certificate', allowedSize: '50 KB to 300 KB', allowedFormat: 'PDF only', notes: 'Issued by designated NEET disability screening centers' },
+      { name: 'Citizenship / Domicile Certificate', allowedSize: '50 KB to 300 KB', allowedFormat: 'PDF only', notes: 'For NRI, OCI, or state quota eligibility proof' },
+      { name: 'Passport Photo (Postcard & Standard)', allowedSize: '10 KB to 200 KB', allowedFormat: 'JPEG / JPG', notes: 'White background with 80% face coverage' },
+      { name: 'Left & Right Fingers / Thumb Impressions', allowedSize: '10 KB to 200 KB', allowedFormat: 'JPEG / JPG', notes: 'Blue ink on white paper, clearly unblurred' },
     ],
     keyHighlights: [
-      'Calibrated for neet.nta.nic.in online registration (Last Verified: October 2026 for 2026–2027 Admissions)',
+      'Calibrated for neet.nta.nic.in online registration (Last Verified: October 2026 for 2026 to 2027 Admissions)',
       'Guarantees output stays strictly inside NTA\'s mandatory 50KB to 300KB document window',
       'Target Size input lets you dial in 200 KB for optimal text sharpness and zero portal rejection',
       '100% in-browser WebAssembly processing: zero document upload, complete candidate privacy',
     ],
     steps: [
       { name: 'Upload NEET Document', text: 'Select your 10th certificate, category proof, or domicile PDF.' },
-      { name: 'Target 200 KB', text: 'Set target size to 200 KB to land right in the middle of NTA\'s 50KB–300KB window.' },
+      { name: 'Target 200 KB', text: 'Set target size to 200 KB to land right in the middle of NTA\'s 50 KB to 300 KB window.' },
       { name: 'Submit to NTA Portal', text: 'Download the verified PDF and upload directly to neet.nta.nic.in without size errors.' },
     ],
     sections: [
       {
         heading: 'Official National Testing Agency (NTA) NEET UG Document Guidelines',
         paragraphs: [
-          'The National Testing Agency (NTA) conducts the National Eligibility cum Entrance Test (NEET UG) for admission to undergraduate medical programs (MBBS/BDS/BAMS) across India via neet.nta.nic.in (Last Verified: October 2026 for 2026–2027 Admissions).',
+          'The National Testing Agency (NTA) conducts the National Eligibility cum Entrance Test (NEET UG) for admission to undergraduate medical programs (MBBS/BDS/BAMS) across India via neet.nta.nic.in (Last Verified: October 2026 for 2026 to 2027 Admissions).',
           'During online application submission, candidates must upload educational certificates and category proofs. The official NTA bulletin states: \'The document must be in PDF format with size between 50 KB and 300 KB.\' Files outside this boundary cannot be saved, blocking form completion. PDFBolt ensures instant compliance.',
         ]
       },
@@ -607,7 +603,7 @@ export const EXAM_COMPRESSION_PAGES: LandingPageContent[] = [
     ],
     faqs: [
       { q: 'What happens if my NEET document is 305KB or 45KB?', a: 'The NTA portal will display an error: \'File size must be between 50 KB and 300 KB\'. Use PDFBolt\'s Exact Target Size mode and set 200 KB to land safely in the approved range.' },
-      { q: 'What are the exact document upload specifications for NEET UG 2026–2027?', a: 'Per official NTA guidelines: Class 10 certificate, category certificate, and citizenship proof must be in PDF between 50KB and 300KB. Passport photos must be 10KB to 200KB (JPEG), and signatures must be 4KB to 30KB (JPEG).' },
+      { q: 'What are the exact document upload specifications for NEET UG 2026 to 2027?', a: 'Per official NTA guidelines: Class 10 certificate, category certificate, and citizenship proof must be in PDF between 50KB and 300KB. Passport photos must be 10KB to 200KB (JPEG), and signatures must be 4KB to 30KB (JPEG).' },
       { q: 'Can I compress my 10th marksheet on an Android smartphone?', a: 'Yes! PDFBolt runs locally inside Google Chrome or Apple Safari on any phone with zero software installation and instant download.' },
       { q: 'Does NTA accept black-and-white scanned certificates for NEET?', a: 'Yes. Black-and-white (grayscale) scans are completely acceptable as long as text, roll numbers, board emblems, and official signatures are clearly readable.' },
       { q: 'Are my medical application documents uploaded to any third-party server?', a: 'Never. PDFBolt executes 100% inside your browser memory using WebAssembly. Zero bytes leave your device, ensuring complete privacy.' },
@@ -618,36 +614,36 @@ export const EXAM_COMPRESSION_PAGES: LandingPageContent[] = [
     slug: 'compress-pdf-for-jee',
     toolType: 'compress',
     presetLevel: 'recommended',
-    targetSizeHint: 'JEE Main Mode (50KB–300KB Range)',
+    targetSizeHint: 'JEE Main Mode (50 KB to 300 KB Range)',
     title: 'Compress PDF for JEE Main Application (NTA Portal) | PDFBolt',
     h1: 'Compress PDF for JEE Main Application',
-    subtitle: 'Resize 10th certificates and category proofs to exact NTA JEE Main 50KB–300KB upload requirements.',
+    subtitle: 'Resize 10th certificates and category proofs to exact NTA JEE Main 50 KB to 300 KB upload requirements.',
     seoTitle: 'Compress PDF for JEE Main Application (50KB to 300KB) | PDFBolt',
     metaDescription: 'Compress PDF for JEE Main online application free. Meet official NTA JEE document size limits (50KB to 300KB) for certificates and category proofs.',
-    quickAnswer: 'To compress documents for JEE Main: 1. Drag & drop your PDF marksheet or certificate. 2. Select \'Exact Target Size\' and enter 200 KB (safely within NTA\'s 50KB–300KB range). 3. Toggle \'Convert to Black & White\' if your scan contains colored grain. 4. Click \'Compress PDF\' and download your verified file for jeemain.nta.nic.in.',
+    quickAnswer: 'To compress documents for JEE Main: 1. Drag & drop your PDF marksheet or certificate. 2. Select \'Exact Target Size\' and enter 200 KB (safely within NTA\'s 50 KB to 300 KB range). 3. Toggle \'Convert to Black & White\' if your scan contains colored grain. 4. Click \'Compress PDF\' and download your verified file for jeemain.nta.nic.in.',
     portalSpecs: [
-      { name: 'Class 10 / Equivalent Certificate', allowedSize: '50 KB – 300 KB', allowedFormat: 'PDF only', notes: 'Mandatory proof of candidate name and date of birth' },
-      { name: 'Category Certificate (Gen-EWS / OBC-NCL / SC / ST)', allowedSize: '50 KB – 300 KB', allowedFormat: 'PDF only', notes: 'Must be issued in Central Government format' },
-      { name: 'PwD / PwBD Certificate', allowedSize: '50 KB – 300 KB', allowedFormat: 'PDF only', notes: 'Disability certificate for extra time / scribe eligibility' },
-      { name: 'Candidate Photograph', allowedSize: '10 KB – 200 KB', allowedFormat: 'JPEG / JPG', notes: 'Color or B&W with 80% face visible against white background' },
-      { name: 'Candidate Signature', allowedSize: '4 KB – 30 KB', allowedFormat: 'JPEG / JPG', notes: 'Black ink on white paper, 3.5cm x 1.5cm' },
+      { name: 'Class 10 / Equivalent Certificate', allowedSize: '50 KB to 300 KB', allowedFormat: 'PDF only', notes: 'Mandatory proof of candidate name and date of birth' },
+      { name: 'Category Certificate (Gen-EWS / OBC-NCL / SC / ST)', allowedSize: '50 KB to 300 KB', allowedFormat: 'PDF only', notes: 'Must be issued in Central Government format' },
+      { name: 'PwD / PwBD Certificate', allowedSize: '50 KB to 300 KB', allowedFormat: 'PDF only', notes: 'Disability certificate for extra time / scribe eligibility' },
+      { name: 'Candidate Photograph', allowedSize: '10 KB to 200 KB', allowedFormat: 'JPEG / JPG', notes: 'Color or B&W with 80% face visible against white background' },
+      { name: 'Candidate Signature', allowedSize: '4 KB to 30 KB', allowedFormat: 'JPEG / JPG', notes: 'Black ink on white paper, 3.5cm x 1.5cm' },
     ],
     keyHighlights: [
-      'Calibrated for jeemain.nta.nic.in portal guidelines (Last Verified: October 2026 for 2026–2027 Admissions)',
+      'Calibrated for jeemain.nta.nic.in portal guidelines (Last Verified: October 2026 for 2026 to 2027 Admissions)',
       'Guarantees output stays strictly inside NTA\'s 50KB to 300KB document bracket',
       'Target Size mode lets you input 200 KB for optimal clarity and zero upload errors',
       '100% in-browser WebAssembly processing: complete privacy with zero server uploads',
     ],
     steps: [
       { name: 'Upload JEE Document', text: 'Select your 10th certificate or category document.' },
-      { name: 'Set Target 200 KB', text: 'Set target size to 200 KB to land right in the middle of NTA\'s 50KB–300KB window.' },
+      { name: 'Set Target 200 KB', text: 'Set target size to 200 KB to land right in the middle of NTA\'s 50 KB to 300 KB window.' },
       { name: 'Upload to jeemain.nta.nic.in', text: 'Download the verified PDF and complete your registration smoothly.' },
     ],
     sections: [
       {
         heading: 'Official NTA JEE Main Upload Rules & Document Verification Standards',
         paragraphs: [
-          'The National Testing Agency (NTA) conducts JEE (Main) for admission to NITs, IIITs, and CFTIs via jeemain.nta.nic.in (Last Verified: October 2026 for 2026–2027 Admissions).',
+          'The National Testing Agency (NTA) conducts JEE (Main) for admission to NITs, IIITs, and CFTIs via jeemain.nta.nic.in (Last Verified: October 2026 for 2026 to 2027 Admissions).',
           'During online application submission, candidates must upload educational certificates and category proofs. The official NTA bulletin specifies: \'The document must be in PDF format with size between 50 KB and 300 KB.\' Files exceeding 300KB or below 50KB trigger an immediate upload failure. PDFBolt guarantees your document fits comfortably within the allowed bracket.',
         ]
       },
@@ -655,7 +651,7 @@ export const EXAM_COMPRESSION_PAGES: LandingPageContent[] = [
         heading: 'Why Marksheets Exceed 300KB & How Grayscale Mode Solves It',
         paragraphs: [
           'Secondary school certificates from CBSE, ICSE, and state boards feature colored borders and institutional emblems that inflate scanner files to 2MB to 5MB.',
-          'Enabling PDFBolt\'s \'Convert to Black & White (Grayscale)\' toggle strips color channels while maintaining 300 DPI text sharpness, dropping file size by 70% to 80% effortlessly.',
+          'Enabling PDFBolt\'s \'Convert to Black & White (Grayscale)\' toggle strips color channels while maintaining 300 DPI text sharpness, reducing file size by 70% to 80%.',
         ]
       },
       {
@@ -668,7 +664,7 @@ export const EXAM_COMPRESSION_PAGES: LandingPageContent[] = [
     ],
     faqs: [
       { q: 'What happens if my JEE Main certificate is 310KB or 40KB?', a: 'The NTA portal will reject the upload with an error: \'File size must be between 50 KB and 300 KB\'. Use PDFBolt\'s Exact Target Size mode and enter 200 KB to ensure immediate acceptance.' },
-      { q: 'What are the exact document specifications for JEE Main 2026–2027?', a: 'Per official NTA guidelines: Class 10 and category certificates must be PDF format between 50KB and 300KB. Photographs must be 10KB to 200KB (JPEG), and signatures must be 4KB to 30KB (JPEG).' },
+      { q: 'What are the exact document specifications for JEE Main 2026 to 2027?', a: 'Per official NTA guidelines: Class 10 and category certificates must be PDF format between 50KB and 300KB. Photographs must be 10KB to 200KB (JPEG), and signatures must be 4KB to 30KB (JPEG).' },
       { q: 'Can I compress my category certificate on a mobile phone?', a: 'Yes! PDFBolt runs locally inside Google Chrome or Safari on Android and iPhone with zero app downloads.' },
       { q: 'Does NTA accept black-and-white scanned certificates for JEE?', a: 'Yes. Black-and-white (grayscale) scans are fully accepted provided all text, marks, roll numbers, and official signatures are sharp and legible.' },
       { q: 'Are my engineering entrance documents safe on PDFBolt?', a: '100% safe. Processing occurs entirely in your browser RAM using WebAssembly. No files or personal data are ever uploaded to any server.' },
@@ -679,7 +675,7 @@ export const EXAM_COMPRESSION_PAGES: LandingPageContent[] = [
     slug: 'compress-pdf-for-ibps',
     toolType: 'compress',
     presetLevel: 'recommended',
-    targetSizeHint: 'IBPS Banking Mode (100KB–200KB Certificates)',
+    targetSizeHint: 'IBPS Banking Mode (100 KB to 200 KB Certificates)',
     title: 'Compress PDF for IBPS Bank Exam Application (PO, Clerk, SO) | PDFBolt',
     h1: 'Compress PDF for IBPS Exam Application',
     subtitle: 'Resize certificates, marksheets, and declarations to official Institute of Banking Personnel Selection portal limits.',
@@ -687,16 +683,16 @@ export const EXAM_COMPRESSION_PAGES: LandingPageContent[] = [
     metaDescription: 'Compress PDF for IBPS online application free. Resize certificates, marksheets, and hand-written declarations to meet official ibps.in upload guidelines.',
     quickAnswer: 'To compress documents for IBPS: 1. Drag & drop your certificate or declaration. 2. Select \'Exact Target Size\' (150 KB for certificates, 80 KB for declarations). 3. Click \'Compress PDF\' and download your verified file ready for ibps.in.',
     portalSpecs: [
-      { name: 'Educational / 10th / Degree Marksheet', allowedSize: '100 KB – 200 KB', allowedFormat: 'PDF', notes: 'Mandatory proof of graduation and date of birth' },
-      { name: 'Category / Caste / EWS Certificate', allowedSize: '100 KB – 200 KB', allowedFormat: 'PDF', notes: 'Central Government format for reservation benefits' },
-      { name: 'Left Thumb Impression (LTI)', allowedSize: '20 KB – 50 KB', allowedFormat: 'JPEG / JPG', notes: 'White paper with blue or black ink, 3.5cm x 3.5cm' },
-      { name: 'Hand-Written Declaration', allowedSize: '50 KB – 100 KB', allowedFormat: 'JPEG / JPG', notes: 'Black ink on white paper, English only, running hand' },
-      { name: 'Candidate Photograph', allowedSize: '20 KB – 50 KB', allowedFormat: 'JPEG / JPG', notes: 'Color passport size, 4.5cm x 3.5cm' },
-      { name: 'Candidate Signature', allowedSize: '10 KB – 20 KB', allowedFormat: 'JPEG / JPG', notes: 'Not in capital letters, 4.0cm x 2.0cm' },
+      { name: 'Educational / 10th / Degree Marksheet', allowedSize: '100 KB to 200 KB', allowedFormat: 'PDF', notes: 'Mandatory proof of graduation and date of birth' },
+      { name: 'Category / Caste / EWS Certificate', allowedSize: '100 KB to 200 KB', allowedFormat: 'PDF', notes: 'Central Government format for reservation benefits' },
+      { name: 'Left Thumb Impression (LTI)', allowedSize: '20 KB to 50 KB', allowedFormat: 'JPEG / JPG', notes: 'White paper with blue or black ink, 3.5cm x 3.5cm' },
+      { name: 'Hand-Written Declaration', allowedSize: '50 KB to 100 KB', allowedFormat: 'JPEG / JPG', notes: 'Black ink on white paper, English only, running hand' },
+      { name: 'Candidate Photograph', allowedSize: '20 KB to 50 KB', allowedFormat: 'JPEG / JPG', notes: 'Color passport size, 4.5cm x 3.5cm' },
+      { name: 'Candidate Signature', allowedSize: '10 KB to 20 KB', allowedFormat: 'JPEG / JPG', notes: 'Not in capital letters, 4.0cm x 2.0cm' },
     ],
     keyHighlights: [
-      'Calibrated for ibps.in banking recruitment portals (Last Verified: October 2026 for 2026–2027 Recruitment Cycles)',
-      'Handles both sub-100KB hand-written declarations and 100KB–200KB marksheet certificates',
+      'Calibrated for ibps.in banking recruitment portals (Last Verified: October 2026 for 2026 to 2027 Recruitment Cycles)',
+      'Handles both sub-100KB hand-written declarations and 100 KB to 200 KB marksheet certificates',
       'Target Size mode prevents portal upload failure and session timeout',
       '100% in-browser WebAssembly processing: zero document upload, complete privacy',
     ],
@@ -709,7 +705,7 @@ export const EXAM_COMPRESSION_PAGES: LandingPageContent[] = [
       {
         heading: 'Official IBPS Banking Recruitment Upload Rules (PO, Clerk, SO, RRB)',
         paragraphs: [
-          'The Institute of Banking Personnel Selection conducts annual recruitment drives for Probationary Officers (PO), Clerks, Specialist Officers (SO), and Regional Rural Bank (RRB) personnel via its centralized portal at ibps.in (Last Verified: October 2026 for 2026–2027 Cycles).',
+          'The Institute of Banking Personnel Selection conducts annual recruitment drives for Probationary Officers (PO), Clerks, Specialist Officers (SO), and Regional Rural Bank (RRB) personnel via its centralized portal at ibps.in (Last Verified: October 2026 for 2026 to 2027 Cycles).',
           'During online application and document scrutiny, IBPS enforces strict format and size boundaries. Uploading bloated smartphone camera photos causes immediate form rejections or session timeouts. PDFBolt sizes documents safely inside approved limits.',
         ]
       },
@@ -741,7 +737,7 @@ export const EXAM_COMPRESSION_PAGES: LandingPageContent[] = [
     slug: 'compress-pdf-for-rrb',
     toolType: 'compress',
     presetLevel: 'recommended',
-    targetSizeHint: 'RRB Railway Mode (100KB–200KB / 50KB–100KB)',
+    targetSizeHint: 'RRB Railway Mode (100 KB to 200 KB / 50 KB to 100 KB)',
     title: 'Compress PDF for RRB Railway Application (NTPC, Group D, ALP) | PDFBolt',
     h1: 'Compress PDF for RRB Railway Application',
     subtitle: 'Resize caste certificates, marksheets, and travel pass proofs to official Railway Recruitment Board portal specifications.',
@@ -749,17 +745,17 @@ export const EXAM_COMPRESSION_PAGES: LandingPageContent[] = [
     metaDescription: 'Compress PDF for RRB online application free. Resize certificates and documents for RRB NTPC, Group D, ALP, and Technician exams to meet rrbapply.gov.in limits.',
     quickAnswer: 'To compress a PDF for RRB: 1. Drag & drop your railway application document. 2. Select \'Exact Target Size\' and enter 150 KB (or 85 KB for SC/ST travel pass). 3. Optionally toggle \'Convert to Black & White\' to drop file size further. 4. Click \'Compress PDF\' and upload your file on rrbapply.gov.in.',
     portalSpecs: [
-      { name: 'SC/ST Certificate (Free Railway Travel Pass)', allowedSize: '50 KB – 100 KB', allowedFormat: 'PDF only', notes: 'Mandatory to claim free sleeper class railway travel pass' },
-      { name: 'Educational Marksheet (10th / ITI / NAC / Degree)', allowedSize: '100 KB – 200 KB', allowedFormat: 'PDF only', notes: 'Proof of prescribed educational or technical qualification' },
-      { name: 'OBC-NCL / EWS Certificate', allowedSize: '100 KB – 200 KB', allowedFormat: 'PDF only', notes: 'Central Government format issued within the validity period' },
-      { name: 'PwBD Disability Certificate', allowedSize: '100 KB – 200 KB', allowedFormat: 'PDF only', notes: 'UDID card or medical certificate showing disability percentage' },
-      { name: 'Candidate Photograph', allowedSize: '30 KB – 70 KB', allowedFormat: 'JPEG / JPG', notes: 'Plain white background, 35mm x 45mm, clear face' },
-      { name: 'Candidate Signature', allowedSize: '30 KB – 70 KB', allowedFormat: 'JPEG / JPG', notes: 'Running handwriting on white paper, black or blue ink' },
+      { name: 'SC/ST Certificate (Free Railway Travel Pass)', allowedSize: '50 KB to 100 KB', allowedFormat: 'PDF only', notes: 'Mandatory to claim free sleeper class railway travel pass' },
+      { name: 'Educational Marksheet (10th / ITI / NAC / Degree)', allowedSize: '100 KB to 200 KB', allowedFormat: 'PDF only', notes: 'Proof of prescribed educational or technical qualification' },
+      { name: 'OBC-NCL / EWS Certificate', allowedSize: '100 KB to 200 KB', allowedFormat: 'PDF only', notes: 'Central Government format issued within the validity period' },
+      { name: 'PwBD Disability Certificate', allowedSize: '100 KB to 200 KB', allowedFormat: 'PDF only', notes: 'UDID card or medical certificate showing disability percentage' },
+      { name: 'Candidate Photograph', allowedSize: '30 KB to 70 KB', allowedFormat: 'JPEG / JPG', notes: 'Plain white background, 35mm x 45mm, clear face' },
+      { name: 'Candidate Signature', allowedSize: '30 KB to 70 KB', allowedFormat: 'JPEG / JPG', notes: 'Running handwriting on white paper, black or blue ink' },
     ],
     keyHighlights: [
-      'Calibrated for rrbapply.gov.in railway recruitment portals (Last Verified: October 2026 for 2026–2027 CEN Cycles)',
-      'Dedicated optimization for SC/ST travel pass certificates (strict 50KB–100KB bracket)',
-      'Educational certificates sized safely within the 100KB–200KB boundary',
+      'Calibrated for rrbapply.gov.in railway recruitment portals (Last Verified: October 2026 for 2026 to 2027 CEN Cycles)',
+      'Dedicated optimization for SC/ST travel pass certificates (strict 50 KB to 100 KB bracket)',
+      'Educational certificates sized safely within the 100 KB to 200 KB boundary',
       'Instant local WebAssembly execution: bypass server timeouts during high-traffic railway application deadlines',
     ],
     steps: [
@@ -771,12 +767,12 @@ export const EXAM_COMPRESSION_PAGES: LandingPageContent[] = [
       {
         heading: 'Official Railway Recruitment Board (RRB) Application Guidelines',
         paragraphs: [
-          'The Railway Recruitment Boards (RRBs) conduct centralized recruitment examinations (CEN) for millions of candidates applying for NTPC, Group D (Level 1), Assistant Loco Pilot (ALP), and Technicians via rrbapply.gov.in (Last Verified: October 2026 for 2026–2027 Cycles).',
+          'The Railway Recruitment Boards (RRBs) conduct centralized recruitment examinations (CEN) for millions of candidates applying for NTPC, Group D (Level 1), Assistant Loco Pilot (ALP), and Technicians via rrbapply.gov.in (Last Verified: October 2026 for 2026 to 2027 Cycles).',
           'Due to massive server load during the closing days of railway notifications, incomplete uploads or rejected file sizes can lead to missed application deadlines. Ensuring your certificates match the exact byte brackets before logging in prevents gateway timeouts.',
         ]
       },
       {
-        heading: 'SC/ST Free Travel Pass Certificate: Staying Inside the Strict 50KB–100KB Window',
+        heading: 'SC/ST Free Travel Pass Certificate: Staying Inside the Strict 50 KB to 100 KB Window',
         paragraphs: [
           'Candidates claiming the free Second Class railway sleeper travel pass must upload their SC/ST community certificate during registration. The RRB portal imposes a strict 50KB minimum and 100KB maximum file boundary for this document.',
           'If your scan is 105KB, the portal rejects it; if it is 45KB, the portal flags it as poor quality. PDFBolt\'s Target Size Mode allows you to enter 85 KB, producing a file that satisfies both the size threshold and human scrutiny.',
@@ -792,7 +788,7 @@ export const EXAM_COMPRESSION_PAGES: LandingPageContent[] = [
     ],
     faqs: [
       { q: 'What are the exact document file size limits for RRB NTPC, ALP, and Group D?', a: 'Per official rrbapply.gov.in guidelines: SC/ST community certificates for free travel passes must be 50KB to 100KB in PDF. Educational qualification marksheets and category certificates must be 100KB to 200KB in PDF. Photos and signatures must be 30KB to 70KB in JPEG.' },
-      { q: 'How do I compress my SC/ST certificate under 100KB for the free sleeper pass?', a: 'Select \'Exact Target Size\' and type 85 KB. This places your document right in the middle of RRB\'s 50KB–100KB bracket. If the scan is in color, enable \'Convert to Black & White\' for crisp text and smaller size.' },
+      { q: 'How do I compress my SC/ST certificate under 100KB for the free sleeper pass?', a: 'Select \'Exact Target Size\' and type 85 KB. This places your document right in the middle of RRB\'s 50 KB to 100 KB bracket. If the scan is in color, enable \'Convert to Black & White\' for crisp text and smaller size.' },
       { q: 'What should I do if the RRB portal says \'File size must be between 100KB and 200KB\'?', a: 'This error occurs when uploading educational certificates. Simply enter 150 KB in PDFBolt\'s Target Size input to ensure the output lands securely inside the required range.' },
       { q: 'Can I compress multi-page trade apprenticeship or engineering diploma marksheets?', a: 'Yes. PDFBolt handles multi-page documents directly in your browser, downsampling background scanner noise while keeping marks, grades, and roll numbers crisp and verifiable.' },
       { q: 'Does PDFBolt store my railway recruitment documents on any server?', a: 'No. PDFBolt operates 100% inside your browser RAM using WebAssembly. Your documents are never uploaded to any remote server or stored in any database.' },
@@ -811,10 +807,10 @@ export const EXAM_COMPRESSION_PAGES: LandingPageContent[] = [
     metaDescription: 'Compress PDF for government portals online free. Reduce document size to 100KB, 200KB, or 300KB for State PSC, SSC, UPSC, and passport websites with zero server upload.',
     quickAnswer: 'To reduce PDF size for government portals: 1. Drag & drop your PDF file. 2. Select \'Exact Target Size\' and type the required limit (e.g., 200 KB or 100 KB). 3. Enable \'Convert to Black & White\' to eliminate color scanner grain. 4. Click \'Compress PDF\' and download your verified, portal-ready document.',
     portalSpecs: [
-      { name: 'State Public Service Commissions (BPSC, UPPSC, TNPSC, MPSC)', allowedSize: '100 KB – 300 KB', allowedFormat: 'PDF', notes: 'Educational certificates, domicile, caste validity' },
+      { name: 'State Public Service Commissions (BPSC, UPPSC, TNPSC, MPSC)', allowedSize: '100 KB to 300 KB', allowedFormat: 'PDF', notes: 'Educational certificates, domicile, caste validity' },
       { name: 'Passport Seva Supporting Documents', allowedSize: 'Under 1 MB', allowedFormat: 'PDF', notes: 'Utility bills, birth certificates, marriage certificates' },
-      { name: 'EPFO / Income Tax / GST Portals', allowedSize: 'Under 500 KB – 1 MB', allowedFormat: 'PDF', notes: 'Audited balance sheets, grievance attachments' },
-      { name: 'DigiLocker & National Scholarship Portal (NSP)', allowedSize: '50 KB – 200 KB', allowedFormat: 'PDF', notes: 'Income and caste certificates, fee receipts' },
+      { name: 'EPFO / Income Tax / GST Portals', allowedSize: 'Under 500 KB to 1 MB', allowedFormat: 'PDF', notes: 'Audited balance sheets, grievance attachments' },
+      { name: 'DigiLocker & National Scholarship Portal (NSP)', allowedSize: '50 KB to 200 KB', allowedFormat: 'PDF', notes: 'Income and caste certificates, fee receipts' },
       { name: 'High Court / District Court e-Filing', allowedSize: 'Under 2 MB to 5 MB', allowedFormat: 'PDF/A preferred', notes: 'Affidavits, petitions, annexures with seals' },
     ],
     keyHighlights: [
@@ -862,9 +858,7 @@ export const EXAM_COMPRESSION_PAGES: LandingPageContent[] = [
   },
 ];
 
-// ---------------------------------------------------------------------------
 // 3. IDENTITY & WORKFLOW MERGING PAGES (Wave 1)
-// ---------------------------------------------------------------------------
 export const WORKFLOW_PAGES: LandingPageContent[] = [
   {
     slug: 'merge-aadhaar-and-pan-card',
@@ -944,7 +938,7 @@ export const WORKFLOW_PAGES: LandingPageContent[] = [
     portalSpecs: [
       { name: 'Bank Video KYC (SBI, HDFC, ICICI, Axis)', allowedSize: 'Under 1 MB or 2 MB', allowedFormat: 'Single A4 PDF', notes: 'Both front and back card sides must be visible on single sheet' },
       { name: 'Demat & Stock Broker KYC (Zerodha, Groww)', allowedSize: 'Under 2 MB', allowedFormat: 'PDF', notes: 'Must include clear photo, signature, and unmasked QR code' },
-      { name: 'UPSC / SSC / State PSC Recruitment Portals', allowedSize: '20 KB – 300 KB', allowedFormat: 'PDF only', notes: 'Official identity slip verification floor' },
+      { name: 'UPSC / SSC / State PSC Recruitment Portals', allowedSize: '20 KB to 300 KB', allowedFormat: 'PDF only', notes: 'Official identity slip verification floor' },
       { name: 'VFS Global & US Visa Appointment', allowedSize: 'Under 2 MB', allowedFormat: 'A4 PDF', notes: '1:1 physical dimensions or high-clarity KYC zoom' },
       { name: 'Rental Agreements & Hotel Check-in', allowedSize: 'Any', allowedFormat: 'Print / PDF', notes: 'Recommended with anti-theft purpose watermark' },
     ],
@@ -979,7 +973,7 @@ export const WORKFLOW_PAGES: LandingPageContent[] = [
         heading: 'Understanding 1:1 Physical Scale vs KYC Portal Zoom',
         paragraphs: [
           'ISO/IEC 7810 ID-1 is the global dimensional standard for identification cards, measuring exactly 85.60 mm × 53.98 mm (3.370 × 2.125 inches). When printing a replacement card to cut and laminate in plastic, choose PDFBolt\'s "1:1 Actual Physical Size" mode, which includes an optional center cut/fold guide.',
-          'For digital portal uploads (such as bank accounts or Demat registrations), micro-printed text such as the father\'s name or issuing authority signature can be difficult for bank officers to inspect at 1:1 scale. Choosing "KYC Portal Zoom" enlarges both cards by 1.5x while strictly preserving the ISO aspect ratio, ensuring effortless verification.'
+          'For digital portal uploads (such as bank accounts or Demat registrations), micro-printed text such as the father\'s name or issuing authority signature can be difficult for bank officers to inspect at 1:1 scale. Choosing "KYC Portal Zoom" enlarges both cards by 1.5x while strictly preserving the ISO aspect ratio, ensuring clean verification.'
         ]
       },
       {
@@ -1047,15 +1041,15 @@ export const WORKFLOW_PAGES: LandingPageContent[] = [
     title: 'JPG to PDF for Exam Forms & Government Applications | PDFBolt',
     h1: 'JPG to PDF for Exam Forms',
     subtitle: 'Convert smartphone photos of certificates, marksheets, and identity cards into clean, sub-200KB PDF documents for exam portals.',
-    seoTitle: 'JPG to PDF for Exam Form Online Free – Exact Portal Size | PDFBolt',
+    seoTitle: 'JPG to PDF for Exam Form Online Free: Exact Portal Size | PDFBolt',
     metaDescription: 'Convert JPG to PDF for exam forms free online. Turn smartphone photos of marksheets, certificates, and ID cards into compliant PDF files under 100KB or 200KB.',
     quickAnswer: 'To convert JPG to PDF for exam forms: 1. Drag & drop your certificate or marksheet photos. 2. Select \'Exact Target Size\' (200 KB is pre-selected for exam portals). 3. Optionally toggle \'Convert to Black & White\' to eliminate table shadows and color grain. 4. Click \'Convert to PDF\' and download your verified, sub-200KB document.',
     portalSpecs: [
-      { name: 'Class 10 / Matriculation Marksheet Photo', allowedSize: '100 KB – 200 KB', allowedFormat: 'PDF', notes: 'Mandatory proof of date of birth (SSC, State PSCs)' },
-      { name: 'Degree / Diploma Certificate Photo', allowedSize: '100 KB – 300 KB', allowedFormat: 'PDF', notes: 'Must display clear college seal and candidate name' },
-      { name: 'Category / Caste Validity Certificate Photo', allowedSize: '100 KB – 200 KB', allowedFormat: 'PDF', notes: 'Central Government format for reservation benefits' },
+      { name: 'Class 10 / Matriculation Marksheet Photo', allowedSize: '100 KB to 200 KB', allowedFormat: 'PDF', notes: 'Mandatory proof of date of birth (SSC, State PSCs)' },
+      { name: 'Degree / Diploma Certificate Photo', allowedSize: '100 KB to 300 KB', allowedFormat: 'PDF', notes: 'Must display clear college seal and candidate name' },
+      { name: 'Category / Caste Validity Certificate Photo', allowedSize: '100 KB to 200 KB', allowedFormat: 'PDF', notes: 'Central Government format for reservation benefits' },
       { name: 'Photo ID Proof (Aadhaar / Voter ID / PAN)', allowedSize: 'Under 300 KB', allowedFormat: 'PDF', notes: 'Both front and back sides included in one PDF' },
-      { name: 'Candidate Photograph & Signature', allowedSize: '20–50 KB / 10–20 KB', allowedFormat: 'JPEG / JPG', notes: 'Keep as raw JPG; do not convert photo/signature to PDF' },
+      { name: 'Candidate Photograph & Signature', allowedSize: '20 to 50 KB / 10 to 20 KB', allowedFormat: 'JPEG / JPG', notes: 'Keep as raw JPG; do not convert photo/signature to PDF' },
     ],
     keyHighlights: [
       'Calibrated for SSC, UPSC, State PSC, and Railway recruitment portals (Last Verified: October 2026)',
@@ -1105,7 +1099,7 @@ export const WORKFLOW_PAGES: LandingPageContent[] = [
     slug: 'pdf-to-jpg-for-aadhaar',
     toolType: 'pdf2jpg',
     presetLevel: 'recommended',
-    targetSizeHint: 'Aadhaar Image Mode (50KB–200KB JPG)',
+    targetSizeHint: 'Aadhaar Image Mode (50 KB to 200 KB JPG)',
     title: 'PDF to JPG for Aadhaar Upload Online Free | PDFBolt',
     h1: 'PDF to JPG for Aadhaar Upload',
     subtitle: 'Convert your e-Aadhaar PDF into crisp, high-clarity JPG images for mobile apps and portals that only accept image uploads.',
@@ -1115,7 +1109,7 @@ export const WORKFLOW_PAGES: LandingPageContent[] = [
     portalSpecs: [
       { name: 'Telecom SIM Activation & e-KYC', allowedSize: 'Under 500 KB to 1 MB', allowedFormat: 'JPEG / JPG', notes: 'Must show clear photo, name, and address' },
       { name: 'Airline Web Check-in & Travel Portals', allowedSize: 'Under 1 MB', allowedFormat: 'JPEG / JPG', notes: 'Clear full name and date of birth' },
-      { name: 'State Scholarship & Welfare Portals', allowedSize: '50 KB – 100 KB', allowedFormat: 'JPEG / JPG', notes: 'Clear 12-digit Aadhaar number and QR code' },
+      { name: 'State Scholarship & Welfare Portals', allowedSize: '50 KB to 100 KB', allowedFormat: 'JPEG / JPG', notes: 'Clear 12-digit Aadhaar number and QR code' },
       { name: 'Banking & Payment App Verification (Paytm, PhonePe)', allowedSize: 'Under 1 MB', allowedFormat: 'JPEG / JPG', notes: 'Front side with photo and back side with address' },
     ],
     keyHighlights: [
@@ -1168,9 +1162,9 @@ export const WORKFLOW_PAGES: LandingPageContent[] = [
     targetSizeHint: 'Atomic Merge + Under 300KB Output (UPSC & Portal Ready)',
     customHint: 'Upload multiple documents, certificates, or marksheets to combine and compress under 300KB in one step',
     portalSpecs: [
-      { name: 'UPSC OTR & Civil Services (CSE)', allowedSize: '20 KB – 300 KB', allowedFormat: 'PDF only', notes: 'Combine 10th marksheet + caste certificate into single sub-300KB file' },
+      { name: 'UPSC OTR & Civil Services (CSE)', allowedSize: '20 KB to 300 KB', allowedFormat: 'PDF only', notes: 'Combine 10th marksheet + caste certificate into single sub-300KB file' },
       { name: 'EPFO Unified Member Portal', allowedSize: 'Max 300 KB', allowedFormat: 'PDF', notes: 'Bank passbook + joint declaration + cancelled cheque' },
-      { name: 'State PSC Application Portals', allowedSize: '20 KB – 300 KB', allowedFormat: 'PDF', notes: 'Combined educational degrees and domicile proof' },
+      { name: 'State PSC Application Portals', allowedSize: '20 KB to 300 KB', allowedFormat: 'PDF', notes: 'Combined educational degrees and domicile proof' },
       { name: 'High Court & District Court e-Filing', allowedSize: 'Max 300 KB', allowedFormat: 'PDF', notes: 'Legal petition + affidavit annexures' }
     ],
     title: 'Merge and Compress PDF to 300KB Online Free (All-in-One) | PDFBolt',
@@ -1181,7 +1175,7 @@ export const WORKFLOW_PAGES: LandingPageContent[] = [
     quickAnswer: 'To merge and compress PDF to under 300KB: 1. Drag & drop your PDF documents or certificates. 2. Arrange pages in chronological order. 3. Click "Merge & Compress" to automatically downsample to 8-bit grayscale and deflate streams to an exact 270KB-295KB ceiling.',
     keyHighlights: [
       'Solves the multi-tool friction: merge multiple files and hit the 300KB limit in one screen',
-      'Guaranteed binary ceiling: targets 270KB–295KB so government servers never reject your file',
+      'Guaranteed binary ceiling: targets 270 KB to 295 KB so government servers never reject your file',
       'Preserves original text sharpness, stamps, and signatures at 150 DPI',
       '100% private local execution in browser RAM with zero cloud uploads'
     ],
@@ -1195,7 +1189,7 @@ export const WORKFLOW_PAGES: LandingPageContent[] = [
         heading: 'Why You Need an All-in-One Merge & 300KB Compressor',
         paragraphs: [
           'Most government examination portals (such as UPSC OTR, UPPSC, BPSC, and State Public Service Commissions) require candidates to upload a single PDF file containing multiple documents, while strictly capping the file size between 20KB and 300KB.',
-          'Traditional online tools force you through a frustrating two-step process: you merge your files on one website (resulting in a bloated 5MB file), then look for a compressor, compress it, fail the 300KB ceiling, and start over. PDFBolt solves this in a single click: our engine merges your documents in device RAM and immediately deflates the streams to land strictly inside the 250KB–295KB optimal portal window.'
+          'Traditional online tools force you through a frustrating two-step process: you merge your files on one website (resulting in a bloated 5MB file), then look for a compressor, compress it, fail the 300KB ceiling, and start over. PDFBolt solves this in a single click: our engine merges your documents in device RAM and immediately deflates the streams to land strictly inside the 250KB to 295KB optimal portal window.'
         ]
       }
     ],
@@ -1319,7 +1313,7 @@ export const WORKFLOW_PAGES: LandingPageContent[] = [
         heading: 'Why Cloud PDF Tools Enforce Daily Limits & Why PDFBolt Does Not',
         paragraphs: [
           'Commercial SaaS platforms like iLovePDF, Smallpdf, and Sejda operate expensive centralized cloud server fleets. Every megabyte you upload costs them bandwidth and compute power, forcing them to lock free users behind restrictive 2-file daily paywalls ($7/month subscription prompts).',
-          'PDFBolt takes a revolutionary architectural approach: by compiling document processing engines to WebAssembly, all compression, merging, and page manipulation runs directly on your computer or phone CPU. Because we do not pay cloud compute costs for your documents, PDFBolt is truly free and unlimited forever.'
+          'PDFBolt processes files directly on your device: by compiling document processing engines to WebAssembly, all compression, merging, and page manipulation runs directly on your computer or phone CPU. Because we do not pay cloud compute costs for your documents, PDFBolt is truly free and unlimited forever.'
         ]
       }
     ],
@@ -1331,9 +1325,7 @@ export const WORKFLOW_PAGES: LandingPageContent[] = [
 
 ];
 
-// ---------------------------------------------------------------------------
 // 4. HIGH-INTENT KEYWORD GAP PAGES (Wave 2)
-// ---------------------------------------------------------------------------
 export const GAP_EXPANSION_PAGES: LandingPageContent[] = [
   {
     slug: 'mask-aadhaar-card-pdf',
@@ -1476,7 +1468,7 @@ export const GAP_EXPANSION_PAGES: LandingPageContent[] = [
     keyHighlights: [
       'Calibrated safe-band: automatically targets 65 KB to 85 KB to prevent rejection',
       'Text legibility shield: smart downsampling prevents blurry numbers and signatures',
-      'Multi-page certificate support: compress consolidated mark sheets seamlessly',
+      'Multi-page certificate support: compress consolidated mark sheets without page loss',
       'Zero server upload: 100% private client-side processing'
     ],
     steps: [
@@ -1545,15 +1537,15 @@ export const ALTERNATIVE_PAGES: LandingPageContent[] = [
   {
     slug: 'no-upload-pdf-tools',
     toolType: 'edit',
-    title: 'No-Upload PDF Tools – 100% Client-Side Private Document Toolkit | PDFBolt',
+    title: 'No-Upload PDF Tools: 100% Client-Side Private Document Toolkit | PDFBolt',
     h1: 'No-Upload PDF Tools (100% Client-Side)',
     subtitle: 'Process, edit, merge, and compress your sensitive PDF files directly in your web browser with zero server uploads and complete privacy.',
-    seoTitle: 'No-Upload PDF Tools – 100% Client-Side & Private | PDFBolt',
+    seoTitle: 'No-Upload PDF Tools: 100% Client-Side & Private | PDFBolt',
     metaDescription: 'No-upload PDF tools: Merge, compress, split, and edit PDF files in your browser with zero file uploads. Powered by WebAssembly for 100% data confidentiality.',
     quickAnswer: 'PDFBolt executes core PDF operations directly inside your browser memory using WebAssembly. Your documents are never uploaded to remote servers, never stored in databases, and never accessible to third parties.',
     keyHighlights: [
       'Zero Cloud Uploads: Files are processed in your local computer or phone RAM',
-      'WebAssembly Core: Native C/Rust compiled bytecode executes with blazing speed',
+      'WebAssembly Core: Native C/Rust compiled bytecode executes with low latency',
       'Zero Data Retention: Closing the browser tab destroys all temporary document memory',
       'Wipe Site Data Button: One-click purge of all local caches and browser storage'
     ],
@@ -1582,7 +1574,7 @@ export const ALTERNATIVE_PAGES: LandingPageContent[] = [
     title: 'Best Free iLovePDF Alternative (Local In-Browser Privacy) | PDFBolt',
     h1: 'Free iLovePDF Alternative (In-Browser Privacy & Zero Uploads)',
     subtitle: 'Tired of "Daily limit reached" and slow file uploads? Discover PDFBolt, the free, privacy-first alternative to iLovePDF.',
-    seoTitle: 'Best Free iLovePDF Alternative 2026 – Private & Free | PDFBolt',
+    seoTitle: 'Best Free iLovePDF Alternative 2026: Private & Free | PDFBolt',
     metaDescription: 'Looking for a free iLovePDF alternative? PDFBolt offers free PDF merging, compression, and editing with local in-browser WebAssembly privacy.',
     quickAnswer: 'PDFBolt is the top free iLovePDF alternative because it requires no account registrations and executes core PDF tools locally inside your web browser using WebAssembly rather than uploading your private documents to cloud servers.',
     keyHighlights: [
@@ -1617,7 +1609,7 @@ export const ALTERNATIVE_PAGES: LandingPageContent[] = [
     title: 'Best Smallpdf Alternative (Free Unlimited PDF Tools) | PDFBolt',
     h1: 'Free Smallpdf Alternative (Unlimited Tasks & Private)',
     subtitle: 'Frustrated by Smallpdf’s 2-tasks-per-day limit? PDFBolt provides unlimited free PDF tools with complete in-browser privacy.',
-    seoTitle: 'Best Free Smallpdf Alternative 2026 – No 2-Task Paywall | PDFBolt',
+    seoTitle: 'Best Free Smallpdf Alternative 2026: No 2-Task Paywall | PDFBolt',
     metaDescription: 'Tired of Smallpdf daily limits? PDFBolt is a free Smallpdf alternative with unlimited tasks, no 2-file cap, no credit cards, and client-side document processing.',
     quickAnswer: 'PDFBolt replaces Smallpdf with completely free, unlimited PDF operations. While Smallpdf restricts free users to just 2 document tasks every 24 hours, PDFBolt gives you unlimited conversions, merges, and compressions with zero paywalls.',
     keyHighlights: [
@@ -1648,10 +1640,10 @@ export const ALTERNATIVE_PAGES: LandingPageContent[] = [
   {
     slug: 'free-pdf-editor-no-watermark-no-signup',
     toolType: 'edit',
-    title: 'Free PDF Editor – No Watermark & No Signup Required | PDFBolt',
+    title: 'Free PDF Editor: No Watermark & No Signup Required | PDFBolt',
     h1: 'Free PDF Editor (No Watermark, No Signup)',
     subtitle: 'Edit, annotate, draw, and sign PDF documents online for free without watermarks, registration, or credit cards.',
-    seoTitle: 'Free PDF Editor Online – No Watermark & No Signup | PDFBolt',
+    seoTitle: 'Free PDF Editor Online: No Watermark & No Signup | PDFBolt',
     metaDescription: 'Free PDF editor with no watermark and no signup. Edit text, add shapes, annotate, and sign documents online with 100% in-browser privacy.',
     quickAnswer: 'PDFBolt provides a 100% free online PDF editor that requires no account signup and never stamps watermarks on your finished documents. Open any PDF, make edits or add annotations, and download your clean file instantly.',
     keyHighlights: [

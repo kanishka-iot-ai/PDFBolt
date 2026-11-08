@@ -21,7 +21,7 @@ const AnalyzerPage: React.FC<AnalyzerPageProps> = ({ darkMode, notify }) => {
   const [analysis, setAnalysis] = useState<DocumentAnalysis | null>(null);
   const [buildingOutput, setBuildingOutput] = useState<string | null>(null);
 
-  // Q&A state
+  
   const [question, setQuestion] = useState('');
   const [chatHistory, setChatHistory] = useState<{ q: string; a: string }[]>([]);
   const [asking, setAsking] = useState(false);
@@ -69,7 +69,7 @@ const AnalyzerPage: React.FC<AnalyzerPageProps> = ({ darkMode, notify }) => {
     }
   };
 
-  // Builder actions
+  
   const handleExportPPTX = async () => {
     if (!analysis) return;
     setBuildingOutput('pptx');

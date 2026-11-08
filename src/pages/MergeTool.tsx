@@ -38,7 +38,7 @@ const MergeTool: React.FC<MergeToolProps> = ({ darkMode, notify, customHint, all
   const [outputSizeBytes, setOutputSizeBytes] = useState<number>(0);
   const [mergedFileName, setMergedFileName] = useState<string>('merged_pdfbolt.pdf');
 
-  // Sync active work state
+  
   useEffect(() => {
     setHasActiveWork((files.length > 0 && !result) || processing);
     return () => setHasActiveWork(false);
@@ -61,7 +61,7 @@ const MergeTool: React.FC<MergeToolProps> = ({ darkMode, notify, customHint, all
       ? [...ALLOWED_MIME_TYPES.PDF, ...ALLOWED_MIME_TYPES.IMAGE]
       : ALLOWED_MIME_TYPES.PDF;
 
-    // Validate files
+    
     const validation = await validateFiles(nf, {
       allowedTypes,
       maxSize: MAX_FILE_SIZE.PDF,
@@ -187,7 +187,7 @@ const MergeTool: React.FC<MergeToolProps> = ({ darkMode, notify, customHint, all
         /* ── 2-COLUMN FULL-SCREEN WORKSPACE ── */
         <div className="w-full h-full min-h-0 flex flex-col lg:flex-row overflow-hidden text-left bg-[#f4f5f8] dark:bg-slate-950">
 
-          {/* LEFT EXPANSIVE CANVAS */}
+          
           <div className="flex-grow flex flex-col justify-between relative bg-[#f4f5f8] dark:bg-slate-900/80 overflow-y-auto p-4 sm:p-6 lg:p-8">
             
             {/* RAM Advisory Notice */}

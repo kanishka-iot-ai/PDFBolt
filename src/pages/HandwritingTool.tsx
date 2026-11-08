@@ -78,9 +78,9 @@ const HandwritingTool: React.FC<HandwritingToolProps> = ({ darkMode, notify }) =
   const uploadInputRef = useRef<HTMLInputElement>(null);
 
 
-  // ----------------------------------------------------
+  
   // 1. INPUT HANDLERS (Files & Camera)
-  // ----------------------------------------------------
+  
 
   const handleFilesSelected = async (files: File[]) => {
     if (!files || files.length === 0) return;
@@ -120,9 +120,9 @@ const HandwritingTool: React.FC<HandwritingToolProps> = ({ darkMode, notify }) =
     if (notify?.success) notify.success();
   };
 
-  // ----------------------------------------------------
+  
   // 2. QUEUE MANIPULATION (Reorder, Rotate, Delete)
-  // ----------------------------------------------------
+  
 
   const handleRotatePage = async (id: string) => {
     const pageIndex = pages.findIndex(p => p.id === id);
@@ -169,9 +169,9 @@ const HandwritingTool: React.FC<HandwritingToolProps> = ({ darkMode, notify }) =
     }));
   };
 
-  // ----------------------------------------------------
+  
   // 3. RECOGNITION PIPELINE (Local OCR / Cloud AI)
-  // ----------------------------------------------------
+  
 
   const handleStartConversion = async () => {
     if (pages.length === 0) return;
@@ -264,9 +264,9 @@ const HandwritingTool: React.FC<HandwritingToolProps> = ({ darkMode, notify }) =
     }
   };
 
-  // ----------------------------------------------------
+  
   // 4. DOCUMENT EXPORT GENERATION
-  // ----------------------------------------------------
+  
 
   const downloadBlob = (blob: Blob, filename: string) => {
     const url = URL.createObjectURL(blob);
@@ -412,11 +412,8 @@ const HandwritingTool: React.FC<HandwritingToolProps> = ({ darkMode, notify }) =
           <button onClick={() => setErrorNotice(null)} className="text-red-400 hover:text-red-600">✕</button>
         </div>
       )}
-
-      {/* ==================================================== */}
-      {/* STEP 1: QUEUE & INITIAL WORKSPACE                    */}
-      {/* ==================================================== */}
-      {step === 'queue' && (
+{/* STEP 1: QUEUE & INITIAL WORKSPACE                    */}
+{step === 'queue' && (
         <div className="space-y-8">
           {pages.length === 0 ? (
             /* Primary Input Selection Cards */
@@ -531,11 +528,8 @@ const HandwritingTool: React.FC<HandwritingToolProps> = ({ darkMode, notify }) =
           )}
         </div>
       )}
-
-      {/* ==================================================== */}
-      {/* STEP 2: PROCESSING CONVERTING PROGRESS               */}
-      {/* ==================================================== */}
-      {step === 'processing' && (
+{/* STEP 2: PROCESSING CONVERTING PROGRESS               */}
+{step === 'processing' && (
         <div className={`max-w-2xl mx-auto p-10 rounded-[3rem] border text-center space-y-6 ${
           darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200 shadow-xl'
         }`}>
@@ -563,11 +557,8 @@ const HandwritingTool: React.FC<HandwritingToolProps> = ({ darkMode, notify }) =
           </p>
         </div>
       )}
-
-      {/* ==================================================== */}
-      {/* STEP 3: SIDE-BY-SIDE REVIEW & EDIT                   */}
-      {/* ==================================================== */}
-      {step === 'review' && (
+{/* STEP 3: SIDE-BY-SIDE REVIEW & EDIT                   */}
+{step === 'review' && (
         <div className="space-y-6">
           <TranscriptionEditor
             pages={pages}
@@ -598,11 +589,8 @@ const HandwritingTool: React.FC<HandwritingToolProps> = ({ darkMode, notify }) =
           </div>
         </div>
       )}
-
-      {/* ==================================================== */}
-      {/* STEP 4: TYPOGRAPHY DESIGN & MULTI-FORMAT EXPORT      */}
-      {/* ==================================================== */}
-      {step === 'export' && (
+{/* STEP 4: TYPOGRAPHY DESIGN & MULTI-FORMAT EXPORT      */}
+{step === 'export' && (
         <div className="space-y-6">
           <QualityCheckBanner
             report={qualityReport}

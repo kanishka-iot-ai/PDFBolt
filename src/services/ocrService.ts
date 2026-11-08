@@ -36,7 +36,7 @@ export async function ocrPdfToSearchablePdf(
             onProgress?.(Math.round(((i - 1) / numPages) * 75) + 15);
             const page = await pdf.getPage(i);
             
-            // ⚡ Core Brain Optimization: Fast Digital Vector Check
+            // Fast digital vector check
             const textContent = await page.getTextContent();
             const hasDigitalText = textContent.items && textContent.items.length >= 10;
 

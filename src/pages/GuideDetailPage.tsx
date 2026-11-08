@@ -168,7 +168,7 @@ const GuideDetailPage: React.FC<GuideDetailPageProps> = ({ darkMode }) => {
                 Official Web Tool
               </span>
               <h3 className={`text-xl font-black mt-1 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
-                {tool.title} – 100% Free & Local
+                {tool.title}: 100% Free & Local
               </h3>
               <p className={`text-xs mt-1 max-w-md ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
                 Execute this conversion directly in your browser with zero file uploads.

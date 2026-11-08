@@ -15,7 +15,7 @@ import { apiClient } from './services/apiClient';
 // Eagerly import Home to prevent CLS from Suspense fallback displacement
 import Home from './pages/Home';
 
-// Lazy load core tools
+
 const MergeTool = lazy(() => import('./pages/MergeTool'));
 const QRTool = lazy(() => import('./pages/QRTool'));
 const SimpleTool = lazy(() => import('./pages/SimpleTool'));
@@ -29,7 +29,7 @@ const HandwritingTool = lazy(() => import('./pages/HandwritingTool'));
 const AnalyzerPage = lazy(() => import('./pages/AnalyzerPage'));
 const CompressTool = lazy(() => import('./pages/CompressTool'));
 
-// Lazy load SEO Hubs, Guides, Encyclopedia, Workflows, Calculators & Playground
+
 const HubPage = lazy(() => import('./pages/HubPage'));
 const WorkflowPage = lazy(() => import('./pages/WorkflowPage'));
 const GuidesHub = lazy(() => import('./pages/GuidesHub'));
@@ -44,7 +44,7 @@ const NoUploadToolsPage = lazy(() => import('./pages/NoUploadToolsPage'));
 const AlternativeLandingPage = lazy(() => import('./pages/AlternativeLandingPage'));
 const ReviewsPage = lazy(() => import('./pages/ReviewsPage'));
 
-// Static pages
+
 const PrivacyPage = lazy(() => import('./pages/StaticPages').then(m => ({ default: m.PrivacyPage })));
 const TermsPage = lazy(() => import('./pages/StaticPages').then(m => ({ default: m.TermsPage })));
 const AboutPage = lazy(() => import('./pages/StaticPages').then(m => ({ default: m.AboutPage })));
@@ -53,7 +53,7 @@ const CookiesPage = lazy(() => import('./pages/StaticPages').then(m => ({ defaul
 const OfflineModePage = lazy(() => import('./pages/StaticPages').then(m => ({ default: m.OfflineModePage })));
 const ApiKeyManagerPage = lazy(() => import('./pages/ApiKeyManagerPage').then(m => ({ default: m.ApiKeyManagerPage })));
 
-// Loading Fallback
+
 const PageLoader = () => (
   <div className="min-h-[60vh] flex flex-col items-center justify-center animate-fadeIn">
     <div className="w-12 h-12 border-4 border-yellow-500 border-t-transparent rounded-full animate-spin mb-4"></div>
@@ -81,7 +81,7 @@ const NotFoundPage = () => (
   </div>
 );
 
-// Pre-built O(1) lookup map — replaces O(N) TOOLS.find() on every route change.
+// Pre-built O(1) lookup map: replaces O(N) TOOLS.find() on every route change.
 // Indexes BOTH the bare path and the trailing-slash variant so lookup works regardless
 // of whether the browser URL currently has or lacks a trailing slash.
 const TOOLS_BY_PATH = new Map<string, (typeof TOOLS)[number]>(
@@ -94,7 +94,7 @@ const TOOLS_BY_PATH = new Map<string, (typeof TOOLS)[number]>(
   })
 );
 
-// Pre-built Set for O(1) isToolPage check — also covers trailing-slash variants
+// Pre-built Set for O(1) isToolPage check: also covers trailing-slash variants
 const TOOL_PATH_SET = new Set(
   TOOLS.flatMap(t => {
     const paths = [t.path, t.canonicalPath, ...(t.seoPath ? [t.seoPath] : [])].filter(Boolean);
@@ -118,7 +118,7 @@ const SEOManager: React.FC = () => {
     const pathname = location.pathname;
     const pathNorm = pathname !== '/' && pathname.endsWith('/') ? pathname.slice(0, -1) : pathname;
 
-    // O(1) Map lookup — checks both bare and slash variant
+    // O(1) Map lookup: checks both bare and slash variant
     const tool = TOOLS_BY_PATH.get(pathname) ?? TOOLS_BY_PATH.get(pathNorm);
     const cleanSlug = pathNorm.startsWith('/') ? pathNorm.slice(1) : pathNorm;
     if (tool) {
@@ -171,7 +171,7 @@ const SEOManager: React.FC = () => {
       metaDesc.setAttribute('content', description);
     }
 
-    // Canonical MUST match prerendered pages and sitemaps — both use trailing slashes.
+    // Canonical MUST match prerendered pages and sitemaps: both use trailing slashes.
     // Without the slash, Google's WRS (JavaScript renderer) sees a different canonical than
     // the static HTML, triggering "Alternate page with proper canonical tag" in Search Console.
     const rawPath = location.pathname;
@@ -210,7 +210,7 @@ interface MainLayoutProps {
 
 const MainLayout: React.FC<MainLayoutProps> = ({ darkMode, setDarkMode, soundEnabled, setSoundEnabled, notify }) => {
   const { hasActiveWork } = useActiveWork();
-  // O(1) Set lookup — was O(N) TOOLS.some()
+  // O(1) Set lookup: was O(N) TOOLS.some()
   const isToolPage = location.pathname.startsWith('/tool/') ||
     TOOL_PATH_SET.has(location.pathname);
 
@@ -231,14 +231,13 @@ const MainLayout: React.FC<MainLayoutProps> = ({ darkMode, setDarkMode, soundEna
       {/* Background Layer 1: Ambient Key-Light Mesh */}
       <div className="absolute inset-0 bg-ambient-mesh pointer-events-none" aria-hidden="true" />
 
-      {/* Background Layer 2: Top-Edge Horizon Spotlight Line */}
-      <div className="aurora-horizon pointer-events-none" aria-hidden="true" />
+      
 
       {/* Background Layer 3: Precision Architectural Micro-Dot Matrix Canvas */}
       <div className="absolute inset-x-0 top-0 h-[920px] bg-dot-matrix pointer-events-none" aria-hidden="true" />
 
-      {/* Background Layer 4: Tactile Micro-Vellum Grain Overlay */}
-      <div className="site-noise-texture" aria-hidden="true" />
+      
+      
 
       <Navbar
         darkMode={darkMode}
