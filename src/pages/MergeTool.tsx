@@ -11,6 +11,7 @@ import { useActiveWork } from '../context/ActiveWorkContext';
 import PDFThumbnail from '../components/PDFThumbnail';
 import AdSlot from '../components/AdSlot';
 import AdsterraBanner from '../components/AdsterraBanner';
+import PostDownloadFeedback from '../components/PostDownloadFeedback';
 
 export interface MergeToolProps {
   darkMode: boolean;
@@ -397,7 +398,7 @@ const MergeTool: React.FC<MergeToolProps> = ({ darkMode, notify, customHint, all
         </div>
       ) : (
         /* Result State - Compact, Anti-Slop, Professional Layout */
-        <div key={resultKey} className="flex flex-col items-center gap-3.5 max-w-md mx-auto w-full p-4 sm:p-6 animate-fadeIn text-center">
+        <div key={resultKey} className="flex flex-col items-center gap-2 max-w-md mx-auto w-full p-2 sm:p-3 animate-fadeIn text-center">
           {/* Subtle Inline Status Pill */}
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 text-xs font-bold border border-emerald-500/20 select-none">
             <CheckCircle2 size={13} className="text-emerald-600 dark:text-emerald-400" />
@@ -465,6 +466,9 @@ const MergeTool: React.FC<MergeToolProps> = ({ darkMode, notify, customHint, all
             <RefreshCw size={12} />
             <span>Process another merge</span>
           </button>
+
+          {/* Post-Download Micro Feedback Bar */}
+          <PostDownloadFeedback toolName="Merge PDF" />
         </div>
       )}
 

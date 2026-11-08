@@ -393,8 +393,8 @@ const QRTool: React.FC<QRToolProps> = ({ darkMode, notify }) => {
                 </div>
               ) : (
                 <div key={resultKey} className="animate-fadeIn">
-                  <div className="relative group mx-auto w-fit mb-6">
-                    <img src={qrUrl} alt="Secure QR Code" className="w-80 h-80 rounded-[2.5rem] border-8 border-slate-50 dark:border-slate-900 shadow-2xl mx-auto" />
+                  <div className="relative group mx-auto w-fit mb-2">
+                    <img src={qrUrl} alt="Secure QR Code" className="w-44 h-44 sm:w-48 sm:h-48 rounded-2xl border-4 border-slate-50 dark:border-slate-900 shadow-xl mx-auto" />
                     <div className="absolute top-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-[10px] font-black flex items-center gap-1 shadow-lg">
                       <ShieldCheck size={12} /> ENCRYPTED
                     </div>

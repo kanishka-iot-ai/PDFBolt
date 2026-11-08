@@ -132,28 +132,28 @@ const TargetedCompressPage: React.FC<TargetedCompressPageProps> = ({ pageSlug: p
       </Helmet>
 
       {/* Top Breadcrumbs & Compact Header */}
-      <div className={`pt-3 pb-2.5 sm:pt-4 sm:pb-3 border-b ${darkMode ? 'border-slate-800/80 bg-slate-900/40' : 'border-slate-200/80 bg-white/60'}`}>
+      <div className={`pt-1.5 pb-1 sm:pt-2 sm:pb-1.5 border-b ${darkMode ? 'border-slate-800/80 bg-slate-900/40' : 'border-slate-200/80 bg-white/60'}`}>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
-          <nav aria-label="Breadcrumb" className="flex justify-center items-center gap-1.5 text-[11px] font-semibold mb-1 text-slate-500">
-            <Link to="/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Home</Link>
-            <span>/</span>
-            <Link to="/tools/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">PDF Tools</Link>
-            <span>/</span>
-            <span className="text-yellow-700 dark:text-yellow-400 font-bold">{page.h1}</span>
-          </nav>
-
-          <h1 className={`text-xl sm:text-2xl md:text-3xl font-extrabold mb-1 tracking-tight leading-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>
-            {page.h1}
-          </h1>
-          <p className={`text-xs sm:text-sm max-w-2xl mx-auto font-normal ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
-            {page.subtitle}
-          </p>
-
-          {/* Interactive Review Rating Pill & Trust Anchor */}
-          <div className="mt-2.5 flex justify-center">
-            <TrustMicroAnchor toolTitle={page.h1} />
+          <div className="flex justify-between items-center text-[11px] font-semibold mb-0.5 text-slate-500">
+            <nav aria-label="Breadcrumb" className="flex items-center gap-1.5">
+              <Link to="/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Home</Link>
+              <span>/</span>
+              <Link to="/tools/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">PDF Tools</Link>
+              <span>/</span>
+              <span className="text-yellow-700 dark:text-yellow-400 font-bold">{page.h1}</span>
+            </nav>
+            <div className="hidden sm:flex items-center gap-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold">
+              <Star size={11} fill="currentColor" />
+              <span>4.9/5 (1,420+ ratings)</span>
+            </div>
           </div>
 
+          <h1 className={`text-lg sm:text-xl md:text-2xl font-extrabold mb-0.5 tracking-tight leading-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+            {page.h1}
+          </h1>
+          <p className={`text-[11px] sm:text-xs max-w-2xl mx-auto font-normal truncate ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+            {page.subtitle}
+          </p>
         </div>
       </div>
 

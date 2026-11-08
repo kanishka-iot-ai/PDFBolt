@@ -110,9 +110,9 @@ const SEOLandingPage: React.FC<SEOLandingPageProps> = ({ tool: toolProp, toolId,
     .filter(Boolean);
 
   return (
-    <div className={`animate-fadeIn w-full ${hasActiveWork ? 'h-[calc(100vh-64px)] overflow-hidden bg-[#f4f5f8] dark:bg-slate-950 flex flex-col' : 'min-h-[calc(100vh-64px)] flex flex-col justify-between bg-white dark:bg-slate-900'}`}>
+    <div className={`animate-fadeIn w-full ${hasActiveWork ? 'h-[calc(100vh-64px)] overflow-hidden bg-[#f4f5f8] dark:bg-slate-950 flex flex-col' : 'md:h-[calc(100dvh-4rem)] md:max-h-[calc(100dvh-4rem)] md:overflow-hidden min-h-[calc(100vh-64px)] flex flex-col justify-between bg-white dark:bg-slate-900'}`}>
       <Helmet>
-        <title>{tool?.seoTitle || `${tool?.title || 'PDF Tool'} – Free & Private Online Tool | PDFBolt`}</title>
+        <title>{tool?.seoTitle || `${tool?.title || 'PDF Tool'} - Free & Private Online Tool | PDFBolt`}</title>
         <meta name="description" content={tool?.description} />
         <link rel="canonical" href={canonicalUrl} />
         <meta property="og:title" content={tool?.seoTitle || tool?.title} />
@@ -125,116 +125,102 @@ const SEOLandingPage: React.FC<SEOLandingPageProps> = ({ tool: toolProp, toolId,
       </Helmet>
 
       {/* 1. HERO HEADER (Always retained in DOM for SEO & A11y, visually hidden during active interaction) */}
-      <div className={hasActiveWork ? "sr-only" : `pt-3 sm:pt-4 pb-2 sm:pb-3 border-b shrink-0 ${darkMode ? 'border-slate-800/80 bg-slate-900/30' : 'border-slate-200/80 bg-white/40'}`}>
+      <div className={hasActiveWork ? "sr-only" : `pt-1.5 pb-1 sm:pt-2 sm:pb-1.5 border-b shrink-0 ${darkMode ? 'border-slate-800/80 bg-slate-900/30' : 'border-slate-200/80 bg-white/40'}`}>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
-          {/* Breadcrumb Navigation */}
-          <nav className="flex justify-center items-center gap-2 text-xs font-semibold mb-1 text-slate-500">
-            <Link to="/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Home</Link>
-            <span>/</span>
-            <Link to="/tools/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">PDF Tools</Link>
-            <span>/</span>
-            <span className="text-yellow-700 dark:text-yellow-400 font-bold">{tool?.title}</span>
-          </nav>
+          {/* Breadcrumb Navigation & Rating in 1 single line */}
+          <div className="flex justify-between items-center text-[11px] font-semibold text-slate-500 mb-0.5">
+            <nav className="flex items-center gap-1.5">
+              <Link to="/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">Home</Link>
+              <span>/</span>
+              <Link to="/tools/" className="hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors">PDF Tools</Link>
+              <span>/</span>
+              <span className="text-yellow-700 dark:text-yellow-400 font-bold">{tool?.title}</span>
+            </nav>
+            <div className="hidden sm:flex items-center gap-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold">
+              <Star size={11} fill="currentColor" />
+              <span>4.9/5 (1,420+ ratings)</span>
+            </div>
+          </div>
 
-          <h1 className={`text-2xl sm:text-3xl md:text-4xl font-black mb-1 tracking-tight leading-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+          <h1 className={`text-lg sm:text-xl md:text-2xl font-black mb-0.5 tracking-tight leading-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>
             {tool?.title}
           </h1>
-          <p className={`text-xs sm:text-sm max-w-lg mx-auto font-medium line-clamp-1 sm:line-clamp-none ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+          <p className={`text-[11px] sm:text-xs max-w-lg mx-auto font-medium truncate ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
             {tool?.description}
           </p>
-
-          {/* Interactive Review Rating Pill & Trust Anchor */}
-          <div className="mt-2.5 flex justify-center">
-            <TrustMicroAnchor toolId={tool?.id} toolTitle={tool?.title} />
-          </div>
         </div>
       </div>
 
       {/* 2. THE WORKING INTERACTIVE TOOL (Full space when active, flanked with zero-CLS side rails when landing) */}
-      <div className={`w-full flex-grow flex flex-col ${hasActiveWork ? 'h-full overflow-hidden' : 'my-auto justify-center py-2 sm:py-4'}`}>
+      <div className={`w-full flex-grow flex flex-col justify-center items-center overflow-hidden ${hasActiveWork ? 'h-full' : 'my-auto py-1 sm:py-2'}`}>
         <DesktopSideRails
           hasActiveWork={hasActiveWork}
           centerWidthClass={hasActiveWork ? 'max-w-full' : 'max-w-4xl'}
           className={hasActiveWork ? '!px-0 w-full h-full' : 'my-auto'}
         >
-          <div className={`w-full flex flex-col items-center justify-center ${hasActiveWork ? 'h-full p-0' : 'p-1 sm:p-2'}`}>
-            <div className="w-full h-full">
+          <div className={`w-full flex flex-col items-center justify-center ${hasActiveWork ? 'h-full p-0' : 'p-0 sm:p-1'}`}>
+            <div className="w-full">
               {children}
             </div>
           </div>
         </DesktopSideRails>
       </div>
 
-      {/* 3. SEPARATED SPONSOR BANNER (Generously separated from the workbench with clear padding) */}
+      {/* 3. DEDICATED LOWER DOCK (Review Strip + Horizontal Sponsor + Suggested Tools) */}
       {!hasActiveWork && (
-        <div className="w-full max-w-4xl mx-auto px-4 mt-4 mb-2 shrink-0 flex flex-col items-center justify-center min-h-[90px] md:min-h-[95px]">
-          <AdsterraBanner format="responsive" className="my-1" showLabel={true} />
-        </div>
-      )}
-
-      {/* 4. DEDICATED COMMUNITY REVIEW & FEEDBACK STRIP */}
-      {!hasActiveWork && (
-        <div className="w-full max-w-4xl mx-auto px-4 my-4 shrink-0">
-          <div className={`p-4 sm:p-5 rounded-2xl border transition-all flex flex-col sm:flex-row items-center justify-between gap-4 ${
-            darkMode ? 'bg-slate-800/40 border-slate-700/60' : 'bg-slate-50/80 border-slate-200/80'
-          }`}>
-            <div className="flex items-center gap-3 text-center sm:text-left">
-              <div className="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center shrink-0 text-amber-500">
-                <Star size={18} fill="currentColor" />
-              </div>
-              <div>
-                <p className="text-xs font-bold text-slate-900 dark:text-white">
-                  Rated 4.9/5 based on 1,420+ verified community ratings
-                </p>
-                <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
-                  Have feedback about {tool?.title || 'this tool'}? Read community reviews or share your experience.
-                </p>
-              </div>
+        <div className="w-full shrink-0 flex flex-col items-center border-t border-slate-200/70 dark:border-white/10 bg-slate-50/40 dark:bg-slate-900/40">
+          
+          {/* 3A. Compact Community Review Strip (Height: 28px) */}
+          <div className="w-full max-w-4xl mx-auto px-4 py-1 flex items-center justify-between text-xs border-b border-slate-200/40 dark:border-white/5">
+            <div className="flex items-center gap-2 text-slate-700 dark:text-slate-300 text-[11px]">
+              <span className="flex text-amber-500"><Star size={12} fill="currentColor" /></span>
+              <span className="font-bold">Community Rated 4.9/5</span>
+              <span className="hidden md:inline text-slate-400">• Free & 100% Client-Side Private</span>
             </div>
-            <div className="flex items-center gap-2 shrink-0">
+            <div className="flex items-center gap-3 text-[11px]">
               <Link
                 to={`/reviews/?tool=${encodeURIComponent(tool?.title || tool?.id || '')}&write=true#write-review`}
-                className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-600 text-slate-950 transition-all shadow-xs flex items-center gap-1.5 cursor-pointer"
+                className="text-amber-600 dark:text-amber-400 font-bold hover:underline cursor-pointer flex items-center gap-1"
               >
-                <Star size={12} fill="currentColor" /> Write a Review
+                <Star size={10} fill="currentColor" /> Write a Review
               </Link>
+              <span className="text-slate-300 dark:text-slate-700">|</span>
               <Link
                 to={`/reviews/?tool=${encodeURIComponent(tool?.title || tool?.id || '')}`}
-                className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition-colors cursor-pointer ${
-                  darkMode ? 'border-slate-700 hover:bg-slate-700/60 text-slate-300' : 'border-slate-200 hover:bg-slate-100 text-slate-700'
-                }`}
+                className="text-slate-500 hover:text-slate-800 dark:hover:text-white cursor-pointer"
               >
                 Read Reviews
               </Link>
             </div>
           </div>
-        </div>
-      )}
 
-      {/* 5. RELATED PDF TOOLS (Sleek Suggestive Bottom Bar - Only on landing page) */}
-      {!hasActiveWork && relatedToolsList.length > 0 && (
-        <div className={`border-t px-4 sm:px-6 py-1.5 shrink-0 ${darkMode ? 'border-slate-800/80 bg-slate-900/40 backdrop-blur-md' : 'border-slate-200/80 bg-white/70 backdrop-blur-md'}`}>
-          <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
-            <span className="text-[11px] font-black uppercase tracking-wider text-slate-400 shrink-0 hidden sm:inline">
-              Suggested Tools:
-            </span>
-            <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5">
-              {relatedToolsList.map(rt => rt && (
-                <Link
-                  key={rt.id}
-                  to={rt.canonicalPath || rt.path}
-                  className={`px-3 py-1 rounded-xl border text-xs font-bold transition-all shrink-0 flex items-center gap-1.5 ${
-                    darkMode ? 'bg-slate-800 border-slate-700 hover:border-yellow-500/50 text-slate-200' : 'bg-slate-50 border-slate-200 hover:border-yellow-500/50 text-slate-700'
-                  }`}
-                >
-                  <div className="text-yellow-600 dark:text-yellow-400 shrink-0">
-                    {React.cloneElement(getIcon(rt.icon) as React.ReactElement, { className: 'w-3.5 h-3.5' })}
-                  </div>
-                  <span>{rt.title}</span>
-                </Link>
-              ))}
-            </div>
+          {/* 3B. Horizontal Sponsor Banner (Height: ~92px) */}
+          <div className="w-full max-w-3xl mx-auto flex items-center justify-center py-0.5 min-h-[90px] md:min-h-[92px]">
+            <AdsterraBanner format="responsive" showLabel={false} className="!my-0" />
           </div>
+
+          {/* 3C. Suggested Tools Bottom Strip (Height: ~28px) */}
+          {relatedToolsList.length > 0 && (
+            <div className="w-full border-t border-slate-200/60 dark:border-white/5 px-4 py-0.5 overflow-x-auto no-scrollbar">
+              <div className="max-w-5xl mx-auto flex items-center justify-center gap-2 text-[11px]">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 shrink-0">Suggested:</span>
+                {relatedToolsList.slice(0, 6).map(rt => rt && (
+                  <Link
+                    key={rt.id}
+                    to={rt.canonicalPath || rt.path}
+                    className={`px-2 py-0.5 rounded-lg border text-[11px] font-semibold transition-all shrink-0 flex items-center gap-1.5 ${
+                      darkMode ? 'bg-slate-800 border-slate-700 hover:border-yellow-500/50 text-slate-200' : 'bg-white border-slate-200 hover:border-yellow-500/50 text-slate-700'
+                    }`}
+                  >
+                    <div className="text-yellow-600 dark:text-yellow-400 shrink-0">
+                      {React.cloneElement(getIcon(rt.icon) as React.ReactElement, { className: 'w-3 h-3' })}
+                    </div>
+                    <span>{rt.title}</span>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>

@@ -122,7 +122,7 @@ const FileUploader: React.FC<FileUploaderProps> = ({
   const formatBadge = accept.includes('pdf') ? 'PDF' : accept.toUpperCase().replace(/\./g, ' ');
 
   return (
-    <div className="w-full max-w-xl mx-auto flex flex-col items-center justify-center text-center">
+    <div className="w-full max-w-md mx-auto flex flex-col items-center justify-center text-center py-0.5">
       {/* Error Banner */}
       {error && (
         <div className="w-full mb-4 p-4 rounded-2xl border border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-950/40 text-red-900 dark:text-red-200 animate-slideDown flex items-start gap-3 text-left">
@@ -204,19 +204,19 @@ const FileUploader: React.FC<FileUploaderProps> = ({
         <button
           type="button"
           onClick={() => fileInputRef.current?.click()}
-          className="w-full max-w-sm py-4 sm:py-4.5 px-6 sm:px-8 bg-[#e53935] hover:bg-[#d32f2f] text-white font-black text-lg sm:text-xl uppercase tracking-wider rounded-2xl shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2.5 cursor-pointer focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-red-400 focus-visible:ring-offset-2"
+          className="w-full max-w-xs sm:max-w-sm py-2.5 sm:py-3 px-5 sm:px-6 bg-[#e53935] hover:bg-[#d32f2f] text-white font-bold text-sm sm:text-base uppercase tracking-wider rounded-xl shadow-md hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-red-400 focus-visible:ring-offset-2"
         >
-          <Upload size={24} className="shrink-0" />
+          <Upload size={18} className="shrink-0" />
           <span>Select {formatBadge} {multiple ? 'files' : 'file'}</span>
         </button>
 
-        <p className="mt-2 text-xs sm:text-sm font-semibold text-slate-600 dark:text-slate-400">
+        <p className="mt-1 text-xs font-semibold text-slate-600 dark:text-slate-400">
           or drop {formatBadge} here
         </p>
 
-        <p className="mt-1.5 text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 max-w-sm text-center inline-flex items-center justify-center gap-1.5">
-          <ShieldCheck size={14} className="text-emerald-500 shrink-0 inline" />
-          <span>100% Private: Files are processed locally in your browser and never leave your device.</span>
+        <p className="mt-1 text-[11px] text-slate-500 dark:text-slate-400 max-w-sm text-center inline-flex items-center justify-center gap-1.5">
+          <ShieldCheck size={13} className="text-emerald-500 shrink-0 inline" />
+          <span>100% Private: Processed locally in your browser</span>
         </p>
       </div>
     </div>

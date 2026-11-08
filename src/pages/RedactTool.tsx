@@ -432,7 +432,7 @@ const RedactTool: React.FC<RedactToolProps> = ({ darkMode, notify }) => {
 
             {/* Completed Output Banner - Compact, Anti-Slop */}
             {resultBlobUrl && (
-                <div className="flex flex-col items-center gap-3.5 max-w-md mx-auto w-full p-4 sm:p-6 animate-fadeIn text-center">
+                <div className="flex flex-col items-center gap-2 max-w-md mx-auto w-full p-2 sm:p-3 animate-fadeIn text-center">
                     <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 text-xs font-bold border border-emerald-500/20 select-none">
                         <CheckCircle2 size={13} className="text-emerald-600 dark:text-emerald-400" />
                         <span>Document Redacted & Sanitized</span>

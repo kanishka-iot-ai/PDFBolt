@@ -1965,11 +1965,11 @@ const SimpleTool: React.FC<SimpleToolProps> = ({ title, mode, darkMode, notify, 
         </div>
       ) : (
         /* ── 3. RESULT STATE ── */
-        <div key={resultKey} className="flex flex-col items-center gap-3.5 max-w-md mx-auto w-full p-4 sm:p-6 animate-fadeIn text-center">
+        <div key={resultKey} className="flex flex-col items-center gap-2 max-w-md mx-auto w-full p-2 sm:p-3 animate-fadeIn text-center">
 
           {/* Circular Compression Meter for Compress Modes */}
           {(mode === 'compress' || isImageTool) && compressionStats && !Array.isArray(result) ? (
-            <div className="w-full space-y-6">
+            <div className="w-full space-y-1.5">
               <CircularCompressionMeter
                 originalBytes={compressionStats.originalSizeBytes}
                 compressedBytes={compressionStats.compressedSizeBytes}
