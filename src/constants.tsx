@@ -830,8 +830,8 @@ export const TOOLS: ToolMetadata[] = [
   },
   {
     id: ToolType.ANALYZER,
-    title: 'PDF Document Inspector & Builder',
-    seoTitle: 'PDF Document Inspector – Document Structure & Presentation Builder | PDFBolt',
+    title: 'PDF Document Inspector & Deck Builder',
+    seoTitle: 'PDF Document Inspector - Document Structure & Presentation Builder | PDFBolt',
     canonicalPath: '/analyze-pdf/',
     path: '/analyze-pdf/',
     description: 'Extract document structure, word counts, reading times, topics, executive summaries, and transform into 10-slide presentations or reports.',

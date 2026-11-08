@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Helmet } from 'react-helmet-async';
 import { analyzePdfDocument, buildPresentationFromAnalysis, askDocumentQuestion, DocumentAnalysis } from '../services/analyzerService';
 import { pdfToWord, pdfToExcel } from '../services/conversionService';
 import FileUploader from '../components/FileUploader';
-import { FileText, FileSearch, Presentation, Table, CheckCircle2, Download, MessageSquare, Clock, Layers, Hash, Send, RefreshCw, Image as ImageIcon } from 'lucide-react';
+import { FileText, Presentation, Table, CheckCircle2, Download, MessageSquare, Clock, Layers, Hash, Send, RefreshCw, Image as ImageIcon } from 'lucide-react';
 import { saveAs } from 'file-saver';
 import { NotifySystem } from '../types';
 import AdSlot from '../components/AdSlot';
 import AdsterraBanner from '../components/AdsterraBanner';
-import DesktopSideRails from '../components/DesktopSideRails';
 import { useActiveWork } from '../context/ActiveWorkContext';
 
 interface AnalyzerPageProps {
@@ -151,60 +149,30 @@ ${analysis.keyFindings.map((kf, i) => `${i + 1}. ${kf}`).join('\n')}
   };
 
   return (
-    <div className="animate-fadeIn pb-24">
-      <Helmet>
-        <title>PDF Document Inspector & Deck Builder | PDFBolt</title>
-        <meta name="description" content="Deep structural PDF intelligence: Extract word counts, tables, topics, executive summaries, interactive Q&A, and 1-click generation of PPTX presentations and Word reports." />
-        <link rel="canonical" href="https://pdfbolt.in/analyze-pdf/" />
-      </Helmet>
-
-      {/* Hero Header */}
-      <section className={`py-14 border-b ${darkMode ? 'border-slate-800 bg-slate-900/40' : 'border-slate-100 bg-slate-50/70'}`}>
-        <div className="max-w-5xl mx-auto px-6 text-center">
-          <h1 className={`text-3xl md:text-5xl font-black mb-4 tracking-tight leading-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>
-            PDF Document Inspector & Deck Builder
-          </h1>
-          <p className={`text-base md:text-lg max-w-2xl mx-auto ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
-            Understand any PDF instantly. Extract structure, topics, and key insights, then transform it into presentations, reports, or spreadsheets with a single click.
-          </p>
-        </div>
-      </section>
-
-      {/* Main Content Area */}
-      <div className="max-w-6xl mx-auto px-6 py-12">
-        {!analysis && (
-          <DesktopSideRails centerWidthClass="max-w-2xl">
-            <div className="w-full">
-              {analyzing ? (
-                <div className={`p-16 rounded-[2rem] border text-center ${darkMode ? 'bg-slate-800/50 border-slate-700' : 'bg-white border-slate-200 shadow-xl'}`}>
-                  <div className="w-14 h-14 border-4 border-yellow-500 border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
-                  <h2 className={`text-2xl font-black mb-2 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
-                    Analyzing Document Structure...
-                  </h2>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 max-w-md mx-auto">
-                    Extracting text streams, tabular grids, image operators, and page statistics...
-                  </p>
-                </div>
-              ) : (
-                <div className="w-full flex flex-col items-center">
-                  <FileUploader
-                    onFilesSelected={handleFilesSelected}
-                    accept=".pdf"
-                    multiple={false}
-                    darkMode={darkMode}
-                  />
-                  {/* Center Horizontal Ad directly under Uploader */}
-                  <div className="w-full max-w-2xl mx-auto mt-4 shrink-0 flex flex-col items-center justify-center min-h-[114px]">
-                    <AdsterraBanner format="responsive" className="my-1" showLabel={true} />
-                  </div>
-                </div>
-              )}
+    <div className="w-full h-full min-h-0 animate-fadeIn text-center flex flex-col">
+      {!analysis ? (
+        <div className="max-w-4xl mx-auto px-2 sm:px-4 py-2 sm:py-3 w-full my-auto flex flex-col items-center justify-center">
+          {analyzing ? (
+            <div className={`p-8 sm:p-12 rounded-2xl border text-center max-w-md mx-auto ${darkMode ? 'bg-slate-800/50 border-slate-700' : 'bg-white border-slate-200 shadow-xl'}`}>
+              <div className="w-12 h-12 border-4 border-yellow-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+              <h2 className={`text-xl font-black mb-1.5 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+                Analyzing Document Structure...
+              </h2>
+              <p className="text-xs text-slate-500 dark:text-slate-400 max-w-xs mx-auto">
+                Extracting text streams, tabular grids, image operators, and page statistics...
+              </p>
             </div>
-          </DesktopSideRails>
-        )}
-
-        {analysis && (
-          <div className="space-y-10 animate-slideUp">
+          ) : (
+            <FileUploader
+              onFilesSelected={handleFilesSelected}
+              accept=".pdf"
+              multiple={false}
+              darkMode={darkMode}
+            />
+          )}
+        </div>
+      ) : (
+        <div className="w-full h-full min-h-0 overflow-y-auto p-4 sm:p-6 lg:p-8 space-y-8 animate-slideUp text-left">
             {/* Header with Switch File */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-6 border-b border-slate-200 dark:border-slate-800">
               <div>
@@ -456,8 +424,7 @@ ${analysis.keyFindings.map((kf, i) => `${i + 1}. ${kf}`).join('\n')}
               <AdsterraBanner format="responsive" className="my-1" />
             </div>
           </div>
-        )}
-      </div>
+      )}
     </div>
   );
 };

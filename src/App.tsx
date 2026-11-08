@@ -98,7 +98,10 @@ const TOOLS_BY_PATH = new Map<string, (typeof TOOLS)[number]>(
 const TOOL_PATH_SET = new Set(
   TOOLS.flatMap(t => {
     const paths = [t.path, t.canonicalPath, ...(t.seoPath ? [t.seoPath] : [])].filter(Boolean);
-    return paths.flatMap(p => [p, p.endsWith('/') ? p : p + '/']);
+    return paths.flatMap(p => {
+      const clean = p.endsWith('/') ? p.slice(0, -1) : p;
+      return [clean, clean + '/'];
+    });
   })
 );
 
@@ -298,7 +301,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ darkMode, setDarkMode, soundEna
             <Route path="/color-pdf-to-black-and-white" element={<SEOLandingPage toolId="color-to-bw" darkMode={darkMode}><SimpleTool title="Color PDF to Black & White" mode="color-to-bw" darkMode={darkMode} notify={notify} /></SEOLandingPage>} />
             <Route path="/grayscale-pdf" element={<Navigate to="/color-pdf-to-black-and-white/" replace />} />
             <Route path="/pdf-to-black-and-white" element={<Navigate to="/color-pdf-to-black-and-white/" replace />} />
-            <Route path="/analyze-pdf" element={<AnalyzerPage darkMode={darkMode} notify={notify} />} />
+            <Route path="/analyze-pdf" element={<SEOLandingPage toolId="analyze" darkMode={darkMode}><AnalyzerPage darkMode={darkMode} notify={notify} /></SEOLandingPage>} />
             <Route path="/pdf-builder" element={<Navigate to="/analyze-pdf/" replace />} />
 
             {/* Targeted Size Compression Routes (Wave 1 & 2) */}
