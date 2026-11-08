@@ -109,7 +109,7 @@ const SEOLandingPage: React.FC<SEOLandingPageProps> = ({ tool: toolProp, toolId,
     .filter(Boolean);
 
   return (
-    <div className={`animate-fadeIn w-full ${hasActiveWork ? 'h-[calc(100vh-64px)] overflow-hidden bg-[#f4f5f8] dark:bg-slate-950 flex flex-col' : 'min-h-[calc(100vh-64px)] lg:h-[calc(100vh-64px)] lg:max-h-[calc(100vh-64px)] lg:overflow-hidden flex flex-col justify-between bg-white dark:bg-slate-900'}`}>
+    <div className={`animate-fadeIn w-full ${hasActiveWork ? 'h-[calc(100vh-64px)] overflow-hidden bg-[#f4f5f8] dark:bg-slate-950 flex flex-col' : 'min-h-[calc(100vh-64px)] flex flex-col justify-between bg-white dark:bg-slate-900'}`}>
       <Helmet>
         <title>{tool?.seoTitle || `${tool?.title || 'PDF Tool'} – Free & Private Online Tool | PDFBolt`}</title>
         <meta name="description" content={tool?.description} />

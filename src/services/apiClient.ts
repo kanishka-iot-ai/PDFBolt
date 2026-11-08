@@ -34,7 +34,7 @@ export const API_BASE_URL = rawHost.endsWith('/api/v1')
   ? rawHost.replace(/\/$/, '') 
   : `${rawHost.replace(/\/$/, '')}/api/v1`;
 const API_ORIGIN = API_BASE_URL.replace(/\/api\/v1\/?$/, '');
-export const INTERNAL_CLIENT_TOKEN = 'pdfbolt_app_internal_v1_secure';
+export const INTERNAL_CLIENT_TOKEN = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_INTERNAL_CLIENT_TOKEN) || 'pdfbolt_app_internal_v1_secure';
 
 function resolveApiUrl(pathOrUrl?: string, fallback?: string): string {
   const value = pathOrUrl || fallback || '';

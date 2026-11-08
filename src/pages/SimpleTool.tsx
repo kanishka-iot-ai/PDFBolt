@@ -23,6 +23,7 @@ import { useActiveWork } from '../context/ActiveWorkContext';
 import PDFThumbnail from '../components/PDFThumbnail';
 import OutputPreviewModal from '../components/OutputPreviewModal';
 import FileSizeComparisonBadge from '../components/FileSizeComparisonBadge';
+import CircularCompressionMeter from '../components/CircularCompressionMeter';
 import PostDownloadFeedback from '../components/PostDownloadFeedback';
 
 const formatBytes = (bytes?: number) => {
@@ -1966,50 +1967,39 @@ const SimpleTool: React.FC<SimpleToolProps> = ({ title, mode, darkMode, notify, 
         /* ── 3. RESULT STATE ── */
         <div key={resultKey} className="flex flex-col items-center gap-6 max-w-3xl mx-auto w-full p-6 animate-fadeIn">
 
-          {/* Success Banner */}
-          <div className="flex items-center gap-4 text-green-500 font-black bg-green-50 dark:bg-green-900/20 px-10 py-5 rounded-[2rem] border border-green-100 dark:border-green-800 w-full justify-center">
-            <CheckCircle2 size={32} />
-            <span className="text-2xl">Processing Complete</span>
-          </div>
-
-          {/* Compression Savings Report */}
-          {(mode === 'compress' || isImageTool) && compressionStats && (
-            <div className="w-full p-6 sm:p-8 rounded-3xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-xl text-center space-y-4">
-              <div>
-                <span className="text-[11px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400">
-                  Compression Complete
-                </span>
-                <h3 className="text-2xl sm:text-3xl font-black mt-1 text-slate-900 dark:text-white">
-                  Saved {formatBytes(compressionStats.savedBytes)} ({compressionStats.savedPercent}% Smaller)
-                </h3>
-              </div>
-
-              <div className="max-w-md mx-auto space-y-3 pt-2">
-                <div className="space-y-1 text-left">
-                  <div className="flex justify-between text-xs font-bold text-slate-400">
-                    <span>Original Size</span>
-                    <span>{formatBytes(compressionStats.originalSizeBytes)}</span>
-                  </div>
-                  <div className="w-full h-2.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
-                    <div className="w-full h-full bg-slate-400 dark:bg-slate-500 rounded-full"></div>
-                  </div>
-                </div>
-
-                <div className="space-y-1 text-left">
-                  <div className="flex justify-between text-xs font-bold text-emerald-600 dark:text-emerald-400">
-                    <span>Compressed Output</span>
-                    <span>{formatBytes(compressionStats.compressedSizeBytes)}</span>
-                  </div>
-                  <div className="w-full h-2.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-emerald-500 rounded-full transition-all duration-500"
-                      style={{ width: `${Math.max(5, 100 - compressionStats.savedPercent)}%` }}
-                    ></div>
-                  </div>
-                </div>
-              </div>
+          {/* Circular Compression Meter for Compress Modes */}
+          {(mode === 'compress' || isImageTool) && compressionStats && !Array.isArray(result) ? (
+            <div className="w-full space-y-6">
+              <CircularCompressionMeter
+                originalBytes={compressionStats.originalSizeBytes}
+                compressedBytes={compressionStats.compressedSizeBytes}
+                fileName={file?.name || 'document.pdf'}
+                onDownload={(customFileName) => {
+                  if (result && typeof result === 'string') {
+                    const downloadName = customFileName || (file ? file.name.replace(/\.[^/.]+$/, "") + "_compressed.pdf" : `pdfbolt_compress_output.pdf`);
+                    const link = document.createElement('a');
+                    link.href = result;
+                    link.download = downloadName;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    notify.success();
+                  }
+                }}
+                onPreview={() => setShowPreviewModal(true)}
+                onReset={clearSelection}
+                darkMode={darkMode}
+                targetSizeHint={targetSizeHint}
+              />
+              <PostDownloadFeedback toolName={title} />
             </div>
-          )}
+          ) : (
+            <>
+              {/* Success Banner */}
+              <div className="flex items-center gap-4 text-green-500 font-black bg-green-50 dark:bg-green-900/20 px-10 py-5 rounded-[2rem] border border-green-100 dark:border-green-800 w-full justify-center">
+                <CheckCircle2 size={32} />
+                <span className="text-2xl">Processing Complete</span>
+              </div>
 
               {/* Download Area */}
               {Array.isArray(result) ? (
@@ -2088,7 +2078,12 @@ const SimpleTool: React.FC<SimpleToolProps> = ({ title, mode, darkMode, notify, 
                 </>
               )}
 
-              {/* Process Another File CTA (Prominently directly under Download) */}
+            </>
+          )}
+
+          {/* Process Another File CTA (Shown for non-compression or multi-file modes) */}
+          {(!((mode === 'compress' || isImageTool) && compressionStats && !Array.isArray(result))) && (
+            <>
               <button
                 onClick={clearSelection}
                 className={`w-full py-3 rounded-xl font-black text-xs uppercase tracking-wider border-2 transition-all hover:scale-[1.01] flex items-center justify-center gap-2 ${
@@ -2102,9 +2097,10 @@ const SimpleTool: React.FC<SimpleToolProps> = ({ title, mode, darkMode, notify, 
 
               {/* Layer 3: Post-Download Non-Intrusive Feedback Prompt */}
               <PostDownloadFeedback toolName={title} />
+            </>
+          )}
 
-
-            </div>
+        </div>
           )}
 
       {/* Full-screen PDF Preview Modal */}

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { inspectPdfForCompression, compressPdfAdvanced, PdfCompressionStats, CompressionResult, CompressionOptions } from '../services/pdfService';
 import FileUploader from '../components/FileUploader';
 import ProgressBar from '../components/ProgressBar';
+import CircularCompressionMeter from '../components/CircularCompressionMeter';
 import { formatFileSize, validateOutputIntegrity, validateFile, ALLOWED_MIME_TYPES, MAX_FILE_SIZE } from '../utils/fileValidation';
 import { saveAs } from 'file-saver';
 import { apiClient } from '../services/apiClient';
@@ -173,10 +174,10 @@ const CompressTool: React.FC<CompressToolProps> = ({ darkMode, notify }) => {
     }
   };
 
-  const handleDownload = () => {
+  const handleDownload = (customName?: string) => {
     if (!result || !file) return;
     const blob = new Blob([result.compressedBytes as any], { type: 'application/pdf' });
-    const name = file.name.replace(/\.pdf$/i, '') + '_compressed.pdf';
+    const name = customName || (file.name.replace(/\.pdf$/i, '') + '_compressed.pdf');
     saveAs(blob, name);
     notify.complete();
   };
@@ -498,89 +499,16 @@ const CompressTool: React.FC<CompressToolProps> = ({ darkMode, notify }) => {
         {/* Results Screen */}
         {result && file && (
           <div className="space-y-8 animate-slideDown">
-            <div className={`p-8 sm:p-10 rounded-3xl border text-center space-y-6 ${
-              darkMode ? 'bg-slate-800/60 border-slate-700 shadow-2xl' : 'bg-white border-slate-200 shadow-xl'
-            }`}>
-              <div className="w-16 h-16 rounded-full bg-emerald-500/10 text-emerald-500 flex items-center justify-center mx-auto">
-                <CheckCircle2 size={36} />
-              </div>
-
-              <div>
-                <span className="text-[10px] font-black uppercase tracking-widest text-emerald-500">
-                  Compression Complete
-                </span>
-                <h2 className={`text-3xl sm:text-4xl font-black mt-1 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
-                  Saved {formatFileSize(result.savedBytes)} ({result.savedPercent}% Smaller)
-                </h2>
-              </div>
-
-              {/* Visual Comparison Bar */}
-              <div className="max-w-md mx-auto space-y-3 pt-2">
-                <div className="space-y-1 text-left">
-                  <div className="flex justify-between text-xs font-bold text-slate-400">
-                    <span>Original Size</span>
-                    <span>{formatFileSize(result.originalSizeBytes)}</span>
-                  </div>
-                  <div className="w-full h-3 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
-                    <div className="w-full h-full bg-slate-400 dark:bg-slate-500 rounded-full"></div>
-                  </div>
-                </div>
-
-                <div className="space-y-1 text-left">
-                  <div className="flex justify-between text-xs font-bold text-emerald-600 dark:text-emerald-400">
-                    <span>Compressed Output</span>
-                    <span>{formatFileSize(result.compressedSizeBytes)}</span>
-                  </div>
-                  <div className="w-full h-3 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-emerald-500 rounded-full transition-all duration-1000"
-                      style={{ width: `${Math.max(10, 100 - result.savedPercent)}%` }}
-                    ></div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-                <button
-                  onClick={handleDownload}
-                  className="px-8 py-4 bg-yellow-500 hover:bg-yellow-400 text-slate-950 font-black text-sm uppercase tracking-wider rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2"
-                >
-                  <Download size={16} /> Download Compressed PDF
-                </button>
-
-                {result.previewOriginalDataUrl && (
-                  <button
-                    onClick={() => setShowPreviewModal(true)}
-                    className={`px-6 py-4 rounded-2xl font-bold text-sm uppercase tracking-wider transition-all flex items-center justify-center gap-2 border ${
-                      darkMode ? 'bg-slate-700 border-slate-600 text-white hover:bg-slate-600' : 'bg-slate-100 border-slate-200 text-slate-800 hover:bg-slate-200'
-                    }`}
-                  >
-                    <Eye size={16} /> Compare Quality (Page 1)
-                  </button>
-                )}
-
-                <button
-                  onClick={() => { setResult(null); }}
-                  className={`px-6 py-4 rounded-2xl font-bold text-sm uppercase tracking-wider transition-all flex items-center justify-center gap-2 border ${
-                    darkMode ? 'border-slate-700 text-slate-300 hover:bg-slate-800' : 'border-slate-200 text-slate-700 hover:bg-slate-50'
-                  }`}
-                >
-                  <RefreshCw size={14} /> Adjust Settings
-                </button>
-
-                <button
-                  onClick={() => { setResult(null); setStats(null); setFile(null); }}
-                  className={`px-6 py-4 rounded-2xl font-bold text-sm uppercase tracking-wider transition-all flex items-center justify-center gap-2 border ${
-                    darkMode
-                      ? 'border-slate-700 bg-slate-800/80 text-slate-300 hover:border-yellow-500/60 hover:text-yellow-400'
-                      : 'border-slate-200 bg-slate-50 text-slate-700 hover:border-yellow-400 hover:bg-white hover:text-slate-900'
-                  }`}
-                >
-                  <FileText size={14} /> Process Another File
-                </button>
-              </div>
-            </div>
+            <CircularCompressionMeter
+              originalBytes={result.originalSizeBytes}
+              compressedBytes={result.compressedSizeBytes}
+              fileName={file.name}
+              onDownload={handleDownload}
+              onPreview={result.previewOriginalDataUrl ? () => setShowPreviewModal(true) : undefined}
+              onReset={() => { setResult(null); setStats(null); setFile(null); }}
+              darkMode={darkMode}
+              targetSizeHint={targetMode === 'preset' ? `< ${targetSizeMB} MB` : undefined}
+            />
 
             {/* Non-Intrusive Result Screen Sponsored Slot (Far below download button) */}
 
@@ -635,7 +563,7 @@ const CompressTool: React.FC<CompressToolProps> = ({ darkMode, notify }) => {
                   <div className="flex justify-end pt-4">
                     <button
                       type="button"
-                      onClick={handleDownload}
+                      onClick={() => handleDownload()}
                       className="px-6 py-3 bg-yellow-500 text-slate-950 font-black text-xs uppercase tracking-wider rounded-xl shadow-md"
                     >
                       Download Compressed PDF

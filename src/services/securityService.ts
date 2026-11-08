@@ -37,7 +37,7 @@ export async function protectPdf(file: File, password: string): Promise<Uint8Arr
         // 4. Save encrypted PDF
         return await pdfDoc.save({ useObjectStreams: true });
     } catch (err) {
-        console.error("Encryption Error:", err);
+        if (import.meta.env.DEV) { console.error("Encryption Error:", err); }
         throw err;
     }
 }
