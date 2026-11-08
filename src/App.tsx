@@ -227,14 +227,17 @@ const MainLayout: React.FC<MainLayoutProps> = ({ darkMode, setDarkMode, soundEna
   }, [location.pathname]);
 
   return (
-    <div className={`min-h-screen flex flex-col transition-colors duration-300 font-sans relative ${darkMode ? 'dark bg-[#090D15] text-slate-100' : 'bg-[#FBFBF9] text-slate-900'}`}>
-      {/* Background Layer 1: Ambient Photonic Amber Key-Light */}
-      <div className="absolute inset-0 bg-amber-beacon pointer-events-none" aria-hidden="true" />
+    <div className={`min-h-screen flex flex-col transition-colors duration-300 font-sans relative ${darkMode ? 'dark bg-[#090D15] text-slate-100' : 'bg-[#F8FAFC] text-slate-900'}`}>
+      {/* Background Layer 1: Ambient Key-Light Mesh */}
+      <div className="absolute inset-0 bg-ambient-mesh pointer-events-none" aria-hidden="true" />
 
-      {/* Background Layer 2: Radially Masked Precision Architectural Grid */}
-      <div className="absolute inset-x-0 top-0 h-[850px] bg-grid-blueprint pointer-events-none" aria-hidden="true" />
+      {/* Background Layer 2: Top-Edge Horizon Spotlight Line */}
+      <div className="aurora-horizon pointer-events-none" aria-hidden="true" />
 
-      {/* Background Layer 3: Tactile Micro-Vellum Grain Overlay */}
+      {/* Background Layer 3: Precision Architectural Micro-Dot Matrix Canvas */}
+      <div className="absolute inset-x-0 top-0 h-[920px] bg-dot-matrix pointer-events-none" aria-hidden="true" />
+
+      {/* Background Layer 4: Tactile Micro-Vellum Grain Overlay */}
       <div className="site-noise-texture" aria-hidden="true" />
 
       <Navbar

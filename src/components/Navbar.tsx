@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   Moon, Sun, FileText, Menu, X, ChevronDown,
   ArrowRight, FileSearch, ShieldCheck, Calculator, Home, AlertTriangle, Heart,
-  Wrench, BookOpen, Layers, GraduationCap, Briefcase, Star
+  Wrench, BookOpen, Layers, GraduationCap, Briefcase, Star, Sparkles
 } from 'lucide-react';
 import { TOOLS, getIcon } from '../constants';
 import { useActiveWork } from '../context/ActiveWorkContext';
@@ -36,13 +36,43 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Categories mapping with static hover color classes for Tailwind JIT
+  // Categories mapping with static color tokens for Tailwind JIT
   const toolCategories = [
-    { id: 'edit', name: 'Edit & Organize', color: 'text-red-500', hoverColor: 'group-hover:text-red-500', bg: 'bg-red-50 dark:bg-red-900/10' },
-    { id: 'convert-to', name: 'Convert To PDF', color: 'text-blue-500', hoverColor: 'group-hover:text-blue-500', bg: 'bg-blue-50 dark:bg-blue-900/10' },
-    { id: 'convert-from', name: 'Convert From PDF', color: 'text-green-500', hoverColor: 'group-hover:text-green-500', bg: 'bg-green-50 dark:bg-green-900/10' },
-    { id: 'security', name: 'Security', color: 'text-orange-500', hoverColor: 'group-hover:text-orange-500', bg: 'bg-orange-50 dark:bg-orange-900/10' },
-    { id: 'utilities', name: 'Utilities', color: 'text-slate-500', hoverColor: 'group-hover:text-yellow-500', bg: 'bg-slate-50 dark:bg-slate-800/50' }
+    { 
+      id: 'edit', 
+      name: 'Edit & Organize', 
+      dotColor: 'bg-rose-500',
+      badgeClass: 'bg-rose-50 text-rose-700 border-rose-200/70 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800/40',
+      iconBox: 'bg-rose-50 text-rose-600 border-rose-200/60 dark:bg-rose-950/40 dark:text-rose-400 dark:border-rose-800/40'
+    },
+    { 
+      id: 'convert-to', 
+      name: 'Convert To PDF', 
+      dotColor: 'bg-sky-500',
+      badgeClass: 'bg-sky-50 text-sky-700 border-sky-200/70 dark:bg-sky-950/40 dark:text-sky-300 dark:border-sky-800/40',
+      iconBox: 'bg-sky-50 text-sky-600 border-sky-200/60 dark:bg-sky-950/40 dark:text-sky-400 dark:border-sky-800/40'
+    },
+    { 
+      id: 'convert-from', 
+      name: 'Convert From PDF', 
+      dotColor: 'bg-emerald-500',
+      badgeClass: 'bg-emerald-50 text-emerald-700 border-emerald-200/70 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800/40',
+      iconBox: 'bg-emerald-50 text-emerald-600 border-emerald-200/60 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-800/40'
+    },
+    { 
+      id: 'security', 
+      name: 'Security & Legal', 
+      dotColor: 'bg-amber-500',
+      badgeClass: 'bg-amber-50 text-amber-800 border-amber-200/70 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800/40',
+      iconBox: 'bg-amber-50 text-amber-600 border-amber-200/60 dark:bg-amber-950/40 dark:text-amber-400 dark:border-amber-800/40'
+    },
+    { 
+      id: 'utilities', 
+      name: 'Utilities & Lab', 
+      dotColor: 'bg-indigo-500',
+      badgeClass: 'bg-indigo-50 text-indigo-700 border-indigo-200/70 dark:bg-indigo-950/40 dark:text-indigo-300 dark:border-indigo-800/40',
+      iconBox: 'bg-indigo-50 text-indigo-600 border-indigo-200/60 dark:bg-indigo-950/40 dark:text-indigo-400 dark:border-indigo-800/40'
+    }
   ];
 
   const getCategorizedTools = (categoryId: string) => {
@@ -143,15 +173,26 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
                 All Tools <ChevronDown size={16} className={`transition-transform duration-300 ${isToolsOpen ? 'rotate-180' : ''}`} />
               </button>
               
-              {/* Mega Menu */}
+              {/* Mega Menu - 100% Solid Backplate (Zero Bleed-Through) */}
               {isToolsOpen && (
-                <div className={`absolute top-full -left-32 md:-left-48 mt-4 w-[840px] max-w-[95vw] rounded-3xl shadow-2xl border animate-slideDown overflow-hidden ${darkMode ? 'bg-[#0e1422]/95 border-white/[0.08] shadow-[0_20px_50px_rgba(0,0,0,0.5)] backdrop-blur-2xl' : 'bg-white/95 border-slate-200/90 shadow-2xl backdrop-blur-2xl'}`}>
-                  <div className="grid grid-cols-3 gap-0">
-                    <div className="col-span-2 p-6 grid grid-cols-2 gap-6">
+                <div 
+                  id="mega-menu-dropdown"
+                  role="region"
+                  aria-label="All PDF Tools Directory"
+                  className="absolute top-full -left-32 md:-left-48 mt-3.5 w-[880px] max-w-[96vw] rounded-[2rem] mega-menu-panel animate-slideDown overflow-hidden z-[100]"
+                >
+                  <div className="grid grid-cols-12 divide-x divide-slate-100 dark:divide-slate-800/80">
+                    
+                    {/* Primary Tool Categories (8 cols) */}
+                    <div className="col-span-8 p-6 grid grid-cols-2 gap-x-6 gap-y-5 bg-white dark:bg-[#0c111d]">
                       {toolCategories.slice(0, 4).map(cat => (
-                        <div key={cat.id}>
-                          <p className={`text-xs font-black uppercase tracking-widest mb-3 ${cat.color}`}>{cat.name}</p>
-                          <ul className="space-y-1">
+                        <div key={cat.id} className="space-y-2">
+                          <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10.5px] font-black uppercase tracking-wider border ${cat.badgeClass}`}>
+                            <span className={`w-1.5 h-1.5 rounded-full ${cat.dotColor}`} />
+                            <span>{cat.name}</span>
+                          </div>
+                          
+                          <ul className="space-y-0.5">
                             {getCategorizedTools(cat.id).slice(0, 5).map(tool => (
                               <li key={tool.id}>
                                 <Link 
@@ -160,12 +201,12 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
                                     setIsToolsOpen(false);
                                     handleSafeNavigation(e, tool.canonicalPath || tool.path);
                                   }}
-                                  className={`group flex items-center gap-2.5 p-2 rounded-xl transition-colors ${darkMode ? 'hover:bg-slate-800' : 'hover:bg-slate-50'}`}
+                                  className="group flex items-center gap-2.5 px-2 py-1.5 rounded-xl transition-all duration-150 hover:bg-slate-100/70 dark:hover:bg-slate-800/60"
                                 >
-                                  <div className={`p-1.5 rounded-lg ${darkMode ? 'bg-slate-800 text-slate-300' : 'bg-white shadow-sm text-slate-600'} ${cat.hoverColor} group-hover:scale-110 transition-all`}>
-                                    {React.cloneElement(getIcon(tool.icon) as React.ReactElement, { className: 'w-4 h-4' })}
+                                  <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 border transition-all duration-200 group-hover:scale-110 shadow-2xs ${cat.iconBox}`}>
+                                    {React.cloneElement(getIcon(tool.icon) as React.ReactElement, { className: 'w-3.5 h-3.5' })}
                                   </div>
-                                  <span className={`text-sm font-semibold ${darkMode ? 'text-slate-300 group-hover:text-white' : 'text-slate-600 group-hover:text-slate-900'}`}>
+                                  <span className="text-xs font-bold text-slate-800 dark:text-slate-200 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors truncate">
                                     {tool.title}
                                   </span>
                                 </Link>
@@ -175,23 +216,51 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
                         </div>
                       ))}
                     </div>
-                    <div className={`p-6 border-l flex flex-col justify-between ${darkMode ? 'bg-slate-800/50 border-slate-700' : 'bg-slate-50 border-slate-100'}`}>
-                      <div>
-                        <p className="text-xs font-black uppercase tracking-widest mb-3 text-slate-500">Utilities & Calculators</p>
-                        <ul className="space-y-1 mb-6">
-                          <li>
-                            <Link 
-                              to="/analyze-pdf/" 
-                              onClick={(e) => {
-                                setIsToolsOpen(false);
-                                handleSafeNavigation(e, "/analyze-pdf");
-                              }}
-                              className={`group flex items-center gap-2 p-2 rounded-lg transition-colors ${darkMode ? 'hover:bg-slate-800 text-slate-300' : 'hover:bg-white text-slate-700'}`}
-                            >
-                              <FileSearch size={16} className="text-yellow-600 dark:text-yellow-400" />
-                              <span className="text-xs font-bold">PDF Inspector</span>
-                            </Link>
-                          </li>
+
+                    {/* Pro Intelligence & Utilities Column (4 cols) */}
+                    <div className={`col-span-4 p-5 flex flex-col justify-between ${darkMode ? 'bg-[#0f1524]' : 'bg-slate-50/90'}`}>
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider bg-amber-500/10 text-amber-800 dark:text-amber-300 border border-amber-500/20">
+                            <Sparkles size={11} className="text-amber-500" /> Pro Utilities
+                          </span>
+                          <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400">100% Client RAM</span>
+                        </div>
+
+                        {/* PDF Inspector Feature Card */}
+                        <div className="p-3 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-2xs relative overflow-hidden group">
+                          <div className="flex items-center justify-between mb-1.5">
+                            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9.5px] font-black uppercase tracking-wider bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/25">
+                              Featured
+                            </span>
+                            <ShieldCheck size={13} className="text-emerald-500" />
+                          </div>
+
+                          <Link 
+                            to="/analyze-pdf/" 
+                            onClick={(e) => {
+                              setIsToolsOpen(false);
+                              handleSafeNavigation(e, "/analyze-pdf");
+                            }}
+                            className="block group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors"
+                          >
+                            <h4 className="text-xs font-black text-slate-900 dark:text-white flex items-center gap-1.5 mb-1">
+                              <FileSearch size={14} className="text-amber-500 shrink-0" />
+                              PDF Inspector
+                            </h4>
+                            <p className="text-[11px] text-slate-600 dark:text-slate-400 leading-snug mb-2 font-medium">
+                              Deep document tree, font diagnostics and metadata audit.
+                            </p>
+                          </Link>
+
+                          <div className="flex items-center gap-1.5 pt-2 border-t border-slate-100 dark:border-slate-800 text-[10px] font-bold text-slate-500 dark:text-slate-400">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                            Zero Server Uploads
+                          </div>
+                        </div>
+
+                        {/* Quick Utility Links */}
+                        <ul className="space-y-0.5">
                           <li>
                             <Link 
                               to="/tools/pdf-size-calculator/" 
@@ -199,10 +268,12 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
                                 setIsToolsOpen(false);
                                 handleSafeNavigation(e, "/tools/pdf-size-calculator");
                               }}
-                              className={`group flex items-center gap-2 p-2 rounded-lg transition-colors ${darkMode ? 'hover:bg-slate-800 text-slate-300' : 'hover:bg-white text-slate-700'}`}
+                              className="group flex items-center gap-2 px-2 py-1 rounded-xl transition-colors hover:bg-white dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300"
                             >
-                              <Calculator size={16} className="text-yellow-500" />
-                              <span className="text-xs font-bold">Size Calculator</span>
+                              <div className="w-6 h-6 rounded-md bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0 border border-indigo-200/50 dark:border-indigo-800/40">
+                                <Calculator size={13} />
+                              </div>
+                              <span className="text-xs font-bold truncate">Size Calculator</span>
                             </Link>
                           </li>
                           <li>
@@ -212,10 +283,12 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
                                 setIsToolsOpen(false);
                                 handleSafeNavigation(e, "/test-files");
                               }}
-                              className={`group flex items-center gap-2 p-2 rounded-lg transition-colors ${darkMode ? 'hover:bg-slate-800 text-slate-300' : 'hover:bg-white text-slate-700'}`}
+                              className="group flex items-center gap-2 px-2 py-1 rounded-xl transition-colors hover:bg-white dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300"
                             >
-                              <FileText size={16} className="text-blue-500" />
-                              <span className="text-xs font-bold">Sample Test Files</span>
+                              <div className="w-6 h-6 rounded-md bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0 border border-blue-200/50 dark:border-blue-800/40">
+                                <FileText size={13} />
+                              </div>
+                              <span className="text-xs font-bold truncate">Sample Test Files</span>
                             </Link>
                           </li>
                           <li>
@@ -225,13 +298,31 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
                                 setIsToolsOpen(false);
                                 handleSafeNavigation(e, "/compare/online-pdf-tools");
                               }}
-                              className={`group flex items-center gap-2 p-2 rounded-lg transition-colors ${darkMode ? 'hover:bg-slate-800 text-slate-300' : 'hover:bg-white text-slate-700'}`}
+                              className="group flex items-center gap-2 px-2 py-1 rounded-xl transition-colors hover:bg-white dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300"
                             >
-                              <ShieldCheck size={16} className="text-emerald-500" />
-                              <span className="text-xs font-bold">Privacy Comparison</span>
+                              <div className="w-6 h-6 rounded-md bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 border border-emerald-200/50 dark:border-emerald-800/40">
+                                <ShieldCheck size={13} />
+                              </div>
+                              <span className="text-xs font-bold truncate">Privacy Comparison</span>
                             </Link>
                           </li>
                         </ul>
+
+                        {/* Social Proof Review Pill */}
+                        <Link
+                          to="/reviews/"
+                          onClick={(e) => {
+                            setIsToolsOpen(false);
+                            handleSafeNavigation(e, "/reviews/");
+                          }}
+                          className="flex items-center justify-between p-2 rounded-xl bg-amber-500/[0.08] dark:bg-amber-400/[0.06] border border-amber-500/20 text-slate-800 dark:text-slate-200 transition-transform hover:scale-[1.02]"
+                        >
+                          <div className="flex items-center gap-1.5">
+                            <Star size={13} fill="currentColor" className="text-amber-500" />
+                            <span className="text-[11px] font-black">4.9 / 5 Rating</span>
+                          </div>
+                          <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400">1,420+ reviews</span>
+                        </Link>
                       </div>
 
                       <Link
@@ -240,11 +331,13 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, soundEnabled,
                           setIsToolsOpen(false);
                           handleSafeNavigation(e, "/tools");
                         }}
-                        className="w-full py-3 bg-yellow-500 hover:bg-yellow-400 text-slate-950 font-black text-xs uppercase tracking-wider rounded-xl transition-all text-center flex items-center justify-center gap-1 shadow-md"
+                        className="mt-3.5 w-full py-2.5 px-3 bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-black text-xs uppercase tracking-wider rounded-xl transition-all duration-200 text-center flex items-center justify-center gap-1.5 shadow-[0_4px_14px_rgba(245,158,11,0.22)] hover:shadow-[0_6px_20px_rgba(245,158,11,0.32)] active:scale-[0.98]"
                       >
-                        View All Tools Hub <ArrowRight size={14} />
+                        <span>View All 28 Tools</span>
+                        <ArrowRight size={13} className="transition-transform group-hover:translate-x-0.5" />
                       </Link>
                     </div>
+
                   </div>
                 </div>
               )}
