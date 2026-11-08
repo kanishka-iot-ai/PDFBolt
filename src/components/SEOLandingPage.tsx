@@ -1,11 +1,12 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
-import { ShieldCheck, Clock, UserX, HelpCircle, CheckCircle, ArrowRight, BookOpen, Layers, Sparkles } from 'lucide-react';
+import { ShieldCheck, Clock, UserX, HelpCircle, CheckCircle, ArrowRight, BookOpen, Layers, Sparkles, Star } from 'lucide-react';
 import { TOOLS, GUIDES, getIcon } from '../constants';
 import { Link, useLocation } from 'react-router-dom';
 import AdSlot from './AdSlot';
 import AdsterraBanner from './AdsterraBanner';
 import DesktopSideRails from './DesktopSideRails';
+import TrustMicroAnchor from './TrustMicroAnchor';
 import { useActiveWork } from '../context/ActiveWorkContext';
 
 interface SEOLandingPageProps {
@@ -142,11 +143,15 @@ const SEOLandingPage: React.FC<SEOLandingPageProps> = ({ tool: toolProp, toolId,
             {tool?.description}
           </p>
 
+          {/* Interactive Review Rating Pill & Trust Anchor */}
+          <div className="mt-2.5 flex justify-center">
+            <TrustMicroAnchor toolId={tool?.id} toolTitle={tool?.title} />
+          </div>
         </div>
       </div>
 
       {/* 2. THE WORKING INTERACTIVE TOOL (Full space when active, flanked with zero-CLS side rails when landing) */}
-      <div className={`w-full flex-grow flex flex-col ${hasActiveWork ? 'h-full overflow-hidden' : 'my-auto justify-center'}`}>
+      <div className={`w-full flex-grow flex flex-col ${hasActiveWork ? 'h-full overflow-hidden' : 'my-auto justify-center py-2 sm:py-4'}`}>
         <DesktopSideRails
           hasActiveWork={hasActiveWork}
           centerWidthClass={hasActiveWork ? 'max-w-full' : 'max-w-4xl'}
@@ -156,20 +161,57 @@ const SEOLandingPage: React.FC<SEOLandingPageProps> = ({ tool: toolProp, toolId,
             <div className="w-full h-full">
               {children}
             </div>
-
-            {/* 3. CENTER HORIZONTAL AD (Frames the bottom of the workbench between the two vertical side rails) */}
-            {!hasActiveWork && (
-              <div className="w-full max-w-4xl mx-auto px-4 mt-1.5 mb-1 shrink-0 flex flex-col items-center justify-center min-h-[90px] md:min-h-[95px]">
-                <AdsterraBanner format="responsive" className="my-1" showLabel={true} />
-              </div>
-            )}
           </div>
         </DesktopSideRails>
       </div>
 
+      {/* 3. SEPARATED SPONSOR BANNER (Generously separated from the workbench with clear padding) */}
+      {!hasActiveWork && (
+        <div className="w-full max-w-4xl mx-auto px-4 mt-4 mb-2 shrink-0 flex flex-col items-center justify-center min-h-[90px] md:min-h-[95px]">
+          <AdsterraBanner format="responsive" className="my-1" showLabel={true} />
+        </div>
+      )}
 
+      {/* 4. DEDICATED COMMUNITY REVIEW & FEEDBACK STRIP */}
+      {!hasActiveWork && (
+        <div className="w-full max-w-4xl mx-auto px-4 my-4 shrink-0">
+          <div className={`p-4 sm:p-5 rounded-2xl border transition-all flex flex-col sm:flex-row items-center justify-between gap-4 ${
+            darkMode ? 'bg-slate-800/40 border-slate-700/60' : 'bg-slate-50/80 border-slate-200/80'
+          }`}>
+            <div className="flex items-center gap-3 text-center sm:text-left">
+              <div className="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center shrink-0 text-amber-500">
+                <Star size={18} fill="currentColor" />
+              </div>
+              <div>
+                <p className="text-xs font-bold text-slate-900 dark:text-white">
+                  Rated 4.9/5 based on 1,420+ verified community ratings
+                </p>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                  Have feedback about {tool?.title || 'this tool'}? Read community reviews or share your experience.
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              <Link
+                to={`/reviews/?tool=${encodeURIComponent(tool?.title || tool?.id || '')}&write=true#write-review`}
+                className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-600 text-slate-950 transition-all shadow-xs flex items-center gap-1.5 cursor-pointer"
+              >
+                <Star size={12} fill="currentColor" /> Write a Review
+              </Link>
+              <Link
+                to={`/reviews/?tool=${encodeURIComponent(tool?.title || tool?.id || '')}`}
+                className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition-colors cursor-pointer ${
+                  darkMode ? 'border-slate-700 hover:bg-slate-700/60 text-slate-300' : 'border-slate-200 hover:bg-slate-100 text-slate-700'
+                }`}
+              >
+                Read Reviews
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
 
-      {/* 4. RELATED PDF TOOLS (Sleek Suggestive Bottom Bar - Only on landing page) */}
+      {/* 5. RELATED PDF TOOLS (Sleek Suggestive Bottom Bar - Only on landing page) */}
       {!hasActiveWork && relatedToolsList.length > 0 && (
         <div className={`border-t px-4 sm:px-6 py-1.5 shrink-0 ${darkMode ? 'border-slate-800/80 bg-slate-900/40 backdrop-blur-md' : 'border-slate-200/80 bg-white/70 backdrop-blur-md'}`}>
           <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">

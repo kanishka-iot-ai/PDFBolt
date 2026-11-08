@@ -35,6 +35,7 @@ const MergeTool: React.FC<MergeToolProps> = ({ darkMode, notify, customHint, all
   const [simultaneousCompressLevel, setSimultaneousCompressLevel] = useState<'balanced' | 'high' | 'extreme'>('balanced');
   const [originalSizeBytes, setOriginalSizeBytes] = useState<number>(0);
   const [outputSizeBytes, setOutputSizeBytes] = useState<number>(0);
+  const [mergedFileName, setMergedFileName] = useState<string>('merged_pdfbolt.pdf');
 
   // Sync active work state
   useEffect(() => {
@@ -411,6 +412,24 @@ const MergeTool: React.FC<MergeToolProps> = ({ darkMode, notify, customHint, all
             className="my-1"
           />
 
+          {/* Inline File Rename Input */}
+          <div className="w-full text-left max-w-md mx-auto">
+            <label htmlFor="merged-filename-input" className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">
+              Output File Name
+            </label>
+            <input
+              id="merged-filename-input"
+              type="text"
+              value={mergedFileName}
+              onChange={(e) => setMergedFileName(e.target.value)}
+              className={`w-full px-3.5 py-2.5 rounded-xl border text-xs font-semibold focus:ring-2 focus:ring-yellow-500 outline-none transition-all ${
+                darkMode
+                  ? 'bg-slate-800/90 border-slate-700 text-white placeholder-slate-500'
+                  : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400'
+              }`}
+            />
+          </div>
+
           <div className="flex flex-col sm:flex-row gap-3 w-full">
             <button
               type="button"
@@ -422,7 +441,7 @@ const MergeTool: React.FC<MergeToolProps> = ({ darkMode, notify, customHint, all
             </button>
             <a
               href={result}
-              download="merged_pdfbolt.pdf"
+              download={mergedFileName.trim().endsWith('.pdf') ? mergedFileName.trim() : `${mergedFileName.trim()}.pdf`}
               onClick={() => notify.success()}
               className="flex-1 py-4 sm:py-5 bg-[#e53935] hover:bg-[#d32f2f] text-white rounded-2xl font-black text-xl shadow-2xl hover:scale-105 transition-all flex items-center justify-center gap-3"
             >

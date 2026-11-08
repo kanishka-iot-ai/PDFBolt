@@ -199,6 +199,22 @@ export const ReviewsPage: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
   const [formBody, setFormBody] = useState('');
   const [formSubmitted, setFormSubmitted] = useState(false);
 
+  // Deep-link query param listener (?tool=... &write=true)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const toolParam = params.get('tool');
+      const writeParam = params.get('write');
+      if (toolParam) {
+        setSearchQuery(toolParam);
+        setFormTool(toolParam);
+      }
+      if (writeParam === 'true' || window.location.hash === '#write-review') {
+        setIsModalOpen(true);
+      }
+    }
+  }, []);
+
   const toggleHelpful = (id: string) => {
     setHelpfulMap(prev => {
       const isCurrentlyHelpful = !!prev[id];
@@ -840,6 +856,19 @@ export const ReviewsPage: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
                         darkMode ? 'bg-slate-800 border-slate-700 text-white' : 'bg-slate-50 border-slate-200'
                       }`}
                     >
+                      {formTool && ![
+                        "Compress PDF to 300KB",
+                        "Merge PDF",
+                        "Flatten PDF for Court",
+                        "Watermark Aadhaar & PAN",
+                        "Combine ID Card to Single Page",
+                        "Compress Signature to 20KB",
+                        "Split PDF",
+                        "Color PDF to B&W",
+                        "Other Tool"
+                      ].includes(formTool) && (
+                        <option value={formTool}>{formTool}</option>
+                      )}
                       <option value="Compress PDF to 300KB">Compress PDF to 300KB</option>
                       <option value="Merge PDF">Merge PDF</option>
                       <option value="Flatten PDF for Court">Flatten PDF for Court</option>

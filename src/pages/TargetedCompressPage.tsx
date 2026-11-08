@@ -9,7 +9,8 @@ import IDCardComposer from '../components/IDCardComposer';
 import { NotifySystem } from '../types';
 import AdsterraBanner from '../components/AdsterraBanner';
 import DesktopSideRails from '../components/DesktopSideRails';
-import { FileText, Cpu, LayoutGrid, HelpCircle, ChevronDown, ShieldCheck } from 'lucide-react';
+import TrustMicroAnchor from '../components/TrustMicroAnchor';
+import { FileText, Cpu, LayoutGrid, HelpCircle, ChevronDown, ShieldCheck, Star } from 'lucide-react';
 
 interface TargetedCompressPageProps {
   pageSlug?: string;
@@ -147,6 +148,11 @@ const TargetedCompressPage: React.FC<TargetedCompressPageProps> = ({ pageSlug: p
           <p className={`text-xs sm:text-sm max-w-2xl mx-auto font-normal ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
             {page.subtitle}
           </p>
+
+          {/* Interactive Review Rating Pill & Trust Anchor */}
+          <div className="mt-2.5 flex justify-center">
+            <TrustMicroAnchor toolTitle={page.h1} />
+          </div>
 
         </div>
       </div>
@@ -636,6 +642,42 @@ const TargetedCompressPage: React.FC<TargetedCompressPageProps> = ({ pageSlug: p
         </div>
       </DesktopSideRails>
 
+      {/* Community Review & Feedback Strip */}
+      <div className="w-full max-w-4xl mx-auto px-4 my-6">
+        <div className={`p-4 sm:p-5 rounded-2xl border transition-all flex flex-col sm:flex-row items-center justify-between gap-4 ${
+          darkMode ? 'bg-slate-800/40 border-slate-700/60' : 'bg-slate-50/80 border-slate-200/80'
+        }`}>
+          <div className="flex items-center gap-3 text-center sm:text-left">
+            <div className="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center shrink-0 text-amber-500">
+              <Star size={18} fill="currentColor" />
+            </div>
+            <div>
+              <p className="text-xs font-bold text-slate-900 dark:text-white">
+                Rated 4.9/5 based on 1,420+ verified community ratings
+              </p>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                Have feedback about {page.h1}? Read community reviews or share your experience.
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <Link
+              to={`/reviews/?tool=${encodeURIComponent(page.h1)}&write=true#write-review`}
+              className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-600 text-slate-950 transition-all shadow-xs flex items-center gap-1.5 cursor-pointer"
+            >
+              <Star size={12} fill="currentColor" /> Write a Review
+            </Link>
+            <Link
+              to={`/reviews/?tool=${encodeURIComponent(page.h1)}`}
+              className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition-colors cursor-pointer ${
+                darkMode ? 'border-slate-700 hover:bg-slate-700/60 text-slate-300' : 'border-slate-200 hover:bg-slate-100 text-slate-700'
+              }`}
+            >
+              Read Reviews
+            </Link>
+          </div>
+        </div>
+      </div>
 
     </div>
   );

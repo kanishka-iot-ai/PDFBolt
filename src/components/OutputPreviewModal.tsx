@@ -318,8 +318,19 @@ export const OutputPreviewModal: React.FC<OutputPreviewModalProps> = ({
                     )}
                     <span className="font-bold text-slate-800 dark:text-slate-200">{formatBytes(outputSizeBytes)}</span>
                     {deltaPct && deltaPct > 0 ? (
-                      <span className="inline-flex items-center gap-0.5 text-[10px] font-black uppercase tracking-wider text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-full border border-emerald-300 dark:border-emerald-800">
-                        <CheckCircle2 size={11} /> {deltaPct}% Smaller
+                      <span className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2.5 py-0.5 rounded-full border border-emerald-300 dark:border-emerald-800">
+                        <svg className="w-3 h-3 -rotate-90 transform" viewBox="0 0 32 32">
+                          <circle cx="16" cy="16" r="12" className="stroke-emerald-200 dark:stroke-emerald-900/60 fill-none" strokeWidth="3.5" />
+                          <circle
+                            cx="16" cy="16" r="12"
+                            className="stroke-emerald-600 dark:stroke-emerald-400 fill-none"
+                            strokeWidth="3.5"
+                            strokeDasharray={75.4}
+                            strokeDashoffset={75.4 - (Math.min(100, deltaPct) / 100) * 75.4}
+                            strokeLinecap="round"
+                          />
+                        </svg>
+                        <span>{deltaPct}% Smaller</span>
                       </span>
                     ) : deltaPct && deltaPct < 0 ? (
                       <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 px-2 py-0.5 rounded-full border border-amber-300 dark:border-amber-800">
