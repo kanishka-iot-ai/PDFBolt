@@ -11,7 +11,7 @@ import { pptToPdf, pdfToPpt } from '../services/pptService';
 import { redactPdf, repairPdf } from '../services/sanitizeService';
 import { comparePdfDocuments } from '../services/compareService';
 import { extractSignatureFromPhoto } from '../services/signatureExtractor';
-import { FileText, Download, CheckCircle2, Camera, Settings2, Eye, EyeOff, X, Image as ImageIcon, Lock, Zap, ArrowRight, Trash2, Plus, Copy, Check, AlertCircle, Target, ShieldCheck, AlertTriangle } from 'lucide-react';
+import { FileText, Download, CheckCircle2, RefreshCw, Camera, Settings2, Eye, EyeOff, X, Image as ImageIcon, Lock, Zap, ArrowRight, Trash2, Plus, Copy, Check, AlertCircle, Target, ShieldCheck, AlertTriangle } from 'lucide-react';
 import { NotifySystem } from '../types';
 
 import ProgressBar from '../components/ProgressBar';
@@ -1965,7 +1965,7 @@ const SimpleTool: React.FC<SimpleToolProps> = ({ title, mode, darkMode, notify, 
         </div>
       ) : (
         /* ── 3. RESULT STATE ── */
-        <div key={resultKey} className="flex flex-col items-center gap-6 max-w-3xl mx-auto w-full p-6 animate-fadeIn">
+        <div key={resultKey} className="flex flex-col items-center gap-3.5 max-w-md mx-auto w-full p-4 sm:p-6 animate-fadeIn text-center">
 
           {/* Circular Compression Meter for Compress Modes */}
           {(mode === 'compress' || isImageTool) && compressionStats && !Array.isArray(result) ? (
@@ -1995,10 +1995,10 @@ const SimpleTool: React.FC<SimpleToolProps> = ({ title, mode, darkMode, notify, 
             </div>
           ) : (
             <>
-              {/* Success Banner */}
-              <div className="flex items-center gap-4 text-green-500 font-black bg-green-50 dark:bg-green-900/20 px-10 py-5 rounded-[2rem] border border-green-100 dark:border-green-800 w-full justify-center">
-                <CheckCircle2 size={32} />
-                <span className="text-2xl">Processing Complete</span>
+              {/* Subtle Inline Status Pill */}
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 text-xs font-bold border border-emerald-500/20 select-none">
+                <CheckCircle2 size={13} className="text-emerald-600 dark:text-emerald-400" />
+                <span>Processing Complete</span>
               </div>
 
               {/* Download Area */}
@@ -2041,9 +2041,9 @@ const SimpleTool: React.FC<SimpleToolProps> = ({ title, mode, darkMode, notify, 
                       setTimeout(() => URL.revokeObjectURL(zipUrl), 1000);
                       notify.success();
                     }}
-                    className="w-full max-w-sm py-4 bg-slate-900 text-white rounded-2xl font-black text-lg shadow-xl hover:scale-105 transition-all flex items-center justify-center gap-3"
+                    className="w-full max-w-sm py-2.5 sm:py-3 px-5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-bold text-xs sm:text-sm shadow-xs transition-all flex items-center justify-center gap-2 cursor-pointer"
                   >
-                    <Download size={24} /> Download All (ZIP)
+                    <Download size={15} /> <span>Download All (ZIP)</span>
                   </button>
                 </div>
               ) : (
@@ -2057,22 +2057,27 @@ const SimpleTool: React.FC<SimpleToolProps> = ({ title, mode, darkMode, notify, 
                   className="my-1"
                 />
 
-                <div className="flex flex-col sm:flex-row gap-4 w-full">
+                <div className="flex flex-col sm:flex-row gap-2.5 w-full pt-1">
                   <button 
                     type="button"
                     onClick={() => setShowPreviewModal(true)} 
-                    className="flex-1 py-3.5 sm:py-4 rounded-xl font-black border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all flex items-center justify-center gap-2 shadow-xs text-sm sm:text-base"
+                    className={`flex-1 py-2.5 sm:py-3 px-4 rounded-xl border text-xs sm:text-sm font-semibold transition-all flex items-center justify-center gap-2 shadow-2xs cursor-pointer ${
+                      darkMode
+                        ? 'border-slate-700 bg-slate-800/90 hover:bg-slate-700 text-slate-200'
+                        : 'border-slate-200 bg-white hover:bg-slate-50 text-slate-700'
+                    }`}
                   >
-                    <Eye size={18} className="text-yellow-600 dark:text-yellow-400" />
+                    <Eye size={15} className="text-amber-500" />
                     <span>Preview Document</span>
                   </button>
                   <a
                     href={result}
                     download={`pdfbolt_${mode}_output.${resultMeta.extension}`}
                     onClick={() => notify.success()}
-                    className="flex-1 flex items-center justify-center gap-3 py-3.5 sm:py-4 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-xl font-black text-base sm:text-lg shadow-xl hover:from-yellow-600 hover:to-orange-600 hover:scale-[1.02] transition-all"
+                    className="flex-1 py-2.5 sm:py-3 px-5 bg-[#e53935] hover:bg-[#d32f2f] text-white rounded-xl font-bold text-xs sm:text-sm shadow-xs hover:shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer"
                   >
-                    <Download size={24} /> Download {resultMeta.label}
+                    <Download size={15} />
+                    <span>Download {resultMeta.label}</span>
                   </a>
                 </div>
                 </>
@@ -2085,14 +2090,12 @@ const SimpleTool: React.FC<SimpleToolProps> = ({ title, mode, darkMode, notify, 
           {(!((mode === 'compress' || isImageTool) && compressionStats && !Array.isArray(result))) && (
             <>
               <button
+                type="button"
                 onClick={clearSelection}
-                className={`w-full py-3 rounded-xl font-black text-xs uppercase tracking-wider border-2 transition-all hover:scale-[1.01] flex items-center justify-center gap-2 ${
-                  darkMode
-                    ? 'border-slate-700 bg-slate-800 text-slate-300 hover:border-yellow-500/60 hover:text-yellow-400'
-                    : 'border-slate-200 bg-slate-50 text-slate-600 hover:border-yellow-400 hover:bg-white hover:text-slate-900'
-                }`}
+                className="inline-flex items-center justify-center gap-1.5 py-1.5 px-3 text-xs font-medium text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 transition-colors cursor-pointer"
               >
-                <FileText size={16} /> Process Another File
+                <RefreshCw size={12} />
+                <span>Process another file</span>
               </button>
 
               {/* Layer 3: Post-Download Non-Intrusive Feedback Prompt */}

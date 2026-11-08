@@ -4,7 +4,7 @@ import { ToolMetadata } from '../types';
 import { getIcon } from '../constants';
 import { ArrowRight } from 'lucide-react';
 
-// Stable pure functions — defined outside component so they never re-allocate on render
+// Stable pure functions : defined outside component so they never re-allocate on render
 const getCategoryStyles = (category: string, darkMode: boolean): string => {
   if (darkMode) {
     return 'hover:border-slate-600 hover:bg-slate-800/80';
@@ -47,7 +47,7 @@ const ToolCard: React.FC<ToolCardProps> = ({ tool, darkMode, compact = false }) 
   const categoryStyle = getCategoryStyles(tool.category, darkMode);
   const iconStyle = getIconStyles(tool.category);
 
-  // Prefetch the route chunk on hover — navigation feels instant on click
+  // Prefetch the route chunk on hover : navigation feels instant on click
   const handlePrefetch = useCallback(() => {
     const prefetch = PREFETCH_MAP[targetPath];
     if (prefetch) prefetch().catch(() => {/* silently ignore network errors */});

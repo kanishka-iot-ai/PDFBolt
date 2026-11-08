@@ -13,7 +13,7 @@ interface PDFThumbnailProps {
 const thumbnailCache = new Map<string, string>();
 const pageCountCache = new Map<string, number>();
 
-// Worker URL set once at module level — not on every render
+// Worker URL set once at module level : not on every render
 let _workerSet = false;
 
 const PDFThumbnail: React.FC<PDFThumbnailProps> = ({ file, className = '', alt = 'PDF Preview', pageNumber = 1, onPageCount }) => {
@@ -40,7 +40,7 @@ const PDFThumbnail: React.FC<PDFThumbnailProps> = ({ file, className = '', alt =
       };
     }
 
-    // Direct image handling — use data URL (not object URL) to allow caching safely
+    // Direct image handling : use data URL (not object URL) to allow caching safely
     if (file.type.startsWith('image/')) {
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -107,7 +107,7 @@ const PDFThumbnail: React.FC<PDFThumbnailProps> = ({ file, className = '', alt =
 
           if (!active) return;
 
-          // Store as data URL — safe to cache without memory leak
+          // Store as data URL : safe to cache without memory leak
           const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
           thumbnailCache.set(cacheKey, dataUrl);
 

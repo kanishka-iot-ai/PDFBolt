@@ -63,7 +63,7 @@ const FileUploader: React.FC<FileUploaderProps> = ({
       await new Promise<void>((resolve) => {
         entry.file(
           (file: File) => { allFiles.push(file); resolve(); },
-          () => resolve() // error callback — skip unreadable files instead of hanging
+          () => resolve() // error callback : skip unreadable files instead of hanging
         );
       });
     } else if (entry.isDirectory) {

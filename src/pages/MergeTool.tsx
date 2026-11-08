@@ -3,7 +3,7 @@ import FileUploader from '../components/FileUploader';
 import { mergeFiles, compressPdfAdvanced } from '../services/pdfService';
 import OutputPreviewModal from '../components/OutputPreviewModal';
 import FileSizeComparisonBadge from '../components/FileSizeComparisonBadge';
-import { FileText, Download, Trash2, ArrowUp, ArrowDown, CheckCircle2, Plus, ArrowRight, AlertTriangle, X, Eye, Zap } from 'lucide-react';
+import { FileText, Download, Trash2, ArrowUp, ArrowDown, CheckCircle2, Plus, ArrowRight, AlertTriangle, X, Eye, Zap, RefreshCw } from 'lucide-react';
 import { NotifySystem } from '../types';
 import ProgressBar from '../components/ProgressBar';
 import { validateFiles, ALLOWED_MIME_TYPES, MAX_FILE_SIZE } from '../utils/fileValidation';
@@ -396,11 +396,12 @@ const MergeTool: React.FC<MergeToolProps> = ({ darkMode, notify, customHint, all
           </div>
         </div>
       ) : (
-        /* Result State */
-        <div key={resultKey} className="flex flex-col items-center gap-6 max-w-xl mx-auto w-full p-6 animate-fadeIn text-center">
-          <div className="flex items-center gap-4 text-green-500 font-black bg-green-50 dark:bg-green-900/20 px-10 py-5 rounded-[2rem] border border-green-100 dark:border-green-800 w-full justify-center">
-            <CheckCircle2 size={32} />
-            <span className="text-2xl">Merge Ready</span>
+        /* Result State - Compact, Anti-Slop, Professional Layout */
+        <div key={resultKey} className="flex flex-col items-center gap-3.5 max-w-md mx-auto w-full p-4 sm:p-6 animate-fadeIn text-center">
+          {/* Subtle Inline Status Pill */}
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 text-xs font-bold border border-emerald-500/20 select-none">
+            <CheckCircle2 size={13} className="text-emerald-600 dark:text-emerald-400" />
+            <span>Documents Merged Successfully</span>
           </div>
 
           {/* Size Comparison Badge */}
@@ -409,11 +410,11 @@ const MergeTool: React.FC<MergeToolProps> = ({ darkMode, notify, customHint, all
             outputBytes={outputSizeBytes}
             darkMode={darkMode}
             isCompressed={enableSimultaneousCompress}
-            className="my-1"
+            className="my-0.5"
           />
 
           {/* Inline File Rename Input */}
-          <div className="w-full text-left max-w-md mx-auto">
+          <div className="w-full text-left">
             <label htmlFor="merged-filename-input" className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">
               Output File Name
             </label>
@@ -422,7 +423,7 @@ const MergeTool: React.FC<MergeToolProps> = ({ darkMode, notify, customHint, all
               type="text"
               value={mergedFileName}
               onChange={(e) => setMergedFileName(e.target.value)}
-              className={`w-full px-3.5 py-2.5 rounded-xl border text-xs font-semibold focus:ring-2 focus:ring-yellow-500 outline-none transition-all ${
+              className={`w-full px-3 py-2 rounded-xl border text-xs font-semibold focus:ring-2 focus:ring-yellow-500 outline-none transition-all ${
                 darkMode
                   ? 'bg-slate-800/90 border-slate-700 text-white placeholder-slate-500'
                   : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400'
@@ -430,37 +431,40 @@ const MergeTool: React.FC<MergeToolProps> = ({ darkMode, notify, customHint, all
             />
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-3 w-full">
+          {/* Compact Dual Action Bar */}
+          <div className="flex flex-col sm:flex-row gap-2.5 w-full pt-1">
             <button
               type="button"
               onClick={() => setShowPreviewModal(true)}
-              className="flex-1 py-4 sm:py-5 border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-900 dark:text-white rounded-2xl font-black text-lg shadow-sm transition-all flex items-center justify-center gap-2"
+              className={`flex-1 py-2.5 sm:py-3 px-4 rounded-xl border text-xs sm:text-sm font-semibold transition-all flex items-center justify-center gap-2 shadow-2xs cursor-pointer ${
+                darkMode
+                  ? 'border-slate-700 bg-slate-800/90 hover:bg-slate-700 text-slate-200'
+                  : 'border-slate-200 bg-white hover:bg-slate-50 text-slate-700'
+              }`}
             >
-              <Eye size={20} className="text-yellow-600 dark:text-yellow-400" />
-              <span>Preview Merged PDF</span>
+              <Eye size={15} className="text-amber-500" />
+              <span>Preview PDF</span>
             </button>
             <a
               href={result}
               download={mergedFileName.trim().endsWith('.pdf') ? mergedFileName.trim() : `${mergedFileName.trim()}.pdf`}
               onClick={() => notify.success()}
-              className="flex-1 py-4 sm:py-5 bg-[#e53935] hover:bg-[#d32f2f] text-white rounded-2xl font-black text-xl shadow-2xl hover:scale-105 transition-all flex items-center justify-center gap-3"
+              className="flex-1 py-2.5 sm:py-3 px-5 bg-[#e53935] hover:bg-[#d32f2f] text-white rounded-xl font-bold text-xs sm:text-sm shadow-xs hover:shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer"
             >
-              <Download size={24} /> Download Merged PDF
+              <Download size={15} />
+              <span>Download PDF</span>
             </a>
           </div>
+
+          {/* Minimal Secondary Reset Action */}
           <button
             type="button"
             onClick={() => { setFiles([]); setResult(null); }}
-            className={`w-full py-3 rounded-xl font-black text-xs uppercase tracking-wider border-2 transition-all hover:scale-[1.01] flex items-center justify-center gap-2 ${
-              darkMode
-                ? 'border-slate-700 bg-slate-800 text-slate-300 hover:border-yellow-500/60 hover:text-yellow-400'
-                : 'border-slate-200 bg-slate-50 text-slate-600 hover:border-yellow-400 hover:bg-white hover:text-slate-900'
-            }`}
+            className="inline-flex items-center justify-center gap-1.5 py-1.5 px-3 text-xs font-medium text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 transition-colors cursor-pointer"
           >
-            <FileText size={16} /> Process Another Merge
+            <RefreshCw size={12} />
+            <span>Process another merge</span>
           </button>
-
-
         </div>
       )}
 

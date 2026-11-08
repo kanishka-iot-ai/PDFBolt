@@ -51,10 +51,10 @@ export const CircularCompressionMeter: React.FC<CircularCompressionMeterProps> =
 
   return (
     <div
-      className={`w-full max-w-xl mx-auto p-6 sm:p-8 rounded-3xl border text-center transition-all shadow-xl ${
+      className={`w-full max-w-md mx-auto p-4 sm:p-6 rounded-2xl border text-center transition-all shadow-sm ${
         darkMode
-          ? 'bg-[#0e1422]/95 border-white/[0.08] shadow-[0_8px_32px_rgba(0,0,0,0.36)]'
-          : 'bg-white border-slate-200/90 shadow-[0_4px_24px_rgba(0,0,0,0.06)]'
+          ? 'bg-[#0e1422]/95 border-white/[0.08]'
+          : 'bg-white border-slate-200/90'
       }`}
     >
       {/* Top Completion Badge */}
@@ -73,7 +73,7 @@ export const CircularCompressionMeter: React.FC<CircularCompressionMeterProps> =
       </div>
 
       {/* Radial Donut Progress Ring */}
-      <div className="relative w-44 h-44 mx-auto my-2 flex items-center justify-center">
+      <div className="relative w-36 h-36 mx-auto my-1 flex items-center justify-center">
         <svg className="w-full h-full -rotate-90 transform" viewBox="0 0 160 160">
           {/* Background Track */}
           <circle
@@ -98,7 +98,7 @@ export const CircularCompressionMeter: React.FC<CircularCompressionMeterProps> =
 
         {/* Center Readout */}
         <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-          <span className="text-4xl font-black font-mono tracking-tight text-slate-900 dark:text-white">
+          <span className="text-3xl font-black font-mono tracking-tight text-slate-900 dark:text-white">
             -{animatedPct}%
           </span>
           <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 mt-0.5">
@@ -108,10 +108,10 @@ export const CircularCompressionMeter: React.FC<CircularCompressionMeterProps> =
       </div>
 
       {/* Two-Pillar Metric Comparison Cards */}
-      <div className="grid grid-cols-2 gap-3 my-5">
+      <div className="grid grid-cols-2 gap-2.5 my-3.5">
         {/* Original */}
         <div
-          className={`p-3.5 rounded-2xl border text-left transition-colors ${
+          className={`p-2.5 sm:p-3 rounded-xl border text-left transition-colors ${
             darkMode ? 'bg-slate-800/60 border-slate-700/80' : 'bg-slate-50 border-slate-200/80'
           }`}
         >
@@ -125,7 +125,7 @@ export const CircularCompressionMeter: React.FC<CircularCompressionMeterProps> =
 
         {/* Compressed */}
         <div
-          className={`p-3.5 rounded-2xl border text-left transition-colors ${
+          className={`p-2.5 sm:p-3 rounded-xl border text-left transition-colors ${
             darkMode
               ? 'bg-emerald-950/20 border-emerald-800/40 text-emerald-300'
               : 'bg-emerald-50/80 border-emerald-200 text-emerald-800'
@@ -166,44 +166,44 @@ export const CircularCompressionMeter: React.FC<CircularCompressionMeterProps> =
         />
       </div>
 
-      {/* Action Buttons */}
-      <div className="space-y-2.5">
+      {/* Action Buttons - Compact Anti-Slop Layout */}
+      <div className="space-y-2 w-full pt-1">
         <button
           type="button"
           onClick={handleDownloadClick}
-          className="w-full py-4 bg-yellow-500 hover:bg-yellow-400 text-slate-950 font-black text-sm uppercase tracking-wider rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2 transform hover:-translate-y-0.5 active:scale-[0.99]"
+          className="w-full py-2.5 sm:py-3 px-5 bg-[#e53935] hover:bg-[#d32f2f] text-white font-bold text-xs sm:text-sm rounded-xl shadow-xs hover:shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer"
         >
-          <Download size={18} />
+          <Download size={15} />
           <span>Download Compressed PDF ({formatFileSize(compressedBytes)})</span>
         </button>
 
-        <div className="flex gap-2.5">
+        <div className="flex gap-2 w-full">
           {onPreview && (
             <button
               type="button"
               onClick={onPreview}
-              className={`flex-1 py-3 rounded-xl border text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+              className={`flex-1 py-2 px-3 rounded-lg border text-xs font-semibold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
                 darkMode
                   ? 'border-slate-700 bg-slate-800/80 text-slate-300 hover:bg-slate-700 hover:text-white'
                   : 'border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100'
               }`}
             >
-              <Eye size={14} />
-              <span>Preview Quality</span>
+              <Eye size={13} className="text-amber-500" />
+              <span>Preview Document</span>
             </button>
           )}
 
           <button
             type="button"
             onClick={onReset}
-            className={`flex-1 py-3 rounded-xl border text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+            className={`flex-1 py-2 px-3 rounded-lg border text-xs font-semibold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
               darkMode
                 ? 'border-slate-700 bg-slate-800/80 text-slate-300 hover:bg-slate-700 hover:text-white'
                 : 'border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100'
             }`}
           >
-            <RefreshCw size={13} />
-            <span>Compress Another</span>
+            <RefreshCw size={12} />
+            <span>Compress another</span>
           </button>
         </div>
       </div>

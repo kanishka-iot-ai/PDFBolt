@@ -487,7 +487,7 @@ const CompressTool: React.FC<CompressToolProps> = ({ darkMode, notify }) => {
                 <button
                   type="button"
                   onClick={handleCompress}
-                  className="w-full py-5 bg-yellow-500 hover:bg-yellow-400 text-slate-950 font-black text-base uppercase tracking-wider rounded-2xl shadow-xl transition-all flex items-center justify-center gap-2 transform hover:-translate-y-0.5"
+                  className="w-full py-3 sm:py-3.5 bg-yellow-500 hover:bg-yellow-400 text-slate-950 font-bold text-xs sm:text-sm uppercase tracking-wider rounded-xl shadow-md transition-all flex items-center justify-center gap-2 transform hover:-translate-y-0.5 cursor-pointer"
                 >
                   Compress PDF Now <ArrowRight size={18} />
                 </button>

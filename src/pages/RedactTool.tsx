@@ -430,44 +430,47 @@ const RedactTool: React.FC<RedactToolProps> = ({ darkMode, notify }) => {
                 </div>
             )}
 
-            {/* Completed Output Banner */}
+            {/* Completed Output Banner - Compact, Anti-Slop */}
             {resultBlobUrl && (
-                <div className={`p-8 rounded-3xl border shadow-xl flex flex-col items-center gap-6 text-center animate-fadeIn ${
-                    darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-green-100'
-                }`}>
-                    <div className="w-16 h-16 rounded-full bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 flex items-center justify-center">
-                        <CheckCircle2 size={36} />
+                <div className="flex flex-col items-center gap-3.5 max-w-md mx-auto w-full p-4 sm:p-6 animate-fadeIn text-center">
+                    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 text-xs font-bold border border-emerald-500/20 select-none">
+                        <CheckCircle2 size={13} className="text-emerald-600 dark:text-emerald-400" />
+                        <span>Document Redacted & Sanitized</span>
                     </div>
-                    <div className="space-y-1">
-                        <h3 className="text-2xl font-black">Document Redacted & Sanitized</h3>
-                        <p className="text-sm text-slate-500 max-w-md">
-                            All targeted sensitive text vectors, character glyphs, and metadata packets have been permanently eradicated.
-                        </p>
-                    </div>
-                    <div className="flex flex-wrap gap-4 justify-center">
+                    <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm">
+                        Sensitive text vectors, characters, and metadata packets were permanently removed.
+                    </p>
+                    <div className="flex flex-col sm:flex-row gap-2.5 w-full pt-1">
                         <a
                             href={resultBlobUrl}
                             download={`pdfbolt_redacted_${file.name}`}
-                            className="px-8 py-4 bg-gradient-to-r from-yellow-500 to-orange-500 text-white font-black rounded-2xl text-lg shadow-xl hover:scale-105 transition-all flex items-center gap-3"
+                            className="w-full py-2.5 sm:py-3 px-5 bg-[#e53935] hover:bg-[#d32f2f] text-white rounded-xl font-bold text-xs sm:text-sm shadow-xs hover:shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer"
                         >
-                            <Download size={22} /> Download Redacted PDF
+                            <Download size={15} />
+                            <span>Download Redacted PDF</span>
                         </a>
+                    </div>
+                    <div className="flex items-center justify-center gap-3 pt-1">
                         <button
+                            type="button"
                             onClick={() => setResultBlobUrl(null)}
-                            className="px-6 py-4 rounded-2xl font-bold border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-all"
+                            className="inline-flex items-center justify-center gap-1.5 py-1.5 px-3 text-xs font-medium text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 transition-colors cursor-pointer"
                         >
-                            Redact Another Item
+                            <span>Redact another item</span>
                         </button>
+                        <span className="text-slate-300 dark:text-slate-700">|</span>
                         <button
+                            type="button"
                             onClick={() => {
                                 setFile(null);
                                 setResultBlobUrl(null);
                                 setRedactions([]);
                                 setDetectedItems([]);
                             }}
-                            className="px-6 py-4 rounded-2xl font-bold border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-all flex items-center gap-2"
+                            className="inline-flex items-center justify-center gap-1.5 py-1.5 px-3 text-xs font-medium text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 transition-colors cursor-pointer"
                         >
-                            <FileText size={16} /> Process Another File
+                            <RefreshCw size={12} />
+                            <span>Process another file</span>
                         </button>
                     </div>
                 </div>

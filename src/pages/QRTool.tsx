@@ -353,12 +353,12 @@ const QRTool: React.FC<QRToolProps> = ({ darkMode, notify }) => {
             </div>
 
             {/* Privacy & Retention Disclosure */}
-            <div className={`p-8 rounded-[2rem] border-2 border-green-500/30 bg-green-500/5 transition-all ${darkMode ? 'bg-green-900/10' : 'bg-green-50'}`}>
-              <div className="flex items-center gap-3 mb-2">
-                <ShieldCheck className="text-green-600" size={24} />
-                <h2 className={`font-black uppercase text-sm tracking-tight ${darkMode ? 'text-green-400' : 'text-green-800'}`}>Temporary Cloud Storage Policy</h2>
+            <div className={`p-3.5 rounded-xl border border-emerald-500/20 bg-emerald-500/5 transition-all ${darkMode ? 'bg-emerald-950/20' : 'bg-emerald-50/50'}`}>
+              <div className="flex items-center gap-2 mb-1">
+                <ShieldCheck className="text-emerald-600" size={16} />
+                <h2 className={`font-bold text-xs ${darkMode ? 'text-emerald-400' : 'text-emerald-800'}`}>Temporary Cloud Storage Policy</h2>
               </div>
-              <p className="text-xs font-bold leading-relaxed text-green-900/70 dark:text-green-400/70">
+              <p className="text-xs leading-relaxed text-slate-600 dark:text-slate-400">
                 This file is stored temporarily and will be automatically deleted when the share expires. The QR code links to a private, unguessable access point with signed URL protection.
               </p>
             </div>
@@ -366,7 +366,7 @@ const QRTool: React.FC<QRToolProps> = ({ darkMode, notify }) => {
 
           {/* QR Display Panel */}
           <div className="space-y-6">
-            <div className={`p-10 rounded-[3rem] border shadow-2xl text-center relative overflow-hidden transition-all ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'}`}>
+            <div className={`p-6 sm:p-8 rounded-2xl border shadow-lg text-center relative overflow-hidden transition-all ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'}`}>
               {isRevoked ? (
                 <div className="py-16 space-y-4">
                   <div className="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center mx-auto border border-red-500/20">
@@ -408,13 +408,13 @@ const QRTool: React.FC<QRToolProps> = ({ darkMode, notify }) => {
                       </div>
                     )}
 
-                    <div className="flex gap-3">
+                    <div className="flex gap-2.5">
                       <button
                         type="button"
                         onClick={() => setShowPreview(true)}
-                        className="flex-1 py-3.5 bg-slate-100 dark:bg-slate-900 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-yellow-50 dark:hover:bg-yellow-900/20 transition-all flex items-center justify-center gap-2"
+                        className="flex-1 py-2.5 bg-slate-100 dark:bg-slate-900 rounded-xl font-semibold text-xs hover:bg-yellow-50 dark:hover:bg-yellow-900/20 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
                       >
-                        <Eye size={16} /> Preview
+                        <Eye size={14} className="text-amber-500" /> <span>Preview</span>
                       </button>
                       <button
                         type="button"
@@ -424,18 +424,18 @@ const QRTool: React.FC<QRToolProps> = ({ darkMode, notify }) => {
                           a.download = `pdfbolt_qr_share.png`;
                           a.click();
                         }}
-                        className="flex-1 py-3.5 bg-slate-100 dark:bg-slate-900 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-yellow-50 dark:hover:bg-yellow-900/20 transition-all flex items-center justify-center gap-2"
+                        className="flex-1 py-2.5 bg-slate-100 dark:bg-slate-900 rounded-xl font-semibold text-xs hover:bg-yellow-50 dark:hover:bg-yellow-900/20 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
                       >
-                        <Download size={16} /> Export
+                        <Download size={14} /> <span>Export</span>
                       </button>
                     </div>
 
                     <button
                       type="button"
                       onClick={copyLink}
-                      className={`w-full py-4 rounded-xl font-black text-sm uppercase tracking-widest transition-all flex items-center justify-center gap-2 ${copied ? 'bg-green-600 text-white' : 'bg-slate-900 text-white'}`}
+                      className={`w-full py-2.5 sm:py-3 rounded-xl font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 cursor-pointer ${copied ? 'bg-emerald-600 text-white' : 'bg-slate-900 text-white'}`}
                     >
-                      {copied ? <><Check size={18} /> Link Copied</> : <><Copy size={18} /> Copy Share Link</>}
+                      {copied ? <><Check size={15} /> <span>Link Copied</span></> : <><Copy size={15} /> <span>Copy Share Link</span></>}
                     </button>
 
                     {/* Instant User Revocation Button */}
@@ -443,9 +443,9 @@ const QRTool: React.FC<QRToolProps> = ({ darkMode, notify }) => {
                       type="button"
                       onClick={handleRevokeShare}
                       disabled={isRevoking}
-                      className="w-full py-3.5 bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/30 rounded-xl font-black text-xs uppercase tracking-widest transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                      className="w-full py-2 bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 border border-red-500/30 rounded-xl font-semibold text-xs transition-all flex items-center justify-center gap-1.5 disabled:opacity-50 cursor-pointer"
                     >
-                      {isRevoking ? <RefreshCw size={16} className="animate-spin" /> : <><Trash2 size={16} /> Revoke Share & Delete File</>}
+                      {isRevoking ? <RefreshCw size={13} className="animate-spin" /> : <><Trash2 size={13} /> <span>Revoke Share & Delete File</span></>}
                     </button>
 
                     {/* Share Another File Button */}

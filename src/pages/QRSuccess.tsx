@@ -313,19 +313,18 @@ const QRSuccess: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
   // State: Verified & Ready for Download
   return (
     <div className="min-h-[80vh] flex flex-col items-center justify-start sm:justify-center px-4 sm:px-6 py-6 sm:py-12 pb-36">
-      <div className={`max-w-xl w-full p-6 sm:p-12 rounded-3xl sm:rounded-[3.5rem] border text-center shadow-2xl animate-fadeIn ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'}`}>
-        <div className="inline-flex p-4 sm:p-6 rounded-full bg-green-50 dark:bg-green-900/20 mb-6 sm:mb-8 border-4 border-green-100 dark:border-green-800 animate-pulse">
-          <CheckCircle className="text-green-500 w-12 h-12 sm:w-16 sm:h-16" />
+      <div className={`max-w-md w-full p-6 sm:p-8 rounded-2xl border text-center shadow-lg animate-fadeIn ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'}`}>
+        <div className="inline-flex p-3 rounded-full bg-emerald-50 dark:bg-emerald-900/20 mb-4 border border-emerald-200 dark:border-emerald-800">
+          <CheckCircle className="text-emerald-500 w-8 h-8" />
         </div>
 
-
-        <h1 className={`text-2xl sm:text-4xl font-black mb-3 sm:mb-4 ${darkMode ? 'text-white' : 'text-slate-900'}`}>Secure Document Ready</h1>
-        <p className={`text-base sm:text-lg font-medium mb-6 sm:mb-8 leading-relaxed ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+        <h1 className={`text-xl sm:text-2xl font-black mb-2 ${darkMode ? 'text-white' : 'text-slate-900'}`}>Secure Document Ready</h1>
+        <p className={`text-xs sm:text-sm font-medium mb-5 leading-relaxed ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
           You have established a secure link to download <span className="text-yellow-600 font-bold">{filename}</span>.
         </p>
 
         {/* Document Info Card */}
-        <div className={`p-6 rounded-2xl mb-8 text-left border ${darkMode ? 'bg-slate-900 border-slate-700' : 'bg-slate-50 border-slate-200'}`}>
+        <div className={`p-4 rounded-xl mb-5 text-left border ${darkMode ? 'bg-slate-900 border-slate-700' : 'bg-slate-50 border-slate-200'}`}>
           <div className="flex items-center gap-3 mb-2">
             <FileText className="text-yellow-600" size={20} />
             <span className="font-black text-sm truncate">{filename}</span>
@@ -345,32 +344,32 @@ const QRSuccess: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
 
         {/* Download Button */}
         {downloadUrl && (
-          <div className="mb-8">
+          <div className="mb-4">
             <a
               href={downloadUrl}
               download={filename}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full py-5 sm:py-6 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-3xl font-black text-xl sm:text-2xl shadow-xl hover:from-yellow-600 hover:to-orange-600 transition-all flex items-center justify-center gap-4 active:scale-95"
+              className="w-full py-2.5 sm:py-3 px-5 bg-[#e53935] hover:bg-[#d32f2f] text-white rounded-xl font-bold text-xs sm:text-sm shadow-xs hover:shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer"
             >
-              <Download size={28} /> Download PDF
+              <Download size={15} /> <span>Download PDF</span>
             </a>
           </div>
         )}
 
         {/* Retention Policy Notice */}
-        <div className={`p-5 sm:p-6 rounded-2xl text-left mb-8 border-2 border-green-500/20 ${darkMode ? 'bg-green-950/20' : 'bg-green-50/50'}`}>
-          <div className="flex items-start gap-3">
-            <ShieldCheck className="text-green-600 shrink-0 w-5 h-5 mt-0.5" />
-            <p className="text-xs font-bold leading-relaxed text-green-900/70 dark:text-green-400/70">
+        <div className={`p-3.5 rounded-xl text-left mb-5 border border-emerald-500/20 ${darkMode ? 'bg-emerald-950/20' : 'bg-emerald-50/50'}`}>
+          <div className="flex items-start gap-2.5">
+            <ShieldCheck className="text-emerald-600 shrink-0 w-4 h-4 mt-0.5" />
+            <p className="text-xs font-medium leading-relaxed text-emerald-900/80 dark:text-emerald-300/80">
               This file is stored temporarily and will be automatically deleted when the share expires.
             </p>
           </div>
         </div>
 
-        <div className="grid gap-4">
-          <Link to="/" className="flex items-center justify-center gap-3 py-4 bg-slate-900 text-white rounded-2xl font-black text-sm uppercase tracking-widest shadow-xl hover:bg-slate-800 transition-all">
-            Explore All PDF Tools <ArrowRight size={16} />
+        <div className="grid gap-2.5">
+          <Link to="/" className="flex items-center justify-center gap-2 py-2.5 px-4 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-semibold text-xs sm:text-sm shadow-xs transition-all cursor-pointer">
+            <span>Explore All PDF Tools</span> <ArrowRight size={14} />
           </Link>
           <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em]">PDFBolt Cloud Storage Engine • Encrypted Direct Stream</p>
         </div>
