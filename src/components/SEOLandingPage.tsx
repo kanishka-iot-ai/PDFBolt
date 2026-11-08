@@ -152,14 +152,14 @@ const SEOLandingPage: React.FC<SEOLandingPageProps> = ({ tool: toolProp, toolId,
       </div>
 
       {/* 2. THE WORKING INTERACTIVE TOOL (Full space when active, flanked with zero-CLS side rails when landing) */}
-      <div className={`w-full flex-grow flex flex-col justify-center items-center overflow-hidden ${hasActiveWork ? 'h-full' : 'my-auto py-1 sm:py-2'}`}>
+      <div className={`w-full flex-grow flex flex-col min-h-0 ${hasActiveWork ? 'h-full overflow-hidden' : 'my-auto justify-center items-center py-1 sm:py-2 overflow-hidden'}`}>
         <DesktopSideRails
           hasActiveWork={hasActiveWork}
           centerWidthClass={hasActiveWork ? 'max-w-full' : 'max-w-4xl'}
-          className={hasActiveWork ? '!px-0 w-full h-full' : 'my-auto'}
+          className={hasActiveWork ? '!px-0 w-full h-full min-h-0' : 'my-auto'}
         >
-          <div className={`w-full flex flex-col items-center justify-center ${hasActiveWork ? 'h-full p-0' : 'p-0 sm:p-1'}`}>
-            <div className="w-full">
+          <div className={`w-full ${hasActiveWork ? 'h-full min-h-0 p-0 flex flex-col' : 'flex flex-col items-center justify-center p-0 sm:p-1'}`}>
+            <div className={`w-full ${hasActiveWork ? 'h-full min-h-0 flex flex-col' : ''}`}>
               {children}
             </div>
           </div>

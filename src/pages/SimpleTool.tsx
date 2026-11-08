@@ -918,7 +918,7 @@ const SimpleTool: React.FC<SimpleToolProps> = ({ title, mode, darkMode, notify, 
   };
 
   return (
-    <div className="w-full h-full text-center animate-fadeIn">
+    <div className="w-full h-full min-h-0 text-center animate-fadeIn flex flex-col">
       {!file && multiFiles.length === 0 ? (
         <div className="max-w-4xl mx-auto px-2 sm:px-4 py-2 sm:py-3 space-y-3">
           {targetSizeHint && (
@@ -940,7 +940,7 @@ const SimpleTool: React.FC<SimpleToolProps> = ({ title, mode, darkMode, notify, 
         </div>
       ) : !result ? (
         /* ── 2-COLUMN FULL-SCREEN WORKSPACE (iLovePDF Style) ── */
-        <div className="w-full h-full flex flex-col lg:flex-row overflow-hidden text-left bg-[#f4f5f8] dark:bg-slate-950">
+        <div className="w-full h-full min-h-0 flex flex-col lg:flex-row overflow-hidden text-left bg-[#f4f5f8] dark:bg-slate-950">
 
           {/* LEFT EXPANSIVE CANVAS */}
           <div className="flex-grow flex flex-col justify-between relative bg-[#f4f5f8] dark:bg-slate-900/80 overflow-y-auto p-4 sm:p-6 lg:p-8">
@@ -1934,7 +1934,7 @@ const SimpleTool: React.FC<SimpleToolProps> = ({ title, mode, darkMode, notify, 
             </div>
 
             {/* Sidebar Bottom CTA Action Button */}
-            <div className="p-4 sm:p-5 pt-3 sm:pt-4 border-t border-slate-100 dark:border-slate-700/60 bg-white dark:bg-slate-800 shrink-0 sticky bottom-0 z-10">
+            <div className="p-3.5 sm:p-4 border-t border-slate-200/80 dark:border-slate-700/80 bg-white dark:bg-slate-800 shrink-0 sticky bottom-0 z-10 shadow-lg">
               {inputError && !needsPageInput && !needsPassword && (
                 <div className="mb-3 p-3 rounded-xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 text-xs font-bold text-red-600 dark:text-red-300 flex items-center gap-2 animate-fadeIn">
                   <AlertCircle size={16} className="shrink-0" />

@@ -148,7 +148,7 @@ const MergeTool: React.FC<MergeToolProps> = ({ darkMode, notify, customHint, all
   };
 
   return (
-    <div className="w-full h-full text-center animate-fadeIn">
+    <div className="w-full h-full min-h-0 text-center animate-fadeIn flex flex-col">
       {/* Error notification banner */}
       {errorMessage && (
         <div className="max-w-3xl mx-auto my-4 p-4 rounded-2xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900 text-red-900 dark:text-red-200 flex items-center justify-between gap-3 animate-slideDown">
@@ -185,7 +185,7 @@ const MergeTool: React.FC<MergeToolProps> = ({ darkMode, notify, customHint, all
         </div>
       ) : !result ? (
         /* ── 2-COLUMN FULL-SCREEN WORKSPACE ── */
-        <div className="w-full h-full flex flex-col lg:flex-row overflow-hidden text-left bg-[#f4f5f8] dark:bg-slate-950">
+        <div className="w-full h-full min-h-0 flex flex-col lg:flex-row overflow-hidden text-left bg-[#f4f5f8] dark:bg-slate-950">
 
           {/* LEFT EXPANSIVE CANVAS */}
           <div className="flex-grow flex flex-col justify-between relative bg-[#f4f5f8] dark:bg-slate-900/80 overflow-y-auto p-4 sm:p-6 lg:p-8">
@@ -372,7 +372,7 @@ const MergeTool: React.FC<MergeToolProps> = ({ darkMode, notify, customHint, all
             </div>
 
             {/* Sidebar Bottom CTA Action Button */}
-            <div className="p-4 sm:p-5 pt-3 sm:pt-4 border-t border-slate-100 dark:border-slate-700/60 bg-white dark:bg-slate-800 shrink-0 sticky bottom-0 z-10">
+            <div className="p-3.5 sm:p-4 border-t border-slate-200/80 dark:border-slate-700/80 bg-white dark:bg-slate-800 shrink-0 sticky bottom-0 z-10 shadow-lg">
               {processing ? (
                 <ProgressBar
                   progress={progress}
